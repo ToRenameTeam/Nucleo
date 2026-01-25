@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "private": true,
+  "type": "module",
   "scripts": {
+    "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "dev:users": "pnpm --filter @nucleo/users-service dev",
@@ -13,9 +15,14 @@
   "license": "ISC",
   "packageManager": "pnpm@10.28.1",
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/eslint": "^9.6.1",
     "@types/node": "^25.0.10",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.53.1"
   }
 }
