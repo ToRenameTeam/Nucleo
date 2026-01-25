@@ -1,2 +1,5 @@
 packages:
-  - 'users-service'
+  - users-service
+
+onlyBuiltDependencies:
+  - esbuild
