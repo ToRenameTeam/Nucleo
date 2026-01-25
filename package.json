@@ -4,7 +4,8 @@
   "description": "",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:users": "pnpm --filter @nucleo/users-service dev",
+    "start:users": "pnpm --filter @nucleo/users-service start"
   },
   "author": "",
   "license": "ISC",
