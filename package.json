@@ -4,6 +4,8 @@
   "description": "",
   "private": true,
   "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "dev:users": "pnpm --filter @nucleo/users-service dev",
     "start:users": "pnpm --filter @nucleo/users-service start"
   },
@@ -12,6 +14,7 @@
   "packageManager": "pnpm@10.28.1",
   "devDependencies": {
     "@types/node": "^25.0.10",
+    "prettier": "^3.8.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
