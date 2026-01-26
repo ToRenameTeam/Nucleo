@@ -1,7 +1,11 @@
 # Contains version catalog for dependencies
 [versions]
 kotlin = "2.2.20"
+kotest = "6.1.1"
 ktfmt = "0.18.0" # cannot use latest version (0.25.0 at the moment) due to version conflicts with kotlin-dsl. This is getting ridiculous...
+
+[libraries]
+kotest = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
