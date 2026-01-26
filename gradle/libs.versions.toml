@@ -1,6 +1,6 @@
 # Contains version catalog for dependencies
 [versions]
-kotlin = "2.3.0"
+kotlin = "2.2.20"
 ktfmt = "0.18.0" # cannot use latest version (0.25.0 at the moment) due to version conflicts with kotlin-dsl. This is getting ridiculous...
 
 [plugins]
