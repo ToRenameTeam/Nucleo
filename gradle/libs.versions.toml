@@ -1,0 +1,6 @@
+# Contains version catalog for dependencies
+[versions]
+kotlin = "2.3.0"
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
