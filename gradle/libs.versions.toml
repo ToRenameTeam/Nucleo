@@ -3,10 +3,14 @@
 kotlin = "2.2.20"
 kotest = "6.1.1"
 ktfmt = "0.18.0" # cannot use latest version (0.25.0 at the moment) due to version conflicts with kotlin-dsl. This is getting ridiculous...
+ktor = "3.4.0"
 
 [libraries]
 kotest = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
