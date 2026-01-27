@@ -13,9 +13,8 @@ RUN ./gradlew :appointments-service:build -x test --no-daemon
 FROM eclipse-temurin:22-jre-alpine
 WORKDIR /app
 
-COPY --from=build /app/appointments-service/build/libs/*.jar app.jar
-COPY --from=build /app/appointments-service/build/classes/kotlin/main /app/classes
+COPY --from=build /app/appointments-service/build/libs/*-all.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-cp", "app.jar:classes", "it.nucleo.MainKt"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
