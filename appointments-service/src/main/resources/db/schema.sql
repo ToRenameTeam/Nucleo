@@ -1,0 +1,20 @@
+-- Create availabilities table
+CREATE TABLE IF NOT EXISTS availabilities (
+    availability_id VARCHAR(50) PRIMARY KEY,
+    doctor_id VARCHAR(50) NOT NULL,
+    facility_id VARCHAR(50) NOT NULL,
+    service_type_id VARCHAR(50) NOT NULL,
+    start_date_time TIMESTAMP NOT NULL,
+    duration_minutes INTEGER NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    CHECK (duration_minutes > 0),
+    CHECK (status IN ('AVAILABLE', 'BOOKED', 'CANCELLED'))
+);
+
+-- Create indices for common queries
+CREATE INDEX idx_availabilities_doctor_id ON availabilities(doctor_id);
+CREATE INDEX idx_availabilities_facility_id ON availabilities(facility_id);
+CREATE INDEX idx_availabilities_service_type_id ON availabilities(service_type_id);
+CREATE INDEX idx_availabilities_status ON availabilities(status);
+CREATE INDEX idx_availabilities_start_date_time ON availabilities(start_date_time);
+CREATE INDEX idx_availabilities_doctor_date ON availabilities(doctor_id, start_date_time);
