@@ -22,6 +22,9 @@ dependencies {
 
     // DateTime
     implementation(libs.kotlinx.datetime)
+    
+    // Logging
+    implementation(libs.logback)
 }
 
 application {
