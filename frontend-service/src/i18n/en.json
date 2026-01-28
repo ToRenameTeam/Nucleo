@@ -1,0 +1,407 @@
+{
+  "app": {
+    "title": "Nucleo"
+  },
+  "login": {
+    "subtitle": "Who is using the app?",
+    "addProfile": "Add"
+  },
+  "topbar": {
+    "notifications": "Notifications",
+    "user": "Main User",
+    "languageSelectorAria": "Change language to {lang}",
+    "italianSelectedAria": "Italian language selected",
+    "selectItalianAria": "Select Italian language",
+    "englishSelectedAria": "English language selected",
+    "selectEnglishAria": "Select English language",
+    "userMenuAria": "User menu for {user}",
+    "userProfileAria": "Profile of {user}",
+    "unread": "unread",
+    "notification": "notification"
+  },
+  "userMenu": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "tabs": {
+    "home": "Home",
+    "documents": "Documents",
+    "health": "Health",
+    "calendar": "Calendar",
+    "settings": "Settings"
+  },
+  "tags": {
+    "all": "All",
+    "toRead": "To Read",
+    "folder": "Folder"
+  },
+  "documents": {
+    "title": "Document Archive",
+    "subtitle": "15 documents",
+    "documentComparison": "Compare Documents",
+    "searchPlaceholder": "Search documents, symptoms, doctors...",
+    "noResults": "No documents found",
+    "showBarcode": "Show Code",
+    "prescriptionCode": "Prescription Code",
+    "prescriptionCodeSubtitle": "Show this code at the pharmacy or testing center",
+    "issuedOn": "Issued on",
+    "expiresIn": "Expires {days} days from issue date",
+    "barcodeInstruction": "Present this barcode to pick up medications or book the prescribed visit",
+    "barcodeNotAvailable": "Barcode not available",
+    "usedOn": "Used on {date}",
+    "expiredOn": "Expired on {date}",
+    "downloadBarcode": "Download Barcode",
+    "close": "Close",
+    "selectDocument": "Select Document",
+    "selection": {
+      "selectMode": "Select documents",
+      "cancel": "Cancel selection"
+    },
+    "batch": {
+      "documentSelected": "document selected",
+      "documentsSelected": "documents selected",
+      "all": "All",
+      "downloadAll": "Download all",
+      "deselectAll": "Deselect all"
+    },
+    "dateRange": {
+      "selectRange": "Filter by date",
+      "from": "From",
+      "to": "To",
+      "quickSelect": "Quick select",
+      "customRange": "Custom range",
+      "apply": "Apply",
+      "lastMonth": "Last month",
+      "last3Months": "Last 3 months",
+      "last6Months": "Last 6 months",
+      "lastYear": "Last year",
+      "clearRange": "Clear filter"
+    },
+    "comparison": {
+      "title": "Compare Documents",
+      "subtitle": "Select two different documents to compare",
+      "selectDocument": "Select document",
+      "availableDocuments": "Available documents",
+      "selectPlaceholder": "Select a document",
+      "page": "Page {current} of {total}",
+      "date": "Date:",
+      "doctor": "Doctor:",
+      "hospital": "Hospital:",
+      "description": "Description:",
+      "tags": "Tags:",
+      "close": "Close"
+    },
+    "tags": {
+      "all": "All",
+      "toRead": "To Read",
+      "cardiology": "Cardiology"
+    }
+  },
+  "calendar": {
+    "title": "Calendar",
+    "subtitle": "Your family's shared calendar",
+    "newAppointment": "New Appointment",
+    "appointments": "Appointments",
+    "noAppointments": "No appointments found",
+    "today": "Today",
+    "month": "Month",
+    "week": "Week",
+    "categories": {
+      "all": "All",
+      "cardiologia": "Cardiology",
+      "analisi": "Analysis",
+      "pediatria": "Pediatrics"
+    },
+    "tags": {
+      "all": "All",
+      "health": "Health",
+      "work": "Work",
+      "family": "Family"
+    }
+  },
+  "appointments": {
+    "editAppointment": "Edit appointment",
+    "cancelAppointment": "Cancel appointment"
+  },
+  "home": {
+    "uploadDocument": "Upload Document",
+    "newAppointment": "Book Visit",
+    "upcomingAppointments": "Upcoming Appointments",
+    "noAppointments": "No scheduled appointments",
+    "recentDocuments": "Recent Documents",
+    "searchHint": "Try: \"back pain\", \"chest pain\" or \"Marco's blood tests\"",
+    "quickOverview": "My Widgets"
+  },
+  "appointmentBooking": {
+    "title": "Book a Visit",
+    "searchPlaceholder": "Search visit type...",
+    "selectVisit": "Select visit type first",
+    "loadingAvailability": "Searching availability...",
+    "selectDateTime": "Select date and time",
+    "selectDate": "Select a date first",
+    "selectTime": "Select a time",
+    "customDateLabel": "Search availability from a specific date:",
+    "confirm": "Confirm Booking",
+    "cancel": "Cancel",
+    "loadMoreDates": "View later dates",
+    "loadPreviousDates": "View earlier dates",
+    "detailsTitle": "Appointment Details",
+    "doctor": "Doctor",
+    "location": "Location",
+    "visitTypes": {
+      "cardiology": "Cardiology Visit",
+      "dermatology": "Dermatology Visit",
+      "general": "General Medical Visit",
+      "ophthalmology": "Ophthalmology Visit",
+      "orthopedics": "Orthopedic Visit",
+      "pediatrics": "Pediatric Visit",
+      "gynecology": "Gynecology Visit",
+      "neurology": "Neurology Visit",
+      "psychiatry": "Psychiatry Visit",
+      "physiotherapy": "Physiotherapy Session",
+      "bloodTest": "Blood Test",
+      "ecg": "Electrocardiogram",
+      "ultrasound": "Ultrasound",
+      "xray": "X-Ray"
+    }
+  },
+  "documentModal": {
+    "descriptionLabel": "Report content description:",
+    "download": "Download",
+    "share": "Share"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and preferences",
+    "account": {
+      "title": "Account",
+      "owner": "Account Owner",
+      "changeProfile": "Change Profile"
+    },
+    "profileFamily": {
+      "title": "Profile and Family",
+      "myProfile": {
+        "title": "My Profile",
+        "subtitle": "Personal data and service status"
+      },
+      "familyManagement": {
+        "title": "Family Management",
+        "subtitle": "Add or edit family accounts"
+      },
+      "permissions": {
+        "title": "Permissions and Access",
+        "subtitle": "Who can see your documents"
+      }
+    },
+    "app": {
+      "title": "App",
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Appointment and deadline reminders"
+      },
+      "privacy": {
+        "title": "Privacy and Security",
+        "subtitle": "Face ID, biometrics, screen lock"
+      },
+      "accessibility": {
+        "title": "Accessibility",
+        "subtitle": "Screen reader, voice commands, motion reduction"      
+      },
+      "appearance": {
+        "title": "Appearance",
+        "subtitle": "Theme, colors and appearance, text size",
+        "theme": {
+          "title": "Theme",
+          "light": "Light",
+          "dark": "Dark"
+        },
+        "colorBlind": {
+          "title": "Color Blind Mode",
+          "subtitle": "Adjust colors for better visibility",
+          "none": "None",
+          "deuteranopia": "Deuteranopia (red-green)",
+          "protanopia": "Protanopia (red-green)",
+          "tritanopia": "Tritanopia (blue-yellow)"
+        }
+      }
+    },
+    "dataPrivacy": {
+      "title": "Data and Privacy",
+      "exportData": {
+        "title": "Export My Data",
+        "subtitle": "Download all your documents"
+      },
+      "terms": {
+        "title": "Terms and Conditions",
+        "subtitle": "Read the terms of service"
+      }
+    },
+    "support": {
+      "title": "Help Center",
+      "helpCenter": {
+        "title": "Help Center",
+        "subtitle": "FAQ, tutorials, contacts"
+      }
+    },
+    "logout": "Logout",
+    "footer": {
+      "version": "Nucleo v0.1 · Prototype"
+    }
+  },
+  "widgets": {
+    "selector": {
+      "title": "Customize Your Widgets",
+      "subtitle": "Selected: {count} / {total}",
+      "close": "Close",
+      "cancel": "Cancel",
+      "save": "Save",
+      "selected": "Selected",
+      "select": "Select"
+    },
+    "loading": {
+      "title": "Loading widgets...",
+      "description": "Retrieving data from documents"
+    },
+    "categories": {
+      "quick": "Quick Widgets",
+      "healthMetric": "Vital Parameters",
+      "healthChart": "Trend Charts"
+    },
+    "items": {
+      "nextVisit": {
+        "name": "Next Visit",
+        "description": "Days until next medical visit"
+      },
+      "newDocs": {
+        "name": "New Documents",
+        "description": "Number of recently added documents"
+      },
+      "medicationReminder": {
+        "name": "Medication Reminder",
+        "description": "Next medication to take today"
+      },
+      "nextVaccine": {
+        "name": "Next Vaccine",
+        "description": "Days until next vaccination"
+      },
+      "heartRate": {
+        "name": "Heart Rate",
+        "description": "Heart beats per minute"
+      },
+      "bloodPressureSys": {
+        "name": "Systolic Pressure",
+        "description": "Maximum blood pressure"
+      },
+      "bloodPressureDia": {
+        "name": "Diastolic Pressure",
+        "description": "Minimum blood pressure"
+      },
+      "glucose": {
+        "name": "Blood Glucose",
+        "description": "Blood glucose level"
+      },
+      "oxygen": {
+        "name": "O₂ Saturation",
+        "description": "Oxygen percentage in blood"
+      },
+      "cholesterol": {
+        "name": "Cholesterol",
+        "description": "Total cholesterol level"
+      },
+      "heartRateChart": {
+        "name": "Heart Rate Chart",
+        "description": "Heart rate trend over last 6 days"
+      },
+      "glucoseChart": {
+        "name": "Blood Glucose Chart",
+        "description": "Glucose level trend"
+      },
+      "bloodPressureSysChart": {
+        "name": "Systolic Pressure Chart",
+        "description": "Maximum pressure trend"
+      },
+      "cholesterolChart": {
+        "name": "Cholesterol Chart",
+        "description": "Total cholesterol trend"
+      }
+    },
+    "emptyState": {
+      "title": "No widgets selected",
+      "description": "Click the + button to add widgets to your dashboard",
+      "addButton": "Add widget"
+    }
+  },
+  "health": {
+    "title": "Health",
+    "subtitle": "Monitor your vital parameters and receive personalized advice to stay healthy.",
+    "alerts": {
+      "title": "⚠️ Important Alerts"
+    },
+    "parameters": {
+      "title": "📊 Your Parameters",
+      "cholesterol": "Cholesterol",
+      "bloodPressureSys": "Systolic Pressure",
+      "bloodPressureDia": "Diastolic Pressure",
+      "heartRate": "Heart Rate",
+      "glucose": "Blood Glucose",
+      "oxygen": "O₂ Saturation"
+    },
+    "charts": {
+      "title": "📈 Historical Trend"
+    },
+    "normalRange": "Normal Range",
+    "info": {
+      "title": "Data Information",
+      "description": "The data shown comes from your connected devices and recorded measurements. Always consult your doctor for professional evaluation."
+    },
+    "sourceDocuments": {
+      "title": "Source Documents",
+      "showDetails": "Show details",
+      "hideDetails": "Hide details",
+      "description": "These values were extracted from the following documents:",
+      "noDocuments": "No linked documents"
+    }
+  },
+  "legalFooter": {
+    "privacy": "Privacy",
+    "privacyAria": "Open privacy and cookie policy",
+    "legalNotes": "Legal Notes",
+    "legalAria": "Open legal notes",
+    "accessibility": "Accessibility",
+    "accessibilityAria": "Go to accessibility statement (opens in new window)",
+    "cookieTitle": "Cookie Usage",
+    "cookieDescription": "This site uses technical cookies necessary for operation and analytics cookies to improve user experience. By continuing navigation you accept the use of cookies.",
+    "acceptNecessary": "Necessary only",
+    "acceptNecessaryAria": "Accept necessary cookies only",
+    "moreInfo": "More information",
+    "moreInfoAria": "Read full policy",
+    "acceptAll": "Accept all",
+    "acceptAllAria": "Accept all cookies",
+    "privacyModalTitle": "Privacy Policy and Cookie Policy",
+    "privacyModalClose": "I understand",
+    "legalModalTitle": "Legal Notes",
+    "legalModalClose": "Close",
+    "license": "EUPL-1.2"
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "documents": "Documents",
+    "health": "Health",
+    "calendar": "Calendar",
+    "settings": "Settings",
+    "goTo": "Go to"
+  },
+  "searchSuggestionCard": {
+    "smartSuggestion": "Smart Suggestion",
+    "basedOnSearch": "Based on your search: \"{symptom}\"",
+    "urgencyHigh": "Urgent",
+    "urgencyMedium": "Medium",
+    "urgencyLow": "Non-urgent",
+    "bookVisit": "Book visit"
+  },
+  "toast": {
+    "closeNotification": "Close notification",
+    "bookingConfirmed": "Booking confirmed successfully!"
+  }
+}
