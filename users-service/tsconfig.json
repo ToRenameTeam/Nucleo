@@ -1,10 +1,10 @@
 {
   "extends": "../tsconfig.base.json", // inherit all settings from the base config
   "compilerOptions": {
-    "rootDir": "./src", // where your ts source files live
     "outDir": "./dist", // where compiled js will be emitted
     "declaration": false, // don't generate .d.ts files for executable services (not consumed by other packages)
-    "declarationMap": false // don't generate source maps for .d.ts files
+    "declarationMap": false, // don't generate source maps for .d.ts files
+    "types": ["jest"] // include Jest type definitions for test files
   },
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*", "./tests/**/*"]
 }
