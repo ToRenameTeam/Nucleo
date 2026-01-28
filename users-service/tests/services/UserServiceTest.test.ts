@@ -21,7 +21,7 @@ describe('UserService', () => {
     beforeEach(() => {
         mockUserRepository = {
             findByFiscalCode: jest.fn(),
-            findById: jest.fn(),
+            findUserById: jest.fn(),
             findAll: jest.fn(),
             save: jest.fn(),
             create: jest.fn(),
@@ -104,7 +104,7 @@ describe('UserService', () => {
         const userId = randomUUID();
 
         it('should return user with patient and doctor profiles', async () => {
-            mockUserRepository.findById.mockResolvedValue({
+            mockUserRepository.findUserById.mockResolvedValue({
                 userId,
                 fiscalCode: 'RSSMRA80A01H501U',
                 passwordHash: 'hash',
@@ -143,7 +143,7 @@ describe('UserService', () => {
         });
 
         it('should throw error if user not found', async () => {
-            mockUserRepository.findById.mockResolvedValue(null);
+            mockUserRepository.findUserById.mockResolvedValue(null);
 
             await expect(userService.getUserById(userId)).rejects.toThrow('User not found');
         });

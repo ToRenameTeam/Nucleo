@@ -14,7 +14,7 @@ describe('AuthenticationService', () => {
     beforeEach(() => {
         mockUserRepository = {
             findByFiscalCode: jest.fn(),
-            findById: jest.fn(),
+            findUserById: jest.fn(),
             findAll: jest.fn(),
             save: jest.fn(),
             create: jest.fn(),
@@ -147,7 +147,7 @@ describe('AuthenticationService', () => {
         };
 
         it('should return patient profile data when PATIENT is selected', async () => {
-            mockUserRepository.findById.mockResolvedValue(mockUserData);
+            mockUserRepository.findUserById.mockResolvedValue(mockUserData);
             mockPatientRepository.findByUserId.mockResolvedValue(mockPatientData);
             mockDoctorRepository.findByUserId.mockResolvedValue(null);
 
@@ -175,7 +175,7 @@ describe('AuthenticationService', () => {
                 assignedPatientUserIds: ['patient1', 'patient2'],
             };
 
-            mockUserRepository.findById.mockResolvedValue(mockUserData);
+            mockUserRepository.findUserById.mockResolvedValue(mockUserData);
             mockPatientRepository.findByUserId.mockResolvedValue(mockPatientData);
             mockDoctorRepository.findByUserId.mockResolvedValue(mockDoctorData);
 
@@ -198,7 +198,7 @@ describe('AuthenticationService', () => {
         });
 
         it('should throw error if user not found', async () => {
-            mockUserRepository.findById.mockResolvedValue(null);
+            mockUserRepository.findUserById.mockResolvedValue(null);
 
             await expect(authService.getProfileData(userId, 'PATIENT')).rejects.toThrow(
                 'User not found'
@@ -209,7 +209,7 @@ describe('AuthenticationService', () => {
         });
 
         it('should throw error if patient profile not found', async () => {
-            mockUserRepository.findById.mockResolvedValue(mockUserData);
+            mockUserRepository.findUserById.mockResolvedValue(mockUserData);
             mockPatientRepository.findByUserId.mockResolvedValue(null);
 
             await expect(authService.getProfileData(userId, 'PATIENT')).rejects.toThrow(
@@ -218,7 +218,7 @@ describe('AuthenticationService', () => {
         });
 
         it('should throw error when DOCTOR profile selected but user has no doctor profile', async () => {
-            mockUserRepository.findById.mockResolvedValue(mockUserData);
+            mockUserRepository.findUserById.mockResolvedValue(mockUserData);
             mockPatientRepository.findByUserId.mockResolvedValue(mockPatientData);
             mockDoctorRepository.findByUserId.mockResolvedValue(null);
 
@@ -228,13 +228,13 @@ describe('AuthenticationService', () => {
         });
 
         it('should call repositories with correct userId', async () => {
-            mockUserRepository.findById.mockResolvedValue(mockUserData);
+            mockUserRepository.findUserById.mockResolvedValue(mockUserData);
             mockPatientRepository.findByUserId.mockResolvedValue(mockPatientData);
             mockDoctorRepository.findByUserId.mockResolvedValue(null);
 
             await authService.getProfileData(userId, 'PATIENT');
 
-            expect(mockUserRepository.findById).toHaveBeenCalledWith(userId);
+            expect(mockUserRepository.findUserById).toHaveBeenCalledWith(userId);
             expect(mockPatientRepository.findByUserId).toHaveBeenCalledWith(userId);
             expect(mockDoctorRepository.findByUserId).toHaveBeenCalledWith(userId);
         });

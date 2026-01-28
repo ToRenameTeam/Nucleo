@@ -43,7 +43,7 @@ export class AuthenticationService {
     }
 
     async getProfileData(userId: string, selectedProfile: 'PATIENT' | 'DOCTOR') {
-        const userData = await this.userRepository.findById(userId);
+        const userData = await this.userRepository.findUserById(userId);
         if (!userData) throw new Error('User not found');
 
         const { patientData, doctorData } = await this.loadUserProfiles(userId);

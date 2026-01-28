@@ -3,7 +3,7 @@ import type { User } from '../../../domains/User.js';
 import {IUserRepository, UserData} from "../IUserRepository.js";
 
 export class UserRepositoryImpl implements IUserRepository {
-    async findById(userId: string): Promise<UserData | null> {
+    async findUserById(userId: string): Promise<UserData | null> {
         const user = await UserModel.findOne({ userId });
 
         if (!user) return null;

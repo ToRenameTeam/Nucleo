@@ -11,7 +11,7 @@ export interface UserData {
 
 export interface IUserRepository {
     findByFiscalCode(fiscalCode: string): Promise<UserData | null>;
-    findById(userId: string): Promise<UserData | null>;
+    findUserById(userId: string): Promise<UserData | null>;
     findAll(): Promise<{users: UserData[]}>;
     save(user: User): Promise<void>;
     create(user: User): Promise<void>
