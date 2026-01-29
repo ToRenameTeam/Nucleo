@@ -15,6 +15,14 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/patient-choice',
+    name: 'patient-choice',
+    component: () => import('../views/PatientChoice.vue'),
+    meta: {
+      hideNavigation: true
+    }
+  },
+  {
     path: '/home',
     name: 'home',
     component: () => import('../views/HomePage.vue')

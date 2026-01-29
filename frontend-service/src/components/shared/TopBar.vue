@@ -35,7 +35,7 @@ const logout = () => {
 
 const changeUser = () => {
   showUserMenu.value = false
-  router.push('/login')
+  router.push('/patient-choice')
 }
 
 </script>

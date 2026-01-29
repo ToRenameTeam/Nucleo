@@ -33,8 +33,8 @@ const handleItemClick = (item: string) => {
   }
 }
 
-const handleChangeProfile = () => {
-  router.push('/login')
+function handleChangeProfile() {
+  router.push('/patient-choice')
 }
 </script>
 

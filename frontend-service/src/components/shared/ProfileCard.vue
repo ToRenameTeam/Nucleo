@@ -26,7 +26,7 @@ const emit = defineEmits<{ click: [] }>()
       <span class="profile-card__name">{{ name }}</span>
       <span class="profile-card__role">{{ role }}</span>
     </div>
-    <span v-else class="profile-card__add-label">{{ t('login.addProfile') }}</span>
+    <span v-else class="profile-card__add-label">{{ t('patientChoice.addProfile') }}</span>
   </div>
 </template>
 

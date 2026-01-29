@@ -2,7 +2,17 @@
   "app": {
     "title": "Nucleo"
   },
-  "login": {
+  "auth": {
+    "loginSubtitle": "Log in to your account",
+    "fiscalCode": "Fiscal Code",
+    "fiscalCodePlaceholder": "Enter your fiscal code",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "loginButton": "Log In",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
+  },
+  "patientChoice": {
     "subtitle": "Who is using the app?",
     "addProfile": "Add"
   },

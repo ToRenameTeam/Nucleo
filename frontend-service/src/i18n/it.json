@@ -2,7 +2,17 @@
   "app": {
     "title": "Nucleo"
   },
-  "login": {
+  "auth": {
+    "loginSubtitle": "Accedi al tuo account",
+    "fiscalCode": "Codice Fiscale",
+    "fiscalCodePlaceholder": "Inserisci il tuo codice fiscale",
+    "password": "Password",
+    "passwordPlaceholder": "Inserisci la tua password",
+    "loginButton": "Accedi",
+    "showPassword": "Mostra password",
+    "hidePassword": "Nascondi password"
+  },
+  "patientChoice": {
     "subtitle": "Chi sta usando l'app?",
     "addProfile": "Aggiungi"
   },
