@@ -1,56 +1,46 @@
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { Profile, AuthenticatedUser } from '../types/auth'
 
-const currentUser = ref<AuthenticatedUser | null>(null)
-const currentProfile = ref<Profile | null>(null)
-
-const storedUser = localStorage.getItem('currentUser')
-const storedProfile = localStorage.getItem('currentProfile')
-
-if (storedUser) {
+function getStoredValue<T>(key: string): T | null {
   try {
-    currentUser.value = JSON.parse(storedUser)
+    const item = localStorage.getItem(key)
+    return item ? JSON.parse(item) : null
   } catch (e) {
-    console.error('Error parsing stored user:', e)
+    console.error(`Error parsing stored ${key}:`, e)
+    return null
   }
 }
 
-if (storedProfile) {
-  try {
-    currentProfile.value = JSON.parse(storedProfile)
-  } catch (e) {
-    console.error('Error parsing stored profile:', e)
-  }
-}
+
+const currentUser = ref<AuthenticatedUser | null>(getStoredValue('currentUser'))
+const currentPatientProfile = ref<Profile | null>(getStoredValue('currentPatientProfile'))
 
 export function useAuth() {
+  const isAuthenticated = computed(() => currentUser.value !== null)
+
   const setAuthenticatedUser = (user: AuthenticatedUser) => {
     currentUser.value = user
     localStorage.setItem('currentUser', JSON.stringify(user))
   }
 
-  const selectProfile = (profile: Profile) => {
-    currentProfile.value = profile
-    localStorage.setItem('currentProfile', JSON.stringify(profile))
+  const selectPatientProfile = (profile: Profile) => {
+    currentPatientProfile.value = profile
+    localStorage.setItem('currentPatientProfile', JSON.stringify(profile))
   }
 
   const logout = () => {
     currentUser.value = null
-    currentProfile.value = null
+    currentPatientProfile.value = null
     localStorage.removeItem('currentUser')
-    localStorage.removeItem('currentProfile')
-  }
-
-  const isAuthenticated = () => {
-    return currentUser.value !== null
+    localStorage.removeItem('currentPatientProfile')
   }
 
   return {
     currentUser,
-    currentProfile,
+    currentPatientProfile,
+    isAuthenticated,
     setAuthenticatedUser,
-    selectProfile,
-    logout,
-    isAuthenticated
+    selectPatientProfile,
+    logout
   }
 }

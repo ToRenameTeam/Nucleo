@@ -8,7 +8,7 @@ import type { Profile } from '../types/auth'
 
 const { t } = useI18n()
 const router = useRouter()
-const { selectProfile: setProfile } = useAuth()
+const { selectPatientProfile: setProfile } = useAuth()
 
 const profiles = ref<Profile[]>([
   { id: '1', name: 'Marco', role: 'Tu' },
@@ -18,7 +18,7 @@ const profiles = ref<Profile[]>([
   { id: '5', name: 'Nonna Maria', role: 'Madre' }
 ])
 
-const selectProfile = (profile: Profile) => {
+const selectPatientProfile = (profile: Profile) => {
   setProfile(profile)
   router.push('/home')
 }
@@ -43,7 +43,7 @@ const addProfile = () => {
         :key="profile.id"
         :name="profile.name"
         :role="profile.role"
-        @click="selectProfile(profile)"
+        @click="selectPatientProfile(profile)"
       />
       <ProfileCard
         :name="t('patientChoice.addProfile')"

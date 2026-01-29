@@ -36,7 +36,7 @@ export interface LoginResponse extends UserData {
   requiresProfileSelection?: boolean
 }
 
-export interface SelectProfileRequest {
+export interface SelectPatientProfileRequest {
   userId: string
   selectedProfile: 'PATIENT' | 'DOCTOR'
 }

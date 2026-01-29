@@ -19,6 +19,17 @@
     "subtitle": "Chi sta usando l'app?",
     "addProfile": "Aggiungi"
   },
+  "doctorPatientChoice": {
+    "subtitle": "Come vuoi accedere oggi?",
+    "doctorArea": {
+      "title": "Area Medico",
+      "description": "Gestisci visite, pazienti e prescrizioni"
+    },
+    "patientArea": {
+      "title": "Area Paziente",
+      "description": "Accedi ai tuoi documenti e appuntamenti"
+    }
+  },
   "topbar": {
     "notifications": "Notifiche",
     "user": "Main User"

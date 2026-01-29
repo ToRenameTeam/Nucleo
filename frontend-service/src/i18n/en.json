@@ -19,6 +19,17 @@
     "subtitle": "Who is using the app?",
     "addProfile": "Add"
   },
+  "doctorPatientChoice": {
+    "subtitle": "How do you want to access today?",
+    "doctorArea": {
+      "title": "Doctor Area",
+      "description": "Manage visits, patients and prescriptions"
+    },
+    "patientArea": {
+      "title": "Patient Area",
+      "description": "Access your documents and appointments"
+    }
+  },
   "topbar": {
     "notifications": "Notifications",
     "user": "Main User",

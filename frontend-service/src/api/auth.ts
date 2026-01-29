@@ -1,4 +1,4 @@
-import type { LoginRequest, LoginResponse, SelectProfileRequest } from '../types/auth'
+import type { LoginRequest, LoginResponse, SelectPatientProfileRequest } from '../types/auth'
 import { AuthApiError } from '../types/auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3030'
@@ -26,7 +26,7 @@ export const authApi = {
     return handleResponse<LoginResponse>(response)
   },
 
-  async selectProfile(request: SelectProfileRequest): Promise<LoginResponse> {
+  async selectPatientProfile(request: SelectPatientProfileRequest): Promise<LoginResponse> {
     const response = await fetch(`${API_BASE_URL}/api/auth/select-profile`, {
       method: 'POST',
       headers: {

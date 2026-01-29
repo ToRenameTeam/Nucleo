@@ -29,19 +29,17 @@ async function handleLogin() {
       password: password.value,
     })
 
-    // Salva i dati dell'utente autenticato
     if (!response.requiresProfileSelection && response.activeProfile) {
-      // Caso 1: Solo paziente - login completato
+      // Case 1: Patient only - patient profile selected
       setAuthenticatedUser({
         ...response,
         activeProfile: response.activeProfile
       })
       router.push('/patient-choice')
     } else {
-      // Caso 2: Ha anche profilo dottore - richiede selezione
-      // Per ora trattiamo come paziente, in futuro si può gestire la selezione
-      setAuthenticatedUser({ ...response, activeProfile: 'DOCTOR' })
-      router.push('/home')
+      // Case 2: Doctor and Patient - select profile
+      setAuthenticatedUser({ ...response, activeProfile: 'PATIENT' })
+      router.push('/doctor-patient-choice')
     }
   } catch (error) {
     if (error instanceof AuthApiError) {
