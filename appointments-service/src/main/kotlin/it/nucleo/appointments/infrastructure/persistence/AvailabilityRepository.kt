@@ -1,31 +1,11 @@
 package it.nucleo.appointments.infrastructure.persistence
 
 import it.nucleo.appointments.domain.Availability
+import it.nucleo.appointments.domain.AvailabilityRepository
 import it.nucleo.appointments.domain.valueobjects.*
 import kotlinx.datetime.toJavaLocalDateTime
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
-
-interface AvailabilityRepository {
-    suspend fun save(availability: Availability): Availability
-
-    suspend fun findById(id: AvailabilityId): Availability?
-
-    suspend fun findByFilters(
-        doctorId: DoctorId? = null,
-        facilityId: FacilityId? = null,
-        serviceTypeId: ServiceTypeId? = null,
-        status: AvailabilityStatus? = null
-    ): List<Availability>
-
-    suspend fun update(availability: Availability): Availability?
-
-    suspend fun checkOverlap(
-        doctorId: DoctorId,
-        timeSlot: TimeSlot,
-        excludeId: AvailabilityId? = null
-    ): Boolean
-}
 
 class ExposedAvailabilityRepository : AvailabilityRepository {
 

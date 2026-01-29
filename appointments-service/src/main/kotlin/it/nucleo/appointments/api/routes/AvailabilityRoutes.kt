@@ -7,8 +7,8 @@ import io.ktor.server.routing.*
 import it.nucleo.appointments.api.dto.*
 import it.nucleo.appointments.api.toResponse
 import it.nucleo.appointments.domain.Availability
+import it.nucleo.appointments.domain.AvailabilityRepository
 import it.nucleo.appointments.domain.valueobjects.*
-import it.nucleo.appointments.infrastructure.persistence.AvailabilityRepository
 import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("AvailabilityRoutes")
