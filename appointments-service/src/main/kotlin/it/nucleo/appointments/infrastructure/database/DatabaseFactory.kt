@@ -2,6 +2,7 @@ package it.nucleo.appointments.infrastructure.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import it.nucleo.appointments.infrastructure.persistence.AppointmentsTable
 import it.nucleo.appointments.infrastructure.persistence.AvailabilitiesTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -23,7 +24,7 @@ object DatabaseFactory {
 
         transaction(database) {
             logger.info("Creating database schema if not exists...")
-            SchemaUtils.create(AvailabilitiesTable)
+            SchemaUtils.create(AvailabilitiesTable, AppointmentsTable)
             logger.info("Database schema created/verified")
         }
         logger.info("Database initialization completed")
