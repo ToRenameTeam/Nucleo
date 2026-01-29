@@ -15,5 +15,4 @@ interface MedicalRecord {
     fun getDocumentById(id: DocumentId): Document
 }
 
-@JvmInline
-value class MedicalRecordId(val id: String)
+@JvmInline value class MedicalRecordId(val id: String)

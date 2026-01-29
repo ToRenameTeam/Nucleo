@@ -9,7 +9,7 @@ import it.nucleo.domain.PatientId
 private class MedicalRecordImpl(
     override val id: MedicalRecordId,
     override val patientId: PatientId
-): MedicalRecord {
+) : MedicalRecord {
 
     private val _documents = mutableListOf<Document>()
 
@@ -27,5 +27,4 @@ private class MedicalRecordImpl(
     override fun getDocumentById(id: DocumentId): Document {
         return _documents.first { it.id == id }
     }
-
 }
