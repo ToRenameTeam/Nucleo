@@ -1,10 +1,12 @@
-package it.nucleo.domain.prescription
+package it.nucleo.domain.prescription.implementation
 
 import it.nucleo.domain.DoctorId
 import it.nucleo.domain.DocumentId
 import it.nucleo.domain.IssueDate
 import it.nucleo.domain.Metadata
 import it.nucleo.domain.PatientId
+import it.nucleo.domain.prescription.Prescription
+import it.nucleo.domain.prescription.Validity
 
 data class ServicePrescription(
     override val id: DocumentId,

@@ -18,4 +18,3 @@ sealed interface Validity {
         override fun isExpired(on: LocalDate): Boolean = false
     }
 }
-
