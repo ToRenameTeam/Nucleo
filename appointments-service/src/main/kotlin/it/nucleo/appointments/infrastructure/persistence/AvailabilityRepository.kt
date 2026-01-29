@@ -1,14 +1,22 @@
 package it.nucleo.appointments.infrastructure.persistence
 
 import it.nucleo.appointments.domain.Availability
+import it.nucleo.appointments.domain.valueobjects.AvailabilityStatus
+import it.nucleo.appointments.domain.valueobjects.DoctorId
+import it.nucleo.appointments.domain.valueobjects.FacilityId
+import it.nucleo.appointments.domain.valueobjects.ServiceTypeId
 import kotlinx.datetime.toJavaLocalDateTime
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 interface AvailabilityRepository {
     suspend fun save(availability: Availability): Availability
-
-    suspend fun findAll(): List<Availability>
+    suspend fun findByFilters(
+        doctorId: DoctorId? = null,
+        facilityId: FacilityId? = null,
+        serviceTypeId: ServiceTypeId? = null,
+        status: AvailabilityStatus? = null
+    ): List<Availability>
 }
 
 class ExposedAvailabilityRepository : AvailabilityRepository {
@@ -28,7 +36,27 @@ class ExposedAvailabilityRepository : AvailabilityRepository {
         availability
     }
 
-    override suspend fun findAll(): List<Availability> = dbQuery {
-        AvailabilitiesTable.selectAll().map { it.toAvailability() }
+    override suspend fun findByFilters(
+        doctorId: DoctorId?,
+        facilityId: FacilityId?,
+        serviceTypeId: ServiceTypeId?,
+        status: AvailabilityStatus?
+    ): List<Availability> = dbQuery {
+        var query = AvailabilitiesTable.selectAll()
+
+        doctorId?.let {
+            query = query.where { AvailabilitiesTable.doctorId eq it.value }
+        }
+        facilityId?.let {
+            query = query.andWhere { AvailabilitiesTable.facilityId eq it.value }
+        }
+        serviceTypeId?.let {
+            query = query.andWhere { AvailabilitiesTable.serviceTypeId eq it.value }
+        }
+        status?.let {
+            query = query.andWhere { AvailabilitiesTable.status eq it.name }
+        }
+
+        query.map { it.toAvailability() }
     }
 }
