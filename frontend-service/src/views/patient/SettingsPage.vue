@@ -56,7 +56,6 @@ function handleChangeProfile() {
         </div>
         <div class="settings-account-info">
           <div class="settings-account-name">{{ currentUser?.name || t('settings.account.owner') }}</div>
-          <div class="settings-account-role">{{ currentUser?.activeProfile || t('settings.account.owner') }}</div>
         </div>
         <button class="settings-account-button" @click="handleChangeProfile">
           {{ t('settings.account.changeProfile') }}
@@ -335,13 +334,6 @@ function handleChangeProfile() {
   font-weight: 600;
   color: var(--gray-171717);
   line-height: 1.4;
-}
-
-.settings-account-role {
-  font-size: 0.875rem;
-  color: var(--gray-525252);
-  margin-top: 0.125rem;
-  line-height: 1.3;
 }
 
 .settings-account-button {

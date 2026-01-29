@@ -24,7 +24,6 @@ const emit = defineEmits<{ click: [] }>()
     </div>
     <div v-if="!isAddCard" class="profile-card__info">
       <span class="profile-card__name">{{ name }}</span>
-      <span class="profile-card__role">{{ role }}</span>
     </div>
     <span v-else class="profile-card__add-label">{{ t('patientChoice.addProfile') }}</span>
   </div>
@@ -98,11 +97,6 @@ const emit = defineEmits<{ click: [] }>()
   font-weight: 500; /* font-medium */
   color: var(--text-gray-900);
 }
-.profile-card__role {
-  display: block;
-  font-size: 0.75rem; /* text-xs = 12px */
-  color: var(--text-gray-500);
-}
 
 /* Add label */
 .profile-card__add-label {
@@ -130,9 +124,6 @@ const emit = defineEmits<{ click: [] }>()
   }
   .profile-card__name {
     font-size: 1rem;
-  }
-  .profile-card__role {
-    font-size: 0.625rem;
   }
   .profile-card__add-label {
     font-size: 1rem;
