@@ -51,6 +51,37 @@ fun Route.availabilityRoutes(repository: AvailabilityRepository) {
             }
         }
 
+        // Get availability by ID
+        get("/{id}") {
+            try {
+                val id = call.parameters["id"] ?: return@get call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(message = "Missing ID", code = "MISSING_ID")
+                )
+                logger.info("Fetching availability by ID: $id")
+
+                val availability = repository.findById(AvailabilityId.fromString(id))
+
+                if (availability == null) {
+                    logger.warn("Availability not found with ID: $id")
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(message = "Availability not found", code = "NOT_FOUND")
+                    )
+                } else {
+                    logger.info("Availability found with ID: $id")
+                    call.respond(HttpStatusCode.OK, availability.toResponse())
+                }
+
+            } catch (e: Exception) {
+                logger.error("Error fetching availability by ID: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
+                )
+            }
+        }
+
         // Get all availabilities (with filters)
         get {
             try {

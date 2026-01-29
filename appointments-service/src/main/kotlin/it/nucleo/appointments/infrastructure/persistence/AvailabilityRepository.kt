@@ -1,6 +1,7 @@
 package it.nucleo.appointments.infrastructure.persistence
 
 import it.nucleo.appointments.domain.Availability
+import it.nucleo.appointments.domain.valueobjects.AvailabilityId
 import it.nucleo.appointments.domain.valueobjects.AvailabilityStatus
 import it.nucleo.appointments.domain.valueobjects.DoctorId
 import it.nucleo.appointments.domain.valueobjects.FacilityId
@@ -11,6 +12,7 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 
 interface AvailabilityRepository {
     suspend fun save(availability: Availability): Availability
+    suspend fun findById(id: AvailabilityId): Availability?
     suspend fun findByFilters(
         doctorId: DoctorId? = null,
         facilityId: FacilityId? = null,
@@ -34,6 +36,14 @@ class ExposedAvailabilityRepository : AvailabilityRepository {
             it[status] = availability.status.name
         }
         availability
+    }
+
+    override suspend fun findById(id: AvailabilityId): Availability? = dbQuery {
+        AvailabilitiesTable
+            .selectAll()
+            .where { AvailabilitiesTable.availabilityId eq id.value }
+            .map { it.toAvailability() }
+            .singleOrNull()
     }
 
     override suspend fun findByFilters(
