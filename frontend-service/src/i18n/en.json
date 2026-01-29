@@ -472,9 +472,25 @@
     "actions": {
       "accept": "Accept",
       "decline": "Decline",
+      "revoke": "Revoke",
+      "cancel": "Cancel",
       "remove": "Remove access"
     },
-    "back": "Back"
+    "back": "Back",
+    "errors": {
+      "searchNotImplemented": "Search by fiscal code is not yet implemented. Please contact support.",
+      "loadingFailed": "Failed to load delegations",
+      "actionFailed": "Action failed. Please try again.",
+      "delegationAlreadyExists": "A delegation already exists between these users",
+      "userNotFound": "User not found",
+      "cannotDelegateToYourself": "You cannot delegate to yourself"
+    },
+    "toast": {
+      "delegationSent": "Delegation request sent to {name}",
+      "delegationAccepted": "Delegation accepted successfully",
+      "delegationDeclined": "Delegation declined",
+      "delegationRemoved": "Delegation removed successfully"
+    }
   },
   "toast": {
     "closeNotification": "Close notification",

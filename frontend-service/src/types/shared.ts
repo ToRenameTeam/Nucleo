@@ -45,7 +45,7 @@ export interface Toast {
 // ProfileCard Types
 export interface ProfileCard {
   name?: string
-  isAddCard?: boolean
+  fiscalCode?: string
 }
 
 // Breadcrumbs Types

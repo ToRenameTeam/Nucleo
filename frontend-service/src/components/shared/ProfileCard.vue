@@ -9,11 +9,12 @@ const emit = defineEmits<{ click: [] }>()
 
 <template>
   <div @click="emit('click')" :class="['profile-card']">
-    <div class="profile-card__icon">
+    <div class="profile-card_icon">
       <UserIcon class="icon-user" :stroke-width="1.5" />
     </div>
     <div class="profile-card__info">
-      <span class="profile-card__name">{{ name }}</span>
+      <span class="profile-card_name">{{ name }}</span>
+      <span class="profile-card_subtitle">{{ fiscalCode }}</span>
     </div>
   </div>
 </template>
@@ -42,7 +43,7 @@ const emit = defineEmits<{ click: [] }>()
   transform: translateY(-4px);
 }
 
-.profile-card__icon {
+.profile-card_icon {
   width: 5rem;
   height: 5rem;
   border-radius: 9999px;
@@ -68,11 +69,17 @@ const emit = defineEmits<{ click: [] }>()
   text-align: center;
 }
 
-.profile-card__name {
+.profile-card_name {
   display: block;
   font-size: 1.25rem;
   font-weight: 500;
   color: var(--text-gray-900);
+}
+
+.profile-card_subtitle {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-gray-500);
 }
 
 @media (max-width: 600px) {

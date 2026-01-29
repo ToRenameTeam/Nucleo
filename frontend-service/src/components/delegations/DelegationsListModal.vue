@@ -35,16 +35,28 @@ const getInitials = (name: string, lastName: string) => {
 }
 
 const getStatusBadge = (status: string) => {
-  if (props.type === 'received' && status === 'Pending') {
+  if (status === 'Pending') {
     return {
       label: t('delegations.status.pending'),
       class: 'status-pending'
     }
   }
-  if (props.type === 'sent' && status === 'Active') {
+  if (status === 'Active') {
     return {
       label: t('delegations.status.active'),
       class: 'status-active'
+    }
+  }
+  if (status === 'Declined') {
+    return {
+      label: t('delegations.status.declined'),
+      class: 'status-declined'
+    }
+  }
+  if (status === 'Deleted') {
+    return {
+      label: t('delegations.status.deleted'),
+      class: 'status-deleted'
     }
   }
   return null
@@ -132,7 +144,15 @@ const handleBack = () => {
           </button>
         </div>
 
-        <!-- Actions for sent delegations (active) -->
+        <!-- Actions for received delegations (active) - can revoke -->
+        <div v-if="type === 'received' && delegation.status === 'Active'" class="delegation-actions">
+          <button class="action-button remove-button" @click="handleRemove(delegation.delegationId)">
+            <TrashIcon class="action-icon" />
+            {{ t('delegations.actions.revoke') }}
+          </button>
+        </div>
+
+        <!-- Actions for sent delegations (active) - can remove access -->
         <div v-if="type === 'sent' && delegation.status === 'Active'" class="delegation-actions">
           <button class="action-button remove-button" @click="handleRemove(delegation.delegationId)">
             <TrashIcon class="action-icon" />
@@ -262,15 +282,27 @@ const handleBack = () => {
 }
 
 .status-pending {
-  background: #fef3c7;
-  color: #d97706;
-  border: 1px solid #fbbf24;
+  background: var(--warning-10);
+  color: var(--warning);
+  border: 1px solid var(--warning-30);
 }
 
 .status-active {
-  background: #d1fae5;
-  color: #059669;
-  border: 1px solid #10b981;
+  background: var(--success-10);
+  color: var(--success);
+  border: 1px solid var(--success-30);
+}
+
+.status-declined {
+  background: var(--error-10);
+  color: var(--error);
+  border: 1px solid var(--error-30);
+}
+
+.status-deleted {
+  background: var(--text-primary-10);
+  color: var(--text-secondary);
+  border: 1px solid var(--text-primary-20);
 }
 
 .user-fiscal-code {
@@ -311,27 +343,27 @@ const handleBack = () => {
 }
 
 .accept-button {
-  background: #d1fae5;
-  color: #059669;
-  border-color: #10b981;
+  background: var(--success-10);
+  color: var(--success);
+  border-color: var(--success-30);
 }
 
 .accept-button:hover {
-  background: #a7f3d0;
+  background: var(--success-20);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 4px 8px var(--success-30);
 }
 
 .decline-button {
-  background: #fee2e2;
-  color: #dc2626;
-  border-color: #f87171;
+  background: var(--error-10);
+  color: var(--error);
+  border-color: var(--error-30);
 }
 
 .decline-button:hover {
-  background: #fecaca;
+  background: var(--error-20);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.2);
+  box-shadow: 0 4px 8px var(--error-30);
 }
 
 .remove-button {

@@ -463,9 +463,25 @@
     "actions": {
       "accept": "Accetta",
       "decline": "Rifiuta",
+      "revoke": "Revoca",
+      "cancel": "Annulla",
       "remove": "Rimuovi accesso"
     },
-    "back": "Indietro"
+    "back": "Indietro",
+    "errors": {
+      "searchNotImplemented": "La ricerca per codice fiscale non è ancora implementata. Contatta il supporto.",
+      "loadingFailed": "Errore nel caricamento delle deleghe",
+      "actionFailed": "Azione fallita. Riprova.",
+      "delegationAlreadyExists": "Esiste già una delega tra questi utenti",
+      "userNotFound": "Utente non trovato",
+      "cannotDelegateToYourself": "Non puoi delegare a te stesso"
+    },
+    "toast": {
+      "delegationSent": "Richiesta di delega inviata a {name}",
+      "delegationAccepted": "Delega accettata con successo",
+      "delegationDeclined": "Delega rifiutata",
+      "delegationRemoved": "Delega rimossa con successo"
+    }
   },
   "toast": {
     "closeNotification": "Chiudi notifica",

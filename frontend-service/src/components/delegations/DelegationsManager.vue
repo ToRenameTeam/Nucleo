@@ -5,19 +5,49 @@ import { UsersIcon } from '@heroicons/vue/24/outline'
 import DelegationsMenuModal from './DelegationsMenuModal.vue'
 import NewDelegationModal from './NewDelegationModal.vue'
 import DelegationsListModal from './DelegationsListModal.vue'
+import Toast from '../shared/Toast.vue'
+import { useAuth } from '../../authentication/useAuth'
+import { delegationApi } from '../../api/delegations'
+import { authApi } from '../../api/users'
 import type { DelegationItem } from '../../types/delegation'
+import type { UserData } from '../../types/auth'
 
 const { t } = useI18n()
+const { currentUser } = useAuth()
 
 const isDelegationsModalOpen = ref(false)
 const isNewDelegationModalOpen = ref(false)
 const isDelegationsListModalOpen = ref(false)
 const delegationsListType = ref<'received' | 'sent'>('received')
 const delegationsList = ref<DelegationItem[]>([])
+const receivedDelegationsCount = ref(0)
+const sentDelegationsCount = ref(0)
+const showSuccessToast = ref(false)
+const successToastMessage = ref('')
+const delegationSendError = ref('')
+const newDelegationModalKey = ref(0)
 
 // Menu modal handlers
-const openDelegationsModal = () => {
+const openDelegationsModal = async () => {
   isDelegationsModalOpen.value = true
+  await loadDelegationsCounts()
+}
+
+const loadDelegationsCounts = async () => {
+  if (!currentUser.value?.userId) return
+
+  try {
+    const [receivedResponse, sentResponse] = await Promise.all([
+      delegationApi.getReceivedDelegations(currentUser.value.userId),
+      delegationApi.getSentDelegations(currentUser.value.userId)
+    ])
+    receivedDelegationsCount.value = receivedResponse.delegations.length
+    sentDelegationsCount.value = sentResponse.delegations.length
+  } catch (error) {
+    console.error('Error loading delegations counts:', error)
+    receivedDelegationsCount.value = 0
+    sentDelegationsCount.value = 0
+  }
 }
 
 const closeDelegationsModal = () => {
@@ -32,67 +62,66 @@ const handleNewDelegation = () => {
 
 const closeNewDelegationModal = () => {
   isNewDelegationModalOpen.value = false
+  delegationSendError.value = ''
 }
 
 const handleBackFromNewDelegation = () => {
   isNewDelegationModalOpen.value = false
+  delegationSendError.value = ''
   isDelegationsModalOpen.value = true
 }
 
-const handleSendDelegationRequest = (fiscalCode: string) => {
-  console.log('Invio richiesta delega per:', fiscalCode)
-  // TODO: Implement API call
-  isNewDelegationModalOpen.value = false
+const handleSendDelegationRequest = async (fiscalCode: string) => {
+  if (!currentUser.value?.userId) return
+
+  delegationSendError.value = ''
+
+  try {
+    const foundUser = await delegationApi.searchUserByFiscalCode(fiscalCode)
+    
+    await delegationApi.createDelegation({
+      delegatingUserId: foundUser.userId,
+      delegatorUserId: currentUser.value.userId
+    })
+    
+    // Success: close modal and reset it
+    isNewDelegationModalOpen.value = false
+    newDelegationModalKey.value++ // Force modal reset
+    
+    // Show success toast
+    successToastMessage.value = t('delegations.toast.delegationSent', { name: `${foundUser.name} ${foundUser.lastName}` })
+    showSuccessToast.value = true
+    
+    // Reload counts
+    await loadDelegationsCounts()
+  } catch (error) {
+    console.error('Error sending delegation request:', error)
+    delegationSendError.value = error instanceof Error ? mapErrorToMessage(error) : t('delegations.errors.actionFailed')
+  }
 }
 
-// Received delegations handlers
-const handleReceivedDelegations = () => {
+const handleReceivedDelegations = async () => {
+  if (!currentUser.value?.userId) return
+
   closeDelegationsModal()
   delegationsListType.value = 'received'
-  // TODO: Load received delegations from API
-  delegationsList.value = [
-    {
-      delegationId: '1',
-      userId: 'user1',
-      name: 'Maria',
-      lastName: 'Bianchi',
-      fiscalCode: 'BNCMRA88A41H501Z',
-      date: '2024-01-15',
-      status: 'Pending'
-    },
-    {
-      delegationId: '2',
-      userId: 'user2',
-      name: 'Anna',
-      lastName: 'Neri',
-      fiscalCode: 'NRANNA50S50I501Y',
-      date: '2024-01-08',
-      status: 'Active'
-    }
-  ]
+  
+  await loadReceivedDelegations()
+  
   isDelegationsListModalOpen.value = true
 }
 
-// Sent delegations handlers
-const handleSentDelegations = () => {
+const handleSentDelegations = async () => {
+  if (!currentUser.value?.userId) return
+
   closeDelegationsModal()
   delegationsListType.value = 'sent'
-  // TODO: Load sent delegations from API
-  delegationsList.value = [
-    {
-      delegationId: '3',
-      userId: 'user3',
-      name: 'Paolo',
-      lastName: 'Verdi',
-      fiscalCode: 'VRDPLA75M15H501W',
-      date: '2024-01-10',
-      status: 'Active'
-    }
-  ]
+  
+  await loadSentDelegations()
+  
   isDelegationsListModalOpen.value = true
 }
 
-// Delegations list handlers
 const closeDelegationsListModal = () => {
   isDelegationsListModalOpen.value = false
 }
@@ -102,22 +131,143 @@ const handleBackFromDelegationsList = () => {
   isDelegationsModalOpen.value = true
 }
 
-const handleAcceptDelegation = (delegationId: string) => {
-  console.log('Accetta delega:', delegationId)
-  // TODO: Implement API call
-  // After success, update the list or reload
+// Helper function to reload the current list based on type
+const reloadCurrentList = async () => {
+  if (delegationsListType.value === 'received') {
+    await loadReceivedDelegations()
+  } else {
+    await loadSentDelegations()
+  }
 }
 
-const handleDeclineDelegation = (delegationId: string) => {
-  console.log('Rifiuta delega:', delegationId)
-  // TODO: Implement API call
-  // After success, update the list or reload
+// Extracted loading logic for reuse
+const loadReceivedDelegations = async () => {
+  if (!currentUser.value?.userId) return
+
+  try {
+    const response = await delegationApi.getReceivedDelegations(currentUser.value.userId)
+    
+    const items = await Promise.all(
+      response.delegations.map(async (delegation): Promise<DelegationItem | null> => {
+        try {
+          const userData = await authApi.getUserById(delegation.delegatorUserId) as UserData
+          return {
+            delegationId: delegation.delegationId,
+            userId: delegation.delegatorUserId,
+            name: userData.name || '',
+            lastName: userData.lastName || '',
+            fiscalCode: userData.fiscalCode || '',
+            date: new Date().toISOString().split('T')[0] || '',
+            status: delegation.status
+          }
+        } catch (err) {
+          console.error(`Error loading user ${delegation.delegatorUserId}:`, err)
+          return null
+        }
+      })
+    )
+    
+    delegationsList.value = items.filter((item): item is DelegationItem => item !== null)
+  } catch (error) {
+    console.error('Error loading received delegations:', error)
+    delegationsList.value = []
+  }
 }
 
-const handleRemoveDelegation = (delegationId: string) => {
-  console.log('Rimuovi delega:', delegationId)
-  // TODO: Implement API call
-  // After success, update the list or reload
+const loadSentDelegations = async () => {
+  if (!currentUser.value?.userId) return
+
+  try {
+    const response = await delegationApi.getSentDelegations(currentUser.value.userId)
+    
+    const items = await Promise.all(
+      response.delegations.map(async (delegation): Promise<DelegationItem | null> => {
+        try {
+          const userData = await authApi.getUserById(delegation.delegatingUserId) as UserData
+          return {
+            delegationId: delegation.delegationId,
+            userId: delegation.delegatingUserId,
+            name: userData.name ?? '',
+            lastName: userData.lastName ?? '',
+            fiscalCode: userData.fiscalCode ?? '',
+            date: new Date().toISOString().split('T')[0] ?? '',
+            status: delegation.status
+          }
+        } catch (err) {
+          console.error(`Error loading user ${delegation.delegatingUserId}:`, err)
+          return null
+        }
+      })
+    )
+    
+    delegationsList.value = items.filter((item): item is DelegationItem => item !== null)
+  } catch (error) {
+    console.error('Error loading sent delegations:', error)
+    delegationsList.value = []
+  }
+}
+
+const handleAcceptDelegation = async (delegationId: string) => {
+  if (!currentUser.value?.userId) return
+
+  try {
+    await delegationApi.acceptDelegation(delegationId, currentUser.value.userId)
+    // Reload the current list to get updated data
+    await reloadCurrentList()
+    // Notify PatientChoice to reload profiles
+    window.dispatchEvent(new CustomEvent('delegations-updated'))
+  } catch (error) {
+    console.error('Error accepting delegation:', error)
+  }
+}
+
+const handleDeclineDelegation = async (delegationId: string) => {
+  if (!currentUser.value?.userId) return
+
+  try {
+    await delegationApi.declineDelegation(delegationId, currentUser.value.userId)
+    // Reload the current list to get updated data
+    await reloadCurrentList()
+    // Notify PatientChoice to reload profiles
+    window.dispatchEvent(new CustomEvent('delegations-updated'))
+  } catch (error) {
+    console.error('Error declining delegation:', error)
+  }
+}
+
+const handleRemoveDelegation = async (delegationId: string) => {
+  if (!currentUser.value?.userId) return
+
+  try {
+    await delegationApi.deleteDelegation(delegationId, currentUser.value.userId)
+    // Reload the current list to get updated data
+    await reloadCurrentList()
+    // Notify PatientChoice to reload profiles
+    window.dispatchEvent(new CustomEvent('delegations-updated'))
+  } catch (error) {
+    console.error('Error removing delegation:', error)
+  }
+}
+
+const handleCloseToast = () => {
+  showSuccessToast.value = false
+}
+
+// Map API errors to translated messages
+const mapErrorToMessage = (error: Error): string => {
+  const errorMessage = error.message.toLowerCase()
+  
+  if (errorMessage.includes('already exists')) {
+    return t('delegations.errors.delegationAlreadyExists')
+  }
+  if (errorMessage.includes('not found')) {
+    return t('delegations.errors.userNotFound')
+  }
+  if (errorMessage.includes('cannot delegate to yourself')) {
+    return t('delegations.errors.cannotDelegateToYourself')
+  }
+  
+  return t('delegations.errors.actionFailed')
 }
 </script>
 
@@ -132,6 +282,8 @@ const handleRemoveDelegation = (delegationId: string) => {
     <!-- Menu modal -->
     <DelegationsMenuModal
       :is-open="isDelegationsModalOpen"
+      :received-count="receivedDelegationsCount"
+      :sent-count="sentDelegationsCount"
       @close="closeDelegationsModal"
       @new-delegation="handleNewDelegation"
       @received-delegations="handleReceivedDelegations"
@@ -140,7 +292,9 @@ const handleRemoveDelegation = (delegationId: string) => {
 
     <!-- New delegation modal -->
     <NewDelegationModal
+      :key="newDelegationModalKey"
       :is-open="isNewDelegationModalOpen"
+      :send-error="delegationSendError"
       @close="closeNewDelegationModal"
       @back="handleBackFromNewDelegation"
       @send="handleSendDelegationRequest"
@@ -156,6 +310,14 @@ const handleRemoveDelegation = (delegationId: string) => {
       @accept="handleAcceptDelegation"
       @decline="handleDeclineDelegation"
       @remove="handleRemoveDelegation"
+    />
+
+    <!-- Success Toast -->
+    <Toast
+      :show="showSuccessToast"
+      :message="successToastMessage"
+      :duration="4000"
+      @close="handleCloseToast"
     />
   </div>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import ProfileCard from '../../components/shared/ProfileCard.vue'
@@ -19,7 +19,18 @@ const error = ref<string | null>(null)
 
 onMounted(async () => {
   await loadDelegatedProfiles()
+  // Listen for delegation updates
+  window.addEventListener('delegations-updated', handleDelegationsUpdate)
 })
+
+onUnmounted(() => {
+  // Clean up event listener
+  window.removeEventListener('delegations-updated', handleDelegationsUpdate)
+})
+
+const handleDelegationsUpdate = async () => {
+  await loadDelegatedProfiles()
+}
 
 const loadDelegatedProfiles = async () => {
   if (!currentUser.value?.userId) {
@@ -35,7 +46,8 @@ const loadDelegatedProfiles = async () => {
     // Add always the personal profile
     const personalProfile: Profile = {
       id: currentUser.value.userId,
-      name: `${currentUser.value.name} ${currentUser.value.lastName}`,
+      name: `${currentUser.value.name}`,
+      fiscalCode: currentUser.value.fiscalCode
     }
 
     const delegatedProfiles: Profile[] = []
@@ -50,7 +62,8 @@ const loadDelegatedProfiles = async () => {
             const userData = await authApi.getUserById(delegation.delegatorUserId) as UserData
             return {
               id: delegation.delegatorUserId,
-              name: `${userData.name} ${userData.lastName}`,
+              name: `${userData.name}`,
+              fiscalCode: userData.fiscalCode
             }
           } catch (err) {
             console.error(`Errore nel caricamento dell'utente ${delegation.delegatorUserId}:`, err)
@@ -105,6 +118,7 @@ const selectPatientProfile = (profile: Profile) => {
         v-for="profile in profiles"
         :key="profile.id"
         :name="profile.name"
+        :fiscalCode="profile.fiscalCode"
         @click="selectPatientProfile(profile)"
       />
     </div>

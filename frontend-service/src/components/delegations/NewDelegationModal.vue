@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ArrowLeftIcon, MagnifyingGlassIcon, PaperAirplaneIcon, CheckCircleIcon } from '@heroicons/vue/24/outline'
+import { ArrowLeftIcon, MagnifyingGlassIcon, PaperAirplaneIcon } from '@heroicons/vue/24/outline'
 import BaseModal from '../shared/BaseModal.vue'
+import { delegationApi } from '../../api/delegations'
 
 import type { NewDelegationModal } from '../../types/delegation'
 
 const { t } = useI18n()
 
-const props = defineProps<NewDelegationModal>()
+const props = withDefaults(defineProps<NewDelegationModal & { sendError?: string }>(), {
+  sendError: ''
+})
 
 const emit = defineEmits<{
     close: []
@@ -18,10 +21,12 @@ const emit = defineEmits<{
 
 const fiscalCode = ref('')
 const isSearching = ref(false)
+const searchError = ref('')
 const foundUser = ref<{
     name: string
     lastName: string
     fiscalCode: string
+    userId: string
 } | null>(null)
 
 const maxLength = 16
@@ -38,36 +43,42 @@ const handleSearch = async () => {
     if (!canSearch.value) return
 
     isSearching.value = true
+    searchError.value = ''
+    foundUser.value = null
 
-    // TODO: Implement API call
-    // Simulo ricerca per ora
-    setTimeout(() => {
+    try {
+        const result = await delegationApi.searchUserByFiscalCode(fiscalCode.value)
+        
         foundUser.value = {
-            name: 'Mario',
-            lastName: 'Rossi',
-            fiscalCode: fiscalCode.value
+            name: result.name,
+            lastName: result.lastName,
+            fiscalCode: result.fiscalCode,
+            userId: result.userId
         }
+    } catch (err) {
+        console.error('Search error:', err)
+        searchError.value = err instanceof Error ? err.message : t('delegations.newDelegation.searchError')
+    } finally {
         isSearching.value = false
-    }, 500)
+    }
 }
 
 const handleSendRequest = () => {
-    if (foundUser.value) {
-        emit('send', foundUser.value.fiscalCode)
-        fiscalCode.value = ''
-        foundUser.value = null
-    }
+    if (!foundUser.value) return
+    emit('send', foundUser.value.fiscalCode)
 }
 
 const handleBack = () => {
     fiscalCode.value = ''
     foundUser.value = null
+    searchError.value = ''
     emit('back')
 }
 
 const handleClose = () => {
     fiscalCode.value = ''
     foundUser.value = null
+    searchError.value = ''
     emit('close')
 }
 
@@ -96,7 +107,9 @@ const getInitials = (name: string, lastName: string) => {
                 <label class="input-label">{{ t('delegations.newDelegation.fiscalCodeLabel') }}</label>
                 <div class="search-input-wrapper">
                     <input v-model="fiscalCode" type="text" :maxlength="maxLength"
-                        :placeholder="t('delegations.newDelegation.fiscalCodePlaceholder')" class="fiscal-code-input"
+                        :placeholder="t('delegations.newDelegation.fiscalCodePlaceholder')" 
+                        class="fiscal-code-input"
+                        :class="{ 'input-error': searchError }"
                         @keyup.enter="handleSearch" />
                     <button class="search-button" :disabled="!canSearch || isSearching" @click="handleSearch"
                         :aria-label="t('delegations.newDelegation.search')">
@@ -104,6 +117,9 @@ const getInitials = (name: string, lastName: string) => {
                     </button>
                 </div>
                 <span class="char-counter">{{ remainingChars }} {{ t('delegations.newDelegation.characters') }}</span>
+                
+                <!-- Error Message -->
+                <p v-if="searchError" class="error-message">{{ searchError }}</p>
             </div>
 
             <!-- Found User Section -->
@@ -117,7 +133,6 @@ const getInitials = (name: string, lastName: string) => {
                         <h4 class="user-name">{{ foundUser.name }} {{ foundUser.lastName }}</h4>
                         <p class="user-fiscal-code">{{ foundUser.fiscalCode }}</p>
                     </div>
-                    <CheckCircleIcon class="check-icon" />
                 </div>
 
                 <!-- Send Request Button -->
@@ -125,6 +140,9 @@ const getInitials = (name: string, lastName: string) => {
                     <PaperAirplaneIcon class="send-icon" />
                     {{ t('delegations.newDelegation.sendRequest') }}
                 </button>
+                
+                <!-- Send Error Message -->
+                <p v-if="props.sendError" class="error-message">{{ props.sendError }}</p>
             </div>
         </div>
     </BaseModal>
@@ -262,6 +280,21 @@ const getInitials = (name: string, lastName: string) => {
     height: 1.5rem;
     color: var(--white);
     stroke-width: 2;
+}
+
+.input-error {
+    border-color: #ef4444 !important;
+}
+
+.input-error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+}
+
+.error-message {
+    font-size: 0.875rem;
+    color: #ef4444;
+    margin: 0;
+    margin-top: -0.25rem;
 }
 
 .char-counter {
