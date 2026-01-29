@@ -54,13 +54,13 @@ describe('Delegation', () => {
     });
 
     describe('permissions', () => {
-        it('should allow only delegator to accept pending delegation', () => {
+        it('should allow only delegating user to accept pending delegation', async () => {
             const delegating = randomUUID();
             const delegator = randomUUID();
             const d = Delegation.create(randomUUID(), delegating, delegator);
 
-            expect(d.canBeAcceptedBy(delegator)).toBe(true);
-            expect(d.canBeAcceptedBy(delegating)).toBe(false);
+            expect(d.canBeAcceptedBy(delegating)).toBe(true);
+            expect(d.canBeAcceptedBy(delegator)).toBe(false);
             expect(d.canBeAcceptedBy(randomUUID())).toBe(false);
         });
 

@@ -87,7 +87,7 @@ export class Delegation {
     }
 
     canBeAcceptedBy(userId: UUID): boolean {
-        return this._delegatorUserId === userId && this._status.isPending();
+        return this._delegatingUserId === userId && this._status.isPending();
     }
 
     canBeDeletedBy(userId: UUID): boolean {
