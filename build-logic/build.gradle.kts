@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.plugins.kotlin.asDependency())
+    implementation(libs.plugins.kotlin.jvm.asDependency())
     implementation(libs.plugins.ktfmt.asDependency())
 }
 
