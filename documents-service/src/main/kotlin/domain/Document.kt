@@ -5,9 +5,9 @@ import java.time.LocalDate
 interface Document {
     val id: DocumentId
 
-    val author: Doctor
+    val doctorId: DoctorId
 
-    val patient: Patient
+    val patientId: PatientId
 
     val issueDate: IssueDate
 
@@ -18,9 +18,9 @@ data class Metadata(val fileURI: FileURI, val summary: Summary, val tags: Set<Ta
 
 @JvmInline value class DocumentId(val id: String)
 
-@JvmInline value class Patient(val id: String)
+@JvmInline value class PatientId(val id: String)
 
-@JvmInline value class Doctor(val id: String)
+@JvmInline value class DoctorId(val id: String)
 
 @JvmInline value class IssueDate(val date: LocalDate = LocalDate.now())
 

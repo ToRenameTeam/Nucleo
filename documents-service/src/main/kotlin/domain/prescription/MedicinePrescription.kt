@@ -1,28 +1,29 @@
 package it.nucleo.domain.prescription
 
-import it.nucleo.domain.Doctor
+import it.nucleo.domain.DoctorId
 import it.nucleo.domain.DocumentId
 import it.nucleo.domain.IssueDate
 import it.nucleo.domain.Metadata
-import it.nucleo.domain.Patient
+import it.nucleo.domain.PatientId
 
-data class MedicalPrescription(
+data class MedicinePrescription(
     override val id: DocumentId,
-    override val author: Doctor,
-    override val patient: Patient,
+    override val doctorId: DoctorId,
+    override val patientId: PatientId,
     override val issueDate: IssueDate,
     override val metadata: Metadata,
+    override val validity: Validity,
     val dosage: Dosage
 ) : Prescription
 
 data class Dosage(
-    val medicine: Medicine,
+    val medicine: MedicineId,
     val dose: Dose,
     val frequency: Frequency,
     val duration: Duration
 )
 
-@JvmInline value class Medicine(val id: String)
+@JvmInline value class MedicineId(val id: String)
 
 data class Dose(val amount: Int, val unit: DoseUnit)
 
