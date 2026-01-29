@@ -11,10 +11,10 @@ interface Document {
 
     val issueDate: IssueDate
 
-    val metadata: Metadata
+    val metadata: FileMetadata
 }
 
-data class Metadata(val fileURI: FileURI, val summary: Summary, val tags: Set<Tag>)
+data class FileMetadata(val fileURI: FileURI, val summary: Summary, val tags: Set<Tag>)
 
 @JvmInline value class DocumentId(val id: String)
 
