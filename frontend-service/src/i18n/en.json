@@ -17,9 +17,9 @@
   },
   "patientChoice": {
     "subtitle": "Who is using the app?",
-    "addProfile": "Add",
     "loadingProfiles": "Loading profiles...",
-    "retry": "Retry"
+    "retry": "Retry",
+    "manageDelegations": "Manage Delegations"
   },
   "doctorPatientChoice": {
     "subtitle": "How do you want to access today?",
@@ -426,6 +426,55 @@
     "urgencyMedium": "Medium",
     "urgencyLow": "Non-urgent",
     "bookVisit": "Book visit"
+  },
+  "delegations": {
+    "menu": {
+      "title": "Manage Delegations",
+      "subtitle": "Choose what you want to do",
+      "newDelegation": {
+        "title": "New Delegation",
+        "subtitle": "Search for a user and send a request"
+      },
+      "receivedDelegations": {
+        "title": "Received Delegations",
+        "subtitle": "{count} total delegations"
+      },
+      "sentDelegations": {
+        "title": "Sent Delegations",
+        "subtitle": "{count} total delegations"
+      }
+    },
+    "newDelegation": {
+      "title": "New Delegation",
+      "subtitle": "Enter the fiscal code",
+      "back": "Back",
+      "fiscalCodeLabel": "Fiscal Code",
+      "fiscalCodePlaceholder": "RSSMRA88A41H501Z",
+      "search": "Search",
+      "characters": "characters",
+      "userFound": "USER FOUND",
+      "sendRequest": "Send Request"
+    },
+    "receivedList": {
+      "title": "Received Delegations",
+      "subtitle": "{count} delegations"
+    },
+    "sentList": {
+      "title": "Sent Delegations",
+      "subtitle": "{count} delegations"
+    },
+    "status": {
+      "pending": "Pending",
+      "active": "Active",
+      "declined": "Declined",
+      "deleted": "Deleted"
+    },
+    "actions": {
+      "accept": "Accept",
+      "decline": "Decline",
+      "remove": "Remove access"
+    },
+    "back": "Back"
   },
   "toast": {
     "closeNotification": "Close notification",

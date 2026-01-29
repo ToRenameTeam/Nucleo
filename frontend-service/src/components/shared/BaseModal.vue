@@ -113,7 +113,6 @@ const handleBackdropClick = () => {
   background: var(--white-40);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--white-60);
   border-radius: 1.5rem;
   box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
   width: 100%;

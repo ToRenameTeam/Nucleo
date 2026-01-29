@@ -17,9 +17,9 @@
   },
   "patientChoice": {
     "subtitle": "Chi sta usando l'app?",
-    "addProfile": "Aggiungi",
     "loadingProfiles": "Caricamento profili...",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "manageDelegations": "Gestione Deleghe"
   },
   "doctorPatientChoice": {
     "subtitle": "Come vuoi accedere oggi?",
@@ -417,6 +417,55 @@
     "urgencyMedium": "Medio",
     "urgencyLow": "Non urgente",
     "bookVisit": "Prenota visita"
+  },
+  "delegations": {
+    "menu": {
+      "title": "Gestione Deleghe",
+      "subtitle": "Scegli cosa vuoi fare",
+      "newDelegation": {
+        "title": "Nuova Delega",
+        "subtitle": "Cerca un utente e invia una richiesta"
+      },
+      "receivedDelegations": {
+        "title": "Deleghe Ricevute",
+        "subtitle": "{count} deleghe totali"
+      },
+      "sentDelegations": {
+        "title": "Deleghe Inviate",
+        "subtitle": "{count} deleghe totali"
+      }
+    },
+    "newDelegation": {
+      "title": "Nuova Delega",
+      "subtitle": "Inserisci il codice fiscale",
+      "back": "Indietro",
+      "fiscalCodeLabel": "Codice Fiscale",
+      "fiscalCodePlaceholder": "RSSMRA88A41H501Z",
+      "search": "Cerca",
+      "characters": "caratteri",
+      "userFound": "UTENTE TROVATO",
+      "sendRequest": "Invia Richiesta"
+    },
+    "receivedList": {
+      "title": "Deleghe Ricevute",
+      "subtitle": "{count} deleghe"
+    },
+    "sentList": {
+      "title": "Deleghe Inviate",
+      "subtitle": "{count} deleghe"
+    },
+    "status": {
+      "pending": "In attesa",
+      "active": "Attiva",
+      "declined": "Rifiutata",
+      "deleted": "Eliminata"
+    },
+    "actions": {
+      "accept": "Accetta",
+      "decline": "Rifiuta",
+      "remove": "Rimuovi accesso"
+    },
+    "back": "Indietro"
   },
   "toast": {
     "closeNotification": "Chiudi notifica",

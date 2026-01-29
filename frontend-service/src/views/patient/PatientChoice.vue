@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import ProfileCard from '../../components/shared/ProfileCard.vue'
+import DelegationsManager from '../../components/delegations/DelegationsManager.vue'
 import { useAuth } from '../../authentication/useAuth'
 import { authApi } from '../../api/users'
 import type { Profile, UserData } from '../../types/auth'
@@ -62,10 +63,8 @@ const loadDelegatedProfiles = async () => {
       }
     } catch (err) {
       console.error('Errore nel caricamento delle deleghe:', err)
-      // Not blocking: show personal profile even if delegations fail
     }
 
-    // Combine personal and delegated profiles
     profiles.value = [personalProfile, ...delegatedProfiles]
 
   } catch (err) {
@@ -79,10 +78,6 @@ const loadDelegatedProfiles = async () => {
 const selectPatientProfile = (profile: Profile) => {
   setProfile(profile)
   router.push('/patient-home')
-}
-
-const addProfile = () => {
-  console.log('Aggiungi nuovo profilo')
 }
 </script>
 
@@ -112,13 +107,9 @@ const addProfile = () => {
         :name="profile.name"
         @click="selectPatientProfile(profile)"
       />
-      <ProfileCard
-        :name="t('patientChoice.addProfile')"
-        :is-add-card="true"
-        @click="addProfile"
-      />
     </div>
   </div>
+  <DelegationsManager />
 </template>
 
 <style scoped>
