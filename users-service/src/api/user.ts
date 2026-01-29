@@ -16,7 +16,7 @@ const userService = new UserService(
 // Create a new user
 router.post('/', async (req: Request, res: Response) => {
     try {
-        
+
         const { fiscalCode, password, name, lastName, dateOfBirth, doctor } = req.body;
 
         if (!fiscalCode || !password || !name || !lastName || !dateOfBirth) {
@@ -36,7 +36,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     } catch (err) {
         console.error('Create user error:', err);
-        
+
         if (err instanceof Error) {
             if (err.message.includes('already exists')) {
                 return error(res, err.message, 409);
@@ -45,7 +45,35 @@ router.post('/', async (req: Request, res: Response) => {
                 return error(res, err.message, 400);
             }
         }
-        
+
+        return error(res, 'Internal server error', 500);
+    }
+});
+
+// Search user by fiscal code - DEVE STARE PRIMA DI /:userId
+router.get('/search', async (req: Request, res: Response) => {
+    try {
+        const { fiscalCode } = req.query;
+
+        if (!fiscalCode || typeof fiscalCode !== 'string') {
+            return error(res, 'Missing or invalid fiscal code', 400);
+        }
+
+        const user = await userService.getUserByFiscalCode(fiscalCode);
+        return success(res, user);
+
+    } catch (err) {
+        console.error('Search user error:', err);
+
+        if (err instanceof Error) {
+            if (err.message === 'User not found') {
+                return error(res, err.message, 404);
+            }
+            if (err.message.includes('Invalid')) {
+                return error(res, err.message, 400);
+            }
+        }
+
         return error(res, 'Internal server error', 500);
     }
 });
@@ -63,7 +91,7 @@ router.get('/', async (req: Request, res: Response) => {
     }
 });
 
-// Get user by ID
+// Get user by ID - DEVE STARE DOPO /search
 router.get('/:userId', async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
@@ -77,13 +105,13 @@ router.get('/:userId', async (req: Request, res: Response) => {
 
     } catch (err) {
         console.error('Get user error:', err);
-        
+
         if (err instanceof Error) {
             if (err.message === 'User not found') {
                 return error(res, err.message, 404);
             }
         }
-        
+
         return error(res, 'Internal server error', 500);
     }
 });

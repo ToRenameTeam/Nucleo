@@ -127,4 +127,28 @@ export class UserService {
             users: usersWithProfiles
         };
     }
+
+    async getUserByFiscalCode(fiscalCode: string) {
+        const userData = await this.userRepository.findByFiscalCode(fiscalCode);
+
+        if (!userData) {
+            throw new Error('User not found');
+        }
+
+        const patientData = await this.patientRepository.findByUserId(userData.userId);
+        const doctorData = await this.doctorRepository.findByUserId(userData.userId);
+
+        return {
+            userId: userData.userId,
+            fiscalCode: userData.fiscalCode,
+            name: userData.name,
+            lastName: userData.lastName,
+            dateOfBirth: userData.dateOfBirth.toISOString(),
+            patientData: patientData,
+            doctor: doctorData ? {
+                medicalLicenseNumber: doctorData.medicalLicenseNumber,
+                specializations: doctorData.specializations,
+            } : undefined,
+        };
+    }
 }

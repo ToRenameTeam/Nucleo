@@ -149,6 +149,116 @@ describe('UserService', () => {
         });
     });
 
+    describe('getUserByFiscalCode', () => {
+        const userId = randomUUID();
+        const fiscalCode = 'RSSMRA80A01H501U';
+
+        it('should return user with patient and doctor profiles by fiscal code', async () => {
+            mockUserRepository.findByFiscalCode.mockResolvedValue({
+                userId,
+                fiscalCode,
+                passwordHash: 'hash',
+                name: 'Mario',
+                lastName: 'Rossi',
+                dateOfBirth: new Date('1980-01-01'),
+            });
+
+            mockPatientRepository.findByUserId.mockResolvedValue({
+                userId,
+                activeDelegationIds: ['delegation1'],
+            });
+
+            mockDoctorRepository.findByUserId.mockResolvedValue({
+                userId,
+                medicalLicenseNumber: 'ML123456',
+                specializations: ['Cardiologia'],
+                assignedPatientUserIds: [],
+            });
+
+            const result = await userService.getUserByFiscalCode(fiscalCode);
+
+            expect(result).toMatchObject({
+                userId,
+                fiscalCode,
+                name: 'Mario',
+                lastName: 'Rossi',
+                patientData: {
+                    activeDelegationIds: ['delegation1'],
+                },
+                doctor: {
+                    medicalLicenseNumber: 'ML123456',
+                    specializations: ['Cardiologia'],
+                },
+            });
+            expect(mockUserRepository.findByFiscalCode).toHaveBeenCalledWith(fiscalCode);
+        });
+
+        it('should return user without doctor profile by fiscal code', async () => {
+            mockUserRepository.findByFiscalCode.mockResolvedValue({
+                userId,
+                fiscalCode,
+                passwordHash: 'hash',
+                name: 'Mario',
+                lastName: 'Rossi',
+                dateOfBirth: new Date('1980-01-01'),
+            });
+
+            mockPatientRepository.findByUserId.mockResolvedValue({
+                userId,
+                activeDelegationIds: [],
+            });
+
+            mockDoctorRepository.findByUserId.mockResolvedValue(null);
+
+            const result = await userService.getUserByFiscalCode(fiscalCode);
+
+            expect(result).toMatchObject({
+                userId,
+                fiscalCode,
+                name: 'Mario',
+                lastName: 'Rossi',
+                patientData: {
+                    activeDelegationIds: [],
+                },
+                doctor: undefined,
+            });
+        });
+
+        it('should throw error if user not found by fiscal code', async () => {
+            mockUserRepository.findByFiscalCode.mockResolvedValue(null);
+
+            await expect(userService.getUserByFiscalCode(fiscalCode)).rejects.toThrow(
+                'User not found'
+            );
+            expect(mockUserRepository.findByFiscalCode).toHaveBeenCalledWith(fiscalCode);
+        });
+
+        it('should handle uppercase and lowercase fiscal codes', async () => {
+            const lowerCaseFiscalCode = 'rssmra80a01h501u';
+
+            mockUserRepository.findByFiscalCode.mockResolvedValue({
+                userId,
+                fiscalCode: fiscalCode.toUpperCase(),
+                passwordHash: 'hash',
+                name: 'Mario',
+                lastName: 'Rossi',
+                dateOfBirth: new Date('1980-01-01'),
+            });
+
+            mockPatientRepository.findByUserId.mockResolvedValue({
+                userId,
+                activeDelegationIds: [],
+            });
+
+            mockDoctorRepository.findByUserId.mockResolvedValue(null);
+
+            const result = await userService.getUserByFiscalCode(lowerCaseFiscalCode);
+
+            expect(result.fiscalCode).toBe(fiscalCode.toUpperCase());
+            expect(mockUserRepository.findByFiscalCode).toHaveBeenCalledWith(lowerCaseFiscalCode);
+        });
+    });
+
     describe('listUsers', () => {
         it('should return empty list when no users exist', async () => {
             mockUserRepository.findAll.mockResolvedValue({ users: [] });
