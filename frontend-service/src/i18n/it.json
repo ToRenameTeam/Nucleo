@@ -10,7 +10,10 @@
     "passwordPlaceholder": "Inserisci la tua password",
     "loginButton": "Accedi",
     "showPassword": "Mostra password",
-    "hidePassword": "Nascondi password"
+    "hidePassword": "Nascondi password",
+    "invalidCredentials": "Codice fiscale o password non validi",
+    "loginError": "Errore durante l'accesso. Riprova.",
+    "networkError": "Errore di connessione. Verifica la tua connessione."
   },
   "patientChoice": {
     "subtitle": "Chi sta usando l'app?",

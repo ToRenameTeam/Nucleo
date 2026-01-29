@@ -128,7 +128,7 @@ const changeUser = () => {
               </div>
               <div class="user-profile-details">
                 <div class="user-profile-name">{{ currentUser?.name }}</div>
-                <div class="user-profile-role">{{ currentUser?.role }}</div>
+                <div class="user-profile-role">{{ currentUser?.activeProfile }}</div>
               </div>
             </div>
           </button>

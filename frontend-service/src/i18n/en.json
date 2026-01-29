@@ -10,7 +10,10 @@
     "passwordPlaceholder": "Enter your password",
     "loginButton": "Log In",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "invalidCredentials": "Invalid fiscal code or password",
+    "loginError": "Error during login. Please try again.",
+    "networkError": "Connection error. Please check your connection."
   },
   "patientChoice": {
     "subtitle": "Who is using the app?",

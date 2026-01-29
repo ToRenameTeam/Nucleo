@@ -8,7 +8,7 @@ import type { Profile } from '../types/auth'
 
 const { t } = useI18n()
 const router = useRouter()
-const { login } = useAuth()
+const { selectProfile: setProfile } = useAuth()
 
 const profiles = ref<Profile[]>([
   { id: '1', name: 'Marco', role: 'Tu' },
@@ -19,7 +19,7 @@ const profiles = ref<Profile[]>([
 ])
 
 const selectProfile = (profile: Profile) => {
-  login(profile)
+  setProfile(profile)
   router.push('/home')
 }
 

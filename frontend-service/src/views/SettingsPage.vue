@@ -56,7 +56,7 @@ function handleChangeProfile() {
         </div>
         <div class="settings-account-info">
           <div class="settings-account-name">{{ currentUser?.name || t('settings.account.owner') }}</div>
-          <div class="settings-account-role">{{ currentUser?.role || t('settings.account.owner') }}</div>
+          <div class="settings-account-role">{{ currentUser?.activeProfile || t('settings.account.owner') }}</div>
         </div>
         <button class="settings-account-button" @click="handleChangeProfile">
           {{ t('settings.account.changeProfile') }}

@@ -2,27 +2,61 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { authApi, AuthApiError } from '../api/auth'
+import { useAuth } from '../authentication/useAuth'
 
 const { t } = useI18n()
 const router = useRouter()
+const { setAuthenticatedUser } = useAuth()
 
 const fiscalCode = ref('')
 const password = ref('')
 const isLoading = ref(false)
 const showPassword = ref(false)
+const errorMessage = ref('')
 
-function handleLogin() {
+async function handleLogin() {
   if (!fiscalCode.value || !password.value) {
     return
   }
   
   isLoading.value = true
+  errorMessage.value = ''
   
-  // Simulate login delay
-  setTimeout(() => {
+  try {
+    const response = await authApi.login({
+      fiscalCode: fiscalCode.value.toUpperCase(),
+      password: password.value,
+    })
+
+    // Salva i dati dell'utente autenticato
+    if (!response.requiresProfileSelection && response.activeProfile) {
+      // Caso 1: Solo paziente - login completato
+      setAuthenticatedUser({
+        ...response,
+        activeProfile: response.activeProfile
+      })
+      router.push('/patient-choice')
+    } else {
+      // Caso 2: Ha anche profilo dottore - richiede selezione
+      // Per ora trattiamo come paziente, in futuro si può gestire la selezione
+      setAuthenticatedUser({ ...response, activeProfile: 'DOCTOR' })
+      router.push('/home')
+    }
+  } catch (error) {
+    if (error instanceof AuthApiError) {
+      if (error.statusCode === 401) {
+        errorMessage.value = t('auth.invalidCredentials')
+      } else {
+        errorMessage.value = t('auth.loginError')
+      }
+    } else {
+      errorMessage.value = t('auth.networkError')
+    }
+    console.error('Login error:', error)
+  } finally {
     isLoading.value = false
-    router.push('/patient-choice')
-  }, 500)
+  }
 }
 
 function togglePasswordVisibility() {
@@ -44,6 +78,10 @@ function togglePasswordVisibility() {
       </div>
 
       <form class="login-form" @submit.prevent="handleLogin">
+        <div v-if="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
         <div class="form-group">
           <label for="fiscal-code" class="form-label">
             {{ t('auth.fiscalCode') }}
@@ -178,6 +216,18 @@ function togglePasswordVisibility() {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.error-message {
+  padding: 0.75rem 1rem;
+  background: var(--error-15);
+  border: 1px solid var(--error-30);
+  border-radius: 0.75rem;
+  color: var(--error);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
 }
 
 .form-group {

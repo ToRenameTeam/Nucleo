@@ -1,9 +1,12 @@
 import { ref } from 'vue'
-import type { Profile } from '../types/auth'
+import type { Profile, AuthenticatedUser } from '../types/auth'
 
-const currentUser = ref<Profile | null>(null)
+const currentUser = ref<AuthenticatedUser | null>(null)
+const currentProfile = ref<Profile | null>(null)
 
 const storedUser = localStorage.getItem('currentUser')
+const storedProfile = localStorage.getItem('currentProfile')
+
 if (storedUser) {
   try {
     currentUser.value = JSON.parse(storedUser)
@@ -12,15 +15,30 @@ if (storedUser) {
   }
 }
 
+if (storedProfile) {
+  try {
+    currentProfile.value = JSON.parse(storedProfile)
+  } catch (e) {
+    console.error('Error parsing stored profile:', e)
+  }
+}
+
 export function useAuth() {
-  const login = (user: Profile) => {
+  const setAuthenticatedUser = (user: AuthenticatedUser) => {
     currentUser.value = user
     localStorage.setItem('currentUser', JSON.stringify(user))
   }
 
+  const selectProfile = (profile: Profile) => {
+    currentProfile.value = profile
+    localStorage.setItem('currentProfile', JSON.stringify(profile))
+  }
+
   const logout = () => {
     currentUser.value = null
+    currentProfile.value = null
     localStorage.removeItem('currentUser')
+    localStorage.removeItem('currentProfile')
   }
 
   const isAuthenticated = () => {
@@ -29,7 +47,9 @@ export function useAuth() {
 
   return {
     currentUser,
-    login,
+    currentProfile,
+    setAuthenticatedUser,
+    selectProfile,
     logout,
     isAuthenticated
   }
