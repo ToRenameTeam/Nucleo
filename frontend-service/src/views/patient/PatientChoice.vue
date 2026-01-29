@@ -8,9 +8,13 @@ import { useAuth } from '../../authentication/useAuth'
 import { authApi } from '../../api/users'
 import type { Profile, UserData } from '../../types/auth'
 import type { DelegationsResponse } from '../../types/delegation'
+import { authApi } from '../../api/users'
+import type { Profile, UserData } from '../../types/auth'
+import type { DelegationsResponse } from '../../types/delegation'
 
 const { t } = useI18n()
 const router = useRouter()
+const { selectPatientProfile: setProfile, currentUser } = useAuth()
 const { selectPatientProfile: setProfile, currentUser } = useAuth()
 
 const profiles = ref<Profile[]>([])
@@ -114,6 +118,17 @@ const selectPatientProfile = (profile: Profile) => {
     </div>
 
     <div v-else class="profiles-container">
+
+    <div v-if="loading" class="loading-container">
+      <p class="loading-text">{{ t('patientChoice.loadingProfiles') }}</p>
+    </div>
+
+    <div v-else-if="error" class="error-container">
+      <p class="error-text">{{ error }}</p>
+      <button @click="loadDelegatedProfiles" class="retry-button">{{ t('patientChoice.retry') }}</button>
+    </div>
+
+    <div v-else class="profiles-container">
       <ProfileCard
         v-for="profile in profiles"
         :key="profile.id"
@@ -199,6 +214,49 @@ const selectPatientProfile = (profile: Profile) => {
   animation: fadeIn 0.6s cubic-bezier(0, 0, 0.2, 1);
   animation-delay: 0.4s;
   animation-fill-mode: both;
+}
+
+.loading-container,
+.error-container,
+.no-profiles-container {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  animation: fadeIn 0.6s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.loading-text,
+.error-text,
+.no-profiles-text {
+  color: var(--gray-525252);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.error-text {
+  color: #dc2626;
+  margin-bottom: 1rem;
+}
+
+.retry-button {
+  padding: 0.75rem 1.5rem;
+  background: var(--gray-171717);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.retry-button:hover {
+  background: var(--gray-525252);
+  transform: translateY(-2px);
+}
+
+.retry-button:active {
+  transform: translateY(0);
 }
 
 .loading-container,
