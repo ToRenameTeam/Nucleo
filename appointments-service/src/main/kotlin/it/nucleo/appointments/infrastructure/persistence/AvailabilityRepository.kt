@@ -19,6 +19,7 @@ interface AvailabilityRepository {
         serviceTypeId: ServiceTypeId? = null,
         status: AvailabilityStatus? = null
     ): List<Availability>
+    suspend fun update(availability: Availability): Availability?
 }
 
 class ExposedAvailabilityRepository : AvailabilityRepository {
@@ -68,5 +69,20 @@ class ExposedAvailabilityRepository : AvailabilityRepository {
         }
 
         query.map { it.toAvailability() }
+    }
+    
+    override suspend fun update(availability: Availability): Availability? = dbQuery {
+        val updated = AvailabilitiesTable.update({ 
+            AvailabilitiesTable.availabilityId eq availability.availabilityId.value 
+        }) {
+            it[doctorId] = availability.doctorId.value
+            it[facilityId] = availability.facilityId.value
+            it[serviceTypeId] = availability.serviceTypeId.value
+            it[startDateTime] = availability.timeSlot.startDateTime.toJavaLocalDateTime()
+            it[durationMinutes] = availability.timeSlot.durationMinutes
+            it[status] = availability.status.name
+        }
+        
+        if (updated > 0) availability else null
     }
 }

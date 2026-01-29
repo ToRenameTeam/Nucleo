@@ -104,5 +104,93 @@ fun Route.availabilityRoutes(repository: AvailabilityRepository) {
                 )
             }
         }
+
+        // Update availability
+        put("/{id}") {
+            try {
+                val id = call.parameters["id"] ?: return@put call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(message = "Missing ID", code = "MISSING_ID")
+                )
+                logger.info("Updating availability with ID: $id")
+
+                val request = call.receive<UpdateAvailabilityRequest>()
+
+                val availability = repository.findById(AvailabilityId.fromString(id))
+                    ?: return@put call.respond(
+                    HttpStatusCode.NotFound,
+                    ErrorResponse(message = "Availability not found", code = "NOT_FOUND")
+                )
+
+                val updated = availability.update(
+                    facilityId = request.facilityId?.let { FacilityId.fromString(it) },
+                    serviceTypeId = request.serviceTypeId?.let { ServiceTypeId.fromString(it) },
+                    timeSlot = request.timeSlot
+                )
+
+                val saved = repository.update(updated)
+
+                if (saved == null) {
+                    logger.warn("Availability not found when updating with ID: $id")
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(message = "Availability not found", code = "NOT_FOUND")
+                    )
+                } else {
+                    logger.info("Availability updated successfully with ID: $id")
+                    call.respond(HttpStatusCode.OK, saved.toResponse())
+                }
+
+            } catch (e: IllegalArgumentException) {
+                logger.error("Invalid request for updating availability: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(message = e.message ?: "Invalid request", code = "INVALID_REQUEST")
+                )
+            } catch (e: Exception) {
+                logger.error("Error updating availability: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
+                )
+            }
+        }
+
+        // Delete availability
+        delete("/{id}") {
+            try {
+                val id = call.parameters["id"] ?: return@delete call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(message = "Missing ID", code = "MISSING_ID")
+                )
+                logger.info("Cancelling availability with ID: $id")
+                
+                val availability = repository.findById(AvailabilityId.fromString(id))
+                    ?: return@delete call.respond(
+                    HttpStatusCode.NotFound,
+                    ErrorResponse(message = "Availability not found", code = "NOT_FOUND")
+                )
+                
+                val cancelled = availability.cancel()
+                
+                repository.update(cancelled)
+                logger.info("Availability cancelled successfully with ID: $id")
+                
+                call.respond(HttpStatusCode.NoContent)
+                
+            } catch (e: IllegalArgumentException) {
+                logger.error("Invalid request for cancelling availability: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(message = e.message ?: "Invalid request", code = "INVALID_REQUEST")
+                )
+            } catch (e: Exception) {
+                logger.error("Error cancelling availability: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
+                )
+            }
+        }
     }
 }
