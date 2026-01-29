@@ -17,7 +17,9 @@
   },
   "patientChoice": {
     "subtitle": "Chi sta usando l'app?",
-    "addProfile": "Aggiungi"
+    "addProfile": "Aggiungi",
+    "loadingProfiles": "Caricamento profili...",
+    "retry": "Riprova"
   },
   "doctorPatientChoice": {
     "subtitle": "Come vuoi accedere oggi?",

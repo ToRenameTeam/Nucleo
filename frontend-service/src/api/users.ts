@@ -37,6 +37,28 @@ export const authApi = {
     
     return handleResponse<LoginResponse>(response)
   },
+
+  async getActiveDelegations(userId: string) {
+    const response = await fetch(`${API_BASE_URL}/api/delegations/active-for-user?userId=${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    
+    return handleResponse(response)
+  },
+
+  async getUserById(userId: string): Promise<LoginResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    
+    return handleResponse<LoginResponse>(response)
+  },
 }
 
 export { AuthApiError }

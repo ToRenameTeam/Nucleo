@@ -45,7 +45,6 @@ export interface Toast {
 // ProfileCard Types
 export interface ProfileCard {
   name?: string
-  role?: string
   isAddCard?: boolean
 }
 
