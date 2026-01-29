@@ -30,11 +30,11 @@ const tabIcons = {
 }
 
 const tabsData = computed(() => [
-  { id: 'home', label: t('tabs.home'), icon: tabIcons.home },
-  { id: 'documents', label: t('tabs.documents'), icon: tabIcons.documents },
-  { id: 'health', label: t('tabs.health'), icon: tabIcons.health },
-  { id: 'calendar', label: t('tabs.calendar'), icon: tabIcons.calendar },
-  { id: 'settings', label: t('tabs.settings'), icon: tabIcons.settings }
+  { id: 'patient-home', label: t('tabs.home'), icon: tabIcons.home },
+  { id: 'patient-documents', label: t('tabs.documents'), icon: tabIcons.documents },
+  { id: 'patient-health', label: t('tabs.health'), icon: tabIcons.health },
+  { id: 'patient-calendar', label: t('tabs.calendar'), icon: tabIcons.calendar },
+  { id: 'patient-settings', label: t('tabs.settings'), icon: tabIcons.settings }
 ])
 
 const activeTab = computed(() => route.name as string)

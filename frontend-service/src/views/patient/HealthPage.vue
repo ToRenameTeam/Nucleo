@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import HealthAlert from '../components/health/HealthAlert.vue'
-import HealthMetricWidget from '../components/health/HealthMetricWidget.vue'
-import HealthChart from '../components/health/HealthChart.vue'
+import HealthAlert from '../../components/health/HealthAlert.vue'
+import HealthMetricWidget from '../../components/health/HealthMetricWidget.vue'
+import HealthChart from '../../components/health/HealthChart.vue'
 import { 
   HEALTH_PARAMETERS, 
   HEALTH_ALERTS,
@@ -10,7 +10,7 @@ import {
   BLOOD_PRESSURE_SYS_HISTORY,
   HEART_RATE_HISTORY,
   GLUCOSE_HISTORY
-} from '../constants/mockData'
+} from '../../constants/mockData'
 
 const healthParameters = ref(HEALTH_PARAMETERS)
 const alerts = ref(HEALTH_ALERTS)

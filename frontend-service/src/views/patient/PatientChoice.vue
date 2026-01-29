@@ -2,9 +2,9 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import ProfileCard from '../components/shared/ProfileCard.vue'
-import { useAuth } from '../authentication/useAuth'
-import type { Profile } from '../types/auth'
+import ProfileCard from '../../components/shared/ProfileCard.vue'
+import { useAuth } from '../../authentication/useAuth'
+import type { Profile } from '../../types/auth'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -20,7 +20,7 @@ const profiles = ref<Profile[]>([
 
 const selectPatientProfile = (profile: Profile) => {
   setProfile(profile)
-  router.push('/home')
+  router.push('/patient-home')
 }
 
 const addProfile = () => {

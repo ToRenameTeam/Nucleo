@@ -19,7 +19,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/doctor-patient-choice',
     name: 'doctor-patient-choice',
-    component: () => import('../views/DoctorPatientChoice.vue'),
+    component: () => import('../views/doctor/DoctorPatientChoice.vue'),
     meta: {
       hideNavigation: true,
       requiresAuth: true
@@ -28,48 +28,48 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/patient-choice',
     name: 'patient-choice',
-    component: () => import('../views/PatientChoice.vue'),
+    component: () => import('../views/patient/PatientChoice.vue'),
     meta: {
       hideNavigation: true,
       requiresAuth: true
     }
   },
   {
-    path: '/home',
-    name: 'home',
-    component: () => import('../views/HomePage.vue'),
+    path: '/patient-home',
+    name: 'patient-home',
+    component: () => import('../views/patient/PatientHomePage.vue'),
     meta: {
       requiresAuth: true
     }
   },
   {
-    path: '/documents',
-    name: 'documents',
-    component: () => import('../views/DocumentsPage.vue'),
+    path: '/patient-documents',
+    name: 'patient-documents',
+    component: () => import('../views/patient/PatientDocumentsPage.vue'),
     meta: {
       requiresAuth: true
     }
   },
   {
-    path: '/health',
-    name: 'health',
-    component: () => import('../views/HealthPage.vue'),
+    path: '/patient-health',
+    name: 'patient-health',
+    component: () => import('../views/patient/HealthPage.vue'),
     meta: {
       requiresAuth: true
     }
   },
   {
-    path: '/calendar',
-    name: 'calendar',
-    component: () => import('../views/CalendarPage.vue'),
+    path: '/patient-calendar',
+    name: 'patient-calendar',
+    component: () => import('../views/patient/CalendarPage.vue'),
     meta: {
       requiresAuth: true
     }
   },
   {
-    path: '/settings',
-    name: 'settings',
-    component: () => import('../views/SettingsPage.vue'),
+    path: '/patient-settings',
+    name: 'patient-settings',
+    component: () => import('../views/patient/SettingsPage.vue'),
     meta: {
       requiresAuth: true
     }
@@ -92,7 +92,7 @@ router.beforeEach((to, _, next) => {
   if (requiresAuth && !isAuthenticated.value) {
     next('/login')
   } else if (to.path === '/login' && isAuthenticated.value) {
-    next('/home')
+    next('/patient-home')
   } else {
     next()
   }

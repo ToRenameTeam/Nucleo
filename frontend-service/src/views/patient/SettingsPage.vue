@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useAuth } from '../authentication/useAuth'
+import { useAuth } from '../../authentication/useAuth'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import SettingsItem from '../components/settings/SettingsItem.vue'
-import BaseModal from '../components/shared/BaseModal.vue'
-import AppearanceSettings from '../components/settings/AppearanceSettings.vue'
+import SettingsItem from '../../components/settings/SettingsItem.vue'
+import BaseModal from '../../components/shared/BaseModal.vue'
+import AppearanceSettings from '../../components/settings/AppearanceSettings.vue'
 import {
   UserCircleIcon,
   UsersIcon,

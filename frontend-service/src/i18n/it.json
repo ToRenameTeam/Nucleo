@@ -401,10 +401,11 @@
   },
   "breadcrumbs": {
     "home": "Home",
-    "documents": "Documenti",
-    "health": "Salute",
-    "calendar": "Calendario",
-    "settings": "Impostazioni",
+    "patient-home": "Home",
+    "patient-documents": "Documenti",
+    "patient-health": "Salute",
+    "patient-calendar": "Calendario",
+    "patient-settings": "Impostazioni",
     "goTo": "Vai a"
   },
     "searchSuggestionCard": {

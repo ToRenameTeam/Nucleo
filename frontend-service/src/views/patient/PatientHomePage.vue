@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { DocumentPlusIcon, PlusIcon } from '@heroicons/vue/24/outline'
-import SearchBar from '../components/shared/SearchBar.vue'
-import SearchSuggestionCard from '../components/shared/SearchSuggestionCard.vue'
-import Toast from '../components/shared/Toast.vue'
-import UpcomingAppointments from '../components/home/UpcomingAppointments.vue'
-import DocumentCard from '../components/shared/DocumentCard.vue'
-import DocumentModal from '../components/documents/DocumentModal.vue'
-import WidgetPanel from '../components/home/WidgetPanel.vue'
-import AppointmentBooking from '../components/home/AppointmentBooking.vue'
-import { MOCK_DOCUMENTS, MOCK_APPOINTMENTS, SYMPTOM_SUGGESTIONS } from '../constants/mockData'
-import type { Document } from '../types/document'
-import type { SymptomSuggestion } from '../types/symptom-suggestion'
+import SearchBar from '../../components/shared/SearchBar.vue'
+import SearchSuggestionCard from '../../components/shared/SearchSuggestionCard.vue'
+import Toast from '../../components/shared/Toast.vue'
+import UpcomingAppointments from '../../components/home/UpcomingAppointments.vue'
+import DocumentCard from '../../components/shared/DocumentCard.vue'
+import DocumentModal from '../../components/documents/DocumentModal.vue'
+import WidgetPanel from '../../components/home/WidgetPanel.vue'
+import AppointmentBooking from '../../components/home/AppointmentBooking.vue'
+import { MOCK_DOCUMENTS, MOCK_APPOINTMENTS, SYMPTOM_SUGGESTIONS } from '../../constants/mockData'
+import type { Document } from '../../types/document'
+import type { SymptomSuggestion } from '../../types/symptom-suggestion'
 
 const searchQuery = ref('')
 const appointments = computed(() => MOCK_APPOINTMENTS.slice(0, 2))

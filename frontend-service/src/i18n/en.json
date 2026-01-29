@@ -410,10 +410,11 @@
   },
   "breadcrumbs": {
     "home": "Home",
-    "documents": "Documents",
-    "health": "Health",
-    "calendar": "Calendar",
-    "settings": "Settings",
+    "patient-home": "Home",
+    "patient-documents": "Documents",
+    "patient-health": "Health",
+    "patient-calendar": "Calendar",
+    "patient-settings": "Settings",
     "goTo": "Go to"
   },
   "searchSuggestionCard": {

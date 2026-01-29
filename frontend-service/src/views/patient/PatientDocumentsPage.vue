@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { ArrowsRightLeftIcon, CheckCircleIcon } from '@heroicons/vue/24/outline'
-import SearchBar from '../components/shared/SearchBar.vue'
-import TagBar from '../components/shared/TagBar.vue'
-import DocumentCard from '../components/shared/DocumentCard.vue'
-import DocumentModal from '../components/documents/DocumentModal.vue'
-import DocumentComparisonModal from '../components/documents/comparison/DocumentComparisonModal.vue'
-import DateRangeFilter from '../components/documents/DateRangeFilter.vue'
-import type { DateRange } from '../types/date-range'
-import BatchActionsBar from '../components/documents/BatchActionsBar.vue'
-import type { Tag } from '../types/tag'
-import type { Document } from '../types/document'
-import { MOCK_DOCUMENTS } from '../constants/mockData'
+import SearchBar from '../../components/shared/SearchBar.vue'
+import TagBar from '../../components/shared/TagBar.vue'
+import DocumentCard from '../../components/shared/DocumentCard.vue'
+import DocumentModal from '../../components/documents/DocumentModal.vue'
+import DocumentComparisonModal from '../../components/documents/comparison/DocumentComparisonModal.vue'
+import DateRangeFilter from '../../components/documents/DateRangeFilter.vue'
+import type { DateRange } from '../../types/date-range'
+import BatchActionsBar from '../../components/documents/BatchActionsBar.vue'
+import type { Tag } from '../../types/tag'
+import type { Document } from '../../types/document'
+import { MOCK_DOCUMENTS } from '../../constants/mockData'
 
 const searchQuery = ref('')
 const selectedTags = ref<string[]>([])

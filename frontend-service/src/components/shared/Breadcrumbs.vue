@@ -12,10 +12,10 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => {
   const items: BreadcrumbItem[] = []
   
   // Always add 'home' as the first item if not on home page
-  if (route.path !== '/home' && route.name !== 'home') {
+  if (route.path !== '/patient-home' && route.name !== 'home') {
     items.push({
       name: t('breadcrumbs.home'),
-      path: '/home'
+      path: '/patient-home'
     })
   }
 

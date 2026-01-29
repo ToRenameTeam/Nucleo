@@ -4,14 +4,14 @@ import type { CalendarOptions, EventClickArg, DateSelectArg } from '@fullcalenda
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import TagBar from '../components/shared/TagBar.vue'
-import type { Tag } from '../types/tag'
-import AppointmentCard from '../components/shared/AppointmentCard.vue'
-import type { Appointment } from '../types/appointment'
+import TagBar from '../../components/shared/TagBar.vue'
+import type { Tag } from '../../types/tag'
+import AppointmentCard from '../../components/shared/AppointmentCard.vue'
+import type { Appointment } from '../../types/appointment'
 import { PlusIcon } from '@heroicons/vue/24/outline'
-import { MOCK_APPOINTMENTS } from '../constants/mockData'
+import { MOCK_APPOINTMENTS } from '../../constants/mockData'
 import { useI18n } from 'vue-i18n'
-import { parseItalianDate, formatDateToISO } from '../utils/dateUtils'
+import { parseItalianDate, formatDateToISO } from '../../utils/dateUtils'
 
 const { t } = useI18n()
 
