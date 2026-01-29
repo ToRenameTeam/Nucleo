@@ -1,11 +1,7 @@
 package it.nucleo.appointments.infrastructure.persistence
 
 import it.nucleo.appointments.domain.Availability
-import it.nucleo.appointments.domain.valueobjects.AvailabilityId
-import it.nucleo.appointments.domain.valueobjects.AvailabilityStatus
-import it.nucleo.appointments.domain.valueobjects.DoctorId
-import it.nucleo.appointments.domain.valueobjects.FacilityId
-import it.nucleo.appointments.domain.valueobjects.ServiceTypeId
+import it.nucleo.appointments.domain.valueobjects.*
 import kotlinx.datetime.toJavaLocalDateTime
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -20,6 +16,7 @@ interface AvailabilityRepository {
         status: AvailabilityStatus? = null
     ): List<Availability>
     suspend fun update(availability: Availability): Availability?
+    suspend fun checkOverlap(doctorId: DoctorId, timeSlot: TimeSlot, excludeId: AvailabilityId? = null): Boolean
 }
 
 class ExposedAvailabilityRepository : AvailabilityRepository {
@@ -84,5 +81,26 @@ class ExposedAvailabilityRepository : AvailabilityRepository {
         }
         
         if (updated > 0) availability else null
+    }
+    
+    override suspend fun checkOverlap(
+        doctorId: DoctorId, 
+        timeSlot: TimeSlot, 
+        excludeId: AvailabilityId?
+    ): Boolean = dbQuery {
+        var query = AvailabilitiesTable
+            .selectAll()
+            .where { 
+                (AvailabilitiesTable.doctorId eq doctorId.value) and
+                (AvailabilitiesTable.status neq AvailabilityStatus.CANCELLED.name)
+            }
+        
+        excludeId?.let {
+            query = query.andWhere { AvailabilitiesTable.availabilityId neq it.value }
+        }
+        
+        val existingSlots = query.map { it.toAvailability() }
+        
+        existingSlots.any { it.timeSlot.overlaps(timeSlot) }
     }
 }

@@ -21,36 +21,53 @@ fun Route.availabilityRoutes(repository: AvailabilityRepository) {
         post {
             try {
                 val request = call.receive<CreateAvailabilityRequest>()
-
+                logger.info("Creating availability for doctor: ${request.doctorId}")
+                
                 val doctorId = DoctorId.fromString(request.doctorId)
                 val facilityId = FacilityId.fromString(request.facilityId)
                 val serviceTypeId = ServiceTypeId.fromString(request.serviceTypeId)
-                val availability =
-                    Availability.create(
-                        doctorId = doctorId,
-                        facilityId = facilityId,
-                        serviceTypeId = serviceTypeId,
-                        timeSlot = request.timeSlot
+                
+                // Check for overlaps
+                val hasOverlap = repository.checkOverlap(doctorId, request.timeSlot)
+                
+                if (hasOverlap) {
+                    logger.warn("Overlap detected for doctor: $doctorId in time slot: ${request.timeSlot}")
+                    call.respond(
+                        HttpStatusCode.Conflict,
+                        ErrorResponse(
+                            message = "The doctor already has an availability that overlaps with the requested time slot (${request.timeSlot.startDateTime} - ${request.timeSlot.endDateTime})",
+                            code = "OVERLAP_ERROR"
+                        )
                     )
-
+                    return@post
+                }
+                
+                val availability = Availability.create(
+                    doctorId = doctorId,
+                    facilityId = facilityId,
+                    serviceTypeId = serviceTypeId,
+                    timeSlot = request.timeSlot
+                )
+                
                 val saved = repository.save(availability)
+                logger.info("Availability created successfully with ID: ${saved.availabilityId}")
                 call.respond(HttpStatusCode.Created, saved.toResponse())
+                
             } catch (e: IllegalArgumentException) {
+                logger.error("Invalid request for creating availability: ${e.message}", e)
                 call.respond(
                     HttpStatusCode.BadRequest,
-                    ErrorResponse(
-                        message = e.message ?: "Invalid request",
-                        code = "INVALID_REQUEST"
-                    )
+                    ErrorResponse(message = e.message ?: "Invalid request", code = "INVALID_REQUEST")
                 )
             } catch (e: Exception) {
+                logger.error("Error creating availability: ${e.message}", e)
                 call.respond(
                     HttpStatusCode.InternalServerError,
                     ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
                 )
             }
         }
-
+        
         // Get availability by ID
         get("/{id}") {
             try {
@@ -121,7 +138,28 @@ fun Route.availabilityRoutes(repository: AvailabilityRepository) {
                     HttpStatusCode.NotFound,
                     ErrorResponse(message = "Availability not found", code = "NOT_FOUND")
                 )
-
+                
+                // Check for overlaps if time slot is being changed
+                if (request.timeSlot != null) {
+                    val hasOverlap = repository.checkOverlap(
+                        availability.doctorId, 
+                        request.timeSlot,
+                        availability.availabilityId
+                    )
+                    
+                    if (hasOverlap) {
+                        logger.warn("Overlap detected when updating availability $id for doctor: ${availability.doctorId}")
+                        call.respond(
+                            HttpStatusCode.Conflict,
+                            ErrorResponse(
+                                message = "The doctor already has an availability that overlaps with the requested time slot (${request.timeSlot.startDateTime} - ${request.timeSlot.endDateTime})",
+                                code = "OVERLAP_ERROR"
+                            )
+                        )
+                        return@put
+                    }
+                }
+                
                 val updated = availability.update(
                     facilityId = request.facilityId?.let { FacilityId.fromString(it) },
                     serviceTypeId = request.serviceTypeId?.let { ServiceTypeId.fromString(it) },
