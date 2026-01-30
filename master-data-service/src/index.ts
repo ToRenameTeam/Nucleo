@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import { serviceCatalogRoutes, facilityRoutes } from './api/index.js';
+import { serviceCatalogRoutes, facilityRoutes, medicineRoutes } from './api/index.js';
 import { runSeeds } from './infrastructure/database/index.js';
 
 const app = express();
@@ -25,6 +25,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/service-catalog', serviceCatalogRoutes);
 app.use('/api/facilities', facilityRoutes);
+app.use('/api/medicines', medicineRoutes);
 
 startServer();
 
@@ -38,6 +39,7 @@ async function startServer() {
         console.log(`Health check: http://localhost:${PORT}/health`);
         console.log(`Service Catalog API: http://localhost:${PORT}/api/service-catalog`);
         console.log(`Facilities API: http://localhost:${PORT}/api/facilities`);
+        console.log(`Medicines API: http://localhost:${PORT}/api/medicines`);
     });
 }
 
