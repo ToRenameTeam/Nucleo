@@ -10,8 +10,11 @@ import it.nucleo.appointments.api.toResponse
 import it.nucleo.appointments.domain.Appointment
 import it.nucleo.appointments.domain.AppointmentRepository
 import it.nucleo.appointments.domain.AvailabilityRepository
+import it.nucleo.appointments.domain.valueobjects.AppointmentStatus
 import it.nucleo.appointments.domain.valueobjects.AvailabilityId
 import it.nucleo.appointments.domain.valueobjects.AvailabilityStatus
+import it.nucleo.appointments.domain.valueobjects.DoctorId
+import it.nucleo.appointments.domain.valueobjects.FacilityId
 import it.nucleo.appointments.domain.valueobjects.PatientId
 import org.slf4j.LoggerFactory
 
@@ -22,6 +25,7 @@ fun Route.appointmentRoutes(
     availabilityRepository: AvailabilityRepository
 ) {
     route("/appointments") {
+        // Create appointment
         post {
             try {
                 val request = call.receive<CreateAppointmentRequest>()
@@ -91,12 +95,100 @@ fun Route.appointmentRoutes(
             }
         }
 
+        // Get appointment by ID
+        get("/{id}") {
+            try {
+                val id =
+                    call.parameters["id"]
+                        ?: return@get call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(message = "Missing ID", code = "MISSING_ID")
+                        )
+                logger.info("Fetching appointment by ID: $id")
+
+                val appointment = appointmentRepository.findById(
+                    it.nucleo.appointments.domain.valueobjects.AppointmentId.fromString(id)
+                )
+
+                if (appointment == null) {
+                    logger.warn("Appointment not found with ID: $id")
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(message = "Appointment not found", code = "NOT_FOUND")
+                    )
+                } else {
+                    logger.info("Appointment found with ID: $id")
+                    call.respond(HttpStatusCode.OK, appointment.toResponse())
+                }
+            } catch (e: IllegalArgumentException) {
+                logger.error("Invalid appointment ID: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(
+                        message = e.message ?: "Invalid ID",
+                        code = "INVALID_ID"
+                    )
+                )
+            } catch (e: Exception) {
+                logger.error("Error fetching appointment by ID: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
+                )
+            }
+        }
+
+        // Get all appointments (with filters)
         get {
             try {
-                logger.info("Fetching all appointments")
-                val appointments = appointmentRepository.findAll()
+                val patientId =
+                    call.request.queryParameters["patientId"]?.let { PatientId.fromString(it) }
+                val doctorId =
+                    call.request.queryParameters["doctorId"]?.let {
+                        DoctorId.fromString(it)
+                    }
+                val facilityId =
+                    call.request.queryParameters["facilityId"]?.let {
+                        FacilityId.fromString(it)
+                    }
+                val status =
+                    call.request.queryParameters["status"]?.let {
+                        AppointmentStatus.valueOf(it)
+                    }
+                val startDate =
+                    call.request.queryParameters["startDate"]?.let {
+                        kotlinx.datetime.LocalDateTime.parse(it)
+                    }
+                val endDate =
+                    call.request.queryParameters["endDate"]?.let {
+                        kotlinx.datetime.LocalDateTime.parse(it)
+                    }
+
+                logger.info(
+                    "Fetching appointments with filters - patientId: $patientId, doctorId: $doctorId, facilityId: $facilityId, status: $status, startDate: $startDate, endDate: $endDate"
+                )
+
+                val appointments =
+                    appointmentRepository.findByFilters(
+                        patientId,
+                        doctorId,
+                        facilityId,
+                        status,
+                        startDate,
+                        endDate
+                    )
+
                 logger.info("Found ${appointments.size} appointments")
                 call.respond(HttpStatusCode.OK, appointments.map { it.toResponse() })
+            } catch (e: IllegalArgumentException) {
+                logger.error("Invalid query parameters: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(
+                        message = e.message ?: "Invalid query parameters",
+                        code = "INVALID_QUERY_PARAMETERS"
+                    )
+                )
             } catch (e: Exception) {
                 logger.error("Error fetching appointments: ${e.message}", e)
                 call.respond(
