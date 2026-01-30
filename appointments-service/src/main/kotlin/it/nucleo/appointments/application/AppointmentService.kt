@@ -151,6 +151,32 @@ class AppointmentService(
 
         return saved
     }
+
+    suspend fun deleteAppointment(id: String): Boolean {
+        logger.info("Deleting appointment with ID: $id")
+
+        val appointmentId = AppointmentId.fromString(id)
+        val appointment = appointmentRepository.findById(appointmentId)
+
+        if (appointment == null) {
+            logger.warn("Appointment not found with ID: $id")
+            return false
+        }
+
+        // Update appointment status to CANCELLED
+        val cancelled = appointment.cancel()
+        appointmentRepository.update(cancelled)
+
+        // Free up the availability
+        val availability = availabilityRepository.findById(appointment.availabilityId)
+        if (availability != null) {
+            val freedAvailability = availability.makeAvailable()
+            availabilityRepository.update(freedAvailability)
+        }
+
+        logger.info("Appointment deleted successfully with ID: $id")
+        return true
+    }
 }
 
 class AvailabilityNotFoundException(message: String) : Exception(message)

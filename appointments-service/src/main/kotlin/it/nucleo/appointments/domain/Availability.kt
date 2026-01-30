@@ -37,6 +37,13 @@ data class Availability(
         return copy(status = AvailabilityStatus.BOOKED)
     }
 
+    fun makeAvailable(): Availability {
+        require(status == AvailabilityStatus.BOOKED) {
+            "Cannot make available an availability that is not BOOKED"
+        }
+        return copy(status = AvailabilityStatus.AVAILABLE)
+    }
+
     fun cancel(): Availability {
         require(status != AvailabilityStatus.BOOKED) {
             "Cannot cancel availability that is already BOOKED"

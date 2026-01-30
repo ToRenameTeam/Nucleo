@@ -204,5 +204,43 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                 )
             }
         }
+
+        // Delete appointment
+        delete("/{id}") {
+            try {
+                val id =
+                    call.parameters["id"]
+                        ?: return@delete call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(message = "Missing ID", code = "MISSING_ID")
+                        )
+
+                val deleted = service.deleteAppointment(id)
+
+                if (deleted) {
+                    call.respond(HttpStatusCode.NoContent)
+                } else {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(message = "Appointment not found", code = "NOT_FOUND")
+                    )
+                }
+            } catch (e: IllegalArgumentException) {
+                logger.error("Invalid appointment ID: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(
+                        message = e.message ?: "Invalid ID",
+                        code = "INVALID_ID"
+                    )
+                )
+            } catch (e: Exception) {
+                logger.error("Error deleting appointment: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
+                )
+            }
+        }
     }
 }
