@@ -34,9 +34,7 @@ class AvailabilityService(private val repository: AvailabilityRepository) {
         val hasOverlap = repository.checkOverlap(doctorId, command.timeSlot)
 
         if (hasOverlap) {
-            logger.warn(
-                "Overlap detected for doctor: $doctorId in time slot: ${command.timeSlot}"
-            )
+            logger.warn("Overlap detected for doctor: $doctorId in time slot: ${command.timeSlot}")
             throw AvailabilityOverlapException(
                 "The doctor already has an availability that overlaps with the requested time slot (${command.timeSlot.startDateTime} - ${command.timeSlot.endDateTime})"
             )
@@ -84,7 +82,12 @@ class AvailabilityService(private val repository: AvailabilityRepository) {
         )
 
         val availabilities =
-            repository.findByFilters(doctorIdValue, facilityIdValue, serviceTypeIdValue, statusValue)
+            repository.findByFilters(
+                doctorIdValue,
+                facilityIdValue,
+                serviceTypeIdValue,
+                statusValue
+            )
         logger.info("Found ${availabilities.size} availabilities")
 
         return availabilities
@@ -93,9 +96,7 @@ class AvailabilityService(private val repository: AvailabilityRepository) {
     suspend fun updateAvailability(command: UpdateAvailabilityCommand): Availability? {
         logger.info("Updating availability with ID: ${command.id}")
 
-        val availability =
-            repository.findById(AvailabilityId.fromString(command.id))
-                ?: return null
+        val availability = repository.findById(AvailabilityId.fromString(command.id)) ?: return null
 
         // Check for overlaps if time slot is being changed
         if (command.timeSlot != null) {
@@ -137,9 +138,7 @@ class AvailabilityService(private val repository: AvailabilityRepository) {
     suspend fun cancelAvailability(id: String): Boolean {
         logger.info("Cancelling availability with ID: $id")
 
-        val availability =
-            repository.findById(AvailabilityId.fromString(id))
-                ?: return false
+        val availability = repository.findById(AvailabilityId.fromString(id)) ?: return false
 
         val cancelled = availability.cancel()
         repository.update(cancelled)

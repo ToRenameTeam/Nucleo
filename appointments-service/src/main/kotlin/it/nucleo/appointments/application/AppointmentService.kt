@@ -13,10 +13,7 @@ class AppointmentService(
 
     private val logger = LoggerFactory.getLogger(AppointmentService::class.java)
 
-    data class CreateAppointmentCommand(
-        val patientId: String,
-        val availabilityId: String
-    )
+    data class CreateAppointmentCommand(val patientId: String, val availabilityId: String)
 
     data class UpdateAppointmentCommand(
         val id: String,
@@ -30,8 +27,9 @@ class AppointmentService(
         val patientId = PatientId.fromString(command.patientId)
         val availabilityId = AvailabilityId.fromString(command.availabilityId)
 
-        val availability = availabilityRepository.findById(availabilityId)
-            ?: throw AvailabilityNotFoundException("Availability not found: $availabilityId")
+        val availability =
+            availabilityRepository.findById(availabilityId)
+                ?: throw AvailabilityNotFoundException("Availability not found: $availabilityId")
 
         if (availability.status != AvailabilityStatus.AVAILABLE) {
             logger.warn("Availability is not available: ${availability.status}")
@@ -107,39 +105,40 @@ class AppointmentService(
         logger.info("Updating appointment with ID: ${command.id}")
 
         val appointment =
-            appointmentRepository.findById(AppointmentId.fromString(command.id))
-                ?: return null
+            appointmentRepository.findById(AppointmentId.fromString(command.id)) ?: return null
 
-        val updated = when {
-            command.status != null -> {
-                val newStatus = AppointmentStatus.valueOf(command.status)
-                when (newStatus) {
-                    AppointmentStatus.COMPLETED -> appointment.complete()
-                    AppointmentStatus.CANCELLED -> appointment.cancel()
-                    AppointmentStatus.NO_SHOW -> appointment.markNoShow()
-                    else -> throw IllegalArgumentException(
-                        "Cannot update to status: $newStatus. Use appropriate endpoints."
-                    )
+        val updated =
+            when {
+                command.status != null -> {
+                    val newStatus = AppointmentStatus.valueOf(command.status)
+                    when (newStatus) {
+                        AppointmentStatus.COMPLETED -> appointment.complete()
+                        AppointmentStatus.CANCELLED -> appointment.cancel()
+                        AppointmentStatus.NO_SHOW -> appointment.markNoShow()
+                        else ->
+                            throw IllegalArgumentException(
+                                "Cannot update to status: $newStatus. Use appropriate endpoints."
+                            )
+                    }
                 }
-            }
-            command.availabilityId != null -> {
-                val newAvailabilityId = AvailabilityId.fromString(command.availabilityId)
-                
-                // Validate new availability
-                val newAvailability = availabilityRepository.findById(newAvailabilityId)
-                    ?: throw AvailabilityNotFoundException("New availability not found")
+                command.availabilityId != null -> {
+                    val newAvailabilityId = AvailabilityId.fromString(command.availabilityId)
 
-                if (newAvailability.status != AvailabilityStatus.AVAILABLE) {
-                    throw AvailabilityNotAvailableException("New availability is not available")
+                    // Validate new availability
+                    val newAvailability =
+                        availabilityRepository.findById(newAvailabilityId)
+                            ?: throw AvailabilityNotFoundException("New availability not found")
+
+                    if (newAvailability.status != AvailabilityStatus.AVAILABLE) {
+                        throw AvailabilityNotAvailableException("New availability is not available")
+                    }
+
+                    // Use the timeSlot from the availability
+                    appointment.reschedule(newAvailability.timeSlot, newAvailabilityId)
                 }
-
-                // Use the timeSlot from the availability
-                appointment.reschedule(newAvailability.timeSlot, newAvailabilityId)
+                else ->
+                    throw IllegalArgumentException("Must provide either status or availabilityId")
             }
-            else -> throw IllegalArgumentException(
-                "Must provide either status or availabilityId"
-            )
-        }
 
         val saved = appointmentRepository.update(updated)
 
@@ -180,4 +179,5 @@ class AppointmentService(
 }
 
 class AvailabilityNotFoundException(message: String) : Exception(message)
+
 class AvailabilityNotAvailableException(message: String) : Exception(message)

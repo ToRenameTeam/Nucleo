@@ -6,8 +6,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import it.nucleo.appointments.api.dto.*
 import it.nucleo.appointments.api.toResponse
-import it.nucleo.appointments.application.AvailabilityService
 import it.nucleo.appointments.application.AvailabilityOverlapException
+import it.nucleo.appointments.application.AvailabilityService
 import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("AvailabilityRoutes")
@@ -20,24 +20,22 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
         post {
             try {
                 val request = call.receive<CreateAvailabilityRequest>()
-                
-                val command = AvailabilityService.CreateAvailabilityCommand(
-                    doctorId = request.doctorId,
-                    facilityId = request.facilityId,
-                    serviceTypeId = request.serviceTypeId,
-                    timeSlot = request.timeSlot
-                )
-                
+
+                val command =
+                    AvailabilityService.CreateAvailabilityCommand(
+                        doctorId = request.doctorId,
+                        facilityId = request.facilityId,
+                        serviceTypeId = request.serviceTypeId,
+                        timeSlot = request.timeSlot
+                    )
+
                 val availability = service.createAvailability(command)
                 call.respond(HttpStatusCode.Created, availability.toResponse())
             } catch (e: AvailabilityOverlapException) {
                 logger.warn("Overlap error: ${e.message}", e)
                 call.respond(
                     HttpStatusCode.Conflict,
-                    ErrorResponse(
-                        message = e.message ?: "Overlap error",
-                        code = "OVERLAP_ERROR"
-                    )
+                    ErrorResponse(message = e.message ?: "Overlap error", code = "OVERLAP_ERROR")
                 )
             } catch (e: IllegalArgumentException) {
                 logger.error("Invalid request for creating availability: ${e.message}", e)
@@ -94,12 +92,13 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
                 val serviceTypeId = call.request.queryParameters["serviceTypeId"]
                 val status = call.request.queryParameters["status"]
 
-                val availabilities = service.getAvailabilitiesByFilters(
-                    doctorId = doctorId,
-                    facilityId = facilityId,
-                    serviceTypeId = serviceTypeId,
-                    status = status
-                )
+                val availabilities =
+                    service.getAvailabilitiesByFilters(
+                        doctorId = doctorId,
+                        facilityId = facilityId,
+                        serviceTypeId = serviceTypeId,
+                        status = status
+                    )
 
                 call.respond(HttpStatusCode.OK, availabilities.map { it.toResponse() })
             } catch (e: Exception) {
@@ -123,12 +122,13 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
 
                 val request = call.receive<UpdateAvailabilityRequest>()
 
-                val command = AvailabilityService.UpdateAvailabilityCommand(
-                    id = id,
-                    facilityId = request.facilityId,
-                    serviceTypeId = request.serviceTypeId,
-                    timeSlot = request.timeSlot
-                )
+                val command =
+                    AvailabilityService.UpdateAvailabilityCommand(
+                        id = id,
+                        facilityId = request.facilityId,
+                        serviceTypeId = request.serviceTypeId,
+                        timeSlot = request.timeSlot
+                    )
 
                 val updated = service.updateAvailability(command)
 
@@ -144,10 +144,7 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
                 logger.warn("Overlap error: ${e.message}", e)
                 call.respond(
                     HttpStatusCode.Conflict,
-                    ErrorResponse(
-                        message = e.message ?: "Overlap error",
-                        code = "OVERLAP_ERROR"
-                    )
+                    ErrorResponse(message = e.message ?: "Overlap error", code = "OVERLAP_ERROR")
                 )
             } catch (e: IllegalArgumentException) {
                 logger.error("Invalid request for updating availability: ${e.message}", e)

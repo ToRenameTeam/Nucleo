@@ -54,12 +54,13 @@ class ExposedAppointmentRepository : AppointmentRepository {
         doctorId?.let { query = query.andWhere { AppointmentsTable.doctorId eq it.value } }
         facilityId?.let { query = query.andWhere { AppointmentsTable.facilityId eq it.value } }
         status?.let { query = query.andWhere { AppointmentsTable.status eq it.name } }
-        
+
         if (startDate != null && endDate != null) {
-            query = query.andWhere {
-                (AppointmentsTable.startDateTime greaterEq startDate.toJavaLocalDateTime()) and
+            query =
+                query.andWhere {
+                    (AppointmentsTable.startDateTime greaterEq startDate.toJavaLocalDateTime()) and
                         (AppointmentsTable.startDateTime lessEq endDate.toJavaLocalDateTime())
-            }
+                }
         }
 
         query.map { it.toAppointment() }
@@ -67,9 +68,7 @@ class ExposedAppointmentRepository : AppointmentRepository {
 
     override suspend fun update(appointment: Appointment): Appointment? = dbQuery {
         val updated =
-            AppointmentsTable.update({
-                AppointmentsTable.appointmentId eq appointment.id.value
-            }) {
+            AppointmentsTable.update({ AppointmentsTable.appointmentId eq appointment.id.value }) {
                 it[patientId] = appointment.patientId.value
                 it[availabilityId] = appointment.availabilityId.value
                 it[doctorId] = appointment.doctorId.value

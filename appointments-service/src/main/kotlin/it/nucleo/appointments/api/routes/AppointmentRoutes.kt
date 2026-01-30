@@ -9,8 +9,8 @@ import it.nucleo.appointments.api.dto.ErrorResponse
 import it.nucleo.appointments.api.dto.UpdateAppointmentRequest
 import it.nucleo.appointments.api.toResponse
 import it.nucleo.appointments.application.AppointmentService
-import it.nucleo.appointments.application.AvailabilityNotFoundException
 import it.nucleo.appointments.application.AvailabilityNotAvailableException
+import it.nucleo.appointments.application.AvailabilityNotFoundException
 import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("AppointmentRoutes")
@@ -21,12 +21,13 @@ fun Route.appointmentRoutes(service: AppointmentService) {
         post {
             try {
                 val request = call.receive<CreateAppointmentRequest>()
-                
-                val command = AppointmentService.CreateAppointmentCommand(
-                    patientId = request.patientId,
-                    availabilityId = request.availabilityId
-                )
-                
+
+                val command =
+                    AppointmentService.CreateAppointmentCommand(
+                        patientId = request.patientId,
+                        availabilityId = request.availabilityId
+                    )
+
                 val appointment = service.createAppointment(command)
                 call.respond(HttpStatusCode.Created, appointment.toResponse())
             } catch (e: AvailabilityNotFoundException) {
@@ -89,10 +90,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                 logger.error("Invalid appointment ID: ${e.message}", e)
                 call.respond(
                     HttpStatusCode.BadRequest,
-                    ErrorResponse(
-                        message = e.message ?: "Invalid ID",
-                        code = "INVALID_ID"
-                    )
+                    ErrorResponse(message = e.message ?: "Invalid ID", code = "INVALID_ID")
                 )
             } catch (e: Exception) {
                 logger.error("Error fetching appointment by ID: ${e.message}", e)
@@ -113,14 +111,15 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                 val startDate = call.request.queryParameters["startDate"]
                 val endDate = call.request.queryParameters["endDate"]
 
-                val appointments = service.getAppointmentsByFilters(
-                    patientId = patientId,
-                    doctorId = doctorId,
-                    facilityId = facilityId,
-                    status = status,
-                    startDate = startDate,
-                    endDate = endDate
-                )
+                val appointments =
+                    service.getAppointmentsByFilters(
+                        patientId = patientId,
+                        doctorId = doctorId,
+                        facilityId = facilityId,
+                        status = status,
+                        startDate = startDate,
+                        endDate = endDate
+                    )
 
                 call.respond(HttpStatusCode.OK, appointments.map { it.toResponse() })
             } catch (e: IllegalArgumentException) {
@@ -153,11 +152,12 @@ fun Route.appointmentRoutes(service: AppointmentService) {
 
                 val request = call.receive<UpdateAppointmentRequest>()
 
-                val command = AppointmentService.UpdateAppointmentCommand(
-                    id = id,
-                    status = request.status,
-                    availabilityId = request.availabilityId
-                )
+                val command =
+                    AppointmentService.UpdateAppointmentCommand(
+                        id = id,
+                        status = request.status,
+                        availabilityId = request.availabilityId
+                    )
 
                 val updated = service.updateAppointment(command)
 
@@ -229,10 +229,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                 logger.error("Invalid appointment ID: ${e.message}", e)
                 call.respond(
                     HttpStatusCode.BadRequest,
-                    ErrorResponse(
-                        message = e.message ?: "Invalid ID",
-                        code = "INVALID_ID"
-                    )
+                    ErrorResponse(message = e.message ?: "Invalid ID", code = "INVALID_ID")
                 )
             } catch (e: Exception) {
                 logger.error("Error deleting appointment: ${e.message}", e)
