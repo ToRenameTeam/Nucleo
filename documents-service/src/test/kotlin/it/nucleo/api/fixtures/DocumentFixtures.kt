@@ -9,12 +9,13 @@ object DocumentFixtures {
         metadata: FileMetadataDto = defaultMetadata("Medicine prescription for test"),
         validity: ValidityRequest = ValidityRequest.UntilDate("2026-12-31"),
         dosage: DosageRequest = defaultDosage()
-    ): CreateMedicinePrescriptionRequest = CreateMedicinePrescriptionRequest(
-        doctorId = doctorId,
-        metadata = metadata,
-        validity = validity,
-        dosage = dosage
-    )
+    ): CreateMedicinePrescriptionRequest =
+        CreateMedicinePrescriptionRequest(
+            doctorId = doctorId,
+            metadata = metadata,
+            validity = validity,
+            dosage = dosage
+        )
 
     fun servicePrescriptionRequest(
         doctorId: String = "doctor-test-001",
@@ -23,14 +24,15 @@ object DocumentFixtures {
         serviceId: String = "service-blood-test",
         facilityId: String = "facility-lab-001",
         priority: String = "ROUTINE"
-    ): CreateServicePrescriptionRequest = CreateServicePrescriptionRequest(
-        doctorId = doctorId,
-        metadata = metadata,
-        validity = validity,
-        serviceId = serviceId,
-        facilityId = facilityId,
-        priority = priority
-    )
+    ): CreateServicePrescriptionRequest =
+        CreateServicePrescriptionRequest(
+            doctorId = doctorId,
+            metadata = metadata,
+            validity = validity,
+            serviceId = serviceId,
+            facilityId = facilityId,
+            priority = priority
+        )
 
     fun reportRequest(
         doctorId: String = "doctor-test-002",
@@ -41,27 +43,30 @@ object DocumentFixtures {
         clinicalQuestion: String? = "Check for infection markers",
         conclusion: String? = "No abnormalities detected",
         recommendations: String? = "Repeat in 12 months"
-    ): CreateReportRequest = CreateReportRequest(
-        doctorId = doctorId,
-        metadata = metadata,
-        servicePrescriptionId = servicePrescriptionId,
-        executionDate = executionDate,
-        findings = findings,
-        clinicalQuestion = clinicalQuestion,
-        conclusion = conclusion,
-        recommendations = recommendations
-    )
+    ): CreateReportRequest =
+        CreateReportRequest(
+            doctorId = doctorId,
+            metadata = metadata,
+            servicePrescriptionId = servicePrescriptionId,
+            executionDate = executionDate,
+            findings = findings,
+            clinicalQuestion = clinicalQuestion,
+            conclusion = conclusion,
+            recommendations = recommendations
+        )
 
-    private fun defaultMetadata(summary: String): FileMetadataDto = FileMetadataDto(
-        fileUri = "s3://test-bucket/documents/${System.currentTimeMillis()}.pdf",
-        summary = summary,
-        tags = setOf("test", "automated")
-    )
+    private fun defaultMetadata(summary: String): FileMetadataDto =
+        FileMetadataDto(
+            fileUri = "s3://test-bucket/documents/${System.currentTimeMillis()}.pdf",
+            summary = summary,
+            tags = setOf("test", "automated")
+        )
 
-    private fun defaultDosage(): DosageRequest = DosageRequest(
-        medicineId = "medicine-amoxicillin",
-        dose = DoseDto(amount = 500, unit = "MILLIGRAM"),
-        frequency = FrequencyDto(timesPerPeriod = 3, period = "DAY"),
-        duration = DurationDto(length = 7, unit = "DAY")
-    )
+    private fun defaultDosage(): DosageRequest =
+        DosageRequest(
+            medicineId = "medicine-amoxicillin",
+            dose = DoseDto(amount = 500, unit = "MILLIGRAM"),
+            frequency = FrequencyDto(timesPerPeriod = 3, period = "DAY"),
+            duration = DurationDto(length = 7, unit = "DAY")
+        )
 }

@@ -21,10 +21,11 @@ fun configuredTestApplication(block: suspend (HttpClient) -> Unit) = testApplica
         configureSerialization()
         configureStatusPages()
 
-        val database = MongoDbFactory.createDatabase(
-            connectionUri = TestMongoConfig.CONNECTION_URI,
-            databaseName = TestMongoConfig.DATABASE_NAME
-        )
+        val database =
+            MongoDbFactory.createDatabase(
+                connectionUri = TestMongoConfig.CONNECTION_URI,
+                databaseName = TestMongoConfig.DATABASE_NAME
+            )
         val repository = MongoMedicalRecordRepository(database)
 
         configureRouting(repository)
@@ -32,13 +33,15 @@ fun configuredTestApplication(block: suspend (HttpClient) -> Unit) = testApplica
 
     val client = createClient {
         install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-                ignoreUnknownKeys = true
-                encodeDefaults = true
-                classDiscriminator = "_t"
-            })
+            json(
+                Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                    encodeDefaults = true
+                    classDiscriminator = "_t"
+                }
+            )
         }
     }
 

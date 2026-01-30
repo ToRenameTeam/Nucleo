@@ -81,7 +81,9 @@ private fun Route.getDocumentById(repository: MedicalRecordRepository) {
         logger.debug("GET /patients/$patientId/documents/$documentId - Retrieving document")
         try {
             val document = repository.findDocumentById(PatientId(patientId), DocumentId(documentId))
-            logger.info("GET /patients/$patientId/documents/$documentId - Document retrieved successfully")
+            logger.info(
+                "GET /patients/$patientId/documents/$documentId - Document retrieved successfully"
+            )
             call.respond(HttpStatusCode.OK, document.toResponse())
         } catch (e: DocumentNotFoundException) {
             logger.warn("GET /patients/$patientId/documents/$documentId - Document not found")
@@ -90,7 +92,10 @@ private fun Route.getDocumentById(repository: MedicalRecordRepository) {
                 ErrorResponse("not_found", "Document not found", e.message)
             )
         } catch (e: RepositoryException) {
-            logger.error("GET /patients/$patientId/documents/$documentId - Failed to retrieve document", e)
+            logger.error(
+                "GET /patients/$patientId/documents/$documentId - Failed to retrieve document",
+                e
+            )
             call.respond(
                 HttpStatusCode.InternalServerError,
                 ErrorResponse("internal_error", "Failed to retrieve document", e.message)
@@ -124,7 +129,9 @@ private fun Route.addDocument(repository: MedicalRecordRepository) {
         try {
             val document = createDocumentFromRequest(PatientId(patientId), request, repository)
             repository.addDocument(PatientId(patientId), document)
-            logger.info("POST /patients/$patientId/documents - Document created successfully with id: ${document.id.id}")
+            logger.info(
+                "POST /patients/$patientId/documents - Document created successfully with id: ${document.id.id}"
+            )
             call.respond(HttpStatusCode.Created, document.toResponse())
         } catch (e: DocumentNotFoundException) {
             logger.warn("POST /patients/$patientId/documents - Referenced document not found", e)
@@ -171,7 +178,9 @@ private fun Route.deleteDocument(repository: MedicalRecordRepository) {
         logger.debug("DELETE /patients/$patientId/documents/$documentId - Deleting document")
         try {
             repository.deleteDocument(PatientId(patientId), DocumentId(documentId))
-            logger.info("DELETE /patients/$patientId/documents/$documentId - Document deleted successfully")
+            logger.info(
+                "DELETE /patients/$patientId/documents/$documentId - Document deleted successfully"
+            )
             call.respond(HttpStatusCode.OK, DeleteResponse("Document deleted successfully"))
         } catch (e: DocumentNotFoundException) {
             logger.warn("DELETE /patients/$patientId/documents/$documentId - Document not found")
@@ -180,7 +189,10 @@ private fun Route.deleteDocument(repository: MedicalRecordRepository) {
                 ErrorResponse("not_found", "Document not found", e.message)
             )
         } catch (e: RepositoryException) {
-            logger.error("DELETE /patients/$patientId/documents/$documentId - Failed to delete document", e)
+            logger.error(
+                "DELETE /patients/$patientId/documents/$documentId - Failed to delete document",
+                e
+            )
             call.respond(
                 HttpStatusCode.InternalServerError,
                 ErrorResponse("internal_error", "Failed to delete document", e.message)
@@ -214,7 +226,10 @@ private fun Route.updateReport(repository: MedicalRecordRepository) {
             try {
                 call.receive<UpdateReportRequest>()
             } catch (e: Exception) {
-                logger.warn("PUT /patients/$patientId/documents/$documentId/report - Invalid request body", e)
+                logger.warn(
+                    "PUT /patients/$patientId/documents/$documentId/report - Invalid request body",
+                    e
+                )
                 return@put call.respond(
                     HttpStatusCode.BadRequest,
                     ErrorResponse("bad_request", "Invalid request body", e.message)
@@ -226,7 +241,9 @@ private fun Route.updateReport(repository: MedicalRecordRepository) {
                 repository.findDocumentById(PatientId(patientId), DocumentId(documentId))
 
             if (existingDocument !is Report) {
-                logger.warn("PUT /patients/$patientId/documents/$documentId/report - Document is not a report")
+                logger.warn(
+                    "PUT /patients/$patientId/documents/$documentId/report - Document is not a report"
+                )
                 return@put call.respond(
                     HttpStatusCode.BadRequest,
                     ErrorResponse("bad_request", "Only reports can be updated")
@@ -244,16 +261,23 @@ private fun Route.updateReport(repository: MedicalRecordRepository) {
 
             repository.updateReport(PatientId(patientId), existingDocument)
 
-            logger.info("PUT /patients/$patientId/documents/$documentId/report - Report updated successfully")
+            logger.info(
+                "PUT /patients/$patientId/documents/$documentId/report - Report updated successfully"
+            )
             call.respond(HttpStatusCode.OK, existingDocument.toResponse())
         } catch (e: DocumentNotFoundException) {
-            logger.warn("PUT /patients/$patientId/documents/$documentId/report - Document not found")
+            logger.warn(
+                "PUT /patients/$patientId/documents/$documentId/report - Document not found"
+            )
             call.respond(
                 HttpStatusCode.NotFound,
                 ErrorResponse("not_found", "Document not found", e.message)
             )
         } catch (e: RepositoryException) {
-            logger.error("PUT /patients/$patientId/documents/$documentId/report - Failed to update report", e)
+            logger.error(
+                "PUT /patients/$patientId/documents/$documentId/report - Failed to update report",
+                e
+            )
             call.respond(
                 HttpStatusCode.InternalServerError,
                 ErrorResponse("internal_error", "Failed to update report", e.message)

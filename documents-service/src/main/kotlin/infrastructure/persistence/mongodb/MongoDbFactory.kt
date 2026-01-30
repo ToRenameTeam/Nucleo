@@ -38,18 +38,20 @@ object MongoDbFactory {
         }
 
         // Create custom codec registry with the BSON configuration and serializers module
-        val codecRegistry: CodecRegistry = CodecRegistries.fromRegistries(
-            MongoClientSettings.getDefaultCodecRegistry(),
-            CodecRegistries.fromProviders(
-                KotlinSerializerCodecProvider(serializersModule, bsonConfiguration)
+        val codecRegistry: CodecRegistry =
+            CodecRegistries.fromRegistries(
+                MongoClientSettings.getDefaultCodecRegistry(),
+                CodecRegistries.fromProviders(
+                    KotlinSerializerCodecProvider(serializersModule, bsonConfiguration)
+                )
             )
-        )
 
         // Build MongoDB client with custom codec registry
-        val settings = MongoClientSettings.builder()
-            .applyConnectionString(com.mongodb.ConnectionString(connectionUri))
-            .codecRegistry(codecRegistry)
-            .build()
+        val settings =
+            MongoClientSettings.builder()
+                .applyConnectionString(com.mongodb.ConnectionString(connectionUri))
+                .codecRegistry(codecRegistry)
+                .build()
 
         val client = MongoClient.create(settings)
         val database = client.getDatabase(databaseName)

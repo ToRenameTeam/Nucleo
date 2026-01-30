@@ -11,11 +11,11 @@ import it.nucleo.domain.report.Report
 import it.nucleo.domain.repository.DocumentNotFoundException
 import it.nucleo.domain.repository.MedicalRecordRepository
 import it.nucleo.domain.repository.RepositoryException
+import it.nucleo.infrastructure.logging.logger
 import it.nucleo.infrastructure.persistence.mongodb.dto.DocumentDto
 import it.nucleo.infrastructure.persistence.mongodb.dto.MedicalRecordDocument
 import it.nucleo.infrastructure.persistence.mongodb.dto.toDomain
 import it.nucleo.infrastructure.persistence.mongodb.dto.toDto
-import it.nucleo.infrastructure.logging.logger
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.serialization.json.Json
 import org.bson.BsonDocument
@@ -43,7 +43,9 @@ class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepos
                 Updates.push(MedicalRecordDocument::documents.name, bsonDoc),
                 UpdateOptions().upsert(true)
             )
-            logger.info("Document added successfully for patient: ${patientId.id}, documentId: ${document.id.id}")
+            logger.info(
+                "Document added successfully for patient: ${patientId.id}, documentId: ${document.id.id}"
+            )
         } catch (e: Exception) {
             logger.error("Failed to add document for patient: ${patientId.id}", e)
             throw RepositoryException("Failed to add document for patient '${patientId.id}'", e)
@@ -68,11 +70,16 @@ class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepos
                 logger.warn("Document not found for deletion: ${documentId.id}")
                 throw DocumentNotFoundException(patientId, documentId)
             }
-            logger.info("Document deleted successfully: ${documentId.id} for patient: ${patientId.id}")
+            logger.info(
+                "Document deleted successfully: ${documentId.id} for patient: ${patientId.id}"
+            )
         } catch (e: DocumentNotFoundException) {
             throw e
         } catch (e: Exception) {
-            logger.error("Failed to delete document: ${documentId.id} for patient: ${patientId.id}", e)
+            logger.error(
+                "Failed to delete document: ${documentId.id} for patient: ${patientId.id}",
+                e
+            )
             throw RepositoryException(
                 "Failed to delete document '${documentId.id}' for patient '${patientId.id}'",
                 e
@@ -115,7 +122,10 @@ class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepos
             logger.warn("Document not found: ${documentId.id} for patient: ${patientId.id}")
             throw e
         } catch (e: Exception) {
-            logger.error("Failed to find document: ${documentId.id} for patient: ${patientId.id}", e)
+            logger.error(
+                "Failed to find document: ${documentId.id} for patient: ${patientId.id}",
+                e
+            )
             throw RepositoryException(
                 "Failed to find document '${documentId.id}' for patient '${patientId.id}'",
                 e

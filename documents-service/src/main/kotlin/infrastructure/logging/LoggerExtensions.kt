@@ -4,8 +4,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * Creates a logger instance for the class that calls this function.
- * Uses reified type parameter to automatically infer the class name.
+ * Creates a logger instance for the class that calls this function. Uses reified type parameter to
+ * automatically infer the class name.
  *
  * Usage in a class:
  * ```
@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory
 inline fun <reified T> T.logger(): Logger = LoggerFactory.getLogger(T::class.java)
 
 /**
- * Creates a logger instance with a custom name.
- * Useful for top-level functions or when a specific logger name is needed.
+ * Creates a logger instance with a custom name. Useful for top-level functions or when a specific
+ * logger name is needed.
  *
  * Usage:
  * ```
