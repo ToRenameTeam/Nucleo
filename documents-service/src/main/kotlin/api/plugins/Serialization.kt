@@ -5,11 +5,16 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.request.httpMethod
+import io.ktor.server.request.uri
 import io.ktor.server.response.*
 import it.nucleo.api.dto.ErrorResponse
 import it.nucleo.domain.repository.DocumentNotFoundException
 import it.nucleo.domain.repository.RepositoryException
+import it.nucleo.infrastructure.logging.logger
 import kotlinx.serialization.json.Json
+
+private val logger = logger("it.nucleo.api.plugins.StatusPages")
 
 fun Application.configureSerialization() {
     install(ContentNegotiation) {
@@ -28,6 +33,7 @@ fun Application.configureSerialization() {
 fun Application.configureStatusPages() {
     install(StatusPages) {
         exception<DocumentNotFoundException> { call, cause ->
+            logger.warn("Document not found: ${cause.message}")
             call.respond(
                 HttpStatusCode.NotFound,
                 ErrorResponse(
@@ -39,6 +45,7 @@ fun Application.configureStatusPages() {
         }
 
         exception<RepositoryException> { call, cause ->
+            logger.error("Repository operation failed: ${cause.message}", cause)
             call.respond(
                 HttpStatusCode.InternalServerError,
                 ErrorResponse(
@@ -50,6 +57,7 @@ fun Application.configureStatusPages() {
         }
 
         exception<IllegalArgumentException> { call, cause ->
+            logger.warn("Invalid request: ${cause.message}")
             call.respond(
                 HttpStatusCode.BadRequest,
                 ErrorResponse(
@@ -61,6 +69,7 @@ fun Application.configureStatusPages() {
         }
 
         exception<Throwable> { call, cause ->
+            logger.error("Unexpected error occurred: ${cause.message}", cause)
             call.respond(
                 HttpStatusCode.InternalServerError,
                 ErrorResponse(
@@ -72,6 +81,7 @@ fun Application.configureStatusPages() {
         }
 
         status(HttpStatusCode.NotFound) { call, status ->
+            logger.debug("Resource not found: ${call.request.uri}")
             call.respond(
                 status,
                 ErrorResponse(error = "not_found", message = "The requested resource was not found")
@@ -79,6 +89,7 @@ fun Application.configureStatusPages() {
         }
 
         status(HttpStatusCode.MethodNotAllowed) { call, status ->
+            logger.debug("Method not allowed: ${call.request.httpMethod.value} ${call.request.uri}")
             call.respond(
                 status,
                 ErrorResponse(

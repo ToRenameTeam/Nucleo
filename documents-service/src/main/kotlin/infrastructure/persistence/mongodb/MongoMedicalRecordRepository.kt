@@ -15,13 +15,16 @@ import it.nucleo.infrastructure.persistence.mongodb.model.DocumentDto
 import it.nucleo.infrastructure.persistence.mongodb.model.MedicalRecordDocument
 import it.nucleo.infrastructure.persistence.mongodb.model.toDomain
 import it.nucleo.infrastructure.persistence.mongodb.model.toDto
+import it.nucleo.infrastructure.logging.logger
 import kotlinx.coroutines.flow.firstOrNull
 
 class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepository {
 
+    private val logger = logger()
     private val collection = database.getCollection<MedicalRecordDocument>(COLLECTION_NAME)
 
     override suspend fun addDocument(patientId: PatientId, document: Document) {
+        logger.debug("Adding document for patient: ${patientId.id}, documentId: ${document.id.id}")
         try {
             val documentDto = document.toDto()
 
@@ -30,12 +33,15 @@ class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepos
                 Updates.push(MedicalRecordDocument::documents.name, documentDto),
                 UpdateOptions().upsert(true)
             )
+            logger.info("Document added successfully for patient: ${patientId.id}, documentId: ${document.id.id}")
         } catch (e: Exception) {
+            logger.error("Failed to add document for patient: ${patientId.id}", e)
             throw RepositoryException("Failed to add document for patient '${patientId.id}'", e)
         }
     }
 
     override suspend fun deleteDocument(patientId: PatientId, documentId: DocumentId) {
+        logger.debug("Deleting document: ${documentId.id} for patient: ${patientId.id}")
         try {
             findDocumentById(patientId, documentId)
 
@@ -49,11 +55,14 @@ class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepos
                 )
 
             if (result.modifiedCount == 0L) {
+                logger.warn("Document not found for deletion: ${documentId.id}")
                 throw DocumentNotFoundException(patientId, documentId)
             }
+            logger.info("Document deleted successfully: ${documentId.id} for patient: ${patientId.id}")
         } catch (e: DocumentNotFoundException) {
             throw e
         } catch (e: Exception) {
+            logger.error("Failed to delete document: ${documentId.id} for patient: ${patientId.id}", e)
             throw RepositoryException(
                 "Failed to delete document '${documentId.id}' for patient '${patientId.id}'",
                 e
@@ -62,19 +71,24 @@ class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepos
     }
 
     override suspend fun findAllDocumentsByPatient(patientId: PatientId): Iterable<Document> {
+        logger.debug("Finding all documents for patient: ${patientId.id}")
         try {
             val record =
                 collection
                     .find(Filters.eq(MedicalRecordDocument::patientId.name, patientId.id))
                     .firstOrNull()
 
-            return record?.documents?.map { it.toDomain() } ?: emptyList()
+            val documents = record?.documents?.map { it.toDomain() } ?: emptyList()
+            logger.debug("Found ${documents.size} documents for patient: ${patientId.id}")
+            return documents
         } catch (e: Exception) {
+            logger.error("Failed to find documents for patient: ${patientId.id}", e)
             throw RepositoryException("Failed to find documents for patient '${patientId.id}'", e)
         }
     }
 
     override suspend fun findDocumentById(patientId: PatientId, documentId: DocumentId): Document {
+        logger.debug("Finding document: ${documentId.id} for patient: ${patientId.id}")
         try {
             val record =
                 collection
@@ -85,10 +99,13 @@ class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepos
                 record?.documents?.find { it.id == documentId.id }
                     ?: throw DocumentNotFoundException(patientId, documentId)
 
+            logger.debug("Document found: ${documentId.id} for patient: ${patientId.id}")
             return documentDto.toDomain()
         } catch (e: DocumentNotFoundException) {
+            logger.warn("Document not found: ${documentId.id} for patient: ${patientId.id}")
             throw e
         } catch (e: Exception) {
+            logger.error("Failed to find document: ${documentId.id} for patient: ${patientId.id}", e)
             throw RepositoryException(
                 "Failed to find document '${documentId.id}' for patient '${patientId.id}'",
                 e
@@ -97,9 +114,11 @@ class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepos
     }
 
     override suspend fun updateReport(patientId: PatientId, report: Report) {
+        logger.debug("Updating report: ${report.id.id} for patient: ${patientId.id}")
         try {
             val existingDocument = findDocumentById(patientId, report.id)
             if (existingDocument !is Report) {
+                logger.warn("Document is not a report: ${report.id.id}")
                 throw RepositoryException(
                     "Document '${report.id.id}' is not a report and cannot be updated"
                 )
@@ -120,13 +139,16 @@ class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepos
                 )
 
             if (result.modifiedCount == 0L) {
+                logger.warn("Report not found for update: ${report.id.id}")
                 throw DocumentNotFoundException(patientId, report.id)
             }
+            logger.info("Report updated successfully: ${report.id.id} for patient: ${patientId.id}")
         } catch (e: DocumentNotFoundException) {
             throw e
         } catch (e: RepositoryException) {
             throw e
         } catch (e: Exception) {
+            logger.error("Failed to update report: ${report.id.id} for patient: ${patientId.id}", e)
             throw RepositoryException(
                 "Failed to update report '${report.id.id}' for patient '${patientId.id}'",
                 e

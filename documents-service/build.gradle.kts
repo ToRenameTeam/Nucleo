@@ -13,6 +13,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.mongodb.driver.kotlin.coroutine)
     implementation(libs.mongodb.bson.kotlinx)
+    implementation(libs.logback)
 }
 
 application {
