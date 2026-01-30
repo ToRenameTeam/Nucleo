@@ -6,14 +6,13 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import it.nucleo.appointments.api.dto.*
 import it.nucleo.appointments.api.toResponse
-import it.nucleo.appointments.domain.Availability
-import it.nucleo.appointments.domain.AvailabilityRepository
-import it.nucleo.appointments.domain.valueobjects.*
+import it.nucleo.appointments.application.AvailabilityService
+import it.nucleo.appointments.application.AvailabilityOverlapException
 import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("AvailabilityRoutes")
 
-fun Route.availabilityRoutes(repository: AvailabilityRepository) {
+fun Route.availabilityRoutes(service: AvailabilityService) {
 
     route("/availabilities") {
 
@@ -21,41 +20,25 @@ fun Route.availabilityRoutes(repository: AvailabilityRepository) {
         post {
             try {
                 val request = call.receive<CreateAvailabilityRequest>()
-                logger.info("Creating availability for doctor: ${request.doctorId}")
-
-                val doctorId = DoctorId.fromString(request.doctorId)
-                val facilityId = FacilityId.fromString(request.facilityId)
-                val serviceTypeId = ServiceTypeId.fromString(request.serviceTypeId)
-
-                // Check for overlaps
-                val hasOverlap = repository.checkOverlap(doctorId, request.timeSlot)
-
-                if (hasOverlap) {
-                    logger.warn(
-                        "Overlap detected for doctor: $doctorId in time slot: ${request.timeSlot}"
+                
+                val command = AvailabilityService.CreateAvailabilityCommand(
+                    doctorId = request.doctorId,
+                    facilityId = request.facilityId,
+                    serviceTypeId = request.serviceTypeId,
+                    timeSlot = request.timeSlot
+                )
+                
+                val availability = service.createAvailability(command)
+                call.respond(HttpStatusCode.Created, availability.toResponse())
+            } catch (e: AvailabilityOverlapException) {
+                logger.warn("Overlap error: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.Conflict,
+                    ErrorResponse(
+                        message = e.message ?: "Overlap error",
+                        code = "OVERLAP_ERROR"
                     )
-                    call.respond(
-                        HttpStatusCode.Conflict,
-                        ErrorResponse(
-                            message =
-                                "The doctor already has an availability that overlaps with the requested time slot (${request.timeSlot.startDateTime} - ${request.timeSlot.endDateTime})",
-                            code = "OVERLAP_ERROR"
-                        )
-                    )
-                    return@post
-                }
-
-                val availability =
-                    Availability.create(
-                        doctorId = doctorId,
-                        facilityId = facilityId,
-                        serviceTypeId = serviceTypeId,
-                        timeSlot = request.timeSlot
-                    )
-
-                val saved = repository.save(availability)
-                logger.info("Availability created successfully with ID: ${saved.availabilityId}")
-                call.respond(HttpStatusCode.Created, saved.toResponse())
+                )
             } catch (e: IllegalArgumentException) {
                 logger.error("Invalid request for creating availability: ${e.message}", e)
                 call.respond(
@@ -83,18 +66,15 @@ fun Route.availabilityRoutes(repository: AvailabilityRepository) {
                             HttpStatusCode.BadRequest,
                             ErrorResponse(message = "Missing ID", code = "MISSING_ID")
                         )
-                logger.info("Fetching availability by ID: $id")
 
-                val availability = repository.findById(AvailabilityId.fromString(id))
+                val availability = service.getAvailabilityById(id)
 
                 if (availability == null) {
-                    logger.warn("Availability not found with ID: $id")
                     call.respond(
                         HttpStatusCode.NotFound,
                         ErrorResponse(message = "Availability not found", code = "NOT_FOUND")
                     )
                 } else {
-                    logger.info("Availability found with ID: $id")
                     call.respond(HttpStatusCode.OK, availability.toResponse())
                 }
             } catch (e: Exception) {
@@ -109,23 +89,17 @@ fun Route.availabilityRoutes(repository: AvailabilityRepository) {
         // Get all availabilities (with filters)
         get {
             try {
-                val doctorId =
-                    call.request.queryParameters["doctorId"]?.let { DoctorId.fromString(it) }
-                val facilityId =
-                    call.request.queryParameters["facilityId"]?.let { FacilityId.fromString(it) }
-                val serviceTypeId =
-                    call.request.queryParameters["serviceTypeId"]?.let {
-                        ServiceTypeId.fromString(it)
-                    }
-                val status =
-                    call.request.queryParameters["status"]?.let { AvailabilityStatus.valueOf(it) }
-                logger.info(
-                    "Fetching availabilities with filters - doctorId: $doctorId, facilityId: $facilityId, serviceTypeId: $serviceTypeId, status: $status"
-                )
+                val doctorId = call.request.queryParameters["doctorId"]
+                val facilityId = call.request.queryParameters["facilityId"]
+                val serviceTypeId = call.request.queryParameters["serviceTypeId"]
+                val status = call.request.queryParameters["status"]
 
-                val availabilities =
-                    repository.findByFilters(doctorId, facilityId, serviceTypeId, status)
-                logger.info("Found ${availabilities.size} availabilities")
+                val availabilities = service.getAvailabilitiesByFilters(
+                    doctorId = doctorId,
+                    facilityId = facilityId,
+                    serviceTypeId = serviceTypeId,
+                    status = status
+                )
 
                 call.respond(HttpStatusCode.OK, availabilities.map { it.toResponse() })
             } catch (e: Exception) {
@@ -146,61 +120,35 @@ fun Route.availabilityRoutes(repository: AvailabilityRepository) {
                             HttpStatusCode.BadRequest,
                             ErrorResponse(message = "Missing ID", code = "MISSING_ID")
                         )
-                logger.info("Updating availability with ID: $id")
 
                 val request = call.receive<UpdateAvailabilityRequest>()
 
-                val availability =
-                    repository.findById(AvailabilityId.fromString(id))
-                        ?: return@put call.respond(
-                            HttpStatusCode.NotFound,
-                            ErrorResponse(message = "Availability not found", code = "NOT_FOUND")
-                        )
+                val command = AvailabilityService.UpdateAvailabilityCommand(
+                    id = id,
+                    facilityId = request.facilityId,
+                    serviceTypeId = request.serviceTypeId,
+                    timeSlot = request.timeSlot
+                )
 
-                // Check for overlaps if time slot is being changed
-                if (request.timeSlot != null) {
-                    val hasOverlap =
-                        repository.checkOverlap(
-                            availability.doctorId,
-                            request.timeSlot,
-                            availability.availabilityId
-                        )
+                val updated = service.updateAvailability(command)
 
-                    if (hasOverlap) {
-                        logger.warn(
-                            "Overlap detected when updating availability $id for doctor: ${availability.doctorId}"
-                        )
-                        call.respond(
-                            HttpStatusCode.Conflict,
-                            ErrorResponse(
-                                message =
-                                    "The doctor already has an availability that overlaps with the requested time slot (${request.timeSlot.startDateTime} - ${request.timeSlot.endDateTime})",
-                                code = "OVERLAP_ERROR"
-                            )
-                        )
-                        return@put
-                    }
-                }
-
-                val updated =
-                    availability.update(
-                        facilityId = request.facilityId?.let { FacilityId.fromString(it) },
-                        serviceTypeId = request.serviceTypeId?.let { ServiceTypeId.fromString(it) },
-                        timeSlot = request.timeSlot
-                    )
-
-                val saved = repository.update(updated)
-
-                if (saved == null) {
-                    logger.warn("Availability not found when updating with ID: $id")
+                if (updated == null) {
                     call.respond(
                         HttpStatusCode.NotFound,
                         ErrorResponse(message = "Availability not found", code = "NOT_FOUND")
                     )
                 } else {
-                    logger.info("Availability updated successfully with ID: $id")
-                    call.respond(HttpStatusCode.OK, saved.toResponse())
+                    call.respond(HttpStatusCode.OK, updated.toResponse())
                 }
+            } catch (e: AvailabilityOverlapException) {
+                logger.warn("Overlap error: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.Conflict,
+                    ErrorResponse(
+                        message = e.message ?: "Overlap error",
+                        code = "OVERLAP_ERROR"
+                    )
+                )
             } catch (e: IllegalArgumentException) {
                 logger.error("Invalid request for updating availability: ${e.message}", e)
                 call.respond(
@@ -228,21 +176,17 @@ fun Route.availabilityRoutes(repository: AvailabilityRepository) {
                             HttpStatusCode.BadRequest,
                             ErrorResponse(message = "Missing ID", code = "MISSING_ID")
                         )
-                logger.info("Cancelling availability with ID: $id")
 
-                val availability =
-                    repository.findById(AvailabilityId.fromString(id))
-                        ?: return@delete call.respond(
-                            HttpStatusCode.NotFound,
-                            ErrorResponse(message = "Availability not found", code = "NOT_FOUND")
-                        )
+                val cancelled = service.cancelAvailability(id)
 
-                val cancelled = availability.cancel()
-
-                repository.update(cancelled)
-                logger.info("Availability cancelled successfully with ID: $id")
-
-                call.respond(HttpStatusCode.NoContent)
+                if (!cancelled) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(message = "Availability not found", code = "NOT_FOUND")
+                    )
+                } else {
+                    call.respond(HttpStatusCode.NoContent)
+                }
             } catch (e: IllegalArgumentException) {
                 logger.error("Invalid request for cancelling availability: ${e.message}", e)
                 call.respond(
