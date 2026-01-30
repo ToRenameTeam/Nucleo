@@ -1,21 +1,9 @@
 package it.nucleo.api.dto
 
-import it.nucleo.domain.Document
-import it.nucleo.domain.FileMetadata
-import it.nucleo.domain.FileURI
-import it.nucleo.domain.Summary
-import it.nucleo.domain.Tag
+import it.nucleo.domain.*
 import it.nucleo.domain.prescription.Validity
-import it.nucleo.domain.prescription.implementation.Dosage
-import it.nucleo.domain.prescription.implementation.Dose
-import it.nucleo.domain.prescription.implementation.DoseUnit
-import it.nucleo.domain.prescription.implementation.Duration
-import it.nucleo.domain.prescription.implementation.Frequency
-import it.nucleo.domain.prescription.implementation.MedicineId
-import it.nucleo.domain.prescription.implementation.MedicinePrescription
-import it.nucleo.domain.prescription.implementation.Period
-import it.nucleo.domain.prescription.implementation.ServicePrescription
-import it.nucleo.domain.report.Report
+import it.nucleo.domain.prescription.implementation.*
+import it.nucleo.domain.report.*
 import java.time.LocalDate
 
 fun Document.toResponse(): DocumentResponse =

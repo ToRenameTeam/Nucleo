@@ -5,38 +5,24 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import it.nucleo.api.dto.*
+import it.nucleo.application.DocumentService
 import it.nucleo.domain.*
-import it.nucleo.domain.DocumentFactory
-import it.nucleo.domain.DocumentNotFoundException
-import it.nucleo.domain.DocumentRepository
-import it.nucleo.domain.RepositoryException
-import it.nucleo.domain.prescription.implementation.FacilityId
-import it.nucleo.domain.prescription.implementation.Priority
-import it.nucleo.domain.prescription.implementation.ServiceId
-import it.nucleo.domain.prescription.implementation.ServicePrescription
-import it.nucleo.domain.report.ClinicalQuestion
-import it.nucleo.domain.report.Conclusion
-import it.nucleo.domain.report.ExecutionDate
-import it.nucleo.domain.report.Findings
-import it.nucleo.domain.report.Recommendations
-import it.nucleo.domain.report.Report
 import it.nucleo.infrastructure.logging.logger
-import java.time.LocalDate
 
 private val logger = logger("it.nucleo.api.routes.DocumentRoutes")
 
-fun Route.documentRoutes(repository: DocumentRepository) {
+fun Route.documentRoutes(documentService: DocumentService) {
     route("/patients/{patientId}/documents") {
-        getAllDocuments(repository)
-        getDocumentById(repository)
-        addDocument(repository)
-        deleteDocument(repository)
-        updateReport(repository)
+        getAllDocuments(documentService)
+        getDocumentById(documentService)
+        addDocument(documentService)
+        deleteDocument(documentService)
+        updateReport(documentService)
     }
 }
 
 /** GET /patients/{patientId}/documents Retrieves all documents for a specific patient. */
-private fun Route.getAllDocuments(repository: DocumentRepository) {
+private fun Route.getAllDocuments(documentService: DocumentService) {
     get {
         val patientId =
             call.parameters["patientId"]
@@ -47,7 +33,7 @@ private fun Route.getAllDocuments(repository: DocumentRepository) {
 
         logger.debug("GET /patients/$patientId/documents - Retrieving all documents")
         try {
-            val documents = repository.findAllDocumentsByPatient(PatientId(patientId))
+            val documents = documentService.getAllDocumentsByPatient(PatientId(patientId))
             val response = documents.map { it.toResponse() }
             logger.info("GET /patients/$patientId/documents - Retrieved ${response.size} documents")
             call.respond(HttpStatusCode.OK, response)
@@ -62,7 +48,7 @@ private fun Route.getAllDocuments(repository: DocumentRepository) {
 }
 
 /** GET /patients/{patientId}/documents/{documentId} Retrieves a single document by its ID. */
-private fun Route.getDocumentById(repository: DocumentRepository) {
+private fun Route.getDocumentById(documentService: DocumentService) {
     get("/{documentId}") {
         val patientId =
             call.parameters["patientId"]
@@ -80,7 +66,8 @@ private fun Route.getDocumentById(repository: DocumentRepository) {
 
         logger.debug("GET /patients/$patientId/documents/$documentId - Retrieving document")
         try {
-            val document = repository.findDocumentById(PatientId(patientId), DocumentId(documentId))
+            val document =
+                documentService.getDocumentById(PatientId(patientId), DocumentId(documentId))
             logger.info(
                 "GET /patients/$patientId/documents/$documentId - Document retrieved successfully"
             )
@@ -105,7 +92,7 @@ private fun Route.getDocumentById(repository: DocumentRepository) {
 }
 
 /** POST /patients/{patientId}/documents Adds a new document to a patient's medical record. */
-private fun Route.addDocument(repository: DocumentRepository) {
+private fun Route.addDocument(documentService: DocumentService) {
     post {
         val patientId =
             call.parameters["patientId"]
@@ -127,8 +114,7 @@ private fun Route.addDocument(repository: DocumentRepository) {
             }
 
         try {
-            val document = createDocumentFromRequest(PatientId(patientId), request, repository)
-            repository.addDocument(PatientId(patientId), document)
+            val document = documentService.createDocument(PatientId(patientId), request)
             logger.info(
                 "POST /patients/$patientId/documents - Document created successfully with id: ${document.id.id}"
             )
@@ -159,7 +145,7 @@ private fun Route.addDocument(repository: DocumentRepository) {
  * DELETE /patients/{patientId}/documents/{documentId} Deletes a document from a patient's medical
  * record.
  */
-private fun Route.deleteDocument(repository: DocumentRepository) {
+private fun Route.deleteDocument(documentService: DocumentService) {
     delete("/{documentId}") {
         val patientId =
             call.parameters["patientId"]
@@ -177,7 +163,7 @@ private fun Route.deleteDocument(repository: DocumentRepository) {
 
         logger.debug("DELETE /patients/$patientId/documents/$documentId - Deleting document")
         try {
-            repository.deleteDocument(PatientId(patientId), DocumentId(documentId))
+            documentService.deleteDocument(PatientId(patientId), DocumentId(documentId))
             logger.info(
                 "DELETE /patients/$patientId/documents/$documentId - Document deleted successfully"
             )
@@ -205,7 +191,7 @@ private fun Route.deleteDocument(repository: DocumentRepository) {
  * PUT /patients/{patientId}/documents/{documentId}/report Updates an existing report. Only reports
  * can be updated.
  */
-private fun Route.updateReport(repository: DocumentRepository) {
+private fun Route.updateReport(documentService: DocumentService) {
     put("/{documentId}/report") {
         val patientId =
             call.parameters["patientId"]
@@ -237,34 +223,13 @@ private fun Route.updateReport(repository: DocumentRepository) {
             }
 
         try {
-            val existingDocument =
-                repository.findDocumentById(PatientId(patientId), DocumentId(documentId))
-
-            if (existingDocument !is Report) {
-                logger.warn(
-                    "PUT /patients/$patientId/documents/$documentId/report - Document is not a report"
-                )
-                return@put call.respond(
-                    HttpStatusCode.BadRequest,
-                    ErrorResponse("bad_request", "Only reports can be updated")
-                )
-            }
-
-            request.findings?.let { existingDocument.updateFindings(Findings(it)) }
-            request.clinicalQuestion?.let {
-                existingDocument.setClinicalQuestion(ClinicalQuestion(it))
-            }
-            request.conclusion?.let { existingDocument.setConclusion(Conclusion(it)) }
-            request.recommendations?.let {
-                existingDocument.setRecommendations(Recommendations(it))
-            }
-
-            repository.updateReport(PatientId(patientId), existingDocument)
+            val updatedReport =
+                documentService.updateReport(PatientId(patientId), DocumentId(documentId), request)
 
             logger.info(
                 "PUT /patients/$patientId/documents/$documentId/report - Report updated successfully"
             )
-            call.respond(HttpStatusCode.OK, existingDocument.toResponse())
+            call.respond(HttpStatusCode.OK, updatedReport.toResponse())
         } catch (e: DocumentNotFoundException) {
             logger.warn(
                 "PUT /patients/$patientId/documents/$documentId/report - Document not found"
@@ -272,6 +237,12 @@ private fun Route.updateReport(repository: DocumentRepository) {
             call.respond(
                 HttpStatusCode.NotFound,
                 ErrorResponse("not_found", "Document not found", e.message)
+            )
+        } catch (e: IllegalArgumentException) {
+            logger.warn("PUT /patients/$patientId/documents/$documentId/report - ${e.message}", e)
+            call.respond(
+                HttpStatusCode.BadRequest,
+                ErrorResponse("bad_request", e.message ?: "Invalid request")
             )
         } catch (e: RepositoryException) {
             logger.error(
@@ -281,61 +252,6 @@ private fun Route.updateReport(repository: DocumentRepository) {
             call.respond(
                 HttpStatusCode.InternalServerError,
                 ErrorResponse("internal_error", "Failed to update report", e.message)
-            )
-        }
-    }
-}
-
-/** Helper function to create a domain document from a request DTO. */
-private suspend fun createDocumentFromRequest(
-    patientId: PatientId,
-    request: CreateDocumentRequest,
-    repository: DocumentRepository
-): Document {
-    val doctorId = DoctorId(request.doctorId)
-    val metadata = request.metadata.toDomain()
-
-    return when (request) {
-        is CreateMedicinePrescriptionRequest -> {
-            DocumentFactory.createMedicinePrescription(
-                doctorId = doctorId,
-                patientId = patientId,
-                metadata = metadata,
-                validity = request.validity.toDomain(),
-                dosage = request.dosage.toDomain()
-            )
-        }
-        is CreateServicePrescriptionRequest -> {
-            DocumentFactory.createServicePrescription(
-                doctorId = doctorId,
-                patientId = patientId,
-                metadata = metadata,
-                validity = request.validity.toDomain(),
-                serviceId = ServiceId(request.serviceId),
-                facilityId = FacilityId(request.facilityId),
-                priority = Priority.valueOf(request.priority)
-            )
-        }
-        is CreateReportRequest -> {
-            val servicePrescriptionDoc =
-                repository.findDocumentById(patientId, DocumentId(request.servicePrescriptionId))
-
-            if (servicePrescriptionDoc !is ServicePrescription) {
-                throw IllegalArgumentException(
-                    "Document '${request.servicePrescriptionId}' is not a service prescription"
-                )
-            }
-
-            DocumentFactory.createReport(
-                doctorId = doctorId,
-                patientId = patientId,
-                metadata = metadata,
-                servicePrescription = servicePrescriptionDoc,
-                executionDate = ExecutionDate(LocalDate.parse(request.executionDate)),
-                findings = Findings(request.findings),
-                clinicalQuestion = request.clinicalQuestion?.let { ClinicalQuestion(it) },
-                conclusion = request.conclusion?.let { Conclusion(it) },
-                recommendations = request.recommendations?.let { Recommendations(it) }
             )
         }
     }

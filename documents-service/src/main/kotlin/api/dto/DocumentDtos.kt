@@ -136,7 +136,6 @@ data class DosageRequest(
     val duration: DurationDto
 )
 
-/** Request for updating a report. */
 @Serializable
 data class UpdateReportRequest(
     val findings: String? = null,
@@ -145,9 +144,7 @@ data class UpdateReportRequest(
     val recommendations: String? = null
 )
 
-/** API error response. */
 @Serializable
 data class ErrorResponse(val error: String, val message: String, val details: String? = null)
 
-/** Successful deletion response. */
 @Serializable data class DeleteResponse(val message: String)
