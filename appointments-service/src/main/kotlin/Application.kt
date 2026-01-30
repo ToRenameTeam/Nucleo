@@ -12,6 +12,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import it.nucleo.appointments.api.routes.appointmentRoutes
 import it.nucleo.appointments.api.routes.availabilityRoutes
+import it.nucleo.appointments.application.AppointmentService
 import it.nucleo.appointments.application.AvailabilityService
 import it.nucleo.appointments.infrastructure.database.DatabaseFactory
 import it.nucleo.appointments.infrastructure.persistence.ExposedAppointmentRepository
@@ -66,9 +67,10 @@ fun Application.configureApp() {
 
         // Initialize services
         val availabilityService = AvailabilityService(availabilityRepository)
+        val appointmentService = AppointmentService(appointmentRepository, availabilityRepository)
 
         logger.info("Application configuration completed successfully")
         availabilityRoutes(availabilityService)
-        appointmentRoutes(appointmentRepository, availabilityRepository)
+        appointmentRoutes(appointmentService)
     }
 }
