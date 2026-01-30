@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import { serviceCatalogRoutes } from './api/index.js';
 import { runSeeds } from './infrastructure/database/index.js';
 
 const app = express();
