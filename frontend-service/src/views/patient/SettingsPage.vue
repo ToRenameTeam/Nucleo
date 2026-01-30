@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useAuth } from '../../authentication/useAuth'
+import { useAuth } from '../../composables/useAuth'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import SettingsItem from '../../components/settings/SettingsItem.vue'

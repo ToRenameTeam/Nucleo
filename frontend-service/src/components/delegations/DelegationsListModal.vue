@@ -1,21 +1,38 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeftIcon, CheckIcon, XMarkIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseModal from '../shared/BaseModal.vue'
-import type { DelegationsListModal } from '../../types/delegation'
+import { parseItalianDate } from '../../utils/dateUtils'
+import { useDelegations } from '../../composables/useDelegations'
+import { useAuth } from '../../composables/useAuth'
 
 const { t } = useI18n()
+const { currentUser } = useAuth()
+const {
+  delegations,
+  isLoading,
+  loadDelegations,
+  acceptDelegation,
+  declineDelegation,
+  removeDelegation
+} = useDelegations()
 
-const props = defineProps<DelegationsListModal>()
+const props = defineProps<{
+  isOpen: boolean
+  type: 'received' | 'sent'
+}>()
 
 const emit = defineEmits<{
   close: []
   back: []
-  accept: [delegationId: string]
-  decline: [delegationId: string]
-  remove: [delegationId: string]
 }>()
+
+watch(() => props.isOpen, async (isOpen) => {
+  if (isOpen && currentUser.value?.userId) {
+    await loadDelegations(currentUser.value.userId, props.type)
+  }
+})
 
 const title = computed(() => {
   return props.type === 'received' 
@@ -24,7 +41,7 @@ const title = computed(() => {
 })
 
 const subtitle = computed(() => {
-  const count = props.delegations.length
+  const count = delegations.value.length
   return props.type === 'received'
     ? t('delegations.receivedList.subtitle', { count })
     : t('delegations.sentList.subtitle', { count })
@@ -62,25 +79,34 @@ const getStatusBadge = (status: string) => {
   return null
 }
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return new Intl.DateTimeFormat('it-IT', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  }).format(date)
+const handleAccept = async (delegationId: string) => {
+  if (!currentUser.value?.userId) return
+  
+  const success = await acceptDelegation(delegationId, currentUser.value.userId)
+  if (success) {
+    await loadDelegations(currentUser.value.userId, props.type)
+    window.dispatchEvent(new CustomEvent('delegations-updated'))
+  }
 }
 
-const handleAccept = (delegationId: string) => {
-  emit('accept', delegationId)
+const handleDecline = async (delegationId: string) => {
+  if (!currentUser.value?.userId) return
+  
+  const success = await declineDelegation(delegationId, currentUser.value.userId)
+  if (success) {
+    await loadDelegations(currentUser.value.userId, props.type)
+    window.dispatchEvent(new CustomEvent('delegations-updated'))
+  }
 }
 
-const handleDecline = (delegationId: string) => {
-  emit('decline', delegationId)
-}
-
-const handleRemove = (delegationId: string) => {
-  emit('remove', delegationId)
+const handleRemove = async (delegationId: string) => {
+  if (!currentUser.value?.userId) return
+  
+  const success = await removeDelegation(delegationId, currentUser.value.userId)
+  if (success) {
+    await loadDelegations(currentUser.value.userId, props.type)
+    window.dispatchEvent(new CustomEvent('delegations-updated'))
+  }
 }
 
 const handleBack = () => {
@@ -107,7 +133,15 @@ const handleBack = () => {
       </div>
     </template>
 
-    <div class="delegations-list">
+    <div v-if="isLoading" class="loading-state">
+      <p>{{ t('delegations.loading') }}</p>
+    </div>
+
+    <div v-else-if="delegations.length === 0" class="empty-state">
+      <p>{{ t('delegations.noResults') }}</p>
+    </div>
+
+    <div v-else class="delegations-list">
       <div
         v-for="delegation in delegations"
         :key="delegation.delegationId"
@@ -128,7 +162,7 @@ const handleBack = () => {
               </span>
             </div>
             <p class="user-fiscal-code">{{ delegation.fiscalCode }}</p>
-            <p class="delegation-date">{{ formatDate(delegation.date) }}</p>
+            <p class="delegation-date">{{ parseItalianDate(delegation.date) }}</p>
           </div>
         </div>
 
@@ -165,6 +199,13 @@ const handleBack = () => {
 </template>
 
 <style scoped>
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
 .custom-header {
   display: flex;
   align-items: flex-start;

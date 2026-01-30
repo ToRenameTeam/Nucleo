@@ -1,4 +1,4 @@
-import type { LoginRequest, LoginResponse, SelectPatientProfileRequest } from '../types/auth'
+import type { LoginRequest, LoginResponse, SelectPatientProfileRequest, SearchUserByFiscalCodeResponse } from '../types/auth'
 import { AuthApiError } from '../types/auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3030'
@@ -59,6 +59,22 @@ export const authApi = {
     
     return handleResponse<LoginResponse>(response)
   },
+}
+
+
+export const userApi = {
+  async searchUserByFiscalCode(fiscalCode: string): Promise<SearchUserByFiscalCodeResponse> {
+    const params = new URLSearchParams({ fiscalCode })
+    
+    const response = await fetch(`${API_BASE_URL}/api/users/search?${params}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    
+    return handleResponse<SearchUserByFiscalCodeResponse>(response)
+  }
 }
 
 export { AuthApiError }

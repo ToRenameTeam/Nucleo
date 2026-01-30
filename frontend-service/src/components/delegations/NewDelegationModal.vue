@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeftIcon, MagnifyingGlassIcon, PaperAirplaneIcon } from '@heroicons/vue/24/outline'
 import BaseModal from '../shared/BaseModal.vue'
-import { delegationApi } from '../../api/delegations'
+import { userApi } from '../../api/users'
 
 import type { NewDelegationModal } from '../../types/delegation'
 
@@ -47,7 +47,7 @@ const handleSearch = async () => {
     foundUser.value = null
 
     try {
-        const result = await delegationApi.searchUserByFiscalCode(fiscalCode.value)
+        const result = await userApi.searchUserByFiscalCode(fiscalCode.value)
         
         foundUser.value = {
             name: result.name,
@@ -102,7 +102,6 @@ const getInitials = (name: string, lastName: string) => {
         </template>
 
         <div class="new-delegation-content">
-            <!-- Search Section -->
             <div class="search-section">
                 <label class="input-label">{{ t('delegations.newDelegation.fiscalCodeLabel') }}</label>
                 <div class="search-input-wrapper">
@@ -118,11 +117,9 @@ const getInitials = (name: string, lastName: string) => {
                 </div>
                 <span class="char-counter">{{ remainingChars }} {{ t('delegations.newDelegation.characters') }}</span>
                 
-                <!-- Error Message -->
                 <p v-if="searchError" class="error-message">{{ searchError }}</p>
             </div>
 
-            <!-- Found User Section -->
             <div v-if="foundUser" class="found-user-section">
                 <h3 class="section-title">{{ t('delegations.newDelegation.userFound') }}</h3>
                 <div class="user-card">
@@ -135,13 +132,11 @@ const getInitials = (name: string, lastName: string) => {
                     </div>
                 </div>
 
-                <!-- Send Request Button -->
                 <button class="send-request-button" @click="handleSendRequest">
                     <PaperAirplaneIcon class="send-icon" />
                     {{ t('delegations.newDelegation.sendRequest') }}
                 </button>
                 
-                <!-- Send Error Message -->
                 <p v-if="props.sendError" class="error-message">{{ props.sendError }}</p>
             </div>
         </div>

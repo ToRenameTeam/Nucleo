@@ -4,7 +4,6 @@ import type {
   DelegationResponse,
   DelegationsListResponse,
   AcceptDeclineResponse,
-  SearchUserByFiscalCodeResponse
 } from '../types/delegation'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3030'
@@ -16,7 +15,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
   }
   
   const data = await response.json()
-  return data.data || data
+  return data.data
 }
 
 export const delegationApi = {
@@ -111,17 +110,4 @@ export const delegationApi = {
     
     return handleResponse<AcceptDeclineResponse>(response)
   },
-
-  async searchUserByFiscalCode(fiscalCode: string): Promise<SearchUserByFiscalCodeResponse> {
-    const params = new URLSearchParams({ fiscalCode })
-    
-    const response = await fetch(`${API_BASE_URL}/api/users/search?${params}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    
-    return handleResponse<SearchUserByFiscalCodeResponse>(response)
-  }
 }

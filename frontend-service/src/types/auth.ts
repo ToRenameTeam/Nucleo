@@ -55,5 +55,12 @@ class AuthApiError extends Error {
     this.name = 'AuthApiError'
   }
 }
-
 export { AuthApiError }
+
+export interface SearchUserByFiscalCodeResponse {
+    userId: string
+    fiscalCode: string
+    name: string
+    lastName: string
+    dateOfBirth: string
+}

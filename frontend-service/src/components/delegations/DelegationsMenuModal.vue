@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { UserPlusIcon, InboxArrowDownIcon, PaperAirplaneIcon } from '@heroicons/vue/24/outline'
 import BaseModal from '../shared/BaseModal.vue'
-import type { DelegationsMenuModal } from '../../types/delegation'
+import { useDelegations } from '../../composables/useDelegations'
+import { useAuth } from '../../composables/useAuth'
 
 const { t } = useI18n()
+const { currentUser } = useAuth()
+const { countDelegations } = useDelegations()
 
-const props = defineProps<DelegationsMenuModal>()
+const props = defineProps<{
+  isOpen: boolean
+}>()
+
+const receivedCount = ref(0)
+const sentCount = ref(0)
 
 const emit = defineEmits<{
   close: []
@@ -15,6 +23,26 @@ const emit = defineEmits<{
   'received-delegations': []
   'sent-delegations': []
 }>()
+
+// Carica i conteggi quando il modal viene aperto
+const loadCounts = async () => {
+  if (!currentUser.value?.userId) return
+  
+  const counts = await countDelegations(currentUser.value.userId)
+  receivedCount.value = counts.received
+  sentCount.value = counts.sent
+}
+
+watch(() => props.isOpen, async (isOpen) => {
+  if (isOpen && currentUser.value?.userId) {
+    await loadCounts()
+  }
+})
+
+// Ricarica i conteggi quando ci sono aggiornamenti
+if (typeof window !== 'undefined') {
+  window.addEventListener('delegations-updated', loadCounts)
+}
 
 const menuOptions = computed(() => [
   {
@@ -27,14 +55,14 @@ const menuOptions = computed(() => [
   {
     id: 'received',
     title: t('delegations.menu.receivedDelegations.title'),
-    subtitle: t('delegations.menu.receivedDelegations.subtitle', { count: props.receivedCount || 0 }),
+    subtitle: t('delegations.menu.receivedDelegations.subtitle', { count: receivedCount.value }),
     icon: InboxArrowDownIcon,
     action: () => emit('received-delegations')
   },
   {
     id: 'sent',
     title: t('delegations.menu.sentDelegations.title'),
-    subtitle: t('delegations.menu.sentDelegations.subtitle', { count: props.sentCount || 0 }),
+    subtitle: t('delegations.menu.sentDelegations.subtitle', { count: sentCount.value }),
     icon: PaperAirplaneIcon,
     action: () => emit('sent-delegations')
   }

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { authApi, AuthApiError } from '../api/users'
-import { useAuth } from '../authentication/useAuth'
+import { useAuth } from '../composables/useAuth'
 
 const { t } = useI18n()
 const router = useRouter()

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-import { useAuth } from '../authentication/useAuth'
+import { useAuth } from '../composables/useAuth'
 
 const routes: RouteRecordRaw[] = [
   {

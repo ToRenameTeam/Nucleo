@@ -428,6 +428,8 @@
     "bookVisit": "Book visit"
   },
   "delegations": {
+    "loading": "Loading delegations...",
+    "noResults": "No delegations found",
     "menu": {
       "title": "Manage Delegations",
       "subtitle": "Choose what you want to do",

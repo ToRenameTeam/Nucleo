@@ -419,6 +419,8 @@
     "bookVisit": "Prenota visita"
   },
   "delegations": {
+    "loading": "Caricamento deleghe...",
+    "noResults": "Nessuna delega trovata",
     "menu": {
       "title": "Gestione Deleghe",
       "subtitle": "Scegli cosa vuoi fare",

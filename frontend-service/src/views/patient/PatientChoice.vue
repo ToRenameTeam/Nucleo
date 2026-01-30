@@ -4,17 +4,13 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import ProfileCard from '../../components/shared/ProfileCard.vue'
 import DelegationsManager from '../../components/delegations/DelegationsManager.vue'
-import { useAuth } from '../../authentication/useAuth'
-import { authApi } from '../../api/users'
-import type { Profile, UserData } from '../../types/auth'
-import type { DelegationsResponse } from '../../types/delegation'
+import { useAuth } from '../../composables/useAuth'
 import { authApi } from '../../api/users'
 import type { Profile, UserData } from '../../types/auth'
 import type { DelegationsResponse } from '../../types/delegation'
 
 const { t } = useI18n()
 const router = useRouter()
-const { selectPatientProfile: setProfile, currentUser } = useAuth()
 const { selectPatientProfile: setProfile, currentUser } = useAuth()
 
 const profiles = ref<Profile[]>([])
@@ -107,17 +103,6 @@ const selectPatientProfile = (profile: Profile) => {
     <p class="patient-choice-subtitle">
       {{ t('patientChoice.subtitle') }}
     </p>
-
-    <div v-if="loading" class="loading-container">
-      <p class="loading-text">{{ t('patientChoice.loadingProfiles') }}</p>
-    </div>
-
-    <div v-else-if="error" class="error-container">
-      <p class="error-text">{{ error }}</p>
-      <button @click="loadDelegatedProfiles" class="retry-button">{{ t('patientChoice.retry') }}</button>
-    </div>
-
-    <div v-else class="profiles-container">
 
     <div v-if="loading" class="loading-container">
       <p class="loading-text">{{ t('patientChoice.loadingProfiles') }}</p>

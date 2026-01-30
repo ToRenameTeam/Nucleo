@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { UserIcon, BuildingOfficeIcon } from '@heroicons/vue/24/outline'
-import { useAuth } from '../../authentication/useAuth'
+import { useAuth } from '../../composables/useAuth'
 
 const { t } = useI18n()
 const router = useRouter()

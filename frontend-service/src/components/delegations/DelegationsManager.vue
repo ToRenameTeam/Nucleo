@@ -6,55 +6,30 @@ import DelegationsMenuModal from './DelegationsMenuModal.vue'
 import NewDelegationModal from './NewDelegationModal.vue'
 import DelegationsListModal from './DelegationsListModal.vue'
 import Toast from '../shared/Toast.vue'
-import { useAuth } from '../../authentication/useAuth'
-import { delegationApi } from '../../api/delegations'
-import { authApi } from '../../api/users'
-import type { DelegationItem } from '../../types/delegation'
-import type { UserData } from '../../types/auth'
+import { useAuth } from '../../composables/useAuth'
+import { useDelegations } from '../../composables/useDelegations'
 
 const { t } = useI18n()
 const { currentUser } = useAuth()
+const { createDelegation } = useDelegations()
 
 const isDelegationsModalOpen = ref(false)
 const isNewDelegationModalOpen = ref(false)
 const isDelegationsListModalOpen = ref(false)
 const delegationsListType = ref<'received' | 'sent'>('received')
-const delegationsList = ref<DelegationItem[]>([])
-const receivedDelegationsCount = ref(0)
-const sentDelegationsCount = ref(0)
 const showSuccessToast = ref(false)
 const successToastMessage = ref('')
 const delegationSendError = ref('')
 const newDelegationModalKey = ref(0)
 
-// Menu modal handlers
-const openDelegationsModal = async () => {
+const openDelegationsModal = () => {
   isDelegationsModalOpen.value = true
-  await loadDelegationsCounts()
-}
-
-const loadDelegationsCounts = async () => {
-  if (!currentUser.value?.userId) return
-
-  try {
-    const [receivedResponse, sentResponse] = await Promise.all([
-      delegationApi.getReceivedDelegations(currentUser.value.userId),
-      delegationApi.getSentDelegations(currentUser.value.userId)
-    ])
-    receivedDelegationsCount.value = receivedResponse.delegations.length
-    sentDelegationsCount.value = sentResponse.delegations.length
-  } catch (error) {
-    console.error('Error loading delegations counts:', error)
-    receivedDelegationsCount.value = 0
-    sentDelegationsCount.value = 0
-  }
 }
 
 const closeDelegationsModal = () => {
   isDelegationsModalOpen.value = false
 }
 
-// New delegation handlers
 const handleNewDelegation = () => {
   closeDelegationsModal()
   isNewDelegationModalOpen.value = true
@@ -76,49 +51,30 @@ const handleSendDelegationRequest = async (fiscalCode: string) => {
 
   delegationSendError.value = ''
 
-  try {
-    const foundUser = await delegationApi.searchUserByFiscalCode(fiscalCode)
-    
-    await delegationApi.createDelegation({
-      delegatingUserId: foundUser.userId,
-      delegatorUserId: currentUser.value.userId
-    })
-    
-    // Success: close modal and reset it
+  const result = await createDelegation(fiscalCode, currentUser.value.userId)
+  
+  if (result.success) {
     isNewDelegationModalOpen.value = false
-    newDelegationModalKey.value++ // Force modal reset
+    newDelegationModalKey.value++
     
-    // Show success toast
-    successToastMessage.value = t('delegations.toast.delegationSent', { name: `${foundUser.name} ${foundUser.lastName}` })
+    successToastMessage.value = t('delegations.toast.delegationSent', { name: result.userName })
     showSuccessToast.value = true
     
-    // Reload counts
-    await loadDelegationsCounts()
-  } catch (error) {
-    console.error('Error sending delegation request:', error)
-    delegationSendError.value = error instanceof Error ? mapErrorToMessage(error) : t('delegations.errors.actionFailed')
+    window.dispatchEvent(new CustomEvent('delegations-updated'))
+  } else {
+    delegationSendError.value = mapErrorToMessage(new Error(result.error || 'Unknown error'))
   }
 }
 
-const handleReceivedDelegations = async () => {
-  if (!currentUser.value?.userId) return
-
+const handleReceivedDelegations = () => {
   closeDelegationsModal()
   delegationsListType.value = 'received'
-  
-  await loadReceivedDelegations()
-  
   isDelegationsListModalOpen.value = true
 }
 
-const handleSentDelegations = async () => {
-  if (!currentUser.value?.userId) return
-
+const handleSentDelegations = () => {
   closeDelegationsModal()
   delegationsListType.value = 'sent'
-  
-  await loadSentDelegations()
-  
   isDelegationsListModalOpen.value = true
 }
 
@@ -131,131 +87,13 @@ const handleBackFromDelegationsList = () => {
   isDelegationsModalOpen.value = true
 }
 
-// Helper function to reload the current list based on type
-const reloadCurrentList = async () => {
-  if (delegationsListType.value === 'received') {
-    await loadReceivedDelegations()
-  } else {
-    await loadSentDelegations()
-  }
-}
-
-// Extracted loading logic for reuse
-const loadReceivedDelegations = async () => {
-  if (!currentUser.value?.userId) return
-
-  try {
-    const response = await delegationApi.getReceivedDelegations(currentUser.value.userId)
-    
-    const items = await Promise.all(
-      response.delegations.map(async (delegation): Promise<DelegationItem | null> => {
-        try {
-          const userData = await authApi.getUserById(delegation.delegatorUserId) as UserData
-          return {
-            delegationId: delegation.delegationId,
-            userId: delegation.delegatorUserId,
-            name: userData.name || '',
-            lastName: userData.lastName || '',
-            fiscalCode: userData.fiscalCode || '',
-            date: new Date().toISOString().split('T')[0] || '',
-            status: delegation.status
-          }
-        } catch (err) {
-          console.error(`Error loading user ${delegation.delegatorUserId}:`, err)
-          return null
-        }
-      })
-    )
-    
-    delegationsList.value = items.filter((item): item is DelegationItem => item !== null)
-  } catch (error) {
-    console.error('Error loading received delegations:', error)
-    delegationsList.value = []
-  }
-}
-
-const loadSentDelegations = async () => {
-  if (!currentUser.value?.userId) return
-
-  try {
-    const response = await delegationApi.getSentDelegations(currentUser.value.userId)
-    
-    const items = await Promise.all(
-      response.delegations.map(async (delegation): Promise<DelegationItem | null> => {
-        try {
-          const userData = await authApi.getUserById(delegation.delegatingUserId) as UserData
-          return {
-            delegationId: delegation.delegationId,
-            userId: delegation.delegatingUserId,
-            name: userData.name ?? '',
-            lastName: userData.lastName ?? '',
-            fiscalCode: userData.fiscalCode ?? '',
-            date: new Date().toISOString().split('T')[0] ?? '',
-            status: delegation.status
-          }
-        } catch (err) {
-          console.error(`Error loading user ${delegation.delegatingUserId}:`, err)
-          return null
-        }
-      })
-    )
-    
-    delegationsList.value = items.filter((item): item is DelegationItem => item !== null)
-  } catch (error) {
-    console.error('Error loading sent delegations:', error)
-    delegationsList.value = []
-  }
-}
-
-const handleAcceptDelegation = async (delegationId: string) => {
-  if (!currentUser.value?.userId) return
-
-  try {
-    await delegationApi.acceptDelegation(delegationId, currentUser.value.userId)
-    // Reload the current list to get updated data
-    await reloadCurrentList()
-    // Notify PatientChoice to reload profiles
-    window.dispatchEvent(new CustomEvent('delegations-updated'))
-  } catch (error) {
-    console.error('Error accepting delegation:', error)
-  }
-}
-
-const handleDeclineDelegation = async (delegationId: string) => {
-  if (!currentUser.value?.userId) return
-
-  try {
-    await delegationApi.declineDelegation(delegationId, currentUser.value.userId)
-    // Reload the current list to get updated data
-    await reloadCurrentList()
-    // Notify PatientChoice to reload profiles
-    window.dispatchEvent(new CustomEvent('delegations-updated'))
-  } catch (error) {
-    console.error('Error declining delegation:', error)
-  }
-}
-
-const handleRemoveDelegation = async (delegationId: string) => {
-  if (!currentUser.value?.userId) return
-
-  try {
-    await delegationApi.deleteDelegation(delegationId, currentUser.value.userId)
-    // Reload the current list to get updated data
-    await reloadCurrentList()
-    // Notify PatientChoice to reload profiles
-    window.dispatchEvent(new CustomEvent('delegations-updated'))
-  } catch (error) {
-    console.error('Error removing delegation:', error)
-  }
-}
-
 const handleCloseToast = () => {
   showSuccessToast.value = false
 }
 
-// Map API errors to translated messages
 const mapErrorToMessage = (error: Error): string => {
   const errorMessage = error.message.toLowerCase()
+  console.error('Delegation error:', errorMessage)
   
   if (errorMessage.includes('already exists')) {
     return t('delegations.errors.delegationAlreadyExists')
@@ -273,24 +111,19 @@ const mapErrorToMessage = (error: Error): string => {
 
 <template>
   <div class="delegations-manager">
-    <!-- Floating action button -->
     <button class="delegations-button" @click="openDelegationsModal">
       <UsersIcon class="delegations-icon" />
       {{ t('patientChoice.manageDelegations') }}
     </button>
 
-    <!-- Menu modal -->
     <DelegationsMenuModal
       :is-open="isDelegationsModalOpen"
-      :received-count="receivedDelegationsCount"
-      :sent-count="sentDelegationsCount"
       @close="closeDelegationsModal"
       @new-delegation="handleNewDelegation"
       @received-delegations="handleReceivedDelegations"
       @sent-delegations="handleSentDelegations"
     />
 
-    <!-- New delegation modal -->
     <NewDelegationModal
       :key="newDelegationModalKey"
       :is-open="isNewDelegationModalOpen"
@@ -300,19 +133,13 @@ const mapErrorToMessage = (error: Error): string => {
       @send="handleSendDelegationRequest"
     />
 
-    <!-- Delegations list modal (received/sent) -->
     <DelegationsListModal
       :is-open="isDelegationsListModalOpen"
       :type="delegationsListType"
-      :delegations="delegationsList"
       @close="closeDelegationsListModal"
       @back="handleBackFromDelegationsList"
-      @accept="handleAcceptDelegation"
-      @decline="handleDeclineDelegation"
-      @remove="handleRemoveDelegation"
     />
 
-    <!-- Success Toast -->
     <Toast
       :show="showSuccessToast"
       :message="successToastMessage"

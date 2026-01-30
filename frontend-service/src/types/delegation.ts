@@ -6,6 +6,8 @@ export interface DelegationInfo {
   } | null
 }
 
+export type DelegationStatus = 'Pending' | 'Active' | 'Declined' | 'Deleted'
+
 export interface DelegationsResponse {
   delegations: DelegationInfo[]
 }
@@ -27,7 +29,7 @@ export interface DelegationItem {
   lastName: string
   fiscalCode: string
   date: string
-  status: 'Pending' | 'Active' | 'Declined' | 'Deleted'
+  status: DelegationStatus
 }
 
 export interface DelegationsListModal {
@@ -52,7 +54,8 @@ export interface DelegationResponse {
   delegationId: string
   delegatingUserId: string
   delegatorUserId: string
-  status: 'Pending' | 'Active' | 'Declined' | 'Deleted'
+  status: DelegationStatus
+  createdAt: string
 }
 
 export interface DelegationsListResponse {
@@ -62,12 +65,4 @@ export interface DelegationsListResponse {
 export interface AcceptDeclineResponse {
   delegationId: string
   status: string
-}
-
-export interface SearchUserByFiscalCodeResponse {
-    userId: string
-    fiscalCode: string
-    name: string
-    lastName: string
-    dateOfBirth: string
 }
