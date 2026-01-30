@@ -17,20 +17,30 @@ import it.nucleo.infrastructure.persistence.mongodb.model.toDomain
 import it.nucleo.infrastructure.persistence.mongodb.model.toDto
 import it.nucleo.infrastructure.logging.logger
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.serialization.json.Json
+import org.bson.BsonDocument
 
 class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepository {
 
     private val logger = logger()
     private val collection = database.getCollection<MedicalRecordDocument>(COLLECTION_NAME)
+    private val json = Json {
+        classDiscriminator = "_t"
+        encodeDefaults = true
+    }
 
     override suspend fun addDocument(patientId: PatientId, document: Document) {
         logger.debug("Adding document for patient: ${patientId.id}, documentId: ${document.id.id}")
         try {
             val documentDto = document.toDto()
 
+            // Serialize to JSON and then parse as BsonDocument to ensure discriminator is included
+            val jsonString = json.encodeToString(DocumentDto.serializer(), documentDto)
+            val bsonDoc = BsonDocument.parse(jsonString)
+
             collection.updateOne(
                 Filters.eq(MedicalRecordDocument::patientId.name, patientId.id),
-                Updates.push(MedicalRecordDocument::documents.name, documentDto),
+                Updates.push(MedicalRecordDocument::documents.name, bsonDoc),
                 UpdateOptions().upsert(true)
             )
             logger.info("Document added successfully for patient: ${patientId.id}, documentId: ${document.id.id}")
@@ -126,6 +136,10 @@ class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepos
 
             val reportDto = report.toDto()
 
+            // Serialize to JSON and then parse as BsonDocument to ensure discriminator is included
+            val jsonString = json.encodeToString(DocumentDto.serializer(), reportDto)
+            val bsonDoc = BsonDocument.parse(jsonString)
+
             val result =
                 collection.updateOne(
                     Filters.and(
@@ -135,7 +149,7 @@ class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepos
                             Filters.eq(DocumentDto::id.name, report.id.id)
                         )
                     ),
-                    Updates.set("${MedicalRecordDocument::documents.name}.$", reportDto)
+                    Updates.set("${MedicalRecordDocument::documents.name}.$", bsonDoc)
                 )
 
             if (result.modifiedCount == 0L) {

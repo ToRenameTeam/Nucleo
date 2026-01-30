@@ -24,7 +24,7 @@ fun Application.configureSerialization() {
                 isLenient = true
                 ignoreUnknownKeys = true
                 encodeDefaults = true
-                classDiscriminator = "type"
+                classDiscriminator = "_t"
             }
         )
     }

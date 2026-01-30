@@ -37,7 +37,7 @@ fun configuredTestApplication(block: suspend (HttpClient) -> Unit) = testApplica
                 isLenient = true
                 ignoreUnknownKeys = true
                 encodeDefaults = true
-                classDiscriminator = "type"
+                classDiscriminator = "_t"
             })
         }
     }

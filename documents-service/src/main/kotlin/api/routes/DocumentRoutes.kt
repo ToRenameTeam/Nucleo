@@ -142,7 +142,7 @@ private fun Route.addDocument(repository: MedicalRecordRepository) {
             logger.warn("POST /patients/$patientId/documents - Invalid document data", e)
             call.respond(
                 HttpStatusCode.BadRequest,
-                ErrorResponse("bad_request", "Invalid document data", e.message)
+                ErrorResponse("bad_request", e.message ?: "Invalid document data")
             )
         }
     }
