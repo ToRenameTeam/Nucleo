@@ -25,6 +25,10 @@ dependencies {
     
     // Logging
     implementation(libs.logback)
+
+    // Testing
+    testImplementation(libs.kotest)
+    testImplementation(libs.ktor.server.test.host)
 }
 
 application {
