@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization")
     id("com.ncorti.ktfmt.gradle")
 }
 
