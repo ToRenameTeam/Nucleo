@@ -2,12 +2,14 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: appointments-postgres
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: appointments
-      POSTGRES_USER: appointments_user
-      POSTGRES_PASSWORD: appointments_pass
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
@@ -25,17 +27,19 @@ services:
       context: ..
       dockerfile: appointments-service/Dockerfile
     container_name: appointments-service
+    env_file:
+      - .env
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: appointments
-      DB_USER: appointments_user
-      DB_PASSWORD: appointments_pass
-      DATABASE_URL: jdbc:postgresql://postgres:5432/appointments
-      DATABASE_USER: appointments_user
-      DATABASE_PASSWORD: appointments_pass
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     ports:
-      - "8080:8080"
+      - "${APP_PORT}:8080"
     depends_on:
       postgres:
         condition: service_healthy

@@ -46,3 +46,8 @@ node_modules/
 
 ### TypeScript ###
 dist/
+
+### Environment ###
+.env
+.env.local
+.env.*.local
