@@ -11,10 +11,10 @@ import it.nucleo.domain.report.Report
 import it.nucleo.domain.repository.DocumentNotFoundException
 import it.nucleo.domain.repository.MedicalRecordRepository
 import it.nucleo.domain.repository.RepositoryException
-import it.nucleo.infrastructure.persistence.mongodb.model.DocumentDto
-import it.nucleo.infrastructure.persistence.mongodb.model.MedicalRecordDocument
-import it.nucleo.infrastructure.persistence.mongodb.model.toDomain
-import it.nucleo.infrastructure.persistence.mongodb.model.toDto
+import it.nucleo.infrastructure.persistence.mongodb.dto.DocumentDto
+import it.nucleo.infrastructure.persistence.mongodb.dto.MedicalRecordDocument
+import it.nucleo.infrastructure.persistence.mongodb.dto.toDomain
+import it.nucleo.infrastructure.persistence.mongodb.dto.toDto
 import it.nucleo.infrastructure.logging.logger
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.serialization.json.Json

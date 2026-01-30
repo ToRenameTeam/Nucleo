@@ -1,0 +1,103 @@
+package it.nucleo.api.dto
+
+import it.nucleo.domain.Document
+import it.nucleo.domain.FileMetadata
+import it.nucleo.domain.FileURI
+import it.nucleo.domain.Summary
+import it.nucleo.domain.Tag
+import it.nucleo.domain.prescription.Validity
+import it.nucleo.domain.prescription.implementation.Dosage
+import it.nucleo.domain.prescription.implementation.Dose
+import it.nucleo.domain.prescription.implementation.DoseUnit
+import it.nucleo.domain.prescription.implementation.Duration
+import it.nucleo.domain.prescription.implementation.Frequency
+import it.nucleo.domain.prescription.implementation.MedicineId
+import it.nucleo.domain.prescription.implementation.MedicinePrescription
+import it.nucleo.domain.prescription.implementation.Period
+import it.nucleo.domain.prescription.implementation.ServicePrescription
+import it.nucleo.domain.report.Report
+import java.time.LocalDate
+
+fun Document.toResponse(): DocumentResponse =
+    when (this) {
+        is MedicinePrescription ->
+            MedicinePrescriptionResponse(
+                id = id.id,
+                doctorId = doctorId.id,
+                patientId = patientId.id,
+                issueDate = issueDate.date.toString(),
+                metadata = metadata.toDto(),
+                validity = validity.toResponse(),
+                dosage = dosage.toResponse()
+            )
+        is ServicePrescription ->
+            ServicePrescriptionResponse(
+                id = id.id,
+                doctorId = doctorId.id,
+                patientId = patientId.id,
+                issueDate = issueDate.date.toString(),
+                metadata = metadata.toDto(),
+                validity = validity.toResponse(),
+                serviceId = serviceId.id,
+                facilityId = facilityId.id,
+                priority = priority.name
+            )
+        is Report ->
+            ReportResponse(
+                id = id.id,
+                doctorId = doctorId.id,
+                patientId = patientId.id,
+                issueDate = issueDate.date.toString(),
+                metadata = metadata.toDto(),
+                servicePrescription =
+                    servicePrescription.toResponse() as ServicePrescriptionResponse,
+                executionDate = executionDate.date.toString(),
+                clinicalQuestion = clinicalQuestion?.text,
+                findings = findings.text,
+                conclusion = conclusion?.text,
+                recommendations = recommendations?.text
+            )
+        else -> throw IllegalArgumentException("Unknown document type: ${this::class.simpleName}")
+    }
+
+fun FileMetadata.toDto(): FileMetadataDto =
+    FileMetadataDto(
+        fileUri = fileURI.uri,
+        summary = summary.summary,
+        tags = tags.map { it.tag }.toSet()
+    )
+
+fun Validity.toResponse(): ValidityResponse =
+    when (this) {
+        is Validity.UntilDate -> ValidityResponse.UntilDate(date.toString())
+        is Validity.UntilExecution -> ValidityResponse.UntilExecution
+    }
+
+fun Dosage.toResponse(): DosageResponse =
+    DosageResponse(
+        medicineId = medicine.id,
+        dose = DoseDto(dose.amount, dose.unit.name),
+        frequency = FrequencyDto(frequency.timesPerPeriod, frequency.period.name),
+        duration = DurationDto(duration.length, duration.unit.name)
+    )
+
+fun ValidityRequest.toDomain(): Validity =
+    when (this) {
+        is ValidityRequest.UntilDate -> Validity.UntilDate(LocalDate.parse(date))
+        is ValidityRequest.UntilExecution -> Validity.UntilExecution
+    }
+
+fun DosageRequest.toDomain(): Dosage =
+    Dosage(
+        medicine = MedicineId(medicineId),
+        dose = Dose(dose.amount, DoseUnit.valueOf(dose.unit)),
+        frequency = Frequency(frequency.timesPerPeriod, Period.valueOf(frequency.period)),
+        duration = Duration(duration.length, Period.valueOf(duration.unit))
+    )
+
+fun FileMetadataDto.toDomain(): FileMetadata =
+    FileMetadata(
+        fileURI = FileURI(fileUri),
+        summary = Summary(summary),
+        tags = tags.map { Tag(it) }.toSet()
+    )

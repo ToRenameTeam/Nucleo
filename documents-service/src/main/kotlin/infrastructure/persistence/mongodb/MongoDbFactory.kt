@@ -4,7 +4,7 @@ import com.mongodb.MongoClientSettings
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import it.nucleo.infrastructure.logging.logger
-import it.nucleo.infrastructure.persistence.mongodb.model.*
+import it.nucleo.infrastructure.persistence.mongodb.dto.*
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass

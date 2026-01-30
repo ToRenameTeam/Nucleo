@@ -1,99 +1,35 @@
-package it.nucleo.infrastructure.persistence.mongodb.model
+package it.nucleo.infrastructure.persistence.mongodb.dto
 
-import it.nucleo.domain.*
+import it.nucleo.domain.DoctorId
+import it.nucleo.domain.Document
+import it.nucleo.domain.DocumentId
+import it.nucleo.domain.FileMetadata
+import it.nucleo.domain.FileURI
+import it.nucleo.domain.IssueDate
+import it.nucleo.domain.PatientId
+import it.nucleo.domain.Summary
+import it.nucleo.domain.Tag
 import it.nucleo.domain.prescription.Validity
-import it.nucleo.domain.prescription.implementation.*
-import it.nucleo.domain.report.*
+import it.nucleo.domain.prescription.implementation.Dosage
+import it.nucleo.domain.prescription.implementation.Dose
+import it.nucleo.domain.prescription.implementation.DoseUnit
+import it.nucleo.domain.prescription.implementation.Duration
+import it.nucleo.domain.prescription.implementation.FacilityId
+import it.nucleo.domain.prescription.implementation.Frequency
+import it.nucleo.domain.prescription.implementation.MedicineId
+import it.nucleo.domain.prescription.implementation.MedicinePrescription
+import it.nucleo.domain.prescription.implementation.Period
+import it.nucleo.domain.prescription.implementation.Priority
+import it.nucleo.domain.prescription.implementation.ServiceId
+import it.nucleo.domain.prescription.implementation.ServicePrescription
+import it.nucleo.domain.report.ClinicalQuestion
+import it.nucleo.domain.report.Conclusion
+import it.nucleo.domain.report.ExecutionDate
+import it.nucleo.domain.report.Findings
+import it.nucleo.domain.report.Recommendations
+import it.nucleo.domain.report.Report
 import it.nucleo.domain.report.implementation.DefaultReport
 import java.time.LocalDate
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import org.bson.types.ObjectId
-
-@Serializable
-data class MedicalRecordDocument(
-    @SerialName("_id") @Contextual val id: ObjectId = ObjectId(),
-    val patientId: String,
-    val documents: List<DocumentDto> = emptyList()
-)
-
-@Serializable
-sealed class DocumentDto {
-    abstract val id: String
-    abstract val doctorId: String
-    abstract val patientId: String
-    abstract val issueDate: String
-    abstract val fileUri: String
-    abstract val summary: String
-    abstract val tags: Set<String>
-}
-
-@Serializable
-@SerialName("medicine_prescription")
-data class MedicinePrescriptionDto(
-    override val id: String,
-    override val doctorId: String,
-    override val patientId: String,
-    override val issueDate: String,
-    override val fileUri: String,
-    override val summary: String,
-    override val tags: Set<String>,
-    val validity: ValidityDto,
-    val dosage: DosageDto
-) : DocumentDto()
-
-@Serializable
-@SerialName("service_prescription")
-data class ServicePrescriptionDto(
-    override val id: String,
-    override val doctorId: String,
-    override val patientId: String,
-    override val issueDate: String,
-    override val fileUri: String,
-    override val summary: String,
-    override val tags: Set<String>,
-    val validity: ValidityDto,
-    val serviceId: String,
-    val facilityId: String,
-    val priority: String
-) : DocumentDto()
-
-@Serializable
-@SerialName("report")
-data class ReportDto(
-    override val id: String,
-    override val doctorId: String,
-    override val patientId: String,
-    override val issueDate: String,
-    override val fileUri: String,
-    override val summary: String,
-    override val tags: Set<String>,
-    val servicePrescription: ServicePrescriptionDto,
-    val executionDate: String,
-    val clinicalQuestion: String?,
-    val findings: String,
-    val conclusion: String?,
-    val recommendations: String?
-) : DocumentDto()
-
-@Serializable
-sealed class ValidityDto {
-    @Serializable @SerialName("until_date") data class UntilDate(val date: String) : ValidityDto()
-
-    @Serializable @SerialName("until_execution") data object UntilExecution : ValidityDto()
-}
-
-@Serializable
-data class DosageDto(
-    val medicineId: String,
-    val doseAmount: Int,
-    val doseUnit: String,
-    val frequencyTimesPerPeriod: Int,
-    val frequencyPeriod: String,
-    val durationLength: Int,
-    val durationUnit: String
-)
 
 fun Document.toDto(): DocumentDto =
     when (this) {
