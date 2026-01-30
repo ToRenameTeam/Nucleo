@@ -14,6 +14,10 @@ dependencies {
     implementation(libs.mongodb.driver.kotlin.coroutine)
     implementation(libs.mongodb.bson.kotlinx)
     implementation(libs.logback)
+
+    testImplementation(libs.kotest)
+    testImplementation(libs.ktor.server.test.host)
+    testImplementation(libs.ktor.client.content.negotiation)
 }
 
 application {
