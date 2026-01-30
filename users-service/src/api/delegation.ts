@@ -19,6 +19,9 @@ router.post('/', async (req: Request, res: Response) => {
         if (!delegatingUserId || !delegatorUserId) {
             return error(res, 'delegatingUserId and delegatorUserId are required', 400);
         }
+        if (delegatingUserId === delegatorUserId) {
+            return error(res, 'cannot delegate to yourself', 400);
+        }
 
         const delegation = await delegationService.createDelegation({
             delegatingUserId,
