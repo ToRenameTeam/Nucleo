@@ -16,4 +16,6 @@ interface AppointmentRepository {
         startDate: LocalDateTime? = null,
         endDate: LocalDateTime? = null
     ): List<Appointment>
+
+    suspend fun update(appointment: Appointment): Appointment?
 }

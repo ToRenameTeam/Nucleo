@@ -6,10 +6,12 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import it.nucleo.appointments.api.dto.CreateAppointmentRequest
 import it.nucleo.appointments.api.dto.ErrorResponse
+import it.nucleo.appointments.api.dto.UpdateAppointmentRequest
 import it.nucleo.appointments.api.toResponse
 import it.nucleo.appointments.domain.Appointment
 import it.nucleo.appointments.domain.AppointmentRepository
 import it.nucleo.appointments.domain.AvailabilityRepository
+import it.nucleo.appointments.domain.valueobjects.AppointmentId
 import it.nucleo.appointments.domain.valueobjects.AppointmentStatus
 import it.nucleo.appointments.domain.valueobjects.AvailabilityId
 import it.nucleo.appointments.domain.valueobjects.AvailabilityStatus
@@ -107,7 +109,7 @@ fun Route.appointmentRoutes(
                 logger.info("Fetching appointment by ID: $id")
 
                 val appointment = appointmentRepository.findById(
-                    it.nucleo.appointments.domain.valueobjects.AppointmentId.fromString(id)
+                    AppointmentId.fromString(id)
                 )
 
                 if (appointment == null) {
@@ -191,6 +193,103 @@ fun Route.appointmentRoutes(
                 )
             } catch (e: Exception) {
                 logger.error("Error fetching appointments: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
+                )
+            }
+        }
+
+        // Update appointment
+        put("/{id}") {
+            try {
+                val id =
+                    call.parameters["id"]
+                        ?: return@put call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(message = "Missing ID", code = "MISSING_ID")
+                        )
+                logger.info("Updating appointment with ID: $id")
+
+                val request = call.receive<UpdateAppointmentRequest>()
+
+                val appointment =
+                    appointmentRepository.findById(
+                        AppointmentId.fromString(id)
+                    )
+                        ?: return@put call.respond(
+                            HttpStatusCode.NotFound,
+                            ErrorResponse(message = "Appointment not found", code = "NOT_FOUND")
+                        )
+
+                val updated = when {
+                    request.status != null -> {
+                        val newStatus = AppointmentStatus.valueOf(request.status)
+                        when (newStatus) {
+                            AppointmentStatus.COMPLETED -> appointment.complete()
+                            AppointmentStatus.CANCELLED -> appointment.cancel()
+                            AppointmentStatus.NO_SHOW -> appointment.markNoShow()
+                            else -> throw IllegalArgumentException(
+                                "Cannot update to status: $newStatus. Use appropriate endpoints."
+                            )
+                        }
+                    }
+                    request.availabilityId != null -> {
+                        val newAvailabilityId = AvailabilityId.fromString(request.availabilityId)
+                        
+                        // Validate new availability
+                        val newAvailability = availabilityRepository.findById(newAvailabilityId)
+                        if (newAvailability == null) {
+                            return@put call.respond(
+                                HttpStatusCode.NotFound,
+                                ErrorResponse(
+                                    message = "New availability not found",
+                                    code = "AVAILABILITY_NOT_FOUND"
+                                )
+                            )
+                        }
+
+                        if (newAvailability.status != AvailabilityStatus.AVAILABLE) {
+                            return@put call.respond(
+                                HttpStatusCode.BadRequest,
+                                ErrorResponse(
+                                    message = "New availability is not available",
+                                    code = "AVAILABILITY_NOT_AVAILABLE"
+                                )
+                            )
+                        }
+
+                        // Use the timeSlot from the availability
+                        appointment.reschedule(newAvailability.timeSlot, newAvailabilityId)
+                    }
+                    else -> throw IllegalArgumentException(
+                        "Must provide either status or availabilityId"
+                    )
+                }
+
+                val saved = appointmentRepository.update(updated)
+
+                if (saved == null) {
+                    logger.warn("Appointment not found when updating with ID: $id")
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(message = "Appointment not found", code = "NOT_FOUND")
+                    )
+                } else {
+                    logger.info("Appointment updated successfully with ID: $id")
+                    call.respond(HttpStatusCode.OK, saved.toResponse())
+                }
+            } catch (e: IllegalArgumentException) {
+                logger.error("Invalid request for updating appointment: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(
+                        message = e.message ?: "Invalid request",
+                        code = "INVALID_REQUEST"
+                    )
+                )
+            } catch (e: Exception) {
+                logger.error("Error updating appointment: ${e.message}", e)
                 call.respond(
                     HttpStatusCode.InternalServerError,
                     ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")

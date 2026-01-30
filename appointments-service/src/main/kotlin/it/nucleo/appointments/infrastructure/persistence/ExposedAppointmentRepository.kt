@@ -10,6 +10,7 @@ import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.jetbrains.exposed.sql.update
 
 class ExposedAppointmentRepository : AppointmentRepository {
 
@@ -62,5 +63,24 @@ class ExposedAppointmentRepository : AppointmentRepository {
         }
 
         query.map { it.toAppointment() }
+    }
+
+    override suspend fun update(appointment: Appointment): Appointment? = dbQuery {
+        val updated =
+            AppointmentsTable.update({
+                AppointmentsTable.appointmentId eq appointment.id.value
+            }) {
+                it[patientId] = appointment.patientId.value
+                it[availabilityId] = appointment.availabilityId.value
+                it[doctorId] = appointment.doctorId.value
+                it[facilityId] = appointment.facilityId.value
+                it[serviceTypeId] = appointment.serviceTypeId.value
+                it[startDateTime] = appointment.timeSlot.startDateTime.toJavaLocalDateTime()
+                it[durationMinutes] = appointment.timeSlot.durationMinutes
+                it[status] = appointment.status.name
+                it[updatedAt] = appointment.updatedAt.toJavaLocalDateTime()
+            }
+
+        if (updated > 0) appointment else null
     }
 }
