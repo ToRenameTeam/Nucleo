@@ -8,7 +8,7 @@ import it.nucleo.api.plugins.configureRouting
 import it.nucleo.api.plugins.configureSerialization
 import it.nucleo.api.plugins.configureStatusPages
 import it.nucleo.infrastructure.persistence.mongodb.MongoDbFactory
-import it.nucleo.infrastructure.persistence.mongodb.MongoMedicalRecordRepository
+import it.nucleo.infrastructure.persistence.mongodb.MongoDocumentRepository
 import kotlinx.serialization.json.Json
 
 object TestMongoConfig {
@@ -26,7 +26,7 @@ fun configuredTestApplication(block: suspend (HttpClient) -> Unit) = testApplica
                 connectionUri = TestMongoConfig.CONNECTION_URI,
                 databaseName = TestMongoConfig.DATABASE_NAME
             )
-        val repository = MongoMedicalRecordRepository(database)
+        val repository = MongoDocumentRepository(database)
 
         configureRouting(repository)
     }

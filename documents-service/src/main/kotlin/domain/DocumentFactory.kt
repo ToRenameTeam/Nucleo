@@ -1,11 +1,12 @@
-package it.nucleo.domain.factory
+package it.nucleo.domain
 
-import it.nucleo.domain.*
 import it.nucleo.domain.prescription.Prescription
 import it.nucleo.domain.prescription.Validity
 import it.nucleo.domain.prescription.implementation.Dosage
+import it.nucleo.domain.prescription.implementation.FacilityId
 import it.nucleo.domain.prescription.implementation.MedicinePrescription
 import it.nucleo.domain.prescription.implementation.Priority
+import it.nucleo.domain.prescription.implementation.ServiceId
 import it.nucleo.domain.prescription.implementation.ServicePrescription
 import it.nucleo.domain.report.ClinicalQuestion
 import it.nucleo.domain.report.Conclusion
@@ -41,8 +42,8 @@ object DocumentFactory {
         patientId: PatientId,
         metadata: FileMetadata,
         validity: Validity,
-        serviceId: it.nucleo.domain.prescription.implementation.ServiceId,
-        facilityId: it.nucleo.domain.prescription.implementation.FacilityId,
+        serviceId: ServiceId,
+        facilityId: FacilityId,
         priority: Priority = Priority.ROUTINE,
         issueDate: IssueDate = IssueDate()
     ): Prescription =

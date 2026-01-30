@@ -6,11 +6,11 @@ import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import it.nucleo.domain.Document
 import it.nucleo.domain.DocumentId
+import it.nucleo.domain.DocumentNotFoundException
+import it.nucleo.domain.DocumentRepository
 import it.nucleo.domain.PatientId
+import it.nucleo.domain.RepositoryException
 import it.nucleo.domain.report.Report
-import it.nucleo.domain.repository.DocumentNotFoundException
-import it.nucleo.domain.repository.MedicalRecordRepository
-import it.nucleo.domain.repository.RepositoryException
 import it.nucleo.infrastructure.logging.logger
 import it.nucleo.infrastructure.persistence.mongodb.dto.DocumentDto
 import it.nucleo.infrastructure.persistence.mongodb.dto.MedicalRecordDocument
@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.serialization.json.Json
 import org.bson.BsonDocument
 
-class MongoMedicalRecordRepository(database: MongoDatabase) : MedicalRecordRepository {
+class MongoDocumentRepository(database: MongoDatabase) : DocumentRepository {
 
     private val logger = logger()
     private val collection = database.getCollection<MedicalRecordDocument>(COLLECTION_NAME)

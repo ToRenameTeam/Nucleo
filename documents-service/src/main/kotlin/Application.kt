@@ -8,7 +8,7 @@ import it.nucleo.api.plugins.configureSerialization
 import it.nucleo.api.plugins.configureStatusPages
 import it.nucleo.infrastructure.logging.logger
 import it.nucleo.infrastructure.persistence.mongodb.MongoDbFactory
-import it.nucleo.infrastructure.persistence.mongodb.MongoMedicalRecordRepository
+import it.nucleo.infrastructure.persistence.mongodb.MongoDocumentRepository
 
 private val logger = logger("it.nucleo.Application")
 
@@ -30,7 +30,7 @@ fun Application.module() {
             connectionUri = getMongoConnectionUri(),
             databaseName = getMongoDatabaseName()
         )
-    val repository = MongoMedicalRecordRepository(database)
+    val repository = MongoDocumentRepository(database)
 
     logger.info("Configuring routes")
     configureRouting(repository)

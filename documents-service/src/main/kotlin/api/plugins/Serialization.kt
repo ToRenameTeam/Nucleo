@@ -9,8 +9,8 @@ import io.ktor.server.request.httpMethod
 import io.ktor.server.request.uri
 import io.ktor.server.response.*
 import it.nucleo.api.dto.ErrorResponse
-import it.nucleo.domain.repository.DocumentNotFoundException
-import it.nucleo.domain.repository.RepositoryException
+import it.nucleo.domain.DocumentNotFoundException
+import it.nucleo.domain.RepositoryException
 import it.nucleo.infrastructure.logging.logger
 import kotlinx.serialization.json.Json
 

@@ -6,7 +6,10 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import it.nucleo.api.dto.*
 import it.nucleo.domain.*
-import it.nucleo.domain.factory.DocumentFactory
+import it.nucleo.domain.DocumentFactory
+import it.nucleo.domain.DocumentNotFoundException
+import it.nucleo.domain.DocumentRepository
+import it.nucleo.domain.RepositoryException
 import it.nucleo.domain.prescription.implementation.FacilityId
 import it.nucleo.domain.prescription.implementation.Priority
 import it.nucleo.domain.prescription.implementation.ServiceId
@@ -17,15 +20,12 @@ import it.nucleo.domain.report.ExecutionDate
 import it.nucleo.domain.report.Findings
 import it.nucleo.domain.report.Recommendations
 import it.nucleo.domain.report.Report
-import it.nucleo.domain.repository.DocumentNotFoundException
-import it.nucleo.domain.repository.MedicalRecordRepository
-import it.nucleo.domain.repository.RepositoryException
 import it.nucleo.infrastructure.logging.logger
 import java.time.LocalDate
 
 private val logger = logger("it.nucleo.api.routes.DocumentRoutes")
 
-fun Route.documentRoutes(repository: MedicalRecordRepository) {
+fun Route.documentRoutes(repository: DocumentRepository) {
     route("/patients/{patientId}/documents") {
         getAllDocuments(repository)
         getDocumentById(repository)
@@ -36,7 +36,7 @@ fun Route.documentRoutes(repository: MedicalRecordRepository) {
 }
 
 /** GET /patients/{patientId}/documents Retrieves all documents for a specific patient. */
-private fun Route.getAllDocuments(repository: MedicalRecordRepository) {
+private fun Route.getAllDocuments(repository: DocumentRepository) {
     get {
         val patientId =
             call.parameters["patientId"]
@@ -62,7 +62,7 @@ private fun Route.getAllDocuments(repository: MedicalRecordRepository) {
 }
 
 /** GET /patients/{patientId}/documents/{documentId} Retrieves a single document by its ID. */
-private fun Route.getDocumentById(repository: MedicalRecordRepository) {
+private fun Route.getDocumentById(repository: DocumentRepository) {
     get("/{documentId}") {
         val patientId =
             call.parameters["patientId"]
@@ -105,7 +105,7 @@ private fun Route.getDocumentById(repository: MedicalRecordRepository) {
 }
 
 /** POST /patients/{patientId}/documents Adds a new document to a patient's medical record. */
-private fun Route.addDocument(repository: MedicalRecordRepository) {
+private fun Route.addDocument(repository: DocumentRepository) {
     post {
         val patientId =
             call.parameters["patientId"]
@@ -159,7 +159,7 @@ private fun Route.addDocument(repository: MedicalRecordRepository) {
  * DELETE /patients/{patientId}/documents/{documentId} Deletes a document from a patient's medical
  * record.
  */
-private fun Route.deleteDocument(repository: MedicalRecordRepository) {
+private fun Route.deleteDocument(repository: DocumentRepository) {
     delete("/{documentId}") {
         val patientId =
             call.parameters["patientId"]
@@ -205,7 +205,7 @@ private fun Route.deleteDocument(repository: MedicalRecordRepository) {
  * PUT /patients/{patientId}/documents/{documentId}/report Updates an existing report. Only reports
  * can be updated.
  */
-private fun Route.updateReport(repository: MedicalRecordRepository) {
+private fun Route.updateReport(repository: DocumentRepository) {
     put("/{documentId}/report") {
         val patientId =
             call.parameters["patientId"]
@@ -290,7 +290,7 @@ private fun Route.updateReport(repository: MedicalRecordRepository) {
 private suspend fun createDocumentFromRequest(
     patientId: PatientId,
     request: CreateDocumentRequest,
-    repository: MedicalRecordRepository
+    repository: DocumentRepository
 ): Document {
     val doctorId = DoctorId(request.doctorId)
     val metadata = request.metadata.toDomain()

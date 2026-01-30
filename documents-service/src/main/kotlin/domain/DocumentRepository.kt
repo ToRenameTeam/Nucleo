@@ -1,11 +1,8 @@
-package it.nucleo.domain.repository
+package it.nucleo.domain
 
-import it.nucleo.domain.Document
-import it.nucleo.domain.DocumentId
-import it.nucleo.domain.PatientId
 import it.nucleo.domain.report.Report
 
-interface MedicalRecordRepository {
+interface DocumentRepository {
 
     suspend fun addDocument(patientId: PatientId, document: Document)
 
