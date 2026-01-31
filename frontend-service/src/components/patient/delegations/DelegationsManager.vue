@@ -5,9 +5,9 @@ import { UsersIcon } from '@heroicons/vue/24/outline'
 import DelegationsMenuModal from './DelegationsMenuModal.vue'
 import NewDelegationModal from './NewDelegationModal.vue'
 import DelegationsListModal from './DelegationsListModal.vue'
-import Toast from '../shared/Toast.vue'
-import { useAuth } from '../../composables/useAuth'
-import { useDelegations } from '../../composables/useDelegations'
+import Toast from '../../shared/Toast.vue'
+import { useAuth } from '../../../composables/useAuth'
+import { useDelegations } from '../../../composables/useDelegations'
 
 const { t } = useI18n()
 const { currentUser } = useAuth()

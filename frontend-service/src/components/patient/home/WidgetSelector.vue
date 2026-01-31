@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import BaseModal from '../shared/BaseModal.vue'
-import type { WidgetOption, WidgetSelectorProps } from '../../types/widget'
+import BaseModal from '../../shared/BaseModal.vue'
+import type { WidgetOption, WidgetSelectorProps } from '../../../types/widget'
 
 const props = defineProps<WidgetSelectorProps>()
 

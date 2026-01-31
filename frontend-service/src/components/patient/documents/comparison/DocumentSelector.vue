@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { ChevronDownIcon } from '@heroicons/vue/24/outline'
 import { useI18n } from 'vue-i18n'
-import type { DocumentSelector } from '../../../types/document'
+import type { DocumentSelector } from '../../../../types/document'
 
 const emit = defineEmits<{
   select: [docId: string]

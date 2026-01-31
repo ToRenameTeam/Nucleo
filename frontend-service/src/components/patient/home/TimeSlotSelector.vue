@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { TIME_SLOTS } from '../../constants/mockData'
-import LoadingSpinner from '../shared/LoadingSpinner.vue'
-import type { TimeSlotSelector } from '../../types/appointment'
+import { TIME_SLOTS } from '../../../constants/mockData'
+import LoadingSpinner from '../../shared/LoadingSpinner.vue'
+import type { TimeSlotSelector } from '../../../types/appointment'
 
 const props = withDefaults(defineProps<TimeSlotSelector>(), {
   disabled: false,

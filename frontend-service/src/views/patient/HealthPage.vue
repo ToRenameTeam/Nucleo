@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import HealthAlert from '../../components/health/HealthAlert.vue'
-import HealthMetricWidget from '../../components/health/HealthMetricWidget.vue'
-import HealthChart from '../../components/health/HealthChart.vue'
+import HealthAlert from '../../components/patient/health/HealthAlert.vue'
+import HealthMetricWidget from '../../components/patient/health/HealthMetricWidget.vue'
+import HealthChart from '../../components/patient/health/HealthChart.vue'
 import { 
   HEALTH_PARAMETERS, 
   HEALTH_ALERTS,

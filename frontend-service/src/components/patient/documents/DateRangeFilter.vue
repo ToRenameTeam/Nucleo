@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { CalendarIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { useI18n } from 'vue-i18n'
-import type { DateRange } from '../../types/date-range'
+import type { DateRange } from '../../../types/date-range'
 
 interface DateRangeFilter {
   modelValue: DateRange

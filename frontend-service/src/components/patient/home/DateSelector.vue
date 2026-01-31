@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import LoadingSpinner from '../shared/LoadingSpinner.vue'
-import type { DateSelector } from '../../types/appointment'
+import LoadingSpinner from '../../shared/LoadingSpinner.vue'
+import type { DateSelector } from '../../../types/appointment'
 
 const props = withDefaults(defineProps<DateSelector>(), {
   disabled: false,

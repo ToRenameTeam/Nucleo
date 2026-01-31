@@ -2,10 +2,10 @@
 import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeftIcon, CheckIcon, XMarkIcon, TrashIcon } from '@heroicons/vue/24/outline'
-import BaseModal from '../shared/BaseModal.vue'
-import { parseItalianDate } from '../../utils/dateUtils'
-import { useDelegations } from '../../composables/useDelegations'
-import { useAuth } from '../../composables/useAuth'
+import BaseModal from '../../shared/BaseModal.vue'
+import { parseItalianDate } from '../../../utils/dateUtils'
+import { useDelegations } from '../../../composables/useDelegations'
+import { useAuth } from '../../../composables/useAuth'
 
 const { t } = useI18n()
 const { currentUser } = useAuth()

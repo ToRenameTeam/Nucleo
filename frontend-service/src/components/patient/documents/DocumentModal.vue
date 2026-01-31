@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ArrowDownTrayIcon, ShareIcon } from '@heroicons/vue/24/outline'
-import type { DocumentModal } from '../../types/document'
-import BaseModal from '../shared/BaseModal.vue'
+import type { DocumentModal } from '../../../types/document'
+import BaseModal from '../../shared/BaseModal.vue'
 import DocumentViewer from './DocumentViewer.vue'
 
 const props = defineProps<DocumentModal>()

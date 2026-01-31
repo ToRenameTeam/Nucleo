@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { HealthParameter } from '../../types/health';
+import type { HealthParameter } from '../../../types/health';
 
 // Define props using HealthParameter type from types
 const props = withDefaults(defineProps<{

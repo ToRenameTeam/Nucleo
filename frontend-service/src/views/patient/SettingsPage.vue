@@ -3,9 +3,9 @@ import { ref } from 'vue'
 import { useAuth } from '../../composables/useAuth'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import SettingsItem from '../../components/settings/SettingsItem.vue'
+import SettingsItem from '../../components/patient/settings/SettingsItem.vue'
 import BaseModal from '../../components/shared/BaseModal.vue'
-import AppearanceSettings from '../../components/settings/AppearanceSettings.vue'
+import AppearanceSettings from '../../components/patient/settings/AppearanceSettings.vue'
 import {
   UserCircleIcon,
   UsersIcon,

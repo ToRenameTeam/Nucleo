@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { HealthAlert } from '../../types/health';
+import type { HealthAlert } from '../../../types/health';
 
 const props = defineProps<{ alert: HealthAlert }>();
 

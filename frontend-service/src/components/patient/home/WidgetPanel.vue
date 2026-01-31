@@ -7,7 +7,7 @@ import {
   PlusIcon
 } from '@heroicons/vue/24/outline'
 import WidgetSelector from './WidgetSelector.vue'
-import type { WidgetOption } from '../../types/widget'
+import type { WidgetOption } from '../../../types/widget'
 import HealthMetricWidget from '../health/HealthMetricWidget.vue'
 import HealthChart from '../health/HealthChart.vue'
 import { 
@@ -15,7 +15,7 @@ import {
   getHealthHistory,
   WIDGET_DATA,
   getAvailableWidgets
-} from '../../constants/mockData'
+} from '../../../constants/mockData'
 
 const { t } = useI18n()
 const isWidgetSelectorOpen = ref(false)

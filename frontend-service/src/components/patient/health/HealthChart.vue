@@ -13,7 +13,7 @@ import {
   Filler,
   type ChartOptions,
 } from 'chart.js';
-import type { HealthMetricHistory } from '../../types/health';
+import type { HealthMetricHistory } from '../../../types/health';
 
 ChartJS.register(
   CategoryScale,

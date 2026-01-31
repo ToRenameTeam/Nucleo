@@ -2,10 +2,10 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeftIcon, MagnifyingGlassIcon, PaperAirplaneIcon } from '@heroicons/vue/24/outline'
-import BaseModal from '../shared/BaseModal.vue'
-import { userApi } from '../../api/users'
+import BaseModal from '../../shared/BaseModal.vue'
+import { userApi } from '../../../api/users'
 
-import type { NewDelegationModal } from '../../types/delegation'
+import type { NewDelegationModal } from '../../../types/delegation'
 
 const { t } = useI18n()
 

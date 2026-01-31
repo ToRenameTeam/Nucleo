@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ArrowDownTrayIcon, XMarkIcon, CheckIcon } from '@heroicons/vue/24/outline'
-import type { BatchActions } from '../../types/document'
+import type { BatchActions } from '../../../types/document'
 
 const props = defineProps<BatchActions>()
 const emit = defineEmits<{

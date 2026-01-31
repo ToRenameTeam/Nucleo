@@ -2,12 +2,12 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
-import { VISIT_TYPES } from '../../constants/mockData'
-import LoadingSpinner from '../shared/LoadingSpinner.vue'
+import { VISIT_TYPES } from '../../../constants/mockData'
+import LoadingSpinner from '../../shared/LoadingSpinner.vue'
 
 const { t } = useI18n()
 
-import type { VisitTypeSelector } from '../../types/appointment'
+import type { VisitTypeSelector } from '../../../types/appointment'
 const props = withDefaults(defineProps<VisitTypeSelector>(), {
   loading: false
 })
