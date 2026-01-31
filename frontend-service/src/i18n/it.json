@@ -501,6 +501,26 @@
     "home": {
       "title": "Area Medico",
       "subtitle": "Benvenuto nella tua area di lavoro"
+    },
+    "appointments": {
+      "title": "Appuntamenti",
+      "subtitle": "Gestisci tutti gli appuntamenti dei tuoi pazienti",
+      "appointmentsList": "Lista Appuntamenti",
+      "noAppointments": "Nessun appuntamento trovato",
+      "listView": "Lista",
+      "calendarView": "Calendario",
+      "errorLoading": "Errore nel caricamento degli appuntamenti",
+      "categories": {
+        "all": "Tutti",
+        "confirmed": "Confermati",
+        "pending": "In attesa",
+        "completed": "Completati",
+        "cancelled": "Annullati"
+      }
     }
+  },
+  "common": {
+    "loading": "Caricamento...",
+    "retry": "Riprova"
   }
 }
