@@ -49,11 +49,7 @@ fun Document.toResponse(): DocumentResponse =
     }
 
 fun FileMetadata.toDto(): FileMetadataDto =
-    FileMetadataDto(
-        fileUri = fileURI.uri,
-        summary = summary.summary,
-        tags = tags.map { it.tag }.toSet()
-    )
+    FileMetadataDto(summary = summary.summary, tags = tags.map { it.tag }.toSet())
 
 fun Validity.toResponse(): ValidityResponse =
     when (this) {
@@ -84,8 +80,4 @@ fun DosageRequest.toDomain(): Dosage =
     )
 
 fun FileMetadataDto.toDomain(): FileMetadata =
-    FileMetadata(
-        fileURI = FileURI(fileUri),
-        summary = Summary(summary),
-        tags = tags.map { Tag(it) }.toSet()
-    )
+    FileMetadata(summary = Summary(summary), tags = tags.map { Tag(it) }.toSet())

@@ -171,7 +171,7 @@ class DocumentsApiTest :
                         created.id shouldNotBe null
                         created.patientId shouldBe patientId
                         created.doctorId shouldBe request.doctorId
-                        created.metadata.fileUri shouldBe request.metadata.fileUri
+                        created.metadata.summary shouldBe request.metadata.summary
                         created.dosage.medicineId shouldBe
                             (request as CreateMedicinePrescriptionRequest).dosage.medicineId
                     }

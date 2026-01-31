@@ -14,7 +14,7 @@ interface Document {
     val metadata: FileMetadata
 }
 
-data class FileMetadata(val fileURI: FileURI, val summary: Summary, val tags: Set<Tag>)
+data class FileMetadata(val summary: Summary, val tags: Set<Tag>)
 
 @JvmInline value class DocumentId(val id: String)
 
@@ -23,8 +23,6 @@ data class FileMetadata(val fileURI: FileURI, val summary: Summary, val tags: Se
 @JvmInline value class DoctorId(val id: String)
 
 @JvmInline value class IssueDate(val date: LocalDate = LocalDate.now())
-
-@JvmInline value class FileURI(val uri: String)
 
 @JvmInline value class Summary(val summary: String)
 

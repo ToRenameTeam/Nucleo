@@ -54,8 +54,7 @@ data class ReportResponse(
     val recommendations: String?
 ) : DocumentResponse()
 
-@Serializable
-data class FileMetadataDto(val fileUri: String, val summary: String, val tags: Set<String>)
+@Serializable data class FileMetadataDto(val summary: String, val tags: Set<String>)
 
 @Serializable
 sealed class ValidityResponse {

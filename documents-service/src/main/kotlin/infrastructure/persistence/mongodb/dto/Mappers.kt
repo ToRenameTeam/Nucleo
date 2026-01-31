@@ -4,7 +4,6 @@ import it.nucleo.domain.DoctorId
 import it.nucleo.domain.Document
 import it.nucleo.domain.DocumentId
 import it.nucleo.domain.FileMetadata
-import it.nucleo.domain.FileURI
 import it.nucleo.domain.IssueDate
 import it.nucleo.domain.PatientId
 import it.nucleo.domain.Summary
@@ -39,7 +38,6 @@ fun Document.toDto(): DocumentDto =
                 doctorId = doctorId.id,
                 patientId = patientId.id,
                 issueDate = issueDate.date.toString(),
-                fileUri = metadata.fileURI.uri,
                 summary = metadata.summary.summary,
                 tags = metadata.tags.map { it.tag }.toSet(),
                 validity = validity.toDto(),
@@ -51,7 +49,6 @@ fun Document.toDto(): DocumentDto =
                 doctorId = doctorId.id,
                 patientId = patientId.id,
                 issueDate = issueDate.date.toString(),
-                fileUri = metadata.fileURI.uri,
                 summary = metadata.summary.summary,
                 tags = metadata.tags.map { it.tag }.toSet(),
                 validity = validity.toDto(),
@@ -65,7 +62,6 @@ fun Document.toDto(): DocumentDto =
                 doctorId = doctorId.id,
                 patientId = patientId.id,
                 issueDate = issueDate.date.toString(),
-                fileUri = metadata.fileURI.uri,
                 summary = metadata.summary.summary,
                 tags = metadata.tags.map { it.tag }.toSet(),
                 servicePrescription = servicePrescription.toDto() as ServicePrescriptionDto,
@@ -104,11 +100,7 @@ fun DocumentDto.toDomain(): Document =
                 patientId = PatientId(patientId),
                 issueDate = IssueDate(LocalDate.parse(issueDate)),
                 metadata =
-                    FileMetadata(
-                        fileURI = FileURI(fileUri),
-                        summary = Summary(summary),
-                        tags = tags.map { Tag(it) }.toSet()
-                    ),
+                    FileMetadata(summary = Summary(summary), tags = tags.map { Tag(it) }.toSet()),
                 validity = validity.toDomain(),
                 dosage = dosage.toDomain()
             )
@@ -119,11 +111,7 @@ fun DocumentDto.toDomain(): Document =
                 patientId = PatientId(patientId),
                 issueDate = IssueDate(LocalDate.parse(issueDate)),
                 metadata =
-                    FileMetadata(
-                        fileURI = FileURI(fileUri),
-                        summary = Summary(summary),
-                        tags = tags.map { Tag(it) }.toSet()
-                    ),
+                    FileMetadata(summary = Summary(summary), tags = tags.map { Tag(it) }.toSet()),
                 validity = validity.toDomain(),
                 serviceId = ServiceId(serviceId),
                 facilityId = FacilityId(facilityId),
@@ -136,11 +124,7 @@ fun DocumentDto.toDomain(): Document =
                 patientId = PatientId(patientId),
                 issueDate = IssueDate(LocalDate.parse(issueDate)),
                 metadata =
-                    FileMetadata(
-                        fileURI = FileURI(fileUri),
-                        summary = Summary(summary),
-                        tags = tags.map { Tag(it) }.toSet()
-                    ),
+                    FileMetadata(summary = Summary(summary), tags = tags.map { Tag(it) }.toSet()),
                 servicePrescription = servicePrescription.toDomain() as ServicePrescription,
                 executionDate = ExecutionDate(LocalDate.parse(executionDate)),
                 clinicalQuestion = clinicalQuestion?.let { ClinicalQuestion(it) },

@@ -56,11 +56,7 @@ object DocumentFixtures {
         )
 
     private fun defaultMetadata(summary: String): FileMetadataDto =
-        FileMetadataDto(
-            fileUri = "s3://test-bucket/documents/${System.currentTimeMillis()}.pdf",
-            summary = summary,
-            tags = setOf("test", "automated")
-        )
+        FileMetadataDto(summary = summary, tags = setOf("test", "automated"))
 
     private fun defaultDosage(): DosageRequest =
         DosageRequest(
