@@ -410,14 +410,6 @@
     "patient-settings": "Impostazioni",
     "goTo": "Vai a"
   },
-    "searchSuggestionCard": {
-    "smartSuggestion": "Suggerimento intelligente",
-    "basedOnSearch": "Basato sulla tua ricerca: \"{symptom}\"",
-    "urgencyHigh": "Urgente",
-    "urgencyMedium": "Medio",
-    "urgencyLow": "Non urgente",
-    "bookVisit": "Prenota visita"
-  },
   "delegations": {
     "loading": "Caricamento deleghe...",
     "noResults": "Nessuna delega trovata",

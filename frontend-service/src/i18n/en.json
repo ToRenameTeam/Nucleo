@@ -419,14 +419,6 @@
     "patient-settings": "Settings",
     "goTo": "Go to"
   },
-  "searchSuggestionCard": {
-    "smartSuggestion": "Smart Suggestion",
-    "basedOnSearch": "Based on your search: \"{symptom}\"",
-    "urgencyHigh": "Urgent",
-    "urgencyMedium": "Medium",
-    "urgencyLow": "Non-urgent",
-    "bookVisit": "Book visit"
-  },
   "delegations": {
     "loading": "Loading delegations...",
     "noResults": "No delegations found",
