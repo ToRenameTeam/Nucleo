@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ArrowsRightLeftIcon, CheckCircleIcon } from '@heroicons/vue/24/outline'
+import { CheckCircleIcon } from '@heroicons/vue/24/outline'
 import SearchBar from '../../components/shared/SearchBar.vue'
 import TagBar from '../../components/shared/TagBar.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
 import CardList from '../../components/shared/CardList.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
-import DocumentComparisonModal from '../../components/patient/documents/comparison/DocumentComparisonModal.vue'
 import DateRangeFilter from '../../components/patient/documents/DateRangeFilter.vue'
 import type { DateRange } from '../../types/date-range'
 import BatchActionsBar from '../../components/patient/documents/BatchActionsBar.vue'
@@ -18,7 +17,6 @@ const searchQuery = ref('')
 const selectedTags = ref<string[]>([])
 const selectedDocument = ref<Document | null>(null)
 const isModalOpen = ref(false)
-const isComparisonModalOpen = ref(false)
 
 // Selection mode
 const selectionMode = ref(false)
@@ -197,13 +195,6 @@ const handleCloseModal = () => {
   }, 300)
 }
 
-const handleOpenComparison = () => {
-  isComparisonModalOpen.value = true
-}
-
-const handleCloseComparison = () => {
-  isComparisonModalOpen.value = false
-}
 </script>
 
 <template>
@@ -224,10 +215,6 @@ const handleCloseComparison = () => {
           >
             <CheckCircleIcon class="action-icon" />
             {{ selectionMode ? $t('documents.selection.cancel') : $t('documents.selection.selectMode') }}
-          </button>
-          <button class="action-btn comparison-btn" @click="handleOpenComparison">
-            <ArrowsRightLeftIcon class="action-icon" />
-            {{ $t('documents.documentComparison') }}
           </button>
         </div>
       </div>
@@ -297,13 +284,6 @@ const handleCloseComparison = () => {
       @close="handleCloseModal"
     />
   </Teleport>
-
-  <!-- Document Comparison Modal -->
-  <DocumentComparisonModal
-    :is-open="isComparisonModalOpen"
-    :documents="documents"
-    @close="handleCloseComparison"
-  />
 </template>
 
 <style scoped>
@@ -426,19 +406,6 @@ const handleCloseComparison = () => {
 .selection-btn.active:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px var(--accent-primary-40);
-}
-
-.comparison-btn {
-  background: var(--btn-secondary-bg);
-  color: var(--btn-secondary-text);
-  border: 1px solid var(--btn-secondary-border);
-  box-shadow: 0 4px 16px var(--btn-secondary-shadow);
-}
-
-.comparison-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px var(--btn-secondary-shadow);
-  filter: brightness(1.05);
 }
 
 .filters-row {

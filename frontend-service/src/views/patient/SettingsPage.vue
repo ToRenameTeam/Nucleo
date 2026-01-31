@@ -8,15 +8,9 @@ import BaseModal from '../../components/shared/BaseModal.vue'
 import AppearanceSettings from '../../components/patient/settings/AppearanceSettings.vue'
 import {
   UserCircleIcon,
-  UsersIcon,
-  ShieldCheckIcon,
   BellIcon,
-  LockClosedIcon,
-  AdjustmentsHorizontalIcon,
   SwatchIcon,
-  ArrowDownTrayIcon,
   DocumentTextIcon,
-  QuestionMarkCircleIcon,
   ArrowRightOnRectangleIcon
 } from '@heroicons/vue/24/outline'
 
@@ -69,24 +63,8 @@ function handleChangeProfile() {
         {{ t('settings.profileFamily.title') }}
       </div>
       <div class="settings-list">
-        <SettingsItem
-          :icon="UserCircleIcon"
-          :title="t('settings.profileFamily.myProfile.title')"
-          :subtitle="t('settings.profileFamily.myProfile.subtitle')"
-          @click="handleItemClick('myProfile')"
-        />
-        <SettingsItem
-          :icon="UsersIcon"
-          :title="t('settings.profileFamily.familyManagement.title')"
-          :subtitle="t('settings.profileFamily.familyManagement.subtitle')"
-          @click="handleItemClick('familyManagement')"
-        />
-        <SettingsItem
-          :icon="ShieldCheckIcon"
-          :title="t('settings.profileFamily.permissions.title')"
-          :subtitle="t('settings.profileFamily.permissions.subtitle')"
-          @click="handleItemClick('permissions')"
-        />
+        <SettingsItem :icon="UserCircleIcon" :title="t('settings.profileFamily.myProfile.title')"
+          :subtitle="t('settings.profileFamily.myProfile.subtitle')" @click="handleItemClick('myProfile')" />
       </div>
     </div>
 
@@ -96,30 +74,10 @@ function handleChangeProfile() {
         {{ t('settings.app.title') }}
       </div>
       <div class="settings-list">
-        <SettingsItem
-          :icon="BellIcon"
-          :title="t('settings.app.notifications.title')"
-          :subtitle="t('settings.app.notifications.subtitle')"
-          @click="handleItemClick('notifications')"
-        />
-        <SettingsItem
-          :icon="LockClosedIcon"
-          :title="t('settings.app.privacy.title')"
-          :subtitle="t('settings.app.privacy.subtitle')"
-          @click="handleItemClick('privacy')"
-        />
-        <SettingsItem
-          :icon="AdjustmentsHorizontalIcon"
-          :title="t('settings.app.accessibility.title')"
-          :subtitle="t('settings.app.accessibility.subtitle')"
-          @click="handleItemClick('accessibility')"
-        />
-        <SettingsItem
-          :icon="SwatchIcon"
-          :title="t('settings.app.appearance.title')"
-          :subtitle="t('settings.app.appearance.subtitle')"
-          @click="handleItemClick('appearance')"
-        />
+        <SettingsItem :icon="BellIcon" :title="t('settings.app.notifications.title')"
+          :subtitle="t('settings.app.notifications.subtitle')" @click="handleItemClick('notifications')" />
+        <SettingsItem :icon="SwatchIcon" :title="t('settings.app.appearance.title')"
+          :subtitle="t('settings.app.appearance.subtitle')" @click="handleItemClick('appearance')" />
       </div>
     </div>
 
@@ -129,46 +87,16 @@ function handleChangeProfile() {
         {{ t('settings.dataPrivacy.title') }}
       </div>
       <div class="settings-list">
-        <SettingsItem
-          :icon="ArrowDownTrayIcon"
-          :title="t('settings.dataPrivacy.exportData.title')"
-          :subtitle="t('settings.dataPrivacy.exportData.subtitle')"
-          @click="handleItemClick('exportData')"
-        />
-        <SettingsItem
-          :icon="DocumentTextIcon"
-          :title="t('settings.dataPrivacy.terms.title')"
-          :subtitle="t('settings.dataPrivacy.terms.subtitle')"
-          @click="handleItemClick('terms')"
-        />
-      </div>
-    </div>
-
-    <!-- Support Center -->
-    <div class="settings-section">
-      <div class="settings-section-header">
-        {{ t('settings.support.title') }}
-      </div>
-      <div class="settings-list">
-        <SettingsItem
-          :icon="QuestionMarkCircleIcon"
-          :title="t('settings.support.helpCenter.title')"
-          :subtitle="t('settings.support.helpCenter.subtitle')"
-          @click="handleItemClick('helpCenter')"
-        />
+        <SettingsItem :icon="DocumentTextIcon" :title="t('settings.dataPrivacy.terms.title')"
+          :subtitle="t('settings.dataPrivacy.terms.subtitle')" @click="handleItemClick('terms')" />
       </div>
     </div>
 
     <!-- Logout -->
     <div class="settings-section">
       <div class="settings-list">
-        <SettingsItem
-          :icon="ArrowRightOnRectangleIcon"
-          :title="t('settings.logout')"
-          variant="danger"
-          :show-chevron="false"
-          @click="handleItemClick('logout')"
-        />
+        <SettingsItem :icon="ArrowRightOnRectangleIcon" :title="t('settings.logout')" variant="danger"
+          :show-chevron="false" @click="handleItemClick('logout')" />
       </div>
     </div>
 
@@ -178,11 +106,8 @@ function handleChangeProfile() {
     </div>
 
     <!-- Modal Aspect -->
-    <BaseModal 
-      :is-open="showAppearanceModal" 
-      :title="t('settings.app.appearance.title')" 
-      @close="showAppearanceModal = false"
-    >
+    <BaseModal :is-open="showAppearanceModal" :title="t('settings.app.appearance.title')"
+      @close="showAppearanceModal = false">
       <AppearanceSettings />
     </BaseModal>
   </div>
@@ -206,7 +131,7 @@ function handleChangeProfile() {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, var(--sky-0ea5e9-20) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, var(--purple-a855f7-20) 0%, transparent 50%);
   pointer-events: none;
@@ -248,12 +173,29 @@ function handleChangeProfile() {
   animation-fill-mode: both;
 }
 
-.settings-section:nth-child(2) { animation-delay: 0.1s; }
-.settings-section:nth-child(3) { animation-delay: 0.15s; }
-.settings-section:nth-child(4) { animation-delay: 0.2s; }
-.settings-section:nth-child(5) { animation-delay: 0.25s; }
-.settings-section:nth-child(6) { animation-delay: 0.3s; }
-.settings-section:nth-child(7) { animation-delay: 0.35s; }
+.settings-section:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.settings-section:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.settings-section:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.settings-section:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+.settings-section:nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+.settings-section:nth-child(7) {
+  animation-delay: 0.35s;
+}
 
 .settings-section-header {
   font-size: 0.8125rem;
@@ -275,11 +217,11 @@ function handleChangeProfile() {
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
-.settings-list > * {
+.settings-list>* {
   border-bottom: 1px solid var(--white-20);
 }
 
-.settings-list > *:last-child {
+.settings-list>*:last-child {
   border-bottom: none;
 }
 
@@ -370,6 +312,7 @@ function handleChangeProfile() {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -381,6 +324,7 @@ function handleChangeProfile() {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -391,15 +335,15 @@ function handleChangeProfile() {
   .settings-page {
     padding: 1rem;
   }
-  
+
   .settings-header {
     padding: 1.25rem 1.5rem;
   }
-  
+
   .settings-title {
     font-size: 1.5rem;
   }
-  
+
   .settings-subtitle {
     font-size: 0.875rem;
   }
@@ -409,36 +353,36 @@ function handleChangeProfile() {
   .settings-page {
     padding: 0.75rem;
   }
-  
+
   .settings-header {
     padding: 1rem 1.25rem;
   }
-  
+
   .settings-title {
     font-size: 1.375rem;
   }
-  
+
   .settings-subtitle {
     font-size: 0.8125rem;
   }
-  
+
   .settings-account {
     padding: 1rem;
   }
-  
+
   .settings-account-avatar {
     width: 48px;
     height: 48px;
   }
-  
+
   .settings-account-avatar span {
     font-size: 1.25rem;
   }
-  
+
   .settings-account-name {
     font-size: 1rem;
   }
-  
+
   .settings-account-button {
     font-size: 0.8125rem;
     padding: 0.5rem 0.875rem;

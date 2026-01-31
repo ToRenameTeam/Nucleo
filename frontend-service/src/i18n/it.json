@@ -44,7 +44,6 @@
   "tabs": {
     "home": "Home",
     "documents": "Documenti",
-    "health": "Salute",
     "calendar": "Calendario",
     "settings": "Impostazioni",
     "patients": "Pazienti",
@@ -58,19 +57,8 @@
   "documents": {
     "title": "Archivio documenti",
     "subtitle": "15 documenti",
-    "documentComparison": "Confronto documenti",
     "searchPlaceholder": "Cerca documenti, sintomi, medici...",
     "noResults": "Nessun documento trovato",
-    "showBarcode": "Mostra codice",
-    "prescriptionCode": "Codice prescrizione",
-    "prescriptionCodeSubtitle": "Mostra questo codice in farmacia o al centro prelievi",
-    "issuedOn": "Emessa il",
-    "expiresIn": "Scade dopo {days} giorni dalla data di emissione",
-    "barcodeInstruction": "Presenta questo codice a barre per ritirare i farmaci o prenotare la visita prescritta",
-    "barcodeNotAvailable": "Codice a barre non disponibile",
-    "usedOn": "Utilizzata il {date}",
-    "expiredOn": "Scaduta il {date}",
-    "downloadBarcode": "Scarica codice a barre",
     "close": "Chiudi",
     "selection": {
       "selectMode": "Seleziona documenti",
@@ -97,7 +85,7 @@
       "last6Months": "Ultimi 6 mesi",
       "lastYear": "Ultimo anno"
     },
-    "comparison": {
+    "viewer": {
       "title": "Confronto Documenti",
       "subtitle": "Seleziona due documenti diversi per confrontarli",
       "selectDocument": "Seleziona documento",
@@ -120,7 +108,6 @@
   "calendar": {
     "title": "Calendario",
     "subtitle": "Calendario condiviso della tua famiglia",
-    "newAppointment": "Nuovo appuntamento",
     "appointments": "Appuntamenti",
     "noAppointments": "Nessun appuntamento trovato",
     "today": "Oggi",
@@ -149,8 +136,7 @@
     "upcomingAppointments": "Prossimi appuntamenti",
     "noAppointments": "Nessun appuntamento in programma",
     "recentDocuments": "Documenti recenti",
-    "searchHint": "Prova: \"mal di schiena\", \"dolore al petto\" o \"esami del sangue di Marco\"",
-    "quickOverview": "I miei widget"
+    "searchHint": "Prova: \"mal di schiena\", \"dolore al petto\" o \"esami del sangue di Marco\""
   },
   "appointmentBooking": {
     "title": "Prenota una visita",
@@ -203,14 +189,6 @@
       "myProfile": {
         "title": "Il mio profilo",
         "subtitle": "Anagrafica e stato dei servizi"
-      },
-      "familyManagement": {
-        "title": "Gestione famiglia",
-        "subtitle": "Aggiungi o modifica i conti dei familiari"
-      },
-      "permissions": {
-        "title": "Permessi e accessi",
-        "subtitle": "Chi può vedere i tuoi documenti"
       }
     },
     "app": {
@@ -218,14 +196,6 @@
       "notifications": {
         "title": "Notifiche",
         "subtitle": "Promemoria appuntamenti e scadenze"
-      },
-      "privacy": {
-        "title": "Privacy e sicurezza",
-        "subtitle": "Face ID, biometria, blocco schermo"
-      },
-      "accessibility": {
-        "title": "Accessibilità",
-        "subtitle": "Screen reader, comandi vocali, riduzione movimento"      
       },
       "appearance": {
         "title": "Aspetto",
@@ -247,20 +217,9 @@
     },
     "dataPrivacy": {
       "title": "Dati e privacy",
-      "exportData": {
-        "title": "Esporta i miei dati",
-        "subtitle": "Scarica tutti i tuoi documenti"
-      },
       "terms": {
         "title": "Termini e condizioni",
         "subtitle": "Leggi i termini di servizio"
-      }
-    },
-    "support": {
-      "title": "Centro assistenza",
-      "helpCenter": {
-        "title": "Centro assistenza",
-        "subtitle": "FAQ, tutorial, contatti"
       }
     },
     "logout": "Esci dall'account",
@@ -268,121 +227,8 @@
       "version": "Nucleo v0.1 · Prototipo"
     }
   },
-  "widgets": {
-    "selector": {
-      "title": "Personalizza i tuoi widget",
-      "subtitle": "Selezionati: {count} / {total}",
-      "close": "Chiudi",
-      "cancel": "Annulla",
-      "save": "Salva",
-      "selected": "Selezionato",
-      "select": "Seleziona"
-    },
-    "loading": {
-      "title": "Caricamento widget...",
-      "description": "Recupero dati dai documenti"
-    },
-    "categories": {
-      "quick": "Widget rapidi",
-      "healthMetric": "Parametri vitali",
-      "healthChart": "Grafici andamento"
-    },
-    "items": {
-      "nextVisit": {
-        "name": "Prossima visita",
-        "description": "Giorni alla prossima visita medica"
-      },
-      "newDocs": {
-        "name": "Documenti nuovi",
-        "description": "Numero di documenti aggiunti recentemente"
-      },
-      "medicationReminder": {
-        "name": "Promemoria farmaci",
-        "description": "Prossimo farmaco da assumere oggi"
-      },
-      "nextVaccine": {
-        "name": "Prossimo vaccino",
-        "description": "Giorni al prossimo richiamo vaccinale"
-      },
-      "heartRate": {
-        "name": "Frequenza cardiaca",
-        "description": "Battiti cardiaci al minuto"
-      },
-      "bloodPressureSys": {
-        "name": "Pressione sistolica",
-        "description": "Pressione arteriosa massima"
-      },
-      "bloodPressureDia": {
-        "name": "Pressione diastolica",
-        "description": "Pressione arteriosa minima"
-      },
-      "glucose": {
-        "name": "Glicemia",
-        "description": "Livello di glucosio nel sangue"
-      },
-      "oxygen": {
-        "name": "Saturazione O₂",
-        "description": "Percentuale ossigeno nel sangue"
-      },
-      "cholesterol": {
-        "name": "Colesterolo",
-        "description": "Livello colesterolo totale"
-      },
-      "heartRateChart": {
-        "name": "Grafico frequenza cardiaca",
-        "description": "Andamento battito cardiaco ultimi 6 giorni"
-      },
-      "glucoseChart": {
-        "name": "Grafico glicemia",
-        "description": "Andamento livello glucosio"
-      },
-      "bloodPressureSysChart": {
-        "name": "Grafico pressione sistolica",
-        "description": "Trend pressione massima"
-      },
-      "cholesterolChart": {
-        "name": "Grafico colesterolo",
-        "description": "Trend colesterolo totale"
-      }
-    },
-    "emptyState": {
-      "title": "Nessun widget selezionato",
-      "description": "Clicca sul pulsante + per aggiungere widget alla tua dashboard",
-      "addButton": "Aggiungi widget"
-    }
-  },
-  "health": {
-    "title": "Salute",
-    "subtitle": "Monitora i tuoi parametri vitali e ricevi consigli personalizzati per mantenerti in salute.",
-    "alerts": {
-      "title": "⚠️ Avvisi importanti"
-    },
-    "parameters": {
-      "title": "📊 I tuoi parametri",
-      "cholesterol": "Colesterolo",
-      "bloodPressureSys": "Pressione sistolica",
-      "bloodPressureDia": "Pressione diastolica",
-      "heartRate": "Frequenza cardiaca",
-      "glucose": "Glicemia",
-      "oxygen": "Saturazione O₂"
-    },
-    "charts": {
-      "title": "📈 Andamento storico"
-    },
-    "normalRange": "Range normale",
-    "info": {
-      "title": "Informazioni sui dati",
-      "description": "I dati mostrati provengono dai tuoi dispositivi connessi e dalle misurazioni registrate. Ricorda di consultare sempre il tuo medico per una valutazione professionale."
-    },
-    "sourceDocuments": {
-      "title": "Documenti sorgente",
-      "showDetails": "Mostra dettagli",
-      "hideDetails": "Nascondi dettagli",
-      "description": "Questi valori sono stati estratti dai seguenti documenti:",
-      "noDocuments": "Nessun documento collegato"
-    }
-  },
-    "footer": {
+  
+  "footer": {
     "privacy": "Privacy",
     "privacyAria": "Apri informativa privacy e cookie policy",
     "legalNotes": "Note Legali",
@@ -407,7 +253,6 @@
     "home": "Home",
     "patient-home": "Home",
     "patient-documents": "Documenti",
-    "patient-health": "Salute",
     "patient-calendar": "Calendario",
     "patient-settings": "Impostazioni",
     "doctor-home": "Home",
@@ -416,14 +261,6 @@
     "doctor-analytics": "Analisi",
     "doctor-settings": "Impostazioni",
     "goTo": "Vai a"
-  },
-    "searchSuggestionCard": {
-    "smartSuggestion": "Suggerimento intelligente",
-    "basedOnSearch": "Basato sulla tua ricerca: \"{symptom}\"",
-    "urgencyHigh": "Urgente",
-    "urgencyMedium": "Medio",
-    "urgencyLow": "Non urgente",
-    "bookVisit": "Prenota visita"
   },
   "delegations": {
     "loading": "Caricamento deleghe...",

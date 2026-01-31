@@ -6,10 +6,6 @@ export interface Document {
   date: string
   doctor?: string
   hospital?: string
-  isPrescription?: boolean
-  prescriptionCode?: string
-  expirationDays?: number
-  usedDate?: string
 }
 
 export type DocumentType = 'prescription' | 'report' | 'analysis' | 'visit' | 'diagnostic' | 'other'
@@ -41,17 +37,10 @@ export interface DocumentCategory {
   borderColor: string
 }
 
-export type PrescriptionStatus = 'valid' | 'expired' | 'used'
-
 export interface BadgeColors {
   color: string
   bgColor: string
   borderColor: string
-}
-
-export interface DocumentComparisonModal {
-  isOpen: boolean;
-  documents: Document[];
 }
 
 export interface DocumentSelector {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useAuth } from '../../composables/useAuth'
 import type { CalendarOptions, EventClickArg, DateSelectArg } from '@fullcalendar/core'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
@@ -9,14 +10,19 @@ import type { Tag } from '../../types/tag'
 import AppointmentCard from '../../components/shared/AppointmentCard.vue'
 import CardList from '../../components/shared/CardList.vue'
 import type { Appointment } from '../../types/appointment'
-import { PlusIcon } from '@heroicons/vue/24/outline'
 import { MOCK_APPOINTMENTS } from '../../constants/mockData'
 import { useI18n } from 'vue-i18n'
 import { parseItalianDate, formatDateToISO } from '../../utils/dateUtils'
 
 const { t } = useI18n()
 
-const appointments = ref<Appointment[]>(MOCK_APPOINTMENTS)
+const { currentUser } = useAuth()
+
+// TODO: Replace MOCK_APPOINTMENTS with real data from API
+const appointments = computed<Appointment[]>(() => {
+  if (!currentUser.value?.fiscalCode) return []
+  return MOCK_APPOINTMENTS.filter(a => a.fiscalCode === currentUser.value?.fiscalCode)
+})
 
 const tags = computed<Tag[]>(() => [
   { id: 'all', label: t('calendar.categories.all'), count: appointments.value.length },
@@ -130,11 +136,6 @@ function handleAppointmentClick(id: string) {
   selectedAppointmentId.value = id
 }
 
-function handleNewAppointment() {
-  // Implementare apertura dialog per nuovo appuntamento
-  console.log('Nuovo appuntamento')
-}
-
 function handleEditAppointment(id: string) {
   console.log('Modifica appuntamento:', id)
   // Implementare apertura dialog per modifica appuntamento
@@ -164,10 +165,6 @@ function parseDateToISO(dateString: string): string {
           <h1 class="page-title">{{ $t('calendar.title') }}</h1>
           <p class="page-subtitle">{{ $t('calendar.subtitle') }}</p>
         </div>
-        <button class="new-appointment-btn" @click="handleNewAppointment">
-          <PlusIcon class="icon" />
-          {{ $t('calendar.newAppointment') }}
-        </button>
       </div>
     </div>
 
@@ -266,29 +263,6 @@ function parseDateToISO(dateString: string): string {
   color: var(--gray-525252);
   margin-top: 0.5rem;
   line-height: 1.5;
-}
-
-.new-appointment-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: var(--btn-secondary-bg);
-  backdrop-filter: blur(12px);
-  color: var(--btn-secondary-text);
-  border: 1px solid var(--btn-secondary-border);
-  border-radius: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
-  white-space: nowrap;
-  box-shadow: 0 4px 16px var(--btn-secondary-shadow);
-}
-
-.new-appointment-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px var(--btn-secondary-shadow);
-  filter: brightness(1.05);
 }
 
 .tag-bar-container {
@@ -537,11 +511,6 @@ function parseDateToISO(dateString: string): string {
     font-size: 0.875rem;
   }
 
-  .new-appointment-btn {
-    padding: 0.625rem 1rem;
-    font-size: 0.875rem;
-  }
-
   .calendar-container {
     padding: 1rem;
   }
@@ -575,13 +544,5 @@ function parseDateToISO(dateString: string): string {
   .appointments-container {
     padding: 0.5rem;
   }
-}
-
-/* Icon sizing */
-.icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  display: inline-block;
-  vertical-align: middle;
 }
 </style>

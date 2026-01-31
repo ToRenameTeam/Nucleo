@@ -53,7 +53,6 @@
   "tabs": {
     "home": "Home",
     "documents": "Documents",
-    "health": "Health",
     "calendar": "Calendar",
     "settings": "Settings"
   },
@@ -65,19 +64,8 @@
   "documents": {
     "title": "Document Archive",
     "subtitle": "15 documents",
-    "documentComparison": "Compare Documents",
     "searchPlaceholder": "Search documents, symptoms, doctors...",
     "noResults": "No documents found",
-    "showBarcode": "Show Code",
-    "prescriptionCode": "Prescription Code",
-    "prescriptionCodeSubtitle": "Show this code at the pharmacy or testing center",
-    "issuedOn": "Issued on",
-    "expiresIn": "Expires {days} days from issue date",
-    "barcodeInstruction": "Present this barcode to pick up medications or book the prescribed visit",
-    "barcodeNotAvailable": "Barcode not available",
-    "usedOn": "Used on {date}",
-    "expiredOn": "Expired on {date}",
-    "downloadBarcode": "Download Barcode",
     "close": "Close",
     "selectDocument": "Select Document",
     "selection": {
@@ -104,7 +92,7 @@
       "lastYear": "Last year",
       "clearRange": "Clear filter"
     },
-    "comparison": {
+    "viewer": {
       "title": "Compare Documents",
       "subtitle": "Select two different documents to compare",
       "selectDocument": "Select document",
@@ -127,7 +115,6 @@
   "calendar": {
     "title": "Calendar",
     "subtitle": "Your family's shared calendar",
-    "newAppointment": "New Appointment",
     "appointments": "Appointments",
     "noAppointments": "No appointments found",
     "today": "Today",
@@ -138,12 +125,6 @@
       "cardiologia": "Cardiology",
       "analisi": "Analysis",
       "pediatria": "Pediatrics"
-    },
-    "tags": {
-      "all": "All",
-      "health": "Health",
-      "work": "Work",
-      "family": "Family"
     }
   },
   "appointments": {
@@ -156,8 +137,7 @@
     "upcomingAppointments": "Upcoming Appointments",
     "noAppointments": "No scheduled appointments",
     "recentDocuments": "Recent Documents",
-    "searchHint": "Try: \"back pain\", \"chest pain\" or \"Marco's blood tests\"",
-    "quickOverview": "My Widgets"
+    "searchHint": "Try: \"back pain\", \"chest pain\" or \"Marco's blood tests\""
   },
   "appointmentBooking": {
     "title": "Book a Visit",
@@ -210,14 +190,6 @@
       "myProfile": {
         "title": "My Profile",
         "subtitle": "Personal data and service status"
-      },
-      "familyManagement": {
-        "title": "Family Management",
-        "subtitle": "Add or edit family accounts"
-      },
-      "permissions": {
-        "title": "Permissions and Access",
-        "subtitle": "Who can see your documents"
       }
     },
     "app": {
@@ -225,14 +197,6 @@
       "notifications": {
         "title": "Notifications",
         "subtitle": "Appointment and deadline reminders"
-      },
-      "privacy": {
-        "title": "Privacy and Security",
-        "subtitle": "Face ID, biometrics, screen lock"
-      },
-      "accessibility": {
-        "title": "Accessibility",
-        "subtitle": "Screen reader, voice commands, motion reduction"      
       },
       "appearance": {
         "title": "Appearance",
@@ -254,139 +218,14 @@
     },
     "dataPrivacy": {
       "title": "Data and Privacy",
-      "exportData": {
-        "title": "Export My Data",
-        "subtitle": "Download all your documents"
-      },
       "terms": {
         "title": "Terms and Conditions",
         "subtitle": "Read the terms of service"
       }
     },
-    "support": {
-      "title": "Help Center",
-      "helpCenter": {
-        "title": "Help Center",
-        "subtitle": "FAQ, tutorials, contacts"
-      }
-    },
     "logout": "Logout",
     "footer": {
       "version": "Nucleo v0.1 · Prototype"
-    }
-  },
-  "widgets": {
-    "selector": {
-      "title": "Customize Your Widgets",
-      "subtitle": "Selected: {count} / {total}",
-      "close": "Close",
-      "cancel": "Cancel",
-      "save": "Save",
-      "selected": "Selected",
-      "select": "Select"
-    },
-    "loading": {
-      "title": "Loading widgets...",
-      "description": "Retrieving data from documents"
-    },
-    "categories": {
-      "quick": "Quick Widgets",
-      "healthMetric": "Vital Parameters",
-      "healthChart": "Trend Charts"
-    },
-    "items": {
-      "nextVisit": {
-        "name": "Next Visit",
-        "description": "Days until next medical visit"
-      },
-      "newDocs": {
-        "name": "New Documents",
-        "description": "Number of recently added documents"
-      },
-      "medicationReminder": {
-        "name": "Medication Reminder",
-        "description": "Next medication to take today"
-      },
-      "nextVaccine": {
-        "name": "Next Vaccine",
-        "description": "Days until next vaccination"
-      },
-      "heartRate": {
-        "name": "Heart Rate",
-        "description": "Heart beats per minute"
-      },
-      "bloodPressureSys": {
-        "name": "Systolic Pressure",
-        "description": "Maximum blood pressure"
-      },
-      "bloodPressureDia": {
-        "name": "Diastolic Pressure",
-        "description": "Minimum blood pressure"
-      },
-      "glucose": {
-        "name": "Blood Glucose",
-        "description": "Blood glucose level"
-      },
-      "oxygen": {
-        "name": "O₂ Saturation",
-        "description": "Oxygen percentage in blood"
-      },
-      "cholesterol": {
-        "name": "Cholesterol",
-        "description": "Total cholesterol level"
-      },
-      "heartRateChart": {
-        "name": "Heart Rate Chart",
-        "description": "Heart rate trend over last 6 days"
-      },
-      "glucoseChart": {
-        "name": "Blood Glucose Chart",
-        "description": "Glucose level trend"
-      },
-      "bloodPressureSysChart": {
-        "name": "Systolic Pressure Chart",
-        "description": "Maximum pressure trend"
-      },
-      "cholesterolChart": {
-        "name": "Cholesterol Chart",
-        "description": "Total cholesterol trend"
-      }
-    },
-    "emptyState": {
-      "title": "No widgets selected",
-      "description": "Click the + button to add widgets to your dashboard",
-      "addButton": "Add widget"
-    }
-  },
-  "health": {
-    "title": "Health",
-    "subtitle": "Monitor your vital parameters and receive personalized advice to stay healthy.",
-    "alerts": {
-      "title": "⚠️ Important Alerts"
-    },
-    "parameters": {
-      "title": "📊 Your Parameters",
-      "cholesterol": "Cholesterol",
-      "bloodPressureSys": "Systolic Pressure",
-      "bloodPressureDia": "Diastolic Pressure",
-      "heartRate": "Heart Rate",
-      "glucose": "Blood Glucose",
-      "oxygen": "O₂ Saturation"
-    },
-    "charts": {
-      "title": "📈 Historical Trend"
-    },
-    "normalRange": "Normal Range",
-    "info": {
-      "title": "Data Information",
-      "description": "The data shown comes from your connected devices and recorded measurements. Always consult your doctor for professional evaluation."
-    },
-    "sourceDocuments": {
-      "title": "Source Documents",
-      "showDetails": "Show details",
-      "hideDetails": "Hide details",
-      "description": "These values were extracted from the following documents:",
-      "noDocuments": "No linked documents"
     }
   },
   "footer": {
@@ -414,18 +253,9 @@
     "home": "Home",
     "patient-home": "Home",
     "patient-documents": "Documents",
-    "patient-health": "Health",
     "patient-calendar": "Calendar",
     "patient-settings": "Settings",
     "goTo": "Go to"
-  },
-  "searchSuggestionCard": {
-    "smartSuggestion": "Smart Suggestion",
-    "basedOnSearch": "Based on your search: \"{symptom}\"",
-    "urgencyHigh": "Urgent",
-    "urgencyMedium": "Medium",
-    "urgencyLow": "Non-urgent",
-    "bookVisit": "Book visit"
   },
   "delegations": {
     "loading": "Loading delegations...",

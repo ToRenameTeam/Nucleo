@@ -6,7 +6,7 @@ import { useAuth } from '../composables/useAuth'
 
 const { t } = useI18n()
 const router = useRouter()
-const { setAuthenticatedUser, currentUser } = useAuth()
+const { setAuthenticatedUser, selectPatientProfile: setProfile, currentUser } = useAuth()
 
 const selectDoctor = () => {
   if (currentUser.value) {
@@ -14,6 +14,13 @@ const selectDoctor = () => {
       ...currentUser.value,
       activeProfile: 'DOCTOR'
     })
+
+  setProfile({
+    id: currentUser.value.userId,
+    name: currentUser.value.name,
+    fiscalCode: currentUser.value.fiscalCode
+  })
+
     router.push('/doctor/home')
   }
 }

@@ -21,18 +21,13 @@ const routes: RouteRecordRaw[] = [
     name: 'doctor-patient-choice',
     component: () => import('../views/DoctorPatientChoice.vue'),
     meta: {
-      hideNavigation: true,
-      requiresAuth: true
+      hideNavigation: true
     }
   },
   {
     path: '/patient-choice',
     name: 'patient-choice',
     component: () => import('../views/patient/PatientChoice.vue'),
-    meta: {
-      hideNavigation: true,
-      requiresAuth: true
-    }
   },
   {
     path: '/patient',
@@ -54,11 +49,6 @@ const routes: RouteRecordRaw[] = [
         path: 'documents',
         name: 'patient-documents',
         component: () => import('../views/patient/PatientDocumentsPage.vue')
-      },
-      {
-        path: 'health',
-        name: 'patient-health',
-        component: () => import('../views/patient/HealthPage.vue')
       },
       {
         path: 'calendar',

@@ -34,6 +34,7 @@ withDefaults(defineProps<CardListProps>(), {
 .card-list {
   display: flex;
   width: 100%;
+  min-width: 0;
 }
 
 /* Direction variants */
