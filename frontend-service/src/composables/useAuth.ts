@@ -11,28 +11,69 @@ function getStoredValue<T>(key: string): T | null {
   }
 }
 
+// Dev user for development - automatically logged in
+const DEV_USER: AuthenticatedUser = {
+  userId: 'dev-user-001',
+  fiscalCode: 'DVLUSR00A01H501X',
+  name: 'Dev',
+  lastName: 'User',
+  dateOfBirth: '2000-01-01',
+  activeProfile: 'PATIENT',
+  patient: {
+    userId: 'dev-user-001',
+    activeDelegationIds: []
+  },
+  doctor: {
+    userId: 'dev-user-001',
+    medicalLicenseNumber: 'DEV123456',
+    specializations: ['Medicina Generale'],
+    assignedPatientUserIds: []
+  }
+}
 
-const currentUser = ref<AuthenticatedUser | null>(getStoredValue('currentUser'))
-const currentPatientProfile = ref<Profile | null>(getStoredValue('currentPatientProfile'))
+const DEV_PROFILE: Profile = {
+  id: 'dev-profile-001',
+  name: 'Dev User',
+  fiscalCode: 'DVLUSR00A01H501X'
+}
+
+// In development mode, automatically use dev user
+const isDev = import.meta.env.DEV
+const currentUser = ref<AuthenticatedUser | null>(
+  isDev ? DEV_USER : getStoredValue('currentUser')
+)
+const currentPatientProfile = ref<Profile | null>(
+  isDev ? DEV_PROFILE : getStoredValue('currentPatientProfile')
+)
 
 export function useAuth() {
   const isAuthenticated = computed(() => currentUser.value !== null)
 
   const setAuthenticatedUser = (user: AuthenticatedUser) => {
     currentUser.value = user
-    localStorage.setItem('currentUser', JSON.stringify(user))
+    if (!isDev) {
+      localStorage.setItem('currentUser', JSON.stringify(user))
+    }
   }
 
   const selectPatientProfile = (profile: Profile) => {
     currentPatientProfile.value = profile
-    localStorage.setItem('currentPatientProfile', JSON.stringify(profile))
+    if (!isDev) {
+      localStorage.setItem('currentPatientProfile', JSON.stringify(profile))
+    }
   }
 
   const logout = () => {
-    currentUser.value = null
-    currentPatientProfile.value = null
-    localStorage.removeItem('currentUser')
-    localStorage.removeItem('currentPatientProfile')
+    // In dev mode, reset to dev user instead of full logout
+    if (isDev) {
+      currentUser.value = DEV_USER
+      currentPatientProfile.value = DEV_PROFILE
+    } else {
+      currentUser.value = null
+      currentPatientProfile.value = null
+      localStorage.removeItem('currentUser')
+      localStorage.removeItem('currentPatientProfile')
+    }
   }
 
   return {
