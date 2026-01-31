@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useAuth } from '../../composables/useAuth'
 import type { CalendarOptions, EventClickArg, DateSelectArg } from '@fullcalendar/core'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
@@ -15,7 +16,13 @@ import { parseItalianDate, formatDateToISO } from '../../utils/dateUtils'
 
 const { t } = useI18n()
 
-const appointments = ref<Appointment[]>(MOCK_APPOINTMENTS)
+const { currentUser } = useAuth()
+
+// TODO: Replace MOCK_APPOINTMENTS with real data from API
+const appointments = computed<Appointment[]>(() => {
+  if (!currentUser.value?.fiscalCode) return []
+  return MOCK_APPOINTMENTS.filter(a => a.fiscalCode === currentUser.value?.fiscalCode)
+})
 
 const tags = computed<Tag[]>(() => [
   { id: 'all', label: t('calendar.categories.all'), count: appointments.value.length },

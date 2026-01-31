@@ -5,7 +5,7 @@ export interface Appointment {
   tags?: string[];
   date: string;
   time?: string;
-  user?: string;
+  fiscalCode?: string;
   location?: string;
 }
 
