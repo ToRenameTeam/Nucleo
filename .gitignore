@@ -49,6 +49,8 @@ dist/
 
 ### Python ###
 .venv/
+.ruff_cache/
+.env
 
 ### Logs ###
 logs

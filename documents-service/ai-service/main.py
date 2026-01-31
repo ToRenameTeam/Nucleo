@@ -1,5 +1,5 @@
-def main():
-    print("Hello from ai-service!")
+def main() -> None:
+    print("Hello candy 🥰!")
 
 
 if __name__ == "__main__":

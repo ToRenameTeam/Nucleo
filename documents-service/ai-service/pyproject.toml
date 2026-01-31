@@ -1,10 +1,17 @@
 [project]
 name = "ai-service"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI service for medical document processing"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "groq>=1.0.0",
+    "grpcio>=1.76.0",
+    "minio>=7.2.20",
+    "pydantic>=2.12.5",
+    "pymupdf>=1.26.7",
+    "python-dotenv>=1.2.1",
+]
 
 [dependency-groups]
 dev = [
