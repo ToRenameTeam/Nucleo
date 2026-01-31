@@ -1,5 +1,6 @@
 packages:
   - users-service
+  - master-data-service
 
 onlyBuiltDependencies:
   - esbuild
