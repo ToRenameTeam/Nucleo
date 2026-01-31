@@ -389,7 +389,7 @@
       "noDocuments": "No linked documents"
     }
   },
-  "legalFooter": {
+  "footer": {
     "privacy": "Privacy",
     "privacyAria": "Open privacy and cookie policy",
     "legalNotes": "Legal Notes",

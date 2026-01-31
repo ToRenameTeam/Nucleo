@@ -46,7 +46,9 @@
     "documents": "Documenti",
     "health": "Salute",
     "calendar": "Calendario",
-    "settings": "Impostazioni"
+    "settings": "Impostazioni",
+    "patients": "Pazienti",
+    "analytics": "Analisi"
   },
   "tags": {
     "all": "Tutti",
@@ -380,7 +382,7 @@
       "noDocuments": "Nessun documento collegato"
     }
   },
-    "legalFooter": {
+    "footer": {
     "privacy": "Privacy",
     "privacyAria": "Apri informativa privacy e cookie policy",
     "legalNotes": "Note Legali",
@@ -488,5 +490,11 @@
   "toast": {
     "closeNotification": "Chiudi notifica",
     "bookingConfirmed": "Prenotazione confermata con successo!"
+  },
+  "doctor": {
+    "home": {
+      "title": "Area Medico",
+      "subtitle": "Benvenuto nella tua area di lavoro"
+    }
   }
 }
