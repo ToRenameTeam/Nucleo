@@ -16,17 +16,21 @@ const emit = defineEmits<{
 const handleClick = () => {
   if (props.selectable) {
     emit('toggleSelect')
-  } else {
+  } else if (props.clickable) {
     emit('click')
   }
 }
 </script>
 
 <template>
-  <div :class="['base-card-wrapper', {
-    'card-selectable': selectable,
-    'card-selected': selected
-  }]" @click="handleClick">
+  <div 
+    :id="cardId"
+    :class="['base-card-wrapper', {
+      'card-selectable': selectable,
+      'card-selected': selected
+    }]" 
+    @click="handleClick"
+  >
     <!-- Selection Checkbox (when selectable) -->
     <div v-if="selectable" class="selection-checkbox" :class="{ 'checked': selected }">
       <svg v-if="selected" class="checkbox-icon" fill="currentColor" viewBox="0 0 20 20">
