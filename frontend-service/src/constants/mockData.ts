@@ -28,10 +28,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     tags: ['Prescrizione', 'Farmaci'],
     date: '27 Dic 2025',
     doctor: 'Dr. Mario Rossi',
-    hospital: 'Ospedale San Raffaele',
-    isPrescription: true,
-    prescriptionCode: '8234567890123',
-    expirationDays: 20,
+    hospital: 'Ospedale San Raffaele'
   },
   {
     id: '3',
@@ -49,11 +46,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     tags: ['Prescrizione', 'Cardiologia'],
     date: '1 Nov 2025',
     doctor: 'Dr. Antonio Ferrari',
-    hospital: 'Poliambulatorio Salute',
-    isPrescription: true,
-    prescriptionCode: '8234567890123',
-    expirationDays: 20,
-    usedDate : '10 Nov 2025'
+    hospital: 'Poliambulatorio Salute'
   },
   {
     id: '4',
@@ -80,10 +73,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     tags: ['Prescrizione', 'Analisi'],
     date: '20 Ott 2025',
     doctor: 'Dr.ssa Laura Bianchi',
-    hospital: 'Laboratorio Analisi Medicon',
-    isPrescription: true,
-    prescriptionCode: '8234567890123',
-    expirationDays: 20
+    hospital: 'Laboratorio Analisi Medicon'
   },
   {
     id: '6',
@@ -173,10 +163,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     tags: ['Prescrizione', 'Diabete', 'Farmaci'],
     date: '10 Set 2025',
     doctor: 'Dr. Paolo Santini',
-    hospital: 'Centro Diabetologico Milano',
-    isPrescription: true,
-    prescriptionCode: '8234567890456',
-    expirationDays: 180
+    hospital: 'Centro Diabetologico Milano'
   },
   {
     id: '15',
