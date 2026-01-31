@@ -5,22 +5,14 @@ import type {
   DelegationsListResponse,
   AcceptDeclineResponse,
 } from '../types/delegation'
+import { DELEGATIONS_API_URL, API_ENDPOINTS, handleApiResponse } from './config'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3030'
-
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
-    throw new Error(errorData.message || 'Request failed')
-  }
-  
-  const data = await response.json()
-  return data.data
-}
+const BASE_URL = `${DELEGATIONS_API_URL}${API_ENDPOINTS.DELEGATIONS}`
 
 export const delegationApi = {
   async createDelegation(data: CreateDelegationRequest): Promise<CreateDelegationResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/delegations`, {
+    console.log('[Delegations API] createDelegation called')
+    const response = await fetch(BASE_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -28,54 +20,67 @@ export const delegationApi = {
       body: JSON.stringify(data),
     })
     
-    return handleResponse<CreateDelegationResponse>(response)
+    return handleApiResponse<CreateDelegationResponse>(response)
   },
 
   async getReceivedDelegations(userId: string, status?: string): Promise<DelegationsListResponse> {
+    console.log('[Delegations API] getReceivedDelegations called for userId:', userId)
     const params = new URLSearchParams({ userId })
     if (status) {
       params.append('status', status)
     }
     
-    const response = await fetch(`${API_BASE_URL}/api/delegations/received?${params}`, {
+    const url = `${BASE_URL}/received?${params}`
+    console.log('[Delegations API] Fetching from:', url)
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     })
     
-    return handleResponse<DelegationsListResponse>(response)
+    return handleApiResponse<DelegationsListResponse>(response)
   },
 
   async getSentDelegations(userId: string, status?: string): Promise<DelegationsListResponse> {
+    console.log('[Delegations API] getSentDelegations called for userId:', userId)
     const params = new URLSearchParams({ userId })
     if (status) {
       params.append('status', status)
     }
     
-    const response = await fetch(`${API_BASE_URL}/api/delegations/sent?${params}`, {
+    const url = `${BASE_URL}/sent?${params}`
+    console.log('[Delegations API] Fetching from:', url)
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     })
     
-    return handleResponse<DelegationsListResponse>(response)
+    return handleApiResponse<DelegationsListResponse>(response)
   },
 
   async getDelegationById(delegationId: string): Promise<DelegationResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/delegations/${delegationId}`, {
+    console.log('[Delegations API] getDelegationById called for:', delegationId)
+    const url = `${BASE_URL}/${delegationId}`
+    console.log('[Delegations API] Fetching from:', url)
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     })
     
-    return handleResponse<DelegationResponse>(response)
+    return handleApiResponse<DelegationResponse>(response)
   },
 
   async acceptDelegation(delegationId: string, userId: string): Promise<AcceptDeclineResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/delegations/${delegationId}/accept`, {
+    console.log('[Delegations API] acceptDelegation called for:', delegationId)
+    const response = await fetch(`${BASE_URL}/${delegationId}/accept`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -83,11 +88,12 @@ export const delegationApi = {
       body: JSON.stringify({ userId }),
     })
     
-    return handleResponse<AcceptDeclineResponse>(response)
+    return handleApiResponse<AcceptDeclineResponse>(response)
   },
 
   async declineDelegation(delegationId: string, userId: string): Promise<AcceptDeclineResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/delegations/${delegationId}/decline`, {
+    console.log('[Delegations API] declineDelegation called for:', delegationId)
+    const response = await fetch(`${BASE_URL}/${delegationId}/decline`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -95,19 +101,20 @@ export const delegationApi = {
       body: JSON.stringify({ userId }),
     })
     
-    return handleResponse<AcceptDeclineResponse>(response)
+    return handleApiResponse<AcceptDeclineResponse>(response)
   },
 
   async deleteDelegation(delegationId: string, userId: string): Promise<AcceptDeclineResponse> {
+    console.log('[Delegations API] deleteDelegation called for:', delegationId)
     const params = new URLSearchParams({ userId })
     
-    const response = await fetch(`${API_BASE_URL}/api/delegations/${delegationId}?${params}`, {
+    const response = await fetch(`${BASE_URL}/${delegationId}?${params}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
     })
     
-    return handleResponse<AcceptDeclineResponse>(response)
+    return handleApiResponse<AcceptDeclineResponse>(response)
   },
 }
