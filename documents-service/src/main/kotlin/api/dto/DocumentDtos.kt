@@ -150,4 +150,3 @@ data class ErrorResponse(val error: String, val message: String, val details: St
 @Serializable data class DeleteResponse(val message: String)
 
 @Serializable data class UploadResponse(val success: Boolean, val message: String)
-

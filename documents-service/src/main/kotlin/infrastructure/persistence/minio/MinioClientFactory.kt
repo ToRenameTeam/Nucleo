@@ -18,10 +18,8 @@ object MinioClientFactory {
     fun createClient(endpoint: String, accessKey: String, secretKey: String): MinioClient {
         logger.info("Creating MinIO client connection to endpoint: $endpoint")
 
-        val client = MinioClient.builder()
-            .endpoint(endpoint)
-            .credentials(accessKey, secretKey)
-            .build()
+        val client =
+            MinioClient.builder().endpoint(endpoint).credentials(accessKey, secretKey).build()
 
         logger.info("MinIO client created successfully")
         return client

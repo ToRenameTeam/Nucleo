@@ -6,22 +6,26 @@ import io.ktor.server.routing.*
 import it.nucleo.api.routes.documentRoutes
 import it.nucleo.api.routes.downloadRoutes
 import it.nucleo.api.routes.uploadRoutes
+import it.nucleo.application.DocumentDownloadService
 import it.nucleo.application.DocumentService
+import it.nucleo.application.DocumentUploadService
 import it.nucleo.domain.DocumentRepository
-import it.nucleo.infrastructure.persistence.minio.MinioFileStorageService
+import it.nucleo.domain.FileStorageRepository
 
 fun Application.configureRouting(
-    repository: DocumentRepository,
-    fileStorageService: MinioFileStorageService
+    documentRepository: DocumentRepository,
+    fileStorageRepository: FileStorageRepository
 ) {
-    val documentService = DocumentService(repository)
+    val documentService = DocumentService(documentRepository)
+    val uploadService = DocumentUploadService(fileStorageRepository)
+    val downloadService = DocumentDownloadService(fileStorageRepository)
 
     routing {
         healthCheck()
         route("/api/v1") {
             documentRoutes(documentService)
-            uploadRoutes(fileStorageService)
-            downloadRoutes(fileStorageService)
+            uploadRoutes(uploadService)
+            downloadRoutes(downloadService)
         }
     }
 }
