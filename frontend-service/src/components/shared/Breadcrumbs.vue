@@ -11,11 +11,16 @@ const { t } = useI18n()
 const breadcrumbs = computed<BreadcrumbItem[]>(() => {
   const items: BreadcrumbItem[] = []
   
+  // Determine home path based on current route
+  const isInDoctorArea = route.path.startsWith('/doctor')
+  const homePath = isInDoctorArea ? '/doctor/home' : '/patient/home'
+  const homeName = isInDoctorArea ? 'doctor-home' : 'patient-home'
+  
   // Always add 'home' as the first item if not on home page
-  if (route.path !== '/patient-home' && route.name !== 'home') {
+  if (route.name !== homeName) {
     items.push({
       name: t('breadcrumbs.home'),
-      path: '/patient-home'
+      path: homePath
     })
   }
 

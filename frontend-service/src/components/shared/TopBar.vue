@@ -43,7 +43,7 @@ const changeUser = () => {
 <template>
   <div class="topbar-container">
     <div class="topbar-title-container">
-      <h1 class="topbar-title" @click="router.push('/patient-home')">{{ t('app.title') }}</h1>
+      <h1 class="topbar-title" @click="router.push('/patient/home')">{{ t('app.title') }}</h1>
     </div>
     <div class="topbar-actions">
       <button 

@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { UserIcon, BuildingOfficeIcon } from '@heroicons/vue/24/outline'
-import { useAuth } from '../../composables/useAuth'
+import { useAuth } from '../composables/useAuth'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -14,7 +14,7 @@ const selectDoctor = () => {
       ...currentUser.value,
       activeProfile: 'DOCTOR'
     })
-    router.push('/patient-home')
+    router.push('/doctor/home')
   }
 }
 

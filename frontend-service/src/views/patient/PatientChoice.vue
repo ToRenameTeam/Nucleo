@@ -90,7 +90,7 @@ const loadDelegatedProfiles = async () => {
 
 const selectPatientProfile = (profile: Profile) => {
   setProfile(profile)
-  router.push('/patient-home')
+  router.push('/patient/home')
 }
 </script>
 

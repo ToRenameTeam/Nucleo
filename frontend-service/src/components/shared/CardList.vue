@@ -1,19 +1,14 @@
 <script setup lang="ts">
 /**
- * CardList - Componente riutilizzabile per liste di card
- * 
- * Usato per garantire una presentazione uniforme delle card in:
- * - Homepage: Prossimi appuntamenti, Documenti recenti
- * - Pagina Documenti
- * - Pagina Calendario/Appuntamenti
+ * CardList - Shared component for card lists
  */
 
 export interface CardListProps {
-  /** Gap tra le card (default: 1rem) */
+  /** Gap between cards (default: 1rem) */
   gap?: 'sm' | 'md' | 'lg'
-  /** Direzione del layout (default: column) */
+  /** Layout direction (default: column) */
   direction?: 'column' | 'row'
-  /** Classe CSS aggiuntiva */
+  /** Additional CSS class */
   class?: string
 }
 

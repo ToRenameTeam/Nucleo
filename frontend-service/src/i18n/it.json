@@ -410,6 +410,11 @@
     "patient-health": "Salute",
     "patient-calendar": "Calendario",
     "patient-settings": "Impostazioni",
+    "doctor-home": "Home",
+    "doctor-patients": "Pazienti",
+    "doctor-calendar": "Calendario",
+    "doctor-analytics": "Analisi",
+    "doctor-settings": "Impostazioni",
     "goTo": "Vai a"
   },
     "searchSuggestionCard": {
