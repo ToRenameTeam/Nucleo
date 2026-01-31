@@ -44,7 +44,6 @@
   "tabs": {
     "home": "Home",
     "documents": "Documenti",
-    "health": "Salute",
     "calendar": "Calendario",
     "settings": "Impostazioni"
   },
@@ -146,8 +145,7 @@
     "upcomingAppointments": "Prossimi appuntamenti",
     "noAppointments": "Nessun appuntamento in programma",
     "recentDocuments": "Documenti recenti",
-    "searchHint": "Prova: \"mal di schiena\", \"dolore al petto\" o \"esami del sangue di Marco\"",
-    "quickOverview": "I miei widget"
+    "searchHint": "Prova: \"mal di schiena\", \"dolore al petto\" o \"esami del sangue di Marco\""
   },
   "appointmentBooking": {
     "title": "Prenota una visita",
@@ -265,121 +263,7 @@
       "version": "Nucleo v0.1 · Prototipo"
     }
   },
-  "widgets": {
-    "selector": {
-      "title": "Personalizza i tuoi widget",
-      "subtitle": "Selezionati: {count} / {total}",
-      "close": "Chiudi",
-      "cancel": "Annulla",
-      "save": "Salva",
-      "selected": "Selezionato",
-      "select": "Seleziona"
-    },
-    "loading": {
-      "title": "Caricamento widget...",
-      "description": "Recupero dati dai documenti"
-    },
-    "categories": {
-      "quick": "Widget rapidi",
-      "healthMetric": "Parametri vitali",
-      "healthChart": "Grafici andamento"
-    },
-    "items": {
-      "nextVisit": {
-        "name": "Prossima visita",
-        "description": "Giorni alla prossima visita medica"
-      },
-      "newDocs": {
-        "name": "Documenti nuovi",
-        "description": "Numero di documenti aggiunti recentemente"
-      },
-      "medicationReminder": {
-        "name": "Promemoria farmaci",
-        "description": "Prossimo farmaco da assumere oggi"
-      },
-      "nextVaccine": {
-        "name": "Prossimo vaccino",
-        "description": "Giorni al prossimo richiamo vaccinale"
-      },
-      "heartRate": {
-        "name": "Frequenza cardiaca",
-        "description": "Battiti cardiaci al minuto"
-      },
-      "bloodPressureSys": {
-        "name": "Pressione sistolica",
-        "description": "Pressione arteriosa massima"
-      },
-      "bloodPressureDia": {
-        "name": "Pressione diastolica",
-        "description": "Pressione arteriosa minima"
-      },
-      "glucose": {
-        "name": "Glicemia",
-        "description": "Livello di glucosio nel sangue"
-      },
-      "oxygen": {
-        "name": "Saturazione O₂",
-        "description": "Percentuale ossigeno nel sangue"
-      },
-      "cholesterol": {
-        "name": "Colesterolo",
-        "description": "Livello colesterolo totale"
-      },
-      "heartRateChart": {
-        "name": "Grafico frequenza cardiaca",
-        "description": "Andamento battito cardiaco ultimi 6 giorni"
-      },
-      "glucoseChart": {
-        "name": "Grafico glicemia",
-        "description": "Andamento livello glucosio"
-      },
-      "bloodPressureSysChart": {
-        "name": "Grafico pressione sistolica",
-        "description": "Trend pressione massima"
-      },
-      "cholesterolChart": {
-        "name": "Grafico colesterolo",
-        "description": "Trend colesterolo totale"
-      }
-    },
-    "emptyState": {
-      "title": "Nessun widget selezionato",
-      "description": "Clicca sul pulsante + per aggiungere widget alla tua dashboard",
-      "addButton": "Aggiungi widget"
-    }
-  },
-  "health": {
-    "title": "Salute",
-    "subtitle": "Monitora i tuoi parametri vitali e ricevi consigli personalizzati per mantenerti in salute.",
-    "alerts": {
-      "title": "⚠️ Avvisi importanti"
-    },
-    "parameters": {
-      "title": "📊 I tuoi parametri",
-      "cholesterol": "Colesterolo",
-      "bloodPressureSys": "Pressione sistolica",
-      "bloodPressureDia": "Pressione diastolica",
-      "heartRate": "Frequenza cardiaca",
-      "glucose": "Glicemia",
-      "oxygen": "Saturazione O₂"
-    },
-    "charts": {
-      "title": "📈 Andamento storico"
-    },
-    "normalRange": "Range normale",
-    "info": {
-      "title": "Informazioni sui dati",
-      "description": "I dati mostrati provengono dai tuoi dispositivi connessi e dalle misurazioni registrate. Ricorda di consultare sempre il tuo medico per una valutazione professionale."
-    },
-    "sourceDocuments": {
-      "title": "Documenti sorgente",
-      "showDetails": "Mostra dettagli",
-      "hideDetails": "Nascondi dettagli",
-      "description": "Questi valori sono stati estratti dai seguenti documenti:",
-      "noDocuments": "Nessun documento collegato"
-    }
-  },
-    "legalFooter": {
+  "legalFooter": {
     "privacy": "Privacy",
     "privacyAria": "Apri informativa privacy e cookie policy",
     "legalNotes": "Note Legali",
@@ -404,7 +288,6 @@
     "home": "Home",
     "patient-home": "Home",
     "patient-documents": "Documenti",
-    "patient-health": "Salute",
     "patient-calendar": "Calendario",
     "patient-settings": "Impostazioni",
     "goTo": "Vai a"

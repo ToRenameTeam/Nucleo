@@ -53,7 +53,6 @@
   "tabs": {
     "home": "Home",
     "documents": "Documents",
-    "health": "Health",
     "calendar": "Calendar",
     "settings": "Settings"
   },
@@ -137,12 +136,6 @@
       "cardiologia": "Cardiology",
       "analisi": "Analysis",
       "pediatria": "Pediatrics"
-    },
-    "tags": {
-      "all": "All",
-      "health": "Health",
-      "work": "Work",
-      "family": "Family"
     }
   },
   "appointments": {
@@ -155,8 +148,7 @@
     "upcomingAppointments": "Upcoming Appointments",
     "noAppointments": "No scheduled appointments",
     "recentDocuments": "Recent Documents",
-    "searchHint": "Try: \"back pain\", \"chest pain\" or \"Marco's blood tests\"",
-    "quickOverview": "My Widgets"
+    "searchHint": "Try: \"back pain\", \"chest pain\" or \"Marco's blood tests\""
   },
   "appointmentBooking": {
     "title": "Book a Visit",
@@ -274,120 +266,6 @@
       "version": "Nucleo v0.1 · Prototype"
     }
   },
-  "widgets": {
-    "selector": {
-      "title": "Customize Your Widgets",
-      "subtitle": "Selected: {count} / {total}",
-      "close": "Close",
-      "cancel": "Cancel",
-      "save": "Save",
-      "selected": "Selected",
-      "select": "Select"
-    },
-    "loading": {
-      "title": "Loading widgets...",
-      "description": "Retrieving data from documents"
-    },
-    "categories": {
-      "quick": "Quick Widgets",
-      "healthMetric": "Vital Parameters",
-      "healthChart": "Trend Charts"
-    },
-    "items": {
-      "nextVisit": {
-        "name": "Next Visit",
-        "description": "Days until next medical visit"
-      },
-      "newDocs": {
-        "name": "New Documents",
-        "description": "Number of recently added documents"
-      },
-      "medicationReminder": {
-        "name": "Medication Reminder",
-        "description": "Next medication to take today"
-      },
-      "nextVaccine": {
-        "name": "Next Vaccine",
-        "description": "Days until next vaccination"
-      },
-      "heartRate": {
-        "name": "Heart Rate",
-        "description": "Heart beats per minute"
-      },
-      "bloodPressureSys": {
-        "name": "Systolic Pressure",
-        "description": "Maximum blood pressure"
-      },
-      "bloodPressureDia": {
-        "name": "Diastolic Pressure",
-        "description": "Minimum blood pressure"
-      },
-      "glucose": {
-        "name": "Blood Glucose",
-        "description": "Blood glucose level"
-      },
-      "oxygen": {
-        "name": "O₂ Saturation",
-        "description": "Oxygen percentage in blood"
-      },
-      "cholesterol": {
-        "name": "Cholesterol",
-        "description": "Total cholesterol level"
-      },
-      "heartRateChart": {
-        "name": "Heart Rate Chart",
-        "description": "Heart rate trend over last 6 days"
-      },
-      "glucoseChart": {
-        "name": "Blood Glucose Chart",
-        "description": "Glucose level trend"
-      },
-      "bloodPressureSysChart": {
-        "name": "Systolic Pressure Chart",
-        "description": "Maximum pressure trend"
-      },
-      "cholesterolChart": {
-        "name": "Cholesterol Chart",
-        "description": "Total cholesterol trend"
-      }
-    },
-    "emptyState": {
-      "title": "No widgets selected",
-      "description": "Click the + button to add widgets to your dashboard",
-      "addButton": "Add widget"
-    }
-  },
-  "health": {
-    "title": "Health",
-    "subtitle": "Monitor your vital parameters and receive personalized advice to stay healthy.",
-    "alerts": {
-      "title": "⚠️ Important Alerts"
-    },
-    "parameters": {
-      "title": "📊 Your Parameters",
-      "cholesterol": "Cholesterol",
-      "bloodPressureSys": "Systolic Pressure",
-      "bloodPressureDia": "Diastolic Pressure",
-      "heartRate": "Heart Rate",
-      "glucose": "Blood Glucose",
-      "oxygen": "O₂ Saturation"
-    },
-    "charts": {
-      "title": "📈 Historical Trend"
-    },
-    "normalRange": "Normal Range",
-    "info": {
-      "title": "Data Information",
-      "description": "The data shown comes from your connected devices and recorded measurements. Always consult your doctor for professional evaluation."
-    },
-    "sourceDocuments": {
-      "title": "Source Documents",
-      "showDetails": "Show details",
-      "hideDetails": "Hide details",
-      "description": "These values were extracted from the following documents:",
-      "noDocuments": "No linked documents"
-    }
-  },
   "legalFooter": {
     "privacy": "Privacy",
     "privacyAria": "Open privacy and cookie policy",
@@ -413,7 +291,6 @@
     "home": "Home",
     "patient-home": "Home",
     "patient-documents": "Documents",
-    "patient-health": "Health",
     "patient-calendar": "Calendar",
     "patient-settings": "Settings",
     "goTo": "Go to"

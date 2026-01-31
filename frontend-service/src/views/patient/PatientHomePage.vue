@@ -151,7 +151,7 @@ const handleCloseToast = () => {
   flex-direction: column;
   gap: 1rem;
   min-height: 100%;
-  max-width: 100vw;
+  width: 100%;
   overflow-x: hidden;
   padding: 1.5rem;
   background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
@@ -174,7 +174,6 @@ const handleCloseToast = () => {
 
 .content-grid {
   display: grid;
-  grid-template-columns: 1fr 20rem;
   gap: 1.5rem;
   width: 100%;
   align-items: start;
@@ -269,7 +268,7 @@ const handleCloseToast = () => {
   }
   
   .quick-actions {
-    margin: 0.5rem;
+    padding: 1rem;
   }
 }
 

@@ -59,6 +59,7 @@ const handleSearch = () => {
 
 .search-bar-container {
   position: relative;
+  width: 100%;
   background: var(--bg-secondary-35);
   backdrop-filter: blur(16px);
   border: 1px solid var(--bg-secondary-50);

@@ -21,58 +21,33 @@ const routes: RouteRecordRaw[] = [
     name: 'doctor-patient-choice',
     component: () => import('../views/doctor/DoctorPatientChoice.vue'),
     meta: {
-      hideNavigation: true,
-      requiresAuth: true
+      hideNavigation: true
     }
   },
   {
     path: '/patient-choice',
     name: 'patient-choice',
     component: () => import('../views/patient/PatientChoice.vue'),
-    meta: {
-      hideNavigation: true,
-      requiresAuth: true
-    }
   },
   {
     path: '/patient-home',
     name: 'patient-home',
     component: () => import('../views/patient/PatientHomePage.vue'),
-    meta: {
-      requiresAuth: true
-    }
   },
   {
     path: '/patient-documents',
     name: 'patient-documents',
     component: () => import('../views/patient/PatientDocumentsPage.vue'),
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/patient-health',
-    name: 'patient-health',
-    component: () => import('../views/patient/HealthPage.vue'),
-    meta: {
-      requiresAuth: true
-    }
   },
   {
     path: '/patient-calendar',
     name: 'patient-calendar',
     component: () => import('../views/patient/CalendarPage.vue'),
-    meta: {
-      requiresAuth: true
-    }
   },
   {
     path: '/patient-settings',
     name: 'patient-settings',
     component: () => import('../views/patient/SettingsPage.vue'),
-    meta: {
-      requiresAuth: true
-    }
   }
 ]
 
