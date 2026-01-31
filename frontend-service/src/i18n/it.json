@@ -187,14 +187,6 @@
       "myProfile": {
         "title": "Il mio profilo",
         "subtitle": "Anagrafica e stato dei servizi"
-      },
-      "familyManagement": {
-        "title": "Gestione famiglia",
-        "subtitle": "Aggiungi o modifica i conti dei familiari"
-      },
-      "permissions": {
-        "title": "Permessi e accessi",
-        "subtitle": "Chi può vedere i tuoi documenti"
       }
     },
     "app": {
@@ -202,14 +194,6 @@
       "notifications": {
         "title": "Notifiche",
         "subtitle": "Promemoria appuntamenti e scadenze"
-      },
-      "privacy": {
-        "title": "Privacy e sicurezza",
-        "subtitle": "Face ID, biometria, blocco schermo"
-      },
-      "accessibility": {
-        "title": "Accessibilità",
-        "subtitle": "Screen reader, comandi vocali, riduzione movimento"      
       },
       "appearance": {
         "title": "Aspetto",
@@ -231,20 +215,9 @@
     },
     "dataPrivacy": {
       "title": "Dati e privacy",
-      "exportData": {
-        "title": "Esporta i miei dati",
-        "subtitle": "Scarica tutti i tuoi documenti"
-      },
       "terms": {
         "title": "Termini e condizioni",
         "subtitle": "Leggi i termini di servizio"
-      }
-    },
-    "support": {
-      "title": "Centro assistenza",
-      "helpCenter": {
-        "title": "Centro assistenza",
-        "subtitle": "FAQ, tutorial, contatti"
       }
     },
     "logout": "Esci dall'account",

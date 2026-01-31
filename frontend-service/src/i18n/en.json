@@ -190,14 +190,6 @@
       "myProfile": {
         "title": "My Profile",
         "subtitle": "Personal data and service status"
-      },
-      "familyManagement": {
-        "title": "Family Management",
-        "subtitle": "Add or edit family accounts"
-      },
-      "permissions": {
-        "title": "Permissions and Access",
-        "subtitle": "Who can see your documents"
       }
     },
     "app": {
@@ -205,14 +197,6 @@
       "notifications": {
         "title": "Notifications",
         "subtitle": "Appointment and deadline reminders"
-      },
-      "privacy": {
-        "title": "Privacy and Security",
-        "subtitle": "Face ID, biometrics, screen lock"
-      },
-      "accessibility": {
-        "title": "Accessibility",
-        "subtitle": "Screen reader, voice commands, motion reduction"      
       },
       "appearance": {
         "title": "Appearance",
@@ -234,20 +218,9 @@
     },
     "dataPrivacy": {
       "title": "Data and Privacy",
-      "exportData": {
-        "title": "Export My Data",
-        "subtitle": "Download all your documents"
-      },
       "terms": {
         "title": "Terms and Conditions",
         "subtitle": "Read the terms of service"
-      }
-    },
-    "support": {
-      "title": "Help Center",
-      "helpCenter": {
-        "title": "Help Center",
-        "subtitle": "FAQ, tutorials, contacts"
       }
     },
     "logout": "Logout",
