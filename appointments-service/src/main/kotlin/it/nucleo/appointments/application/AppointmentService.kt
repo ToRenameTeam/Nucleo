@@ -2,6 +2,7 @@ package it.nucleo.appointments.application
 
 import it.nucleo.appointments.domain.Appointment
 import it.nucleo.appointments.domain.AppointmentRepository
+import it.nucleo.appointments.domain.Availability
 import it.nucleo.appointments.domain.AvailabilityRepository
 import it.nucleo.appointments.domain.valueobjects.*
 import org.slf4j.LoggerFactory
@@ -59,6 +60,29 @@ class AppointmentService(
         }
 
         return appointment
+    }
+
+    data class AppointmentDetails(val appointment: Appointment, val availability: Availability)
+
+    suspend fun getAppointmentDetails(id: String): AppointmentDetails? {
+        logger.info("Fetching appointment details by ID: $id")
+
+        val appointment = appointmentRepository.findById(AppointmentId.fromString(id))
+        if (appointment == null) {
+            logger.warn("Appointment not found with ID: $id")
+            return null
+        }
+
+        val availability = availabilityRepository.findById(appointment.availabilityId)
+        if (availability == null) {
+            logger.error(
+                "Availability not found for appointment ID: $id, availabilityId: ${appointment.availabilityId}"
+            )
+            throw AvailabilityNotFoundException("Availability not found for appointment")
+        }
+
+        logger.info("Appointment details found with ID: $id")
+        return AppointmentDetails(appointment, availability)
     }
 
     suspend fun getAppointmentsByFilters(patientId: String?, status: String?): List<Appointment> {

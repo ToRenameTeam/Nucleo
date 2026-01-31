@@ -7,6 +7,7 @@ import io.ktor.server.routing.*
 import it.nucleo.appointments.api.dto.CreateAppointmentRequest
 import it.nucleo.appointments.api.dto.ErrorResponse
 import it.nucleo.appointments.api.dto.UpdateAppointmentRequest
+import it.nucleo.appointments.api.toDetailsResponse
 import it.nucleo.appointments.api.toResponse
 import it.nucleo.appointments.application.AppointmentService
 import it.nucleo.appointments.application.AvailabilityNotAvailableException
@@ -94,6 +95,50 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                 )
             } catch (e: Exception) {
                 logger.error("Error fetching appointment by ID: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
+                )
+            }
+        }
+
+        // Get appointment details by ID (with joined availability data)
+        get("/{id}/details") {
+            try {
+                val id =
+                    call.parameters["id"]
+                        ?: return@get call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(message = "Missing ID", code = "MISSING_ID")
+                        )
+
+                val appointmentDetails = service.getAppointmentDetails(id)
+
+                if (appointmentDetails == null) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(message = "Appointment not found", code = "NOT_FOUND")
+                    )
+                } else {
+                    call.respond(HttpStatusCode.OK, appointmentDetails.toDetailsResponse())
+                }
+            } catch (e: AvailabilityNotFoundException) {
+                logger.error("Availability not found for appointment: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    ErrorResponse(
+                        message = e.message ?: "Availability not found",
+                        code = "AVAILABILITY_NOT_FOUND"
+                    )
+                )
+            } catch (e: IllegalArgumentException) {
+                logger.error("Invalid appointment ID: ${e.message}", e)
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(message = e.message ?: "Invalid ID", code = "INVALID_ID")
+                )
+            } catch (e: Exception) {
+                logger.error("Error fetching appointment details: ${e.message}", e)
                 call.respond(
                     HttpStatusCode.InternalServerError,
                     ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
