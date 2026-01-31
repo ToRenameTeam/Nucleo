@@ -37,14 +37,7 @@ class AppointmentService(
         }
 
         val appointment =
-            Appointment.schedule(
-                patientId = patientId,
-                availabilityId = availabilityId,
-                doctorId = availability.doctorId,
-                facilityId = availability.facilityId,
-                serviceTypeId = availability.serviceTypeId,
-                timeSlot = availability.timeSlot
-            )
+            Appointment.schedule(patientId = patientId, availabilityId = availabilityId)
 
         val savedAppointment = appointmentRepository.save(appointment)
 
@@ -68,34 +61,15 @@ class AppointmentService(
         return appointment
     }
 
-    suspend fun getAppointmentsByFilters(
-        patientId: String?,
-        doctorId: String?,
-        facilityId: String?,
-        status: String?,
-        startDate: String?,
-        endDate: String?
-    ): List<Appointment> {
+    suspend fun getAppointmentsByFilters(patientId: String?, status: String?): List<Appointment> {
         val patientIdValue = patientId?.let { PatientId.fromString(it) }
-        val doctorIdValue = doctorId?.let { DoctorId.fromString(it) }
-        val facilityIdValue = facilityId?.let { FacilityId.fromString(it) }
         val statusValue = status?.let { AppointmentStatus.valueOf(it) }
-        val startDateValue = startDate?.let { kotlinx.datetime.LocalDateTime.parse(it) }
-        val endDateValue = endDate?.let { kotlinx.datetime.LocalDateTime.parse(it) }
 
         logger.info(
-            "Fetching appointments with filters - patientId: $patientIdValue, doctorId: $doctorIdValue, facilityId: $facilityIdValue, status: $statusValue, startDate: $startDateValue, endDate: $endDateValue"
+            "Fetching appointments with filters - patientId: $patientIdValue, status: $statusValue"
         )
 
-        val appointments =
-            appointmentRepository.findByFilters(
-                patientIdValue,
-                doctorIdValue,
-                facilityIdValue,
-                statusValue,
-                startDateValue,
-                endDateValue
-            )
+        val appointments = appointmentRepository.findByFilters(patientIdValue, statusValue)
 
         logger.info("Found ${appointments.size} appointments")
         return appointments
@@ -133,8 +107,13 @@ class AppointmentService(
                         throw AvailabilityNotAvailableException("New availability is not available")
                     }
 
-                    // Use the timeSlot from the availability
-                    appointment.reschedule(newAvailability.timeSlot, newAvailabilityId)
+                    // Free up the old availability and book the new one
+                    val oldAvailability =
+                        availabilityRepository.findById(appointment.availabilityId)
+                    oldAvailability?.let { availabilityRepository.update(it.makeAvailable()) }
+                    availabilityRepository.update(newAvailability.book())
+
+                    appointment.reschedule(newAvailabilityId)
                 }
                 else ->
                     throw IllegalArgumentException("Must provide either status or availabilityId")

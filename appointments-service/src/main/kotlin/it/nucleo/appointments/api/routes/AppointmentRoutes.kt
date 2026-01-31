@@ -105,21 +105,10 @@ fun Route.appointmentRoutes(service: AppointmentService) {
         get {
             try {
                 val patientId = call.request.queryParameters["patientId"]
-                val doctorId = call.request.queryParameters["doctorId"]
-                val facilityId = call.request.queryParameters["facilityId"]
                 val status = call.request.queryParameters["status"]
-                val startDate = call.request.queryParameters["startDate"]
-                val endDate = call.request.queryParameters["endDate"]
 
                 val appointments =
-                    service.getAppointmentsByFilters(
-                        patientId = patientId,
-                        doctorId = doctorId,
-                        facilityId = facilityId,
-                        status = status,
-                        startDate = startDate,
-                        endDate = endDate
-                    )
+                    service.getAppointmentsByFilters(patientId = patientId, status = status)
 
                 call.respond(HttpStatusCode.OK, appointments.map { it.toResponse() })
             } catch (e: IllegalArgumentException) {
