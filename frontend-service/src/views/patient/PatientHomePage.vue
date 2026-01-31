@@ -4,11 +4,12 @@ import { DocumentPlusIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import SearchBar from '../../components/shared/SearchBar.vue'
 import SearchSuggestionCard from '../../components/shared/SearchSuggestionCard.vue'
 import Toast from '../../components/shared/Toast.vue'
-import UpcomingAppointments from '../../components/home/UpcomingAppointments.vue'
+import AppointmentCard from '../../components/shared/AppointmentCard.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
 import DocumentModal from '../../components/documents/DocumentModal.vue'
 import WidgetPanel from '../../components/home/WidgetPanel.vue'
 import AppointmentBooking from '../../components/home/AppointmentBooking.vue'
+import CardList from '../../components/shared/CardList.vue'
 import { MOCK_DOCUMENTS, MOCK_APPOINTMENTS, SYMPTOM_SUGGESTIONS } from '../../constants/mockData'
 import type { Document } from '../../types/document'
 import type { SymptomSuggestion } from '../../types/symptom-suggestion'
@@ -121,22 +122,29 @@ const handleCloseToast = () => {
 
         <div class="section-card">
           <h3 class="section-title">{{ $t('home.upcomingAppointments') }}</h3>
-          <UpcomingAppointments 
-            :appointments="appointments"
-            @appointment-click="handleAppointmentClick"
-          />
+          <div v-if="appointments.length === 0" class="empty-card-message">
+            {{ $t('home.noAppointments') }}
+          </div>
+          <CardList v-else>
+            <AppointmentCard
+              v-for="appointment in appointments"
+              :key="appointment.id"
+              :appointment="appointment"
+              @click="handleAppointmentClick"
+            />
+          </CardList>
         </div>
 
         <div class="section-card section-card-spacing">
           <h3 class="section-title">{{ $t('home.recentDocuments') }}</h3>
-          <div>
+          <CardList>
             <DocumentCard
               v-for="doc in recentDocuments.slice(0, 2)"
               :key="doc.id"
               :document="doc"
               @click="handleDocumentClick(doc)"
             />
-          </div>
+          </CardList>
         </div>
       </div>
 
@@ -229,7 +237,7 @@ const handleCloseToast = () => {
 .main-column {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 1rem;
 }
 
 .section-card {
@@ -270,6 +278,16 @@ const handleCloseToast = () => {
   animation: fadeIn 0.5s cubic-bezier(0, 0, 0.2, 1);
   animation-delay: 0.2s;
   animation-fill-mode: both;
+}
+
+.empty-card-message {
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 2rem 0;
+  font-size: 1rem;
+  background: var(--bg-secondary-40);
+  border-radius: 12px;
+  border: 1px dashed var(--border-color);
 }
 
 @media (min-width: 1024px) {
@@ -379,5 +397,6 @@ const handleCloseToast = () => {
   font-weight: 600;
   font-size: 1.5rem;
   color: var(--section-title-color);
+  margin-bottom: 1rem;
 }
 </style>

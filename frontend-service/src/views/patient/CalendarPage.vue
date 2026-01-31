@@ -7,6 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import TagBar from '../../components/shared/TagBar.vue'
 import type { Tag } from '../../types/tag'
 import AppointmentCard from '../../components/shared/AppointmentCard.vue'
+import CardList from '../../components/shared/CardList.vue'
 import type { Appointment } from '../../types/appointment'
 import { PlusIcon } from '@heroicons/vue/24/outline'
 import { MOCK_APPOINTMENTS } from '../../constants/mockData'
@@ -185,7 +186,7 @@ function parseDateToISO(dateString: string): string {
       <!-- Appointments List -->
       <div class="appointments-container">
         <h2 class="appointments-title">{{ $t('calendar.appointments') }}</h2>
-        <div class="appointments-list">
+        <CardList gap="sm">
           <AppointmentCard
             v-for="appointment in filteredAppointments"
             :id="`appointment-${appointment.id}`"
@@ -200,7 +201,7 @@ function parseDateToISO(dateString: string): string {
           <div v-if="filteredAppointments.length === 0" class="empty-state">
             <p class="empty-state-text">{{ $t('calendar.noAppointments') }}</p>
           </div>
-        </div>
+        </CardList>
       </div>
     </div>
   </div>
@@ -343,13 +344,6 @@ function parseDateToISO(dateString: string): string {
   margin-bottom: 1rem;
   line-height: 1.25;
 }
-
-.appointments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
 
 .empty-state {
   display: flex;

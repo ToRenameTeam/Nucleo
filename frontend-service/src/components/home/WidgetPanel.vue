@@ -92,7 +92,7 @@ onMounted(() => {
         :aria-label="$t('widgets.emptyState.addButton')"
         @click="isWidgetSelectorOpen = true"
       >
-        <PlusIcon class="w-5 h-5" />
+        <PlusIcon class="icon-sm" />
       </button>
     </div>
 
@@ -200,6 +200,7 @@ onMounted(() => {
   padding: 1.25rem;
   box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
+  overflow: hidden;
 }
 .panel-header {
   display: flex;
@@ -313,6 +314,11 @@ onMounted(() => {
 .icon-svg {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+.icon-sm {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 .icon-emoji {
   font-size: 1.5rem;

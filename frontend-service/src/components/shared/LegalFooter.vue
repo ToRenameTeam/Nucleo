@@ -245,7 +245,7 @@ const currentYear = new Date().getFullYear()
             class="modal-close"
             aria-label="Chiudi note legali"
           >
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
@@ -622,6 +622,11 @@ const currentYear = new Date().getFullYear()
 .modal-close:hover {
   color: var(--text-primary);
   background: var(--bg-secondary-95);
+}
+
+.icon-close {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .modal-body {

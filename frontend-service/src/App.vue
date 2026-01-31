@@ -20,7 +20,7 @@ const hideNavigation = computed(() => route.meta.hideNavigation === true)
     <Breadcrumbs v-if="!hideNavigation" />
     <main 
       id="main-content"
-      :class="hideNavigation ? 'h-screen' : 'main-content'"
+      :class="hideNavigation ? 'full-screen' : 'main-content'"
       tabindex="-1"
     >  
       <router-view />
@@ -58,6 +58,10 @@ const hideNavigation = computed(() => route.meta.hideNavigation === true)
   overflow-y: auto;
   position: relative;
   z-index: 1;
+}
+
+.full-screen {
+  height: 100vh;
 }
 
 /* Skip link per accessibilità - visibile solo al focus */

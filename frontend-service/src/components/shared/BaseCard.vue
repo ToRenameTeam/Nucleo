@@ -149,7 +149,6 @@ const handleClick = () => {
   backdrop-filter: blur(20px);
   border-radius: 1.25rem;
   padding: 1.5rem;
-  margin-top: 0.5rem;
   border: 1.5px solid var(--bg-secondary-70);
   box-shadow: 0 4px 24px var(--shadow), 0 1px 2px var(--white-90);
   cursor: pointer;
@@ -165,6 +164,8 @@ const handleClick = () => {
   box-shadow: 0 12px 40px var(--text-primary-15), 0 1px 2px var(--white-90);
   background: var(--bg-secondary-35);
   border-color: var(--white-90);
+  z-index: 10;
+  position: relative;
 }
 
 .base-card.card-not-clickable:hover {

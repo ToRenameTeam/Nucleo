@@ -4,6 +4,7 @@ import { ArrowsRightLeftIcon, CheckCircleIcon } from '@heroicons/vue/24/outline'
 import SearchBar from '../../components/shared/SearchBar.vue'
 import TagBar from '../../components/shared/TagBar.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
+import CardList from '../../components/shared/CardList.vue'
 import DocumentModal from '../../components/documents/DocumentModal.vue'
 import DocumentComparisonModal from '../../components/documents/comparison/DocumentComparisonModal.vue'
 import DateRangeFilter from '../../components/documents/DateRangeFilter.vue'
@@ -261,7 +262,7 @@ const handleCloseComparison = () => {
     </div>
 
     <!-- Documents List -->
-    <div v-if="filteredDocuments.length" class="documents-list">
+    <CardList v-if="filteredDocuments.length" class="documents-list-container">
       <DocumentCard
         v-for="doc in filteredDocuments"
         :key="doc.id"
@@ -271,7 +272,7 @@ const handleCloseComparison = () => {
         @click="handleDocumentClick(doc)"
         @toggle-select="() => toggleDocumentSelection(doc.id)"
       />
-    </div>
+    </CardList>
 
     <!-- Empty State -->
     <div v-else class="empty-state">
@@ -556,9 +557,7 @@ const handleCloseComparison = () => {
   animation-fill-mode: both;
 }
 
-.documents-list {
-  display: flex;
-  flex-direction: column;
+.documents-list-container {
   position: relative;
   z-index: 1;
   animation: fadeIn 0.5s cubic-bezier(0, 0, 0.2, 1);
