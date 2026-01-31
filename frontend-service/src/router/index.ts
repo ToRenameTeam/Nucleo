@@ -81,26 +81,26 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        redirect: '/doctor/home'
+        redirect: '/doctor/appointments'
       },
       {
-        path: 'home',
-        name: 'doctor-home',
-        component: () => import('../views/doctor/DoctorHomePage.vue')
+        path: 'appointments',
+        name: 'doctor-appointments',
+        component: () => import('../views/doctor/DoctorHomePage.vue') // Placeholder - sarà creato dopo
+      },
+      {
+        path: 'availabilities',
+        name: 'doctor-availabilities',
+        component: () => import('../views/doctor/DoctorHomePage.vue') // Placeholder - sarà creato dopo
+      },
+      {
+        path: 'documents',
+        name: 'doctor-documents',
+        component: () => import('../views/doctor/DoctorHomePage.vue') // Placeholder - sarà creato dopo
       },
       {
         path: 'patients',
         name: 'doctor-patients',
-        component: () => import('../views/doctor/DoctorHomePage.vue') // Placeholder - sarà creato dopo
-      },
-      {
-        path: 'calendar',
-        name: 'doctor-calendar',
-        component: () => import('../views/doctor/DoctorHomePage.vue') // Placeholder - sarà creato dopo
-      },
-      {
-        path: 'analytics',
-        name: 'doctor-analytics',
         component: () => import('../views/doctor/DoctorHomePage.vue') // Placeholder - sarà creato dopo
       },
       {

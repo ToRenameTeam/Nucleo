@@ -46,9 +46,10 @@
     "documents": "Documenti",
     "health": "Salute",
     "calendar": "Calendario",
+    "appointments": "Appuntamenti",
     "settings": "Impostazioni",
     "patients": "Pazienti",
-    "analytics": "Analisi"
+    "availability": "Disponibilità"
   },
   "tags": {
     "all": "Tutti",
@@ -410,10 +411,10 @@
     "patient-health": "Salute",
     "patient-calendar": "Calendario",
     "patient-settings": "Impostazioni",
-    "doctor-home": "Home",
+    "doctor-appointments": "Appuntamenti",
+    "doctor-availabilities": "Disponibilità",
+    "doctor-documents": "Documenti",
     "doctor-patients": "Pazienti",
-    "doctor-calendar": "Calendario",
-    "doctor-analytics": "Analisi",
     "doctor-settings": "Impostazioni",
     "goTo": "Vai a"
   },
