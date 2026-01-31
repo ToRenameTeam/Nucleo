@@ -36,14 +36,8 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
 
 <template>
   <div :class="showPanel ? 'document-panel' : 'document-viewer-standalone'">
-    <!-- Placeholder when no document is selected -->
-    <div v-if="!document" class="placeholder">
-      <div class="placeholder-icon">📄</div>
-      <p class="placeholder-text">{{ t('documents.comparison.selectPlaceholder') }}</p>
-    </div>
-
     <!-- Document Viewer -->
-    <div v-else class="document-viewer">
+    <div class="document-viewer">
       <!-- Preview with navigation -->
       <div class="document-preview-wrapper">
         <button
@@ -51,7 +45,7 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
           class="nav-button"
           :disabled="!canGoPrev"
           @click="emit('prevPage')"
-          :aria-label="t('documents.comparison.page', { current: currentPageIndex, total: totalPages })"
+          :aria-label="t('documents.viewer.page', { current: currentPageIndex, total: totalPages })"
         >
           <ChevronLeftIcon class="icon-nav" />
         </button>
@@ -59,7 +53,7 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
         <div class="preview-area" :style="{ height: previewHeight }">
           <img
             :src="currentImage"
-            :alt="`${document.title} - ${t('documents.comparison.page', { current: currentPageIndex + 1, total: totalPages })}`"
+            :alt="`${document?.title} - ${t('documents.viewer.page', { current: currentPageIndex + 1, total: totalPages })}`"
             class="document-image"
           />
         </div>
@@ -69,7 +63,7 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
           class="nav-button"
           :disabled="!canGoNext"
           @click="emit('nextPage')"
-          :aria-label="t('documents.comparison.page', { current: currentPageIndex + 2, total: totalPages })"
+          :aria-label="t('documents.viewer.page', { current: currentPageIndex + 2, total: totalPages })"
         >
           <ChevronRightIcon class="icon-nav" />
         </button>
@@ -78,23 +72,23 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
       <!-- Page indicator -->
       <div class="page-indicator">
         <span class="page-text">
-          {{ t('documents.comparison.page', { current: currentPageIndex + 1, total: totalPages }) }}
+          {{ t('documents.viewer.page', { current: currentPageIndex + 1, total: totalPages }) }}
         </span>
       </div>
 
       <!-- Slot for custom metadata (e.g., icons for modal) -->
       <slot name="metadata">
-        <!-- Default: Simple document info (for comparison) -->
+        <!-- Default: Simple document info (for viewer) -->
         <div class="document-info">
           <!-- Description -->
-          <div v-if="document.description" class="info-section">
-            <span class="info-label">{{ t('documents.comparison.description') }}</span>
+          <div v-if="document?.description" class="info-section">
+            <span class="info-label">{{ t('documents.viewer.description') }}</span>
             <p class="description-text">{{ document.description }}</p>
           </div>
 
           <!-- Tags -->
-          <div v-if="document.tags?.length" class="info-section">
-            <span class="info-label">{{ t('documents.comparison.tags') }}</span>
+          <div v-if="document?.tags?.length" class="info-section">
+            <span class="info-label">{{ t('documents.viewer.tags') }}</span>
             <div class="info-tags">
               <span
                 v-for="(tag, index) in document.tags"
@@ -108,20 +102,20 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
 
           <!-- Date -->
           <div class="info-row">
-            <span class="info-label">{{ t('documents.comparison.date') }}</span>
-            <span class="info-value">{{ document.date }}</span>
+            <span class="info-label">{{ t('documents.viewer.date') }}</span>
+            <span class="info-value">{{ document?.date }}</span>
           </div>
 
           <!-- Doctor -->
           <div class="info-row">
-            <span class="info-label">{{ t('documents.comparison.doctor') }}</span>
-            <span class="info-value">{{ document.doctor }}</span>
+            <span class="info-label">{{ t('documents.viewer.doctor') }}</span>
+            <span class="info-value">{{ document?.doctor }}</span>
           </div>
 
           <!-- Hospital -->
           <div class="info-row">
-            <span class="info-label">{{ t('documents.comparison.hospital') }}</span>
-            <span class="info-value">{{ document.hospital }}</span>
+            <span class="info-label">{{ t('documents.viewer.hospital') }}</span>
+            <span class="info-value">{{ document?.hospital }}</span>
           </div>
         </div>
       </slot>

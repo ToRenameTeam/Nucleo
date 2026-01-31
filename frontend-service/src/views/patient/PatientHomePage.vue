@@ -6,7 +6,6 @@ import Toast from '../../components/shared/Toast.vue'
 import AppointmentCard from '../../components/shared/AppointmentCard.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
-import WidgetPanel from '../../components/patient/home/WidgetPanel.vue'
 import AppointmentBooking from '../../components/patient/home/AppointmentBooking.vue'
 import CardList from '../../components/shared/CardList.vue'
 import { MOCK_DOCUMENTS, MOCK_APPOINTMENTS } from '../../constants/mockData'
@@ -117,12 +116,6 @@ const handleCloseToast = () => {
           </CardList>
         </div>
       </div>
-
-      <div class="widget-column">
-        <div class="widget-card">
-          <WidgetPanel />
-        </div>
-      </div>
     </div>
 
     <!-- Appointment Booking Modal -->
@@ -230,18 +223,6 @@ const handleCloseToast = () => {
   animation-fill-mode: both;
 }
 
-.widget-column {
-  display: block;
-}
-
-.widget-card {
-  position: sticky;
-  margin-top: 1.65rem;
-  animation: fadeIn 0.5s cubic-bezier(0, 0, 0.2, 1);
-  animation-delay: 0.2s;
-  animation-fill-mode: both;
-}
-
 .empty-card-message {
   color: var(--text-secondary);
   text-align: center;
@@ -252,19 +233,9 @@ const handleCloseToast = () => {
   border: 1px dashed var(--border-color);
 }
 
-@media (min-width: 1024px) {
-  .widget-column {
-    display: block;
-  }
-}
-
 @media (max-width: 1023px) {
   .content-grid {
     grid-template-columns: 1fr;
-  }
-
-  .widget-card {
-    position: static;
   }
 }
 

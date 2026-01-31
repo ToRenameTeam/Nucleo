@@ -49,11 +49,6 @@ export interface BadgeColors {
   borderColor: string
 }
 
-export interface DocumentComparisonModal {
-  isOpen: boolean;
-  documents: Document[];
-}
-
 export interface DocumentSelector {
   selectedDocId: string | null;
   availableDocuments: Document[];

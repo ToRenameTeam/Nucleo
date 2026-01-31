@@ -65,7 +65,6 @@
   "documents": {
     "title": "Document Archive",
     "subtitle": "15 documents",
-    "documentComparison": "Compare Documents",
     "searchPlaceholder": "Search documents, symptoms, doctors...",
     "noResults": "No documents found",
     "showBarcode": "Show Code",
@@ -104,7 +103,7 @@
       "lastYear": "Last year",
       "clearRange": "Clear filter"
     },
-    "comparison": {
+    "viewer": {
       "title": "Compare Documents",
       "subtitle": "Select two different documents to compare",
       "selectDocument": "Select document",

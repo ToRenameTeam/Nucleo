@@ -56,7 +56,6 @@
   "documents": {
     "title": "Archivio documenti",
     "subtitle": "15 documenti",
-    "documentComparison": "Confronto documenti",
     "searchPlaceholder": "Cerca documenti, sintomi, medici...",
     "noResults": "Nessun documento trovato",
     "showBarcode": "Mostra codice",
@@ -95,7 +94,7 @@
       "last6Months": "Ultimi 6 mesi",
       "lastYear": "Ultimo anno"
     },
-    "comparison": {
+    "viewer": {
       "title": "Confronto Documenti",
       "subtitle": "Seleziona due documenti diversi per confrontarli",
       "selectDocument": "Seleziona documento",
