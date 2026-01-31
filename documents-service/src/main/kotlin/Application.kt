@@ -9,6 +9,8 @@ import it.nucleo.api.plugins.configureStatusPages
 import it.nucleo.infrastructure.logging.logger
 import it.nucleo.infrastructure.persistence.mongodb.MongoDbFactory
 import it.nucleo.infrastructure.persistence.mongodb.MongoDocumentRepository
+import it.nucleo.infrastructure.persistence.minio.MinioClientFactory
+import it.nucleo.infrastructure.persistence.minio.MinioFileStorageService
 
 private val logger = logger("it.nucleo.Application")
 
@@ -32,8 +34,16 @@ fun Application.module() {
         )
     val repository = MongoDocumentRepository(database)
 
+    logger.info("Initializing MinIO connection")
+    val minioClient = MinioClientFactory.createClient(
+        endpoint = getMinioEndpoint(),
+        accessKey = getMinioAccessKey(),
+        secretKey = getMinioSecretKey()
+    )
+    val fileStorageService = MinioFileStorageService(minioClient, getMinioBucketName())
+
     logger.info("Configuring routes")
-    configureRouting(repository)
+    configureRouting(repository, fileStorageService)
     logger.info("Application initialized successfully")
 }
 
@@ -44,3 +54,16 @@ private fun getMongoConnectionUri(): String =
 
 private fun getMongoDatabaseName(): String =
     System.getenv("MONGO_DATABASE_NAME") ?: MongoDbFactory.Defaults.DATABASE_NAME
+
+private fun getMinioEndpoint(): String =
+    System.getenv("MINIO_ENDPOINT") ?: MinioClientFactory.Defaults.ENDPOINT
+
+private fun getMinioAccessKey(): String =
+    System.getenv("MINIO_ACCESS_KEY") ?: MinioClientFactory.Defaults.ACCESS_KEY
+
+private fun getMinioSecretKey(): String =
+    System.getenv("MINIO_SECRET_KEY") ?: MinioClientFactory.Defaults.SECRET_KEY
+
+private fun getMinioBucketName(): String =
+    System.getenv("MINIO_BUCKET_NAME") ?: MinioClientFactory.Defaults.BUCKET_NAME
+
