@@ -12,6 +12,17 @@ export class DelegationRepositoryImpl implements IDelegationRepository {
         return this.toDelegationData(delegation);
     }
 
+    async findAll(status?: string): Promise<DelegationData[]> {
+        const filter: any = {};
+
+        if (status) {
+            filter.status = status;
+        }
+
+        const delegations = await DelegationModel.find(filter);
+        return delegations.map(d => this.toDelegationData(d));
+    }
+
     async findByDelegatingUserId(userId: string, status?: string): Promise<DelegationData[]> {
         const filter: any = { delegatingUserId: userId };
 

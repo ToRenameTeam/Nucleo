@@ -46,6 +46,22 @@ router.post('/', async (req: Request, res: Response) => {
     }
 });
 
+// Get all delegations
+router.get('/', async (req: Request, res: Response) => {
+    try {
+        const status = req.query.status as string;
+
+        const result = await delegationService.getAllDelegations(status);
+        return success(res, result);
+
+    } catch (err) {
+        console.error('Get all delegations error:', err);
+        return error(res, 'Internal server error', 500);
+    }
+});
+
+
+
 // Get delegations received by user (where user must accept/decline)
 router.get('/received', async (req: Request, res: Response) => {
     try {

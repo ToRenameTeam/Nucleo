@@ -53,6 +53,20 @@ export class DelegationService {
         };
     }
 
+    async getAllDelegations(status?: string) {
+        const delegations = await this.delegationRepository.findAll(status);
+
+        return {
+            delegations: delegations.map(d => ({
+                delegationId: d.delegationId,
+                delegatingUserId: d.delegatingUserId,
+                delegatorUserId: d.delegatorUserId,
+                status: d.status
+            }))
+        };
+    }
+
+
     async getDelegationById(delegationId: string) {
         const data = await this.delegationRepository.findDelegationById(delegationId);
 
