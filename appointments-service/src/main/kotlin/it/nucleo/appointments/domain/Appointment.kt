@@ -10,31 +10,16 @@ data class Appointment(
     val id: AppointmentId,
     val patientId: PatientId,
     val availabilityId: AvailabilityId,
-    val doctorId: DoctorId,
-    val facilityId: FacilityId,
-    val serviceTypeId: ServiceTypeId,
-    val timeSlot: TimeSlot,
     val status: AppointmentStatus,
     val createdAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
     val updatedAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
 ) {
     companion object {
-        fun schedule(
-            patientId: PatientId,
-            availabilityId: AvailabilityId,
-            doctorId: DoctorId,
-            facilityId: FacilityId,
-            serviceTypeId: ServiceTypeId,
-            timeSlot: TimeSlot
-        ): Appointment {
+        fun schedule(patientId: PatientId, availabilityId: AvailabilityId): Appointment {
             return Appointment(
                 id = AppointmentId.generate(),
                 patientId = patientId,
                 availabilityId = availabilityId,
-                doctorId = doctorId,
-                facilityId = facilityId,
-                serviceTypeId = serviceTypeId,
-                timeSlot = timeSlot,
                 status = AppointmentStatus.SCHEDULED
             )
         }
@@ -70,13 +55,12 @@ data class Appointment(
         )
     }
 
-    fun reschedule(newTimeSlot: TimeSlot, newAvailabilityId: AvailabilityId): Appointment {
+    fun reschedule(newAvailabilityId: AvailabilityId): Appointment {
         require(status == AppointmentStatus.SCHEDULED) {
             "Can only reschedule appointments in SCHEDULED status"
         }
         return copy(
             availabilityId = newAvailabilityId,
-            timeSlot = newTimeSlot,
             updatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         )
     }
