@@ -4,6 +4,7 @@ import cors from 'cors';
 import authRoutes from './api/auth.js';
 import userRoutes from './api/user.js';
 import delegationRoutes from './api/delegation.js';
+import {runSeeds} from "./infrastructure/seeds/index.js";
 
 const app = express();
 const PORT = process.env.PORT || 3030;
@@ -32,6 +33,7 @@ startServer();
 // Start server
 async function startServer() {
     await connectDB();
+    await runSeeds();
 
     app.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT}`);
