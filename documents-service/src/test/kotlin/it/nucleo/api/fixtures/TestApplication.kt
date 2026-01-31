@@ -7,6 +7,8 @@ import io.ktor.server.testing.testApplication
 import it.nucleo.api.plugins.configureRouting
 import it.nucleo.api.plugins.configureSerialization
 import it.nucleo.api.plugins.configureStatusPages
+import it.nucleo.infrastructure.persistence.minio.MinioClientFactory
+import it.nucleo.infrastructure.persistence.minio.MinioFileStorageRepository
 import it.nucleo.infrastructure.persistence.mongodb.MongoDbFactory
 import it.nucleo.infrastructure.persistence.mongodb.MongoDocumentRepository
 import kotlinx.serialization.json.Json
@@ -14,6 +16,13 @@ import kotlinx.serialization.json.Json
 object TestMongoConfig {
     const val CONNECTION_URI = "mongodb://admin:password@localhost:27017"
     const val DATABASE_NAME = "nucleo_documents_test"
+}
+
+object TestMinioConfig {
+    const val ENDPOINT = "http://localhost:9000"
+    const val ACCESS_KEY = "minioadmin"
+    const val SECRET_KEY = "minioadmin"
+    const val BUCKET_NAME = "documents-test"
 }
 
 fun configuredTestApplication(block: suspend (HttpClient) -> Unit) = testApplication {
@@ -26,9 +35,18 @@ fun configuredTestApplication(block: suspend (HttpClient) -> Unit) = testApplica
                 connectionUri = TestMongoConfig.CONNECTION_URI,
                 databaseName = TestMongoConfig.DATABASE_NAME
             )
-        val repository = MongoDocumentRepository(database)
+        val documentRepository = MongoDocumentRepository(database)
 
-        configureRouting(repository)
+        val minioClient =
+            MinioClientFactory.createClient(
+                endpoint = TestMinioConfig.ENDPOINT,
+                accessKey = TestMinioConfig.ACCESS_KEY,
+                secretKey = TestMinioConfig.SECRET_KEY
+            )
+        val fileStorageRepository =
+            MinioFileStorageRepository(minioClient, TestMinioConfig.BUCKET_NAME)
+
+        configureRouting(documentRepository, fileStorageRepository)
     }
 
     val client = createClient {
@@ -46,4 +64,10 @@ fun configuredTestApplication(block: suspend (HttpClient) -> Unit) = testApplica
     }
 
     block(client)
+}
+
+/** Loads the test PDF file from resources. */
+fun loadTestPdf(): ByteArray {
+    return object {}.javaClass.getResourceAsStream("/test.pdf")?.readBytes()
+        ?: throw IllegalStateException("test.pdf not found in resources")
 }
