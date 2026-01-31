@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ArrowDownTrayIcon, ShareIcon } from '@heroicons/vue/24/outline'
+import { ArrowDownTrayIcon } from '@heroicons/vue/24/outline'
 import type { DocumentModal } from '../../../types/document'
 import BaseModal from '../../shared/BaseModal.vue'
 import DocumentViewer from './DocumentViewer.vue'
@@ -27,21 +27,10 @@ const handleDownload = () => {
   console.log('Download documento:', props.document?.id)
   // Implementare logica di download
 }
-
-const handleShare = () => {
-  console.log('Condividi documento:', props.document?.id)
-  // Implementare logica di condivisione
-}
 </script>
 
 <template>
-  <BaseModal
-    v-if="document"
-    :is-open="isOpen"
-    :title="document.title"
-    max-width="md"
-    @close="emit('close')"
-  >
+  <BaseModal v-if="document" :is-open="isOpen" :title="document.title" max-width="md" @close="emit('close')">
     <template #header>
       <div class="document-header">
         <h2 class="document-title">{{ document.title }}</h2>
@@ -49,23 +38,13 @@ const handleShare = () => {
     </template>
 
     <!-- DocumentViewer with default style -->
-    <DocumentViewer
-      :document="document"
-      :current-page-index="currentPageIndex"
-      :show-panel="false"
-      preview-height="35vh"
-      @prev-page="handlePrevPage"
-      @next-page="handleNextPage"
-    />
+    <DocumentViewer :document="document" :current-page-index="currentPageIndex" :show-panel="false"
+      preview-height="35vh" @prev-page="handlePrevPage" @next-page="handleNextPage" />
 
     <template #footer>
       <button class="action-button download-button" @click="handleDownload" :aria-label="$t('documentModal.download')">
         <ArrowDownTrayIcon class="icon-action" />
         <span class="button-label">{{ $t('documentModal.download') }}</span>
-      </button>
-      <button class="action-button share-button" @click="handleShare" :aria-label="$t('documentModal.share')">
-        <ShareIcon class="icon-action" />
-        <span class="button-label">{{ $t('documentModal.share') }}</span>
       </button>
     </template>
   </BaseModal>
@@ -84,7 +63,6 @@ const handleShare = () => {
 }
 
 .action-button {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -104,27 +82,13 @@ const handleShare = () => {
   border-color: var(--white-30);
   color: var(--white);
   box-shadow: 0 4px 16px var(--accent-primary-30), inset 0 1px 0 var(--white-20);
+  margin-left: auto;
 }
 
 .download-button:hover {
   background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px var(--accent-primary-40), inset 0 1px 0 var(--white-30);
-}
-
-.share-button {
-  background: var(--white-40);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: var(--text-primary);
-  border: 1px solid var(--white-50);
-  box-shadow: 0 4px 16px var(--shadow), inset 0 1px 0 var(--white-60);
-}
-
-.share-button:hover {
-  background: var(--white-60);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px var(--shadow), inset 0 1px 0 var(--white-80);
 }
 
 .icon-action {
