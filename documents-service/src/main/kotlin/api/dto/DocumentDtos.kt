@@ -148,3 +148,6 @@ data class UpdateReportRequest(
 data class ErrorResponse(val error: String, val message: String, val details: String? = null)
 
 @Serializable data class DeleteResponse(val message: String)
+
+@Serializable data class UploadResponse(val success: Boolean, val message: String)
+
