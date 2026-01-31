@@ -1,6 +1,7 @@
 import type { Appointment } from '../types/appointment'
 import { APPOINTMENTS_API_URL, API_ENDPOINTS } from './config'
 import { masterDataApi, getAvailabilityById } from './masterData'
+import { userApi } from './users'
 
 const BASE_URL = `${APPOINTMENTS_API_URL}${API_ENDPOINTS.APPOINTMENTS}`
 
@@ -45,16 +46,27 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
       availability = fetchedAvailability
     }
   }
+
+  // Get patient user info
+  let patientName = response.patientId
+  if (response.patientId) {
+    console.log('[Appointments API] Fetching patient user info:', response.patientId)
+    const patientUser = await userApi.getUserById(response.patientId)
+    if (patientUser) {
+      patientName = `${patientUser.name} ${patientUser.lastName}`
+      console.log('[Appointments API] Patient name resolved:', patientName)
+    }
+  }
   
   if (!availability) {
     console.warn('[Appointments API] No availability found for appointment:', response.id)
     return {
       id: response.id,
       title: 'Appuntamento',
-      description: `Paziente: ${response.patientId}`,
+      description: `Paziente: ${patientName}`,
       date: new Date().toLocaleDateString('it-IT'),
       time: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
-      user: response.patientId,
+      user: patientName,
       location: 'Non specificata',
       tags: [response.status]
     }
@@ -86,10 +98,10 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
   return {
     id: response.id,
     title: serviceTypeName,
-    description: `Paziente: ${response.patientId}`,
+    description: `Paziente: ${patientName}`,
     date: startTime.toLocaleDateString('it-IT'),
     time: `${startTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })} - ${endTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`,
-    user: response.patientId,
+    user: patientName,
     location: facilityName,
     tags: [response.status]
   }
