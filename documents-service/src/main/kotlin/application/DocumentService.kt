@@ -12,9 +12,15 @@ import it.nucleo.domain.prescription.implementation.Priority
 import it.nucleo.domain.prescription.implementation.ServiceId
 import it.nucleo.domain.prescription.implementation.ServicePrescription
 import it.nucleo.domain.report.*
+import it.nucleo.infrastructure.logging.logger
 import java.time.LocalDate
 
-class DocumentService(private val repository: DocumentRepository) {
+class DocumentService(
+    private val repository: DocumentRepository,
+    private val fileStorageRepository: FileStorageRepository,
+    private val pdfGenerator: DocumentPdfGenerator
+) {
+    private val logger = logger()
 
     suspend fun getAllDocumentsByPatient(patientId: PatientId): Iterable<Document> {
         return repository.findAllDocumentsByPatient(patientId)
@@ -78,6 +84,10 @@ class DocumentService(private val repository: DocumentRepository) {
             }
 
         repository.addDocument(patientId, document)
+
+        // Generate and store PDF
+        generateAndStorePdf(document)
+
         return document
     }
 
@@ -103,6 +113,30 @@ class DocumentService(private val repository: DocumentRepository) {
 
         repository.updateReport(patientId, existingDocument)
 
+        // Regenerate PDF after update
+        generateAndStorePdf(existingDocument)
+
         return existingDocument
+    }
+
+    private fun generateAndStorePdf(document: Document) {
+        try {
+            logger.debug("Generating PDF for document: ${document.id.id}")
+            val pdfBytes = pdfGenerator.generate(document)
+            val filename = "${document.id.id}.pdf"
+
+            fileStorageRepository.store(
+                patientId = document.patientId,
+                documentId = document.id,
+                filename = filename,
+                inputStream = pdfBytes.inputStream(),
+                contentLength = pdfBytes.size.toLong(),
+                contentType = "application/pdf"
+            )
+            logger.info("PDF stored successfully for document: ${document.id.id}")
+        } catch (e: Exception) {
+            logger.error("Failed to generate/store PDF for document: ${document.id.id}", e)
+            // We don't rethrow - the document is already saved, PDF generation is secondary
+        }
     }
 }

@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.mongodb.bson.kotlinx)
     implementation(libs.logback)
     implementation(libs.minio)
+    implementation(libs.pdfbox)
 
     testImplementation(libs.kotest)
     testImplementation(libs.ktor.server.test.host)

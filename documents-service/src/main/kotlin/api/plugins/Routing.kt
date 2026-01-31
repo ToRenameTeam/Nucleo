@@ -7,6 +7,7 @@ import it.nucleo.api.routes.documentRoutes
 import it.nucleo.api.routes.downloadRoutes
 import it.nucleo.api.routes.uploadRoutes
 import it.nucleo.application.DocumentDownloadService
+import it.nucleo.application.DocumentPdfGenerator
 import it.nucleo.application.DocumentService
 import it.nucleo.application.DocumentUploadService
 import it.nucleo.domain.DocumentRepository
@@ -16,7 +17,8 @@ fun Application.configureRouting(
     documentRepository: DocumentRepository,
     fileStorageRepository: FileStorageRepository
 ) {
-    val documentService = DocumentService(documentRepository)
+    val pdfGenerator = DocumentPdfGenerator()
+    val documentService = DocumentService(documentRepository, fileStorageRepository, pdfGenerator)
     val uploadService = DocumentUploadService(fileStorageRepository)
     val downloadService = DocumentDownloadService(fileStorageRepository)
 
