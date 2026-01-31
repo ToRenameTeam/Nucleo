@@ -1,5 +1,6 @@
 package it.nucleo.application
 
+import it.nucleo.domain.DocumentId
 import it.nucleo.domain.FileNotFoundException
 import it.nucleo.domain.FileStorageException
 import it.nucleo.domain.FileStorageRepository
@@ -7,7 +8,7 @@ import it.nucleo.domain.PatientId
 import it.nucleo.domain.StoredFile
 import it.nucleo.infrastructure.logging.logger
 
-data class DownloadDocumentQuery(val patientId: PatientId, val documentKey: String)
+data class DownloadDocumentQuery(val patientId: PatientId, val documentId: DocumentId)
 
 sealed class DownloadResult {
     data class Success(val file: StoredFile) : DownloadResult()
@@ -23,18 +24,18 @@ class DocumentDownloadService(private val fileStorageRepository: FileStorageRepo
 
     fun download(query: DownloadDocumentQuery): DownloadResult {
         logger.debug(
-            "Processing download for patient: ${query.patientId.id}, key: ${query.documentKey}"
+            "Processing download for patient: ${query.patientId.id}, document: ${query.documentId.id}"
         )
 
         return try {
-            val storedFile = fileStorageRepository.retrieve(query.patientId, query.documentKey)
-            logger.info("Document download successful for patient: ${query.patientId.id}")
+            val storedFile = fileStorageRepository.retrieve(query.patientId, query.documentId)
+            logger.info("Document download successful for document: ${query.documentId.id}")
             DownloadResult.Success(storedFile)
         } catch (e: FileNotFoundException) {
-            logger.warn("Document not found: ${query.documentKey}")
+            logger.warn("Document PDF not found: ${query.documentId.id}")
             DownloadResult.NotFound(e.message ?: "Document not found")
         } catch (e: FileStorageException) {
-            logger.error("Failed to download document for patient: ${query.patientId.id}", e)
+            logger.error("Failed to download document: ${query.documentId.id}", e)
             DownloadResult.StorageError(e.message ?: "Unknown storage error")
         }
     }

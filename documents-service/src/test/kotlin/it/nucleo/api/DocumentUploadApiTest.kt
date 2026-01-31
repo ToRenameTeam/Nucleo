@@ -2,6 +2,7 @@ package it.nucleo.api
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldContain
 import io.ktor.client.call.*
 import io.ktor.client.request.forms.*
@@ -42,6 +43,7 @@ class DocumentUploadApiTest :
                     val body = response.body<UploadResponse>()
                     body.success shouldBe true
                     body.message shouldContain "uploaded successfully"
+                    body.documentId shouldNotBe null
                 }
             }
 

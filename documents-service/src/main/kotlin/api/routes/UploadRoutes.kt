@@ -76,13 +76,14 @@ private fun Route.uploadDocument(uploadService: DocumentUploadService) {
                             when (val result = uploadService.upload(command)) {
                                 is UploadResult.Success -> {
                                     logger.info(
-                                        "POST /patients/$patientId/documents/upload - Success"
+                                        "POST /patients/$patientId/documents/upload - Success, documentId: ${result.documentId.id}"
                                     )
                                     call.respond(
                                         HttpStatusCode.Created,
                                         UploadResponse(
                                             success = true,
-                                            message = "Document uploaded successfully"
+                                            message = "Document uploaded successfully",
+                                            documentId = result.documentId.id
                                         )
                                     )
                                 }

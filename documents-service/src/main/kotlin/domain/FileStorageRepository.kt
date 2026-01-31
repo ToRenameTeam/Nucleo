@@ -6,13 +6,14 @@ interface FileStorageRepository {
 
     fun store(
         patientId: PatientId,
+        documentId: DocumentId,
         filename: String,
         inputStream: InputStream,
         contentLength: Long,
         contentType: String
     )
 
-    fun retrieve(patientId: PatientId, fileKey: String): StoredFile
+    fun retrieve(patientId: PatientId, documentId: DocumentId): StoredFile
 }
 
 data class StoredFile(
