@@ -45,9 +45,10 @@
     "home": "Home",
     "documents": "Documenti",
     "calendar": "Calendario",
+    "appointments": "Appuntamenti",
     "settings": "Impostazioni",
     "patients": "Pazienti",
-    "analytics": "Analisi"
+    "availability": "Disponibilità"
   },
   "tags": {
     "all": "Tutti",
@@ -127,8 +128,8 @@
     }
   },
   "appointments": {
-    "editAppointment": "Modifica appuntamento",
-    "cancelAppointment": "Disdici appuntamento"
+    "editAppointment": "Modifica",
+    "cancelAppointment": "Disdici"
   },
   "home": {
     "uploadDocument": "Carica documento",
@@ -255,10 +256,10 @@
     "patient-documents": "Documenti",
     "patient-calendar": "Calendario",
     "patient-settings": "Impostazioni",
-    "doctor-home": "Home",
+    "doctor-appointments": "Appuntamenti",
+    "doctor-availabilities": "Disponibilità",
+    "doctor-documents": "Documenti",
     "doctor-patients": "Pazienti",
-    "doctor-calendar": "Calendario",
-    "doctor-analytics": "Analisi",
     "doctor-settings": "Impostazioni",
     "goTo": "Vai a"
   },
@@ -337,6 +338,85 @@
     "home": {
       "title": "Area Medico",
       "subtitle": "Benvenuto nella tua area di lavoro"
+    },
+    "appointments": {
+      "title": "Appuntamenti",
+      "subtitle": "Gestisci tutti gli appuntamenti dei tuoi pazienti",
+      "appointmentsList": "Lista Appuntamenti",
+      "noAppointments": "Nessun appuntamento trovato",
+      "listView": "Lista",
+      "calendarView": "Calendario",
+      "errorLoading": "Errore nel caricamento degli appuntamenti",
+      "categories": {
+        "all": "Tutti",
+        "confirmed": "Confermati",
+        "pending": "In attesa",
+        "completed": "Completati",
+        "cancelled": "Annullati"
+      }
+    },
+    "availabilities": {
+      "title": "Gestione Disponibilità",
+      "subtitle": "Crea e gestisci le tue disponibilità per le visite",
+      "addAvailability": "Inserisci disponibilità",
+      "errorLoading": "Errore nel caricamento delle disponibilità",
+      "cannotEditBooked": "Non puoi modificare una disponibilità già prenotata",
+      "cannotDeleteBooked": "Non puoi eliminare una disponibilità già prenotata",
+      "stats": {
+        "total": "Totale",
+        "available": "Disponibili",
+        "booked": "Prenotate"
+      },
+      "calendar": {
+        "previousWeek": "Settimana precedente",
+        "nextWeek": "Settimana successiva",
+        "today": "Oggi"
+      },
+      "legend": {
+        "available": "Disponibile",
+        "booked": "Prenotato"
+      },
+      "actions": {
+        "edit": "Modifica disponibilità",
+        "delete": "Elimina disponibilità"
+      },
+      "modal": {
+        "titleCreate": "Nuova Disponibilità",
+        "titleEdit": "Modifica Disponibilità",
+        "subtitle": "Compila i campi per definire la tua disponibilità",
+        "date": "Data",
+        "time": "Ora di inizio",
+        "duration": "Durata",
+        "facility": "Struttura",
+        "selectFacility": "Seleziona una struttura",
+        "serviceType": "Tipo di visita",
+        "selectServiceType": "Seleziona un tipo di visita",
+        "cancel": "Annulla",
+        "save": "Salva"
+      },
+      "deleteConfirm": {
+        "title": "Conferma eliminazione",
+        "message": "Sei sicuro di voler eliminare questa disponibilità? L'azione non può essere annullata.",
+        "cancel": "Annulla",
+        "confirm": "Elimina"
+      },
+      "toast": {
+        "created": "Disponibilità creata con successo",
+        "updated": "Disponibilità aggiornata con successo",
+        "deleted": "Disponibilità eliminata con successo",
+        "error": "Si è verificato un errore. Riprova."
+      },
+      "errors": {
+        "OVERLAP_ERROR": "Esiste già una disponibilità che si sovrappone all'orario selezionato. Scegli un altro orario.",
+        "ALREADY_BOOKED": "Questa disponibilità è già stata prenotata e non può essere modificata o eliminata.",
+        "NOT_FOUND": "La disponibilità richiesta non è stata trovata.",
+        "INVALID_TIME_SLOT": "L'orario selezionato non è valido. Verifica data, ora e durata.",
+        "GENERIC_ERROR": "Si è verificato un errore. Riprova più tardi."
+      }
     }
+  },
+  "common": {
+    "loading": "Caricamento...",
+    "retry": "Riprova"
   }
 }

@@ -327,5 +327,90 @@
   "toast": {
     "closeNotification": "Close notification",
     "bookingConfirmed": "Booking confirmed successfully!"
+  },
+  "doctor": {
+    "home": {
+      "title": "Doctor Area",
+      "subtitle": "Welcome to your workspace"
+    },
+    "appointments": {
+      "title": "Appointments",
+      "subtitle": "Manage all your patients' appointments",
+      "appointmentsList": "Appointments List",
+      "noAppointments": "No appointments found",
+      "listView": "List",
+      "calendarView": "Calendar",
+      "errorLoading": "Error loading appointments",
+      "categories": {
+        "all": "All",
+        "confirmed": "Confirmed",
+        "pending": "Pending",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      }
+    },
+    "availabilities": {
+      "title": "Availability Management",
+      "subtitle": "Create and manage your appointment availabilities",
+      "addAvailability": "Add Availability",
+      "errorLoading": "Error loading availabilities",
+      "cannotEditBooked": "Cannot edit an already booked availability",
+      "cannotDeleteBooked": "Cannot delete an already booked availability",
+      "stats": {
+        "total": "Total this week",
+        "available": "Available",
+        "booked": "Booked"
+      },
+      "calendar": {
+        "previousWeek": "Previous week",
+        "nextWeek": "Next week",
+        "today": "Today"
+      },
+      "legend": {
+        "available": "Available",
+        "booked": "Booked"
+      },
+      "actions": {
+        "edit": "Edit availability",
+        "delete": "Delete availability"
+      },
+      "modal": {
+        "titleCreate": "New Availability",
+        "titleEdit": "Edit Availability",
+        "subtitle": "Fill in the fields to define your availability",
+        "date": "Date",
+        "time": "Start time",
+        "duration": "Duration",
+        "facility": "Facility",
+        "selectFacility": "Select a facility",
+        "serviceType": "Visit type",
+        "selectServiceType": "Select a visit type",
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "deleteConfirm": {
+        "title": "Confirm deletion",
+        "message": "Are you sure you want to delete this availability? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "toast": {
+        "created": "Availability created successfully",
+        "updated": "Availability updated successfully",
+        "deleted": "Availability deleted successfully",
+        "error": "An error occurred. Please try again."
+      },
+      "errors": {
+        "OVERLAP_ERROR": "An availability already exists that overlaps with the selected time. Please choose a different time.",
+        "ALREADY_BOOKED": "This availability has already been booked and cannot be modified or deleted.",
+        "NOT_FOUND": "The requested availability was not found.",
+        "INVALID_TIME_SLOT": "The selected time is invalid. Please check the date, time, and duration.",
+        "GENERIC_ERROR": "An error occurred. Please try again later."
+      }
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "retry": "Retry"
   }
 }

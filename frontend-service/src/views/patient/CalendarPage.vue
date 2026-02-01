@@ -7,12 +7,15 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import TagBar from '../../components/shared/TagBar.vue'
 import type { Tag } from '../../types/tag'
-import AppointmentCard from '../../components/shared/AppointmentCard.vue'
+import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue'
+import BaseCard from '../../components/shared/BaseCard.vue'
 import CardList from '../../components/shared/CardList.vue'
 import type { Appointment } from '../../types/appointment'
-import { MOCK_APPOINTMENTS } from '../../constants/mockData'
+import type { CardMetadata } from '../../types/shared'
+import { PlusIcon, CalendarIcon, ClockIcon, UserIcon, MapPinIcon, PencilIcon, XCircleIcon } from '@heroicons/vue/24/outline'
+import { MOCK_APPOINTMENTS, TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/mockData'
 import { useI18n } from 'vue-i18n'
-import { parseItalianDate, formatDateToISO } from '../../utils/dateUtils'
+import type { BadgeColors } from '../../types/document'
 
 const { t } = useI18n()
 
@@ -34,76 +37,6 @@ const tags = computed<Tag[]>(() => [
 const selectedTag = ref('all')
 const selectedAppointmentId = ref<string | null>(null)
 
-const calendarEvents = computed(() => {
-  const appointmentsByDate = new Map<string, Appointment[]>()
-  
-  appointments.value.forEach(apt => {
-    const dateKey = parseDateToISO(apt.date)
-    if (!appointmentsByDate.has(dateKey)) {
-      appointmentsByDate.set(dateKey, [])
-    }
-    appointmentsByDate.get(dateKey)?.push(apt)
-  })
-  
-  const events: any[] = []
-  const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--blue-3b82f6').trim() || getComputedStyle(document.documentElement).getPropertyValue('--blue-3b82f6')
-  const selectedColor = getComputedStyle(document.documentElement).getPropertyValue('--gray-171717').trim() || getComputedStyle(document.documentElement).getPropertyValue('--black')
-  
-  appointmentsByDate.forEach((apts, date) => {
-    apts.forEach((apt, index) => {
-      if (index < 3) {
-        events.push({
-          id: apt.id,
-          start: date,
-          allDay: true,
-          display: 'block',
-          title: '●',
-          classNames: selectedAppointmentId.value === apt.id ? ['appointment-dot', 'selected'] : ['appointment-dot'],
-          backgroundColor: 'transparent',
-          borderColor: 'transparent',
-          textColor: selectedAppointmentId.value === apt.id ? selectedColor : primaryColor
-        })
-      }
-    })
-    
-    if (apts.length > 3) {
-      events.push({
-        id: `more-${date}`,
-        start: date,
-        allDay: true,
-        display: 'block',
-        title: `+${apts.length - 3}`,
-        classNames: ['appointment-dot-more'],
-        backgroundColor: 'transparent',
-        borderColor: 'transparent',
-        textColor: primaryColor
-      })
-    }
-  })
-  
-  return events
-})
-
-const calendarOptions = ref<CalendarOptions>({
-  plugins: [dayGridPlugin, interactionPlugin],
-  initialView: 'dayGridMonth',
-  locale: 'it',
-  headerToolbar: {
-    left: 'prev,next today',
-    center: 'title',
-    right: 'dayGridMonth,dayGridWeek'
-  },
-  events: calendarEvents.value,
-  selectable: true,
-  selectMirror: true,
-  dayMaxEvents: false,
-  weekends: true,
-  eventClick: handleEventClick,
-  select: handleDateSelect,
-  height: 'auto',
-  eventDisplay: 'block'
-})
-
 const filteredAppointments = computed(() => {
   if (selectedTag.value === 'all') {
     return appointments.value
@@ -117,19 +50,19 @@ function handleTagSelected(tagId: string) {
   selectedTag.value = tagId
 }
 
-function handleEventClick(clickInfo: EventClickArg) {
-  selectedAppointmentId.value = clickInfo.event.id
+function handleCalendarEventClick(appointmentId: string) {
+  selectedAppointmentId.value = appointmentId
   
   if (window.innerWidth >= 768) {
-    const element = document.getElementById(`appointment-${clickInfo.event.id}`)
+    const element = document.getElementById(`appointment-${appointmentId}`)
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
   }
 }
 
-function handleDateSelect(selectInfo: DateSelectArg) {
-  console.log('Selected date range:', selectInfo.startStr, 'to', selectInfo.endStr)
+function handleDateSelect(dateRange: { start: string; end: string }) {
+  console.log('Selected date range:', dateRange)
 }
 
 function handleAppointmentClick(id: string) {
@@ -146,13 +79,57 @@ function handleCancelAppointment(id: string) {
   // Implementare conferma e cancellazione appuntamento
 }
 
-function parseDateToISO(dateString: string): string {
-  const date = parseItalianDate(dateString)
-  if (date) {
-    return formatDateToISO(date)
+// Get badge colors for tags
+function getBadgeColors(tag: string): BadgeColors {
+  const normalizedTag = tag.toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+
+  const colorKey = TAG_COLOR_MAP[normalizedTag]
+
+  if (colorKey) {
+    return {
+      color: `var(--badge-${colorKey})`,
+      bgColor: `var(--badge-${colorKey}-bg)`,
+      borderColor: `var(--badge-${colorKey}-border)`
+    }
   }
-  // fallback: today
-  return formatDateToISO(new Date())
+
+  return {
+    color: 'var(--text-primary)',
+    bgColor: 'var(--bg-secondary-30)',
+    borderColor: 'var(--border-color)'
+  }
+}
+
+// Get badge icon for tags
+function getBadgeIcon(tag: string): string {
+  const normalizedTag = tag.toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+
+  return TAG_ICON_MAP[normalizedTag] || ''
+}
+
+// Get metadata for appointment card
+function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
+  const meta: CardMetadata[] = [
+    { icon: CalendarIcon, label: appointment.date }
+  ]
+  
+  if (appointment.time) {
+    meta.push({ icon: ClockIcon, label: appointment.time })
+  }
+  
+  if (appointment.user) {
+    meta.push({ icon: UserIcon, label: appointment.user })
+  }
+  
+  if (appointment.location) {
+    meta.push({ icon: MapPinIcon, label: appointment.location })
+  }
+  
+  return meta
 }
 </script>
 
@@ -177,28 +154,72 @@ function parseDateToISO(dateString: string): string {
     <div class="content-section">
       <!-- Calendar -->
       <div class="calendar-container">
-        <FullCalendar :options="{ ...calendarOptions, events: calendarEvents }" />
+        <AppointmentsCalendar
+          :appointments="appointments"
+          :selected-appointment-id="selectedAppointmentId"
+          @event-click="handleCalendarEventClick"
+          @date-select="handleDateSelect"
+        />
       </div>
 
       <!-- Appointments List -->
-      <div class="appointments-container">
-        <h2 class="appointments-title">{{ $t('calendar.appointments') }}</h2>
-        <CardList gap="sm">
-          <AppointmentCard
+      <div class="appointments-list-container">
+        <h2 class="appointments-list-title">{{ $t('calendar.appointments') }}</h2>
+        
+        <CardList v-if="filteredAppointments.length > 0" gap="sm">
+          <BaseCard
             v-for="appointment in filteredAppointments"
-            :id="`appointment-${appointment.id}`"
             :key="appointment.id"
-            :appointment="appointment"
+            :card-id="`appointment-${appointment.id}`"
+            :title="appointment.title"
+            :description="appointment.description"
+            :icon="CalendarIcon"
+            :metadata="getAppointmentMetadata(appointment)"
             :selected="selectedAppointmentId === appointment.id"
-            @click="handleAppointmentClick"
-            @edit="handleEditAppointment"
-            @cancel="handleCancelAppointment"
-          />
-          
-          <div v-if="filteredAppointments.length === 0" class="empty-state">
-            <p class="empty-state-text">{{ $t('calendar.noAppointments') }}</p>
-          </div>
+            @click="handleAppointmentClick(appointment.id)"
+          >
+            <template v-if="appointment.tags && appointment.tags.length > 0" #badges>
+              <div class="badges-row">
+                <div 
+                  v-for="tag in appointment.tags.slice(0, 2)" 
+                  :key="tag" 
+                  class="appointment-badge" 
+                  :style="{
+                    color: getBadgeColors(tag).color,
+                    backgroundColor: getBadgeColors(tag).bgColor,
+                    borderColor: getBadgeColors(tag).borderColor
+                  }"
+                >
+                  <span class="badge-icon">{{ getBadgeIcon(tag) }}</span>
+                  <span class="badge-label">{{ tag }}</span>
+                </div>
+              </div>
+            </template>
+
+            <template #actions>
+              <button
+                class="action-button edit-button"
+                @click.stop="handleEditAppointment(appointment.id)"
+                :title="$t('appointments.editAppointment')"
+              >
+                <PencilIcon class="icon-md" />
+                <span>{{ $t('appointments.editAppointment') }}</span>
+              </button>
+              <button
+                class="action-button cancel-button"
+                @click.stop="handleCancelAppointment(appointment.id)"
+                :title="$t('appointments.cancelAppointment')"
+              >
+                <XCircleIcon class="icon-md" />
+                <span>{{ $t('appointments.cancelAppointment') }}</span>
+              </button>
+            </template>
+          </BaseCard>
         </CardList>
+        
+        <div v-else class="empty-state">
+          <p class="empty-state-text">{{ $t('calendar.noAppointments') }}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -288,14 +309,11 @@ function parseDateToISO(dateString: string): string {
 }
 
 .calendar-container {
-  background: white;
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  border: 2px solid var(--border-color);
-  box-shadow: 0 0.5rem 1.875rem var(--black-8);
+  width: 100%;
 }
 
-.appointments-container {
+.appointments-list-container {
+  width: 100%;
   display: flex;
   flex-direction: column;
   background: var(--white-40);
@@ -307,16 +325,104 @@ function parseDateToISO(dateString: string): string {
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
-.appointments-container:hover {
+.appointments-list-container:hover {
   box-shadow: 0 12px 40px var(--black-12), inset 0 1px 0 var(--white-90);
 }
 
-.appointments-title {
+.appointments-list-title {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--gray-171717);
-  margin-bottom: 1rem;
+  margin: 0 0 1rem 0;
   line-height: 1.25;
+}
+
+.badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.appointment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border: 1.5px solid;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  box-shadow: 0 2px 8px var(--badge-shadow), inset 0 1px 0 var(--white-40);
+  width: fit-content;
+  animation: fadeInScale 0.4s cubic-bezier(0, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.badge-icon {
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.badge-label {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-size: 0.8125rem;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.625rem;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  width: 100%;
+  line-height: 1;
+}
+
+.edit-button {
+  background: var(--white-50);
+  border-color: var(--badge-warning-border);
+  color: var(--badge-warning);
+  box-shadow: 0 2px 8px var(--badge-warning-shadow), inset 0 1px 0 var(--white-60);
+}
+
+.edit-button:hover {
+  background: var(--white-70);
+  border-color: var(--badge-warning);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--badge-warning-shadow), inset 0 1px 0 var(--white-80);
+}
+
+.cancel-button {
+  background: var(--white-50);
+  border-color: var(--error-40);
+  color: var(--error);
+  box-shadow: 0 2px 8px var(--error-10), inset 0 1px 0 var(--white-60);
+}
+
+.cancel-button:hover {
+  background: var(--white-70);
+  border-color: var(--error-60);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--error-20), inset 0 1px 0 var(--white-80);
+}
+
+.icon-md {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: block;
+  flex-shrink: 0;
 }
 
 .empty-state {
@@ -334,124 +440,21 @@ function parseDateToISO(dateString: string): string {
 
 .empty-state-text {
   color: var(--gray-525252);
+  margin: 0;
 }
 
-/* FullCalendar customization */
-:deep(.fc) {
-  font-family: inherit;
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-:deep(.fc-button) {
-  background-color: var(--fc-button-bg) !important;
-  border-color: var(--fc-button-bg) !important;
-  text-transform: capitalize;
-}
-
-:deep(.fc-button:hover) {
-  background-color: var(--fc-button-hover-bg) !important;
-}
-
-:deep(.fc-button-active) {
-  background-color: var(--fc-button-hover-bg) !important;
-}
-
-:deep(.fc-daygrid-day-number) {
-  color: var(--fc-day-number);
-  font-weight: 500;
-}
-
-:deep(.fc-col-header-cell-cushion) {
-  color: var(--fc-header-text);
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-}
-
-:deep(.fc-event) {
-  cursor: pointer;
-}
-
-:deep(.fc-daygrid-day.fc-day-today) {
-  background-color: var(--fc-today-bg) !important;
-}
-
-/* Header sticky per i giorni della settimana */
-:deep(.fc-col-header) {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 2 !important;
-  background: white !important;
-}
-
-:deep(.fc-scrollgrid-sync-table) {
-  position: relative !important;
-}
-
-/* Nascondi gli eventi di default per mostrare solo i pallini */
-:deep(.fc-event.appointment-indicator) {
-  display: none !important;
-}
-
-/* Stili per i pallini degli appuntamenti */
-:deep(.fc-daygrid-day-frame) {
-  position: relative;
-}
-
-:deep(.fc-event.appointment-dot) {
-  border: none !important;
-  background: transparent !important;
-  padding: 0 !important;
-  margin: 0 2px !important;
-  font-size: 1rem;
-}
-
-:deep(.fc-event.appointment-dot .fc-event-main) {
-  padding: 0 !important;
-}
-
-:deep(.fc-event.appointment-dot .fc-event-title) {
-  font-size: 0.625rem;
-  line-height: 1;
-}
-
-:deep(.fc-event.appointment-dot.selected .fc-event-title) {
-  font-size: 0.75rem;
-  font-weight: bold;
-}
-
-:deep(.fc-event.appointment-dot-more) {
-  border: none !important;
-  background: transparent !important;
-  padding: 0 !important;
-  margin: 0 2px !important;
-}
-
-:deep(.fc-event.appointment-dot-more .fc-event-main) {
-  padding: 0 !important;
-}
-
-:deep(.fc-event.appointment-dot-more .fc-event-title) {
-  font-size: 0.625rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-/* Centra gli eventi nella cella */
-:deep(.fc-daygrid-day-events) {
-  position: absolute;
-  top: 20px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: unset;
-}
-
-:deep(.fc-daygrid-event-harness) {
-  position: relative !important;
-  margin: 0 !important;
-}
+/* FullCalendar customization styles are handled by AppointmentsCalendar component */
 
 @keyframes slideInDown {
   from {
@@ -485,13 +488,6 @@ function parseDateToISO(dateString: string): string {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  .calendar-container,
-  .appointments-container {
-    padding: 1rem;
-  }
-  .appointments-title {
-    font-size: 1.125rem;
-  }
 }
 
 @media (max-width: 640px) {
@@ -511,12 +507,23 @@ function parseDateToISO(dateString: string): string {
     font-size: 0.875rem;
   }
 
-  .calendar-container {
-    padding: 1rem;
+  .new-appointment-btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
   }
-
-  .appointments-title {
-    font-size: 1.25rem;
+  
+  .appointments-list-title {
+    font-size: 1.125rem;
+  }
+  
+  .action-button span {
+    display: none;
+  }
+  
+  .action-button {
+    padding: 0.5rem;
+    justify-content: center;
+    min-width: 2rem;
   }
 }
 
@@ -535,14 +542,6 @@ function parseDateToISO(dateString: string): string {
   
   .page-subtitle {
     font-size: 0.8125rem;
-  }
-  
-  .calendar-container {
-    padding: 0.5rem;
-  }
-  
-  .appointments-container {
-    padding: 0.5rem;
   }
 }
 </style>

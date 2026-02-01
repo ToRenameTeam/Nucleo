@@ -15,6 +15,8 @@ export interface BaseCard {
   selectable?: boolean
   showActions?: boolean
   clickable?: boolean
+  /** Additional ID for targeting */
+  cardId?: string
 }
 
 // BaseModal Types
