@@ -21,7 +21,7 @@ const selectDoctor = () => {
     fiscalCode: currentUser.value.fiscalCode
   })
 
-    router.push('/doctor/home')
+    router.push('/doctor/appointments')
   }
 }
 
