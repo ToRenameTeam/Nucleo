@@ -1,4 +1,4 @@
-import { MASTER_DATA_API_URL, APPOINTMENTS_API_URL, API_ENDPOINTS, handleApiResponse } from './config'
+import { MASTER_DATA_API_URL, API_ENDPOINTS, handleApiResponse } from './config'
 
 // Service Catalog Types
 export interface ServiceType {
@@ -6,7 +6,6 @@ export interface ServiceType {
   code: string
   name: string
   description?: string
-  duration: number
   category?: string
 }
 
@@ -18,19 +17,6 @@ export interface Facility {
   city?: string
   phone?: string
   email?: string
-}
-
-// Availability Type (from appointments service)
-export interface Availability {
-  id: string
-  doctorId: string
-  facilityId: string
-  serviceTypeId: string
-  timeSlot: {
-    startDateTime: string
-    durationMinutes: number
-  }
-  status: string
 }
 
 /**
@@ -150,35 +136,4 @@ export const masterDataApi = {
       return null
     }
   },
-}
-
-/**
- * Get availability by ID from appointments service
- */
-export async function getAvailabilityById(id: string): Promise<Availability | null> {
-  console.log('[Availability API] getAvailabilityById called for ID:', id)
-  const url = `${APPOINTMENTS_API_URL}${API_ENDPOINTS.AVAILABILITIES}/${id}`
-  console.log('[Availability API] Fetching from:', url)
-  
-  try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    
-    if (response.status === 404) {
-      console.warn('[Availability API] Availability not found:', id)
-      return null
-    }
-    
-    console.log('[Availability API] Response status:', response.status, response.statusText)
-    const data = await handleApiResponse<Availability>(response)
-    console.log('[Availability API] Availability received:', data)
-    return data
-  } catch (error) {
-    console.error('[Availability API] Error fetching availability:', error)
-    return null
-  }
 }

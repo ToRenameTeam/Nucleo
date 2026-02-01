@@ -34,7 +34,10 @@ export const API_ENDPOINTS = {
 export async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
-    throw new Error(errorData.message || 'Request failed')
+    const error = new Error(errorData.message || 'Request failed') as Error & { code?: string; details?: any }
+    error.code = errorData.code
+    error.details = errorData
+    throw error
   }
   
   const data = await response.json()

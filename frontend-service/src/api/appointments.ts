@@ -1,6 +1,8 @@
 import type { Appointment } from '../types/appointment'
+import type { Availability, AvailabilityStatus } from '../types/availability'
 import { APPOINTMENTS_API_URL, API_ENDPOINTS } from './config'
-import { masterDataApi, getAvailabilityById } from './masterData'
+import { masterDataApi } from './masterData'
+import { getAvailabilityByIdRaw } from './availabilities'
 import { userApi } from './users'
 
 const BASE_URL = `${APPOINTMENTS_API_URL}${API_ENDPOINTS.APPOINTMENTS}`
@@ -38,10 +40,15 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
   console.log('[Appointments API] Mapping appointment:', response.id)
   
   // Get availability details if not embedded
-  let availability = response.availability
-  if (!availability && response.availabilityId) {
+  let availability: Availability | undefined
+  if (response.availability) {
+    availability = {
+      ...response.availability,
+      status: response.availability.status as AvailabilityStatus
+    }
+  } else if (response.availabilityId) {
     console.log('[Appointments API] Fetching availability:', response.availabilityId)
-    const fetchedAvailability = await getAvailabilityById(response.availabilityId)
+    const fetchedAvailability = await getAvailabilityByIdRaw(response.availabilityId)
     if (fetchedAvailability) {
       availability = fetchedAvailability
     }
