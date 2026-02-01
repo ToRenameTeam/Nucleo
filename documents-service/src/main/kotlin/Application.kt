@@ -88,8 +88,9 @@ private fun createAiServiceClient(): AiServiceClient? {
         logger.info("Connecting to AI Service at $host:$port")
         AiServiceClient(host = host, port = port)
     } catch (e: Exception) {
-        logger.warn("Failed to initialize AI Service client: ${e.message}. AI analysis will be disabled.")
+        logger.warn(
+            "Failed to initialize AI Service client: ${e.message}. AI analysis will be disabled."
+        )
         null
     }
 }
-

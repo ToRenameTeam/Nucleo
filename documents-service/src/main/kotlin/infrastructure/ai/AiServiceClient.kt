@@ -4,13 +4,13 @@ import it.nucleo.domain.FileMetadata
 import it.nucleo.domain.Summary
 import it.nucleo.domain.Tag
 import it.nucleo.infrastructure.logging.logger
+import java.io.Closeable
+import java.net.HttpURLConnection
+import java.net.URI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import java.io.Closeable
-import java.net.HttpURLConnection
-import java.net.URI
 
 sealed class AiAnalysisResult {
 
@@ -29,11 +29,7 @@ enum class AiErrorCode {
     UNKNOWN
 }
 
-class AiServiceClient(
-    host: String,
-    port: Int,
-    private val timeoutMs: Int = 120_000
-) : Closeable {
+class AiServiceClient(host: String, port: Int, private val timeoutMs: Int = 120_000) : Closeable {
 
     private val logger = logger()
     private val json = Json { ignoreUnknownKeys = true }
@@ -60,7 +56,8 @@ class AiServiceClient(
                     connection.doOutput = true
 
                     // Send request
-                    val requestBody = """{"document_id": "$documentId", "patient_id": "$patientId"}"""
+                    val requestBody =
+                        """{"document_id": "$documentId", "patient_id": "$patientId"}"""
                     connection.outputStream.use { os ->
                         os.write(requestBody.toByteArray(Charsets.UTF_8))
                     }
@@ -71,8 +68,11 @@ class AiServiceClient(
                         val responseBody = connection.inputStream.bufferedReader().readText()
                         parseSuccessResponse(responseBody, documentId)
                     } else {
-                        val errorBody = connection.errorStream?.bufferedReader()?.readText() ?: "Unknown error"
-                        logger.warn("AI analysis failed for document $documentId: HTTP $responseCode - $errorBody")
+                        val errorBody =
+                            connection.errorStream?.bufferedReader()?.readText() ?: "Unknown error"
+                        logger.warn(
+                            "AI analysis failed for document $documentId: HTTP $responseCode - $errorBody"
+                        )
                         AiAnalysisResult.Failure(
                             mapHttpErrorCode(responseCode),
                             "AI analysis failed: HTTP $responseCode"
@@ -108,10 +108,11 @@ class AiServiceClient(
             val response = json.decodeFromString<AiAnalysisResponse>(responseBody)
 
             if (response.success) {
-                val metadata = FileMetadata(
-                    summary = Summary(response.summary),
-                    tags = response.tags.map { Tag(it) }.toSet()
-                )
+                val metadata =
+                    FileMetadata(
+                        summary = Summary(response.summary),
+                        tags = response.tags.map { Tag(it) }.toSet()
+                    )
                 logger.info(
                     "AI analysis successful for document $documentId: " +
                         "summary_length=${response.summary.length}, tags_count=${response.tags.size}"

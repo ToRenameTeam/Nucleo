@@ -1,7 +1,7 @@
 package it.nucleo.domain.report.implementation
 
-import it.nucleo.domain.Document
 import it.nucleo.domain.DoctorId
+import it.nucleo.domain.Document
 import it.nucleo.domain.DocumentId
 import it.nucleo.domain.FileMetadata
 import it.nucleo.domain.IssueDate

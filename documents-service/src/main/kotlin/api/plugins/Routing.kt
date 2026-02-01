@@ -20,12 +20,13 @@ fun Application.configureRouting(
     aiServiceClient: AiServiceClient? = null
 ) {
     val pdfGenerator = DocumentPdfGenerator()
-    val documentService = DocumentService(
-        repository = documentRepository,
-        fileStorageRepository = fileStorageRepository,
-        pdfGenerator = pdfGenerator,
-        aiServiceClient = aiServiceClient
-    )
+    val documentService =
+        DocumentService(
+            repository = documentRepository,
+            fileStorageRepository = fileStorageRepository,
+            pdfGenerator = pdfGenerator,
+            aiServiceClient = aiServiceClient
+        )
     val uploadService = DocumentUploadService(fileStorageRepository)
     val downloadService = DocumentDownloadService(fileStorageRepository)
 
