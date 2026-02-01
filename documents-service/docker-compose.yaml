@@ -14,10 +14,14 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET_NAME=documents
+      - AI_SERVICE_HOST=ai-service
+      - AI_SERVICE_PORT=8000
     depends_on:
       mongodb:
         condition: service_healthy
       minio:
+        condition: service_healthy
+      ai-service:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
@@ -26,6 +30,35 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    environment:
+      - HTTP_PORT=8000
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET_NAME=documents
+      - MINIO_SECURE=false
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GROQ_MODEL=openai/gpt-oss-120b
+      - GROQ_MAX_TOKENS=1024
+      - GROQ_TEMPERATURE=0.1
+      - LOG_LEVEL=INFO
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   mongodb:
     image: mongo:7.0
