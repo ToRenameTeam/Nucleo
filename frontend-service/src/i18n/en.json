@@ -342,10 +342,31 @@
       "errorLoading": "Error loading appointments",
       "categories": {
         "all": "All",
-        "confirmed": "Confirmed",
-        "pending": "Pending",
+        "scheduled": "Scheduled",
         "completed": "Completed",
+        "noShow": "Patient No Show",
         "cancelled": "Cancelled"
+      },
+      "status": {
+        "SCHEDULED": "Scheduled",
+        "COMPLETED": "Completed",
+        "NO_SHOW": "Patient No Show",
+        "CANCELLED": "Cancelled"
+      },
+      "errors": {
+        "notFound": "Appointment not found",
+        "loadFailed": "Error loading appointment details"
+      },
+      "reschedule": {
+        "title": "Reschedule Appointment",
+        "subtitle": "Select a new availability for the appointment",
+        "currentAppointment": "Current Appointment",
+        "selectNewSlot": "Select New Time",
+        "noAvailabilities": "No availabilities found",
+        "errorLoading": "Error loading availabilities",
+        "confirm": "Confirm Reschedule",
+        "success": "Appointment rescheduled successfully",
+        "error": "Error rescheduling appointment"
       }
     },
     "availabilities": {

@@ -348,10 +348,16 @@
       "errorLoading": "Errore nel caricamento degli appuntamenti",
       "categories": {
         "all": "Tutti",
-        "confirmed": "Confermati",
-        "pending": "In attesa",
+        "scheduled": "Programmati",
         "completed": "Completati",
+        "noShow": "Paziente Non Presentato",
         "cancelled": "Annullati"
+      },
+      "status": {
+        "SCHEDULED": "Programmato",
+        "COMPLETED": "Completato",
+        "NO_SHOW": "Paziente Non Presentato",
+        "CANCELLED": "Annullato"
       },
       "errors": {
         "notFound": "Appuntamento non trovato",

@@ -12,12 +12,11 @@ import type { Tag } from '../../types/tag'
 import type { Appointment } from '../../types/appointment'
 import type { CardMetadata } from '../../types/shared'
 import { appointmentsApi } from '../../api/appointments'
-import { TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/mockData'
+import { TAG_COLOR_MAP } from '../../constants/mockData'
 import type { BadgeColors } from '../../types/document'
 
 const { t } = useI18n()
 
-// View mode: 'list' or 'calendar'
 const viewMode = ref<'list' | 'calendar'>('list')
 
 // State
@@ -25,7 +24,7 @@ const appointments = ref<Appointment[]>([])
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const selectedAppointmentId = ref<string | null>(null)
-const selectedTag = ref('all')
+const selectedTag = ref('scheduled')
 const isRescheduleModalOpen = ref(false)
 const appointmentToReschedule = ref<Appointment | null>(null)
 
@@ -40,20 +39,44 @@ const doctorId = 'doc-001'
 // Computed tags based on appointments
 const tags = computed<Tag[]>(() => [
   { id: 'all', label: t('calendar.categories.all'), count: appointments.value.length },
-  { id: 'confirmed', label: t('doctor.appointments.categories.confirmed'), count: appointments.value.filter(a => a.tags?.includes('CONFIRMED')).length },
-  { id: 'pending', label: t('doctor.appointments.categories.pending'), count: appointments.value.filter(a => a.tags?.includes('PENDING')).length },
+  { id: 'scheduled', label: t('doctor.appointments.categories.scheduled'), count: appointments.value.filter(a => a.tags?.includes('SCHEDULED')).length },
   { id: 'completed', label: t('doctor.appointments.categories.completed'), count: appointments.value.filter(a => a.tags?.includes('COMPLETED')).length },
+  { id: 'no-show', label: t('doctor.appointments.categories.noShow'), count: appointments.value.filter(a => a.tags?.includes('NO_SHOW')).length },
   { id: 'cancelled', label: t('doctor.appointments.categories.cancelled'), count: appointments.value.filter(a => a.tags?.includes('CANCELLED')).length }
 ])
+
+// Get status label
+function getStatusLabel(status: string): string {
+  return t(`doctor.appointments.status.${status}`)
+}
+
+// Get status icon
+function getStatusIcon(status: string): string {
+  const iconMap: Record<string, string> = {
+    'SCHEDULED': '📅',
+    'COMPLETED': '✅',
+    'NO_SHOW': '❌',
+    'CANCELLED': '🚫'
+  }
+  return iconMap[status] || '📋'
+}
 
 // Filtered and sorted appointments
 const filteredAppointments = computed(() => {
   let filtered = appointments.value
   
-  // Filter by tag
   if (selectedTag.value !== 'all') {
+    const statusMap: Record<string, string> = {
+      'scheduled': 'SCHEDULED',
+      'completed': 'COMPLETED',
+      'no-show': 'NO_SHOW',
+      'cancelled': 'CANCELLED'
+    }
+    
+    const tagToFilter = statusMap[selectedTag.value] || selectedTag.value.toUpperCase()
+    
     filtered = filtered.filter(apt => 
-      apt.tags?.some(tag => tag.toLowerCase() === selectedTag.value.toLowerCase())
+      apt.tags?.includes(tagToFilter)
     )
   }
   
@@ -78,7 +101,6 @@ const currentAppointmentInfo = computed(() => {
 
 // Parse date and time for sorting
 function parseDateForSorting(dateStr: string, timeStr?: string): Date {
-  // Parse Italian date format (DD/MM/YYYY)
   const parts = dateStr.split('/').map(Number)
   const day = parts[0] || 1
   const month = parts[1] || 1
@@ -118,16 +140,6 @@ function getBadgeColors(tag: string): BadgeColors {
   }
 }
 
-// Get badge icon for tags
-function getBadgeIcon(tag: string): string {
-  const normalizedTag = tag.toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-
-  return TAG_ICON_MAP[normalizedTag] || ''
-}
-
-// Get metadata for appointment card
 function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   const meta: CardMetadata[] = [
     { icon: CalendarIcon, label: appointment.date }
@@ -148,7 +160,6 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   return meta
 }
 
-// Load appointments
 async function loadAppointments() {
   isLoading.value = true
   error.value = null
@@ -346,8 +357,8 @@ onMounted(() => {
                       borderColor: getBadgeColors(tag).borderColor
                     }"
                   >
-                    <span class="badge-icon">{{ getBadgeIcon(tag) }}</span>
-                    <span class="badge-label">{{ tag }}</span>
+                    <span class="badge-icon">{{ getStatusIcon(tag) }}</span>
+                    <span class="badge-label">{{ getStatusLabel(tag) }}</span>
                   </div>
                 </div>
               </template>
@@ -409,8 +420,8 @@ onMounted(() => {
                         borderColor: getBadgeColors(tag).borderColor
                       }"
                     >
-                      <span class="badge-icon">{{ getBadgeIcon(tag) }}</span>
-                      <span class="badge-label">{{ tag }}</span>
+                      <span class="badge-icon">{{ getStatusIcon(tag) }}</span>
+                      <span class="badge-label">{{ getStatusLabel(tag) }}</span>
                     </div>
                   </div>
                 </template>
