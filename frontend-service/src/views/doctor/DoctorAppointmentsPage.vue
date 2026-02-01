@@ -252,11 +252,6 @@ async function handleSelectAvailability(availabilityId: string) {
   }
 }
 
-function handleDateSelect(dateRange: { start: string; end: string }) {
-  console.log('Date range selected:', dateRange)
-  // TODO: Implementare selezione data per creare nuovo appuntamento
-}
-
 // Toast helper
 function showToastMessage(message: string, type: 'success' | 'error' | 'info' = 'success') {
   toastMessage.value = message
@@ -390,7 +385,6 @@ onMounted(() => {
             :appointments="filteredAppointments"
             :selected-appointment-id="selectedAppointmentId"
             @event-click="handleCalendarEventClick"
-            @date-select="handleDateSelect"
           />
           
           <div class="appointments-list-container">
