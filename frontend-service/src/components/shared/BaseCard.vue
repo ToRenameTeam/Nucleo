@@ -6,7 +6,8 @@ const props = withDefaults(defineProps<BaseCard>(), {
   selected: false,
   selectable: false,
   showActions: true,
-  clickable: true
+  clickable: true,
+  actions: () => []
 })
 
 const emit = defineEmits<{
@@ -22,9 +23,28 @@ const handleClick = () => {
   }
 }
 
+const handleActionClick = (event: Event, actionId: string) => {
+  event.stopPropagation()
+  const action = props.actions?.find(a => a.id === actionId)
+  if (action && props.cardId) {
+    action.onClick(props.cardId)
+  }
+}
+
 const isCardSelected = computed(() => {
   return props.selectable && props.selected
 })
+
+const hasActions = computed(() => {
+  return props.showActions && ((props.actions && props.actions.length > 0) || !!slots.actions)
+})
+
+const slots = defineSlots<{
+  badges?: any
+  'title-actions'?: any
+  'status-badge'?: any
+  actions?: any
+}>()
 </script>
 
 <template>
@@ -94,9 +114,23 @@ const isCardSelected = computed(() => {
             </div>
           </div>
 
-          <!-- Actions Slot (right side) -->
-          <div v-if="showActions && $slots.actions" class="card-actions">
-            <slot name="actions" />
+          <!-- Actions (right side) -->
+          <div v-if="hasActions" class="card-actions">
+            <!-- Configurable Actions -->
+            <template v-if="actions && actions.length > 0">
+              <button
+                v-for="action in actions"
+                :key="action.id"
+                :class="['action-button', `action-${action.variant}`]"
+                :title="action.label"
+                @click="handleActionClick($event, action.id)"
+              >
+                <component :is="action.icon" class="action-icon" />
+                <span class="action-label">{{ action.label }}</span>
+              </button>
+            </template>
+            <!-- Fallback to slot for backward compatibility -->
+            <slot v-else name="actions" />
           </div>
         </div>
       </div>
@@ -315,6 +349,107 @@ const isCardSelected = computed(() => {
   flex-shrink: 0;
 }
 
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.625rem;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  width: 100%;
+  line-height: 1;
+  font-family: inherit;
+}
+
+.action-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: block;
+  flex-shrink: 0;
+}
+
+.action-label {
+  display: inline;
+}
+
+.action-primary {
+  background: var(--sky-0ea5e9-20);
+  border-color: var(--sky-0ea5e9-40);
+  color: var(--sky-0ea5e9);
+  box-shadow: 0 2px 8px var(--sky-0ea5e9-10), inset 0 1px 0 var(--white-60);
+}
+
+.action-primary:hover {
+  background: var(--sky-0ea5e9-30);
+  border-color: var(--sky-0ea5e9-60);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--sky-0ea5e9-20), inset 0 1px 0 var(--white-80);
+}
+
+.action-secondary {
+  background: var(--purple-a855f7-20);
+  border-color: var(--purple-a855f7-40);
+  color: var(--purple-a855f7);
+  box-shadow: 0 2px 8px var(--purple-a855f7-10), inset 0 1px 0 var(--white-60);
+}
+
+.action-secondary:hover {
+  background: var(--purple-a855f7-30);
+  border-color: var(--purple-a855f7-60);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--purple-a855f7-20), inset 0 1px 0 var(--white-80);
+}
+
+.action-warning {
+  background: var(--white-50);
+  border-color: var(--badge-warning-border);
+  color: var(--badge-warning);
+  box-shadow: 0 2px 8px var(--badge-warning-shadow), inset 0 1px 0 var(--white-60);
+}
+
+.action-warning:hover {
+  background: var(--white-70);
+  border-color: var(--badge-warning);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--badge-warning-shadow), inset 0 1px 0 var(--white-80);
+}
+
+.action-danger {
+  background: var(--white-50);
+  border-color: var(--error-40);
+  color: var(--error);
+  box-shadow: 0 2px 8px var(--error-10), inset 0 1px 0 var(--white-60);
+}
+
+.action-danger:hover {
+  background: var(--white-70);
+  border-color: var(--error-60);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--error-20), inset 0 1px 0 var(--white-80);
+}
+
+.action-ghost {
+  background: var(--white-20);
+  border-color: var(--white-40);
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px var(--black-5), inset 0 1px 0 var(--white-60);
+}
+
+.action-ghost:hover {
+  background: var(--white-40);
+  border-color: var(--white-60);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--black-10), inset 0 1px 0 var(--white-80);
+}
+
 @media (max-width: 768px) {
   .card-content {
     gap: 1rem;
@@ -337,6 +472,16 @@ const isCardSelected = computed(() => {
   .card-actions {
     flex-direction: row;
     gap: 0.5rem;
+  }
+
+  .action-button {
+    padding: 0.5rem;
+    justify-content: center;
+    min-width: 2rem;
+  }
+
+  .action-label {
+    display: none;
   }
 
   .card-content {

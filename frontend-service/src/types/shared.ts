@@ -6,6 +6,14 @@ export interface CardMetadata {
   label: string
 }
 
+export interface CardAction {
+  id: string
+  label: string
+  icon: FunctionalComponent
+  variant: 'primary' | 'secondary' | 'warning' | 'danger' | 'ghost'
+  onClick: (id: string) => void
+}
+
 export interface BaseCard {
   title: string
   description: string
@@ -17,6 +25,8 @@ export interface BaseCard {
   clickable?: boolean
   /** Additional ID for targeting */
   cardId?: string
+  /** Configurable actions */
+  actions?: CardAction[]
 }
 
 // BaseModal Types

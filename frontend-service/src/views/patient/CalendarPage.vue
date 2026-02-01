@@ -11,7 +11,7 @@ import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.v
 import BaseCard from '../../components/shared/BaseCard.vue'
 import CardList from '../../components/shared/CardList.vue'
 import type { Appointment } from '../../types/appointment'
-import type { CardMetadata } from '../../types/shared'
+import type { CardMetadata, CardAction } from '../../types/shared'
 import { PlusIcon, CalendarIcon, ClockIcon, UserIcon, MapPinIcon, PencilIcon, XCircleIcon } from '@heroicons/vue/24/outline'
 import { MOCK_APPOINTMENTS, TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/mockData'
 import { useI18n } from 'vue-i18n'
@@ -77,6 +77,26 @@ function handleEditAppointment(id: string) {
 function handleCancelAppointment(id: string) {
   console.log('Disdici appuntamento:', id)
   // Implementare conferma e cancellazione appuntamento
+}
+
+// Get actions for appointment card
+function getAppointmentActions(): CardAction[] {
+  return [
+    {
+      id: 'edit',
+      label: t('appointments.editAppointment'),
+      icon: PencilIcon,
+      variant: 'warning',
+      onClick: handleEditAppointment
+    },
+    {
+      id: 'cancel',
+      label: t('appointments.cancelAppointment'),
+      icon: XCircleIcon,
+      variant: 'danger',
+      onClick: handleCancelAppointment
+    }
+  ]
 }
 
 // Get badge colors for tags
@@ -170,11 +190,12 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
           <BaseCard
             v-for="appointment in filteredAppointments"
             :key="appointment.id"
-            :card-id="`appointment-${appointment.id}`"
+            :card-id="appointment.id"
             :title="appointment.title"
             :description="appointment.description"
             :icon="CalendarIcon"
             :metadata="getAppointmentMetadata(appointment)"
+            :actions="getAppointmentActions()"
             :selected="selectedAppointmentId === appointment.id"
             @click="handleAppointmentClick(appointment.id)"
           >
@@ -194,25 +215,6 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
                   <span class="badge-label">{{ tag }}</span>
                 </div>
               </div>
-            </template>
-
-            <template #actions>
-              <button
-                class="action-button edit-button"
-                @click.stop="handleEditAppointment(appointment.id)"
-                :title="$t('appointments.editAppointment')"
-              >
-                <PencilIcon class="icon-md" />
-                <span>{{ $t('appointments.editAppointment') }}</span>
-              </button>
-              <button
-                class="action-button cancel-button"
-                @click.stop="handleCancelAppointment(appointment.id)"
-                :title="$t('appointments.cancelAppointment')"
-              >
-                <XCircleIcon class="icon-md" />
-                <span>{{ $t('appointments.cancelAppointment') }}</span>
-              </button>
             </template>
           </BaseCard>
         </CardList>
@@ -371,60 +373,6 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   font-size: 0.8125rem;
 }
 
-.action-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.625rem 0.875rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: 0.625rem;
-  border: 1px solid;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
-  white-space: nowrap;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  width: 100%;
-  line-height: 1;
-}
-
-.edit-button {
-  background: var(--white-50);
-  border-color: var(--badge-warning-border);
-  color: var(--badge-warning);
-  box-shadow: 0 2px 8px var(--badge-warning-shadow), inset 0 1px 0 var(--white-60);
-}
-
-.edit-button:hover {
-  background: var(--white-70);
-  border-color: var(--badge-warning);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--badge-warning-shadow), inset 0 1px 0 var(--white-80);
-}
-
-.cancel-button {
-  background: var(--white-50);
-  border-color: var(--error-40);
-  color: var(--error);
-  box-shadow: 0 2px 8px var(--error-10), inset 0 1px 0 var(--white-60);
-}
-
-.cancel-button:hover {
-  background: var(--white-70);
-  border-color: var(--error-60);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--error-20), inset 0 1px 0 var(--white-80);
-}
-
-.icon-md {
-  width: 1.25rem;
-  height: 1.25rem;
-  display: block;
-  flex-shrink: 0;
-}
-
 .empty-state {
   display: flex;
   justify-content: center;
@@ -515,16 +463,6 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   .appointments-list-title {
     font-size: 1.125rem;
   }
-  
-  .action-button span {
-    display: none;
-  }
-  
-  .action-button {
-    padding: 0.5rem;
-    justify-content: center;
-    min-width: 2rem;
-  }
 }
 
 @media (max-width: 480px) {
@@ -543,5 +481,13 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   .page-subtitle {
     font-size: 0.8125rem;
   }
+}
+
+.calendar-container {
+    padding: 0.5rem;
+}
+
+.appointments-container {
+  padding: 0.5rem;
 }
 </style>
