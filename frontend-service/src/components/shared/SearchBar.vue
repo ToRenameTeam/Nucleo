@@ -28,11 +28,6 @@ const handleSearch = () => {
         @input="handleSearch"
       />
       <MagnifyingGlassIcon class="search-icon" aria-hidden="true" />
-      <button class="filter-button" aria-label="Open search filters">
-        <svg class="filter-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-        </svg>
-      </button>
     </div>
   </div>
 </template>
@@ -59,6 +54,7 @@ const handleSearch = () => {
 
 .search-bar-container {
   position: relative;
+  width: 100%;
   background: var(--bg-secondary-35);
   backdrop-filter: blur(16px);
   border: 1px solid var(--bg-secondary-50);
@@ -103,35 +99,6 @@ const handleSearch = () => {
   transform: translateY(-50%);
   width: 1.25rem;
   height: 1.25rem;
-  color: var(--text-secondary);
-}
-
-.filter-button {
-  position: absolute;
-  right: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 2.25rem;
-  height: 2.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  background: var(--bg-secondary-50);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--bg-secondary-30);
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
-}
-
-.filter-button:hover {
-  background: var(--bg-secondary-80);
-  transform: translateY(-50%) scale(1.05);
-}
-
-.filter-icon {
-  width: 1.125rem;
-  height: 1.125rem;
   color: var(--text-secondary);
 }
 </style>

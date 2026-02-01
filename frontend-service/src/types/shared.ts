@@ -6,6 +6,14 @@ export interface CardMetadata {
   label: string
 }
 
+export interface CardAction {
+  id: string
+  label: string
+  icon: FunctionalComponent
+  variant: 'primary' | 'secondary' | 'warning' | 'danger' | 'ghost'
+  onClick: (id: string) => void
+}
+
 export interface BaseCard {
   title: string
   description: string
@@ -15,6 +23,10 @@ export interface BaseCard {
   selectable?: boolean
   showActions?: boolean
   clickable?: boolean
+  /** Additional ID for targeting */
+  cardId?: string
+  /** Configurable actions */
+  actions?: CardAction[]
 }
 
 // BaseModal Types
@@ -45,8 +57,7 @@ export interface Toast {
 // ProfileCard Types
 export interface ProfileCard {
   name?: string
-  role?: string
-  isAddCard?: boolean
+  fiscalCode?: string
 }
 
 // Breadcrumbs Types

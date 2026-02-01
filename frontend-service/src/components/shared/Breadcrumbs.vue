@@ -11,11 +11,16 @@ const { t } = useI18n()
 const breadcrumbs = computed<BreadcrumbItem[]>(() => {
   const items: BreadcrumbItem[] = []
   
+  // Determine home path based on current route
+  const isInDoctorArea = route.path.startsWith('/doctor')
+  const homePath = isInDoctorArea ? '/doctor/home' : '/patient/home'
+  const homeName = isInDoctorArea ? 'doctor-home' : 'patient-home'
+  
   // Always add 'home' as the first item if not on home page
-  if (route.path !== '/home' && route.name !== 'home') {
+  if (route.name !== homeName) {
     items.push({
       name: t('breadcrumbs.home'),
-      path: '/home'
+      path: homePath
     })
   }
 
@@ -87,7 +92,7 @@ const navigateTo = (path: string) => {
 .breadcrumbs-container {
   position: relative;
   z-index: 1;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem clamp(2rem, 1.5vw, 3rem);
   background: linear-gradient(135deg, var(--white-40) 0%, var(--white-30) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -134,7 +139,7 @@ const navigateTo = (path: string) => {
 }
 
 .breadcrumb-current {
-  font-size: 0.9375rem;
+  font-size: clamp(0.75rem, 2.5vw, 1rem);
   color: var(--text-primary);
   font-weight: 600;
 }
