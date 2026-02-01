@@ -65,9 +65,6 @@ const handleCloseToast = () => {
       <div class="main-column">
         <div class="section-card">
           <SearchBar @search="handleSearch" />
-          <p class="search-hint">
-            {{ $t('home.searchHint') }}
-          </p>
         </div>
 
         <div class="quick-actions">
@@ -191,7 +188,6 @@ const handleCloseToast = () => {
 .main-column {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
 .section-card {
@@ -216,7 +212,7 @@ const handleCloseToast = () => {
 }
 
 .quick-actions {
-  margin: 1rem;
+  padding: 1.25rem;
   animation: fadeIn 0.5s cubic-bezier(0, 0, 0.2, 1);
   animation-delay: 0.1s;
   animation-fill-mode: both;

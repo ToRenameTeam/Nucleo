@@ -136,8 +136,7 @@
     "newAppointment": "Prenota visita",
     "upcomingAppointments": "Prossimi appuntamenti",
     "noAppointments": "Nessun appuntamento in programma",
-    "recentDocuments": "Documenti recenti",
-    "searchHint": "Prova: \"mal di schiena\", \"dolore al petto\" o \"esami del sangue di Marco\""
+    "recentDocuments": "Documenti recenti"
   },
   "appointmentBooking": {
     "title": "Prenota una visita",

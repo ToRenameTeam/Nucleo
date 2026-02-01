@@ -92,7 +92,7 @@ const navigateTo = (path: string) => {
 .breadcrumbs-container {
   position: relative;
   z-index: 1;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem clamp(2rem, 1.5vw, 3rem);
   background: linear-gradient(135deg, var(--white-40) 0%, var(--white-30) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -139,7 +139,7 @@ const navigateTo = (path: string) => {
 }
 
 .breadcrumb-current {
-  font-size: 0.9375rem;
+  font-size: clamp(0.75rem, 2.5vw, 1rem);
   color: var(--text-primary);
   font-weight: 600;
 }

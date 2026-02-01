@@ -136,8 +136,7 @@
     "newAppointment": "Book Visit",
     "upcomingAppointments": "Upcoming Appointments",
     "noAppointments": "No scheduled appointments",
-    "recentDocuments": "Recent Documents",
-    "searchHint": "Try: \"back pain\", \"chest pain\" or \"Marco's blood tests\""
+    "recentDocuments": "Recent Documents"
   },
   "appointmentBooking": {
     "title": "Book a Visit",
