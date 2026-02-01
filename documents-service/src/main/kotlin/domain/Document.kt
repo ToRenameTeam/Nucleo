@@ -12,6 +12,8 @@ interface Document {
     val issueDate: IssueDate
 
     val metadata: FileMetadata
+
+    fun withMetadata(newMetadata: FileMetadata): Document
 }
 
 data class FileMetadata(val summary: Summary, val tags: Set<Tag>)

@@ -1,5 +1,6 @@
 package it.nucleo.domain.prescription.implementation
 
+import it.nucleo.domain.Document
 import it.nucleo.domain.DoctorId
 import it.nucleo.domain.DocumentId
 import it.nucleo.domain.FileMetadata
@@ -16,7 +17,9 @@ data class MedicinePrescription(
     override val metadata: FileMetadata,
     override val validity: Validity,
     val dosage: Dosage
-) : Prescription
+) : Prescription {
+    override fun withMetadata(newMetadata: FileMetadata): Document = copy(metadata = newMetadata)
+}
 
 data class Dosage(
     val medicine: MedicineId,

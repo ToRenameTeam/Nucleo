@@ -12,13 +12,20 @@ import it.nucleo.application.DocumentService
 import it.nucleo.application.DocumentUploadService
 import it.nucleo.domain.DocumentRepository
 import it.nucleo.domain.FileStorageRepository
+import it.nucleo.infrastructure.ai.AiServiceClient
 
 fun Application.configureRouting(
     documentRepository: DocumentRepository,
-    fileStorageRepository: FileStorageRepository
+    fileStorageRepository: FileStorageRepository,
+    aiServiceClient: AiServiceClient? = null
 ) {
     val pdfGenerator = DocumentPdfGenerator()
-    val documentService = DocumentService(documentRepository, fileStorageRepository, pdfGenerator)
+    val documentService = DocumentService(
+        repository = documentRepository,
+        fileStorageRepository = fileStorageRepository,
+        pdfGenerator = pdfGenerator,
+        aiServiceClient = aiServiceClient
+    )
     val uploadService = DocumentUploadService(fileStorageRepository)
     val downloadService = DocumentDownloadService(fileStorageRepository)
 

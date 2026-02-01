@@ -12,13 +12,17 @@ import it.nucleo.domain.prescription.implementation.Priority
 import it.nucleo.domain.prescription.implementation.ServiceId
 import it.nucleo.domain.prescription.implementation.ServicePrescription
 import it.nucleo.domain.report.*
+import it.nucleo.infrastructure.ai.AiAnalysisResult
+import it.nucleo.infrastructure.ai.AiServiceClient
 import it.nucleo.infrastructure.logging.logger
 import java.time.LocalDate
+import java.util.UUID
 
 class DocumentService(
     private val repository: DocumentRepository,
     private val fileStorageRepository: FileStorageRepository,
-    private val pdfGenerator: DocumentPdfGenerator
+    private val pdfGenerator: DocumentPdfGenerator,
+    private val aiServiceClient: AiServiceClient? = null
 ) {
     private val logger = logger()
 
@@ -32,24 +36,31 @@ class DocumentService(
 
     suspend fun createDocument(patientId: PatientId, request: CreateDocumentRequest): Document {
         val doctorId = DoctorId(request.doctorId)
-        val metadata = request.metadata.toDomain()
+
+        // Generate document ID upfront - needed for PDF storage and AI analysis
+        val documentId = DocumentId(UUID.randomUUID().toString())
+
+        // Create document with placeholder metadata initially
+        val placeholderMetadata = request.metadata.toDomain()
 
         val document =
             when (request) {
                 is CreateMedicinePrescriptionRequest -> {
                     DocumentFactory.createMedicinePrescription(
+                        id = documentId,
                         doctorId = doctorId,
                         patientId = patientId,
-                        metadata = metadata,
+                        metadata = placeholderMetadata,
                         validity = request.validity.toDomain(),
                         dosage = request.dosage.toDomain()
                     )
                 }
                 is CreateServicePrescriptionRequest -> {
                     DocumentFactory.createServicePrescription(
+                        id = documentId,
                         doctorId = doctorId,
                         patientId = patientId,
-                        metadata = metadata,
+                        metadata = placeholderMetadata,
                         validity = request.validity.toDomain(),
                         serviceId = ServiceId(request.serviceId),
                         facilityId = FacilityId(request.facilityId),
@@ -70,9 +81,10 @@ class DocumentService(
                     }
 
                     DocumentFactory.createReport(
+                        id = documentId,
                         doctorId = doctorId,
                         patientId = patientId,
-                        metadata = metadata,
+                        metadata = placeholderMetadata,
                         servicePrescription = servicePrescriptionDoc,
                         executionDate = ExecutionDate(LocalDate.parse(request.executionDate)),
                         findings = Findings(request.findings),
@@ -83,12 +95,13 @@ class DocumentService(
                 }
             }
 
-        repository.addDocument(patientId, document)
-
-        // Generate and store PDF
         generateAndStorePdf(document)
 
-        return document
+        val finalDocument = analyzeDocumentWithAi(document, patientId)
+
+        repository.addDocument(patientId, finalDocument)
+
+        return finalDocument
     }
 
     suspend fun deleteDocument(patientId: PatientId, documentId: DocumentId) {
@@ -116,7 +129,11 @@ class DocumentService(
         // Regenerate PDF after update
         generateAndStorePdf(existingDocument)
 
-        return existingDocument
+        // Re-analyze with AI after update
+        val updatedDocument = analyzeDocumentWithAi(existingDocument, patientId) as Report
+        repository.updateReport(patientId, updatedDocument)
+
+        return updatedDocument
     }
 
     private fun generateAndStorePdf(document: Document) {
@@ -136,7 +153,45 @@ class DocumentService(
             logger.info("PDF stored successfully for document: ${document.id.id}")
         } catch (e: Exception) {
             logger.error("Failed to generate/store PDF for document: ${document.id.id}", e)
-            // We don't rethrow - the document is already saved, PDF generation is secondary
+            throw e
+        }
+    }
+
+    private suspend fun analyzeDocumentWithAi(document: Document, patientId: PatientId): Document {
+        if (aiServiceClient == null) {
+            logger.warn("AI service client not configured, using provided metadata")
+            return document
+        }
+
+        return try {
+            logger.debug("Requesting AI analysis for document: ${document.id.id}")
+
+            val result = aiServiceClient.analyzeDocument(
+                patientId = patientId.id,
+                documentId = document.id.id
+            )
+
+            when (result) {
+                is AiAnalysisResult.Success -> {
+                    logger.info(
+                        "AI analysis successful for document ${document.id.id}: " +
+                        "summary_length=${result.metadata.summary.summary.length}, " +
+                        "tags_count=${result.metadata.tags.size}"
+                    )
+                    document.withMetadata(result.metadata)
+                }
+                is AiAnalysisResult.Failure -> {
+                    logger.warn(
+                        "AI analysis failed for document ${document.id.id}: " +
+                        "${result.errorCode} - ${result.message}. Using provided metadata."
+                    )
+                    document
+                }
+            }
+        } catch (e: Exception) {
+            logger.error("Error during AI analysis for document ${document.id.id}", e)
+            // Fallback to original metadata if AI fails
+            document
         }
     }
 }

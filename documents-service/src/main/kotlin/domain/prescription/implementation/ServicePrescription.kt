@@ -1,5 +1,6 @@
 package it.nucleo.domain.prescription.implementation
 
+import it.nucleo.domain.Document
 import it.nucleo.domain.DoctorId
 import it.nucleo.domain.DocumentId
 import it.nucleo.domain.FileMetadata
@@ -18,7 +19,9 @@ data class ServicePrescription(
     val serviceId: ServiceId,
     val facilityId: FacilityId,
     val priority: Priority
-) : Prescription
+) : Prescription {
+    override fun withMetadata(newMetadata: FileMetadata): Document = copy(metadata = newMetadata)
+}
 
 @JvmInline value class ServiceId(val id: String)
 

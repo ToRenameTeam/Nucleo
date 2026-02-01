@@ -1,5 +1,6 @@
 package it.nucleo.domain.report.implementation
 
+import it.nucleo.domain.Document
 import it.nucleo.domain.DoctorId
 import it.nucleo.domain.DocumentId
 import it.nucleo.domain.FileMetadata
@@ -13,7 +14,7 @@ class DefaultReport(
     override val doctorId: DoctorId,
     override val patientId: PatientId,
     override val issueDate: IssueDate,
-    override val metadata: FileMetadata,
+    override var metadata: FileMetadata,
     override val servicePrescription: ServicePrescription,
     override val executionDate: ExecutionDate,
     clinicalQuestion: ClinicalQuestion? = null,
@@ -45,5 +46,21 @@ class DefaultReport(
 
     override fun setRecommendations(recommendations: Recommendations) {
         this.recommendations = recommendations
+    }
+
+    override fun withMetadata(newMetadata: FileMetadata): Document {
+        return DefaultReport(
+            id = id,
+            doctorId = doctorId,
+            patientId = patientId,
+            issueDate = issueDate,
+            metadata = newMetadata,
+            servicePrescription = servicePrescription,
+            executionDate = executionDate,
+            clinicalQuestion = clinicalQuestion,
+            findings = findings,
+            conclusion = conclusion,
+            recommendations = recommendations
+        )
     }
 }

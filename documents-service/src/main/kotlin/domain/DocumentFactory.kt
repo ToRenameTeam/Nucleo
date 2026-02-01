@@ -20,6 +20,7 @@ import java.util.UUID
 object DocumentFactory {
 
     fun createMedicinePrescription(
+        id: DocumentId = generateDocumentId(),
         doctorId: DoctorId,
         patientId: PatientId,
         metadata: FileMetadata,
@@ -28,7 +29,7 @@ object DocumentFactory {
         issueDate: IssueDate = IssueDate()
     ): Prescription =
         MedicinePrescription(
-            id = generateDocumentId(),
+            id = id,
             doctorId = doctorId,
             patientId = patientId,
             issueDate = issueDate,
@@ -38,6 +39,7 @@ object DocumentFactory {
         )
 
     fun createServicePrescription(
+        id: DocumentId = generateDocumentId(),
         doctorId: DoctorId,
         patientId: PatientId,
         metadata: FileMetadata,
@@ -48,7 +50,7 @@ object DocumentFactory {
         issueDate: IssueDate = IssueDate()
     ): Prescription =
         ServicePrescription(
-            id = generateDocumentId(),
+            id = id,
             doctorId = doctorId,
             patientId = patientId,
             issueDate = issueDate,
@@ -60,6 +62,7 @@ object DocumentFactory {
         )
 
     fun createReport(
+        id: DocumentId = generateDocumentId(),
         doctorId: DoctorId,
         patientId: PatientId,
         metadata: FileMetadata,
@@ -72,7 +75,7 @@ object DocumentFactory {
         issueDate: IssueDate = IssueDate()
     ): Report =
         DefaultReport(
-            id = generateDocumentId(),
+            id = id,
             doctorId = doctorId,
             patientId = patientId,
             issueDate = issueDate,
