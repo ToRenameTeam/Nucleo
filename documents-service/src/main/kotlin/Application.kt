@@ -6,6 +6,7 @@ import io.ktor.server.netty.*
 import it.nucleo.api.plugins.configureRouting
 import it.nucleo.api.plugins.configureSerialization
 import it.nucleo.api.plugins.configureStatusPages
+import it.nucleo.infrastructure.ai.AiServiceClient
 import it.nucleo.infrastructure.logging.logger
 import it.nucleo.infrastructure.persistence.minio.MinioClientFactory
 import it.nucleo.infrastructure.persistence.minio.MinioFileStorageRepository
@@ -43,10 +44,15 @@ fun Application.module() {
         )
     val fileStorageRepository = MinioFileStorageRepository(minioClient, getMinioBucketName())
 
+    logger.info("Initializing AI Service client")
+    val aiServiceClient = createAiServiceClient()
+
     logger.info("Configuring routes")
-    configureRouting(documentRepository, fileStorageRepository)
+    configureRouting(documentRepository, fileStorageRepository, aiServiceClient)
     logger.info("Application initialized successfully")
 }
+
+// TODO: refactor 😅
 
 private fun getServerPort(): Int = System.getenv("SERVER_PORT")?.toIntOrNull() ?: 8080
 
@@ -67,3 +73,23 @@ private fun getMinioSecretKey(): String =
 
 private fun getMinioBucketName(): String =
     System.getenv("MINIO_BUCKET_NAME") ?: MinioClientFactory.Defaults.BUCKET_NAME
+
+private fun getAiServiceHost(): String =
+    System.getenv("AI_SERVICE_HOST") ?: AiServiceClient.Companion.Defaults.HOST
+
+private fun getAiServicePort(): Int =
+    System.getenv("AI_SERVICE_PORT")?.toIntOrNull() ?: AiServiceClient.Companion.Defaults.PORT
+
+private fun createAiServiceClient(): AiServiceClient? {
+    val host = getAiServiceHost()
+    val port = getAiServicePort()
+
+    return try {
+        logger.info("Connecting to AI Service at $host:$port")
+        AiServiceClient(host = host, port = port)
+    } catch (e: Exception) {
+        logger.warn("Failed to initialize AI Service client: ${e.message}. AI analysis will be disabled.")
+        null
+    }
+}
+
