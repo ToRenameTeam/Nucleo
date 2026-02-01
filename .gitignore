@@ -51,6 +51,7 @@ dist/
 .venv/
 .ruff_cache/
 .env
+__pycache__/
 
 ### Logs ###
 logs
