@@ -406,7 +406,7 @@ function formatTime(date: Date): string {
 .availability-content {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   height: 100%;
   gap: 0.25rem;
 }
@@ -428,7 +428,7 @@ function formatTime(date: Date): string {
 
 .availability-actions {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.125rem;
   flex-shrink: 0;
 }
@@ -449,26 +449,54 @@ function formatTime(date: Date): string {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
   padding: 0;
-  background: var(--white-60);
-  border: none;
-  border-radius: 0.25rem;
+  border-radius: 0.375rem;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
 }
 
 .action-btn:hover {
-  transform: scale(1.1);
+  transform: translateY(-2px);
+}
+
+.action-btn.edit-btn {
+  background: rgba(245, 158, 11, 0.8);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3),
+              0 2px 4px rgba(0, 0, 0, 0.1),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .action-btn.edit-btn:hover {
-  background: var(--accent-primary-30);
+  background: rgba(217, 119, 6, 0.85);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 24px rgba(245, 158, 11, 0.4),
+              0 3px 8px rgba(0, 0, 0, 0.15),
+              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.action-btn.delete-btn {
+  background: rgba(239, 68, 68, 0.8);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3),
+              0 2px 4px rgba(0, 0, 0, 0.1),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .action-btn.delete-btn:hover {
-  background: var(--error-25);
+  background: rgba(220, 38, 38, 0.85);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 24px rgba(239, 68, 68, 0.4),
+              0 3px 8px rgba(0, 0, 0, 0.15),
+              inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .action-icon {
@@ -477,11 +505,11 @@ function formatTime(date: Date): string {
 }
 
 .edit-btn .action-icon {
-  color: var(--accent-primary);
+  color: #ffffff;
 }
 
 .delete-btn .action-icon {
-  color: var(--error);
+  color: #ffffff;
 }
 
 .calendar-legend {

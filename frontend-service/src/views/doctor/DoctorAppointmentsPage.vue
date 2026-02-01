@@ -649,31 +649,45 @@ onMounted(() => {
 }
 
 .edit-button {
-  background: var(--white-50);
-  border-color: var(--badge-warning-border);
-  color: var(--badge-warning);
-  box-shadow: 0 2px 8px var(--badge-warning-shadow), inset 0 1px 0 var(--white-60);
+  background: rgba(245, 158, 11, 0.8);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3),
+              0 2px 4px rgba(0, 0, 0, 0.1),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .edit-button:hover {
-  background: var(--white-70);
-  border-color: var(--badge-warning);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--badge-warning-shadow), inset 0 1px 0 var(--white-80);
+  background: rgba(217, 119, 6, 0.85);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(245, 158, 11, 0.4),
+              0 3px 8px rgba(0, 0, 0, 0.15),
+              inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .cancel-button {
-  background: var(--white-50);
-  border-color: var(--error-40);
-  color: var(--error);
-  box-shadow: 0 2px 8px var(--error-10), inset 0 1px 0 var(--white-60);
+  background: rgba(239, 68, 68, 0.8);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3),
+              0 2px 4px rgba(0, 0, 0, 0.1),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .cancel-button:hover {
-  background: var(--white-70);
-  border-color: var(--error-60);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--error-20), inset 0 1px 0 var(--white-80);
+  background: rgba(220, 38, 38, 0.85);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(239, 68, 68, 0.4),
+              0 3px 8px rgba(0, 0, 0, 0.15),
+              inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .icon-md {

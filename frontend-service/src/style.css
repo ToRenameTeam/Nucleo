@@ -498,6 +498,12 @@ img, video {
   /* Badge shadow colors */
   --badge-shadow: rgba(0, 0, 0, 0.08);
   
+  /* Warning badge colors for actions */
+  --badge-warning: #f59e0b;
+  --badge-warning-bg: rgba(245, 158, 11, 0.15);
+  --badge-warning-border: rgba(245, 158, 11, 0.3);
+  --badge-warning-shadow: rgba(245, 158, 11, 0.15);
+  
   /* Legal footer colors */
   --legal-text: #9ca3af;
   --legal-footer-bg: rgba(255, 255, 255, 0.8);
@@ -657,6 +663,12 @@ img, video {
   --warning-15-on-bg: rgba(251, 191, 36, 0.15);
   --warning-10: rgba(251, 191, 36, 0.1);
   --warning-30: rgba(251, 191, 36, 0.3);
+  
+  /* Warning badge colors for actions - dark theme */
+  --badge-warning: #fbbf24;
+  --badge-warning-bg: rgba(251, 191, 36, 0.15);
+  --badge-warning-border: rgba(251, 191, 36, 0.3);
+  --badge-warning-shadow: rgba(251, 191, 36, 0.15);
   
   --bg-gradient-start-40: rgba(30, 58, 138, 0.4);
   --bg-gradient-start-50: rgba(30, 58, 138, 0.5);
