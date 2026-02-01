@@ -397,7 +397,7 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
+  padding: 0.625rem 0.875rem;
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: 0.625rem;
@@ -408,20 +408,21 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   width: 100%;
+  line-height: 1;
 }
 
 .edit-button {
-  background: var(--white-60);
-  border-color: var(--white-50);
-  color: var(--text-primary);
-  box-shadow: 0 2px 8px var(--shadow), inset 0 1px 0 var(--white-80);
+  background: var(--white-50);
+  border-color: var(--badge-warning-border);
+  color: var(--badge-warning);
+  box-shadow: 0 2px 8px var(--badge-warning-shadow), inset 0 1px 0 var(--white-60);
 }
 
 .edit-button:hover {
-  background: var(--white-80);
-  border-color: var(--white-70);
+  background: var(--white-70);
+  border-color: var(--badge-warning);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--shadow), inset 0 1px 0 var(--white-90);
+  box-shadow: 0 4px 12px var(--badge-warning-shadow), inset 0 1px 0 var(--white-80);
 }
 
 .cancel-button {
@@ -441,7 +442,8 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
 .icon-md {
   width: 1.25rem;
   height: 1.25rem;
-  display: inline-block;
+  display: block;
+  flex-shrink: 0;
 }
 
 .empty-state {

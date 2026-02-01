@@ -141,8 +141,8 @@
     }
   },
   "appointments": {
-    "editAppointment": "Modifica appuntamento",
-    "cancelAppointment": "Disdici appuntamento"
+    "editAppointment": "Modifica",
+    "cancelAppointment": "Disdici"
   },
   "home": {
     "uploadDocument": "Carica documento",

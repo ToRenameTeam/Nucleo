@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { BaseCard } from '../../types/shared'
 
 const props = withDefaults(defineProps<BaseCard>(), {
@@ -20,6 +21,10 @@ const handleClick = () => {
     emit('click')
   }
 }
+
+const isCardSelected = computed(() => {
+  return props.selectable && props.selected
+})
 </script>
 
 <template>
@@ -27,7 +32,7 @@ const handleClick = () => {
     :id="cardId"
     :class="['base-card-wrapper', {
       'card-selectable': selectable,
-      'card-selected': selected
+      'card-selected': isCardSelected
     }]" 
     @click="handleClick"
   >
@@ -52,39 +57,44 @@ const handleClick = () => {
 
         <!-- Content -->
         <div class="content-wrapper">
-          <!-- Title Row with Actions -->
-          <div class="title-row">
-            <h3 class="card-title">
-              {{ title }}
-            </h3>
-            <!-- Title Actions (e.g., barcode button for prescriptions) -->
-            <slot name="title-actions" />
-          </div>
+          <!-- Left Content Column -->
+          <div class="left-content">
+            <!-- Title Row with Title Actions -->
+            <div class="title-row">
+              <h3 class="card-title">
+                {{ title }}
+              </h3>
+              <!-- Title Actions (e.g., barcode button for prescriptions) -->
+              <slot name="title-actions" />
+            </div>
 
-          <!-- Badges/Tags Section - nuovo slot! -->
-          <div v-if="$slots.badges" class="badges-section">
-            <slot name="badges" />
-          </div>
+            <!-- Badges/Tags Section -->
+            <div v-if="$slots.badges" class="badges-section">
+              <slot name="badges" />
+            </div>
 
-          <!-- Description -->
-          <p class="card-description">
-            {{ description }}
-          </p>
+            <!-- Status Badge (e.g., expired, used) -->
+            <div v-if="$slots['status-badge']" class="status-badge-section">
+              <slot name="status-badge" />
+            </div>
 
-          <!-- Status Badge - nuovo slot! (e.g., expired, used) -->
-          <div v-if="$slots['status-badge']" class="status-badge-section">
-            <slot name="status-badge" />
-          </div>
-
-          <!-- Metadata (date, doctor, location, etc.) -->
-          <div class="metadata-row">
-            <div v-for="(meta, index) in metadata" :key="index" class="meta-item">
-              <component :is="meta.icon" class="meta-icon" />
-              <span>{{ meta.label }}</span>
+            <!-- Data Row with Description and Metadata -->
+            <div class="data-row">
+              <!-- Description -->
+              <p class="card-description">
+                {{ description }}
+              </p>
+              <!-- Metadata (date, doctor, location, etc.) -->
+              <div class="metadata-container">
+                <div v-for="(meta, index) in metadata" :key="index" class="meta-item">
+                  <component :is="meta.icon" class="meta-icon" />
+                  <span>{{ meta.label }}</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Actions Slot (bottom right) -->
+          <!-- Actions Slot (right side) -->
           <div v-if="showActions && $slots.actions" class="card-actions">
             <slot name="actions" />
           </div>
@@ -215,9 +225,17 @@ const handleClick = () => {
 .content-wrapper {
   position: relative;
   display: flex;
+  gap: 1.5rem;
+  flex: 1 1 0%;
+  min-width: 0;
+  align-items: center;
+}
+
+.left-content {
+  display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  flex: 1 1 0%;
+  flex: 1;
   min-width: 0;
 }
 
@@ -236,7 +254,6 @@ const handleClick = () => {
   overflow-wrap: break-word;
   flex: 1;
   min-width: 0;
-  max-width: calc(100% - 10rem);
   line-height: 1.2;
   margin: 0;
 }
@@ -245,28 +262,35 @@ const handleClick = () => {
   margin-bottom: 0.5rem;
 }
 
-.card-description {
-  color: var(--text-default, var(--text-secondary));
-  font-size: 0.98rem;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  max-width: calc(100% - 12rem);
-  margin: 0;
-  line-height: 1.4;
-}
-
 .status-badge-section {
   margin: 0.5rem 0;
 }
 
-.metadata-row {
-  margin-top: 0.5rem;
+.data-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+}
+
+.card-description {
+  color: var(--text-default, var(--text-secondary));
+  font-size: 1.0125rem;
+  font-weight: 500;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  width: 100%;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.metadata-container {
   display: flex;
   flex-wrap: wrap;
-  color: var(--text-metadata, var(--text-secondary));
   gap: 1.25rem;
-  max-width: calc(100% - 12rem);
+  color: var(--text-metadata, var(--text-secondary));
   font-size: 0.97rem;
+  margin-top: auto;
 }
 
 .meta-item {
@@ -283,40 +307,25 @@ const handleClick = () => {
 }
 
 .card-actions {
-  position: absolute;
-  bottom: 0;
-  right: 0;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: stretch;
   min-width: 200px;
-}
-
-@media (max-width: 1024px) {
-  .card-title {
-    max-width: calc(100% - 8rem);
-  }
-
-  .card-description {
-    max-width: calc(100% - 10rem);
-  }
-
-  .metadata-row {
-    max-width: calc(100% - 10rem);
-  }
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
-
-  .card-title,
-  .card-description,
-  .metadata-row {
-    max-width: 100%;
-  }
-
   .card-content {
     gap: 1rem;
+  }
+  
+  .content-wrapper {
+    flex-direction: column;
+  }
+  
+  .card-actions {
+    width: 100%;
   }
 }
 
@@ -326,12 +335,8 @@ const handleClick = () => {
   }
 
   .card-actions {
-    position: static;
-    margin-top: 1rem;
     flex-direction: row;
     gap: 0.5rem;
-    align-items: center;
-    min-width: auto;
   }
 
   .card-content {
