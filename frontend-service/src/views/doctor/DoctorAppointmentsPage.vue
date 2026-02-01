@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { CalendarIcon, ListBulletIcon, UserIcon, ClockIcon, MapPinIcon, PencilIcon } from '@heroicons/vue/24/outline'
+import { CalendarIcon, ListBulletIcon, UserIcon, ClockIcon, MapPinIcon, PencilIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/vue/24/outline'
 import TagBar from '../../components/shared/TagBar.vue'
 import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue'
 import BaseCard from '../../components/shared/BaseCard.vue'
@@ -117,7 +117,42 @@ function parseDateForSorting(dateStr: string, timeStr?: string): Date {
   return date
 }
 
-// Get badge colors for tags
+// Check if appointment is current or past (date/time <= now)
+function isAppointmentCurrentOrFuture(appointment: Appointment): boolean {
+  if (!appointment.date) return false
+  
+  const timeStr = appointment.time?.split(' - ')[0] || '00:00'
+  const appointmentDateTime = parseDateForSorting(appointment.date, timeStr)
+  const now = new Date()
+  
+  return appointmentDateTime <= now
+}
+
+async function handleUpdateAppointmentStatus(appointmentId: string, newStatus: string) {
+  try {
+    isLoading.value = true
+    
+    await appointmentsApi.updateAppointment(appointmentId, newStatus)
+    
+    showToastMessage(t('doctor.appointments.actions.statusUpdateSuccess'), 'success')
+    
+    await loadAppointments()
+  } catch (err) {
+    console.error('[DoctorAppointmentsPage] Error updating appointment status:', err)
+    showToastMessage(t('doctor.appointments.actions.statusUpdateError'), 'error')
+  } finally {
+    isLoading.value = false
+  }
+}
+
+function handleMarkAsCompleted(appointmentId: string) {
+  handleUpdateAppointmentStatus(appointmentId, 'COMPLETED')
+}
+
+function handleMarkAsNoShow(appointmentId: string) {
+  handleUpdateAppointmentStatus(appointmentId, 'NO_SHOW')
+}
+
 function getBadgeColors(tag: string): BadgeColors {
   const normalizedTag = tag.toLowerCase()
     .normalize('NFD')
@@ -368,6 +403,24 @@ onMounted(() => {
                   <PencilIcon class="icon-md" />
                   <span>{{ $t('appointments.editAppointment') }}</span>
                 </button>
+                <button
+                  v-if="appointment.tags && appointment.tags.includes('SCHEDULED') && isAppointmentCurrentOrFuture(appointment)"
+                  class="action-button completed-button"
+                  @click.stop="handleMarkAsCompleted(appointment.id)"
+                  :title="$t('doctor.appointments.actions.visitCompleted')"
+                >
+                  <CheckCircleIcon class="icon-md" />
+                  <span>{{ $t('doctor.appointments.actions.visitCompleted') }}</span>
+                </button>
+                <button
+                  v-if="appointment.tags && appointment.tags.includes('SCHEDULED') && isAppointmentCurrentOrFuture(appointment)"
+                  class="action-button noshow-button"
+                  @click.stop="handleMarkAsNoShow(appointment.id)"
+                  :title="$t('doctor.appointments.actions.patientNoShow')"
+                >
+                  <XCircleIcon class="icon-md" />
+                  <span>{{ $t('doctor.appointments.actions.patientNoShow') }}</span>
+                </button>
               </template>
             </BaseCard>
           </CardList>
@@ -429,6 +482,24 @@ onMounted(() => {
                   >
                     <PencilIcon class="icon-md" />
                     <span>{{ $t('appointments.editAppointment') }}</span>
+                  </button>
+                  <button
+                    v-if="appointment.tags && appointment.tags.includes('SCHEDULED') && isAppointmentCurrentOrFuture(appointment)"
+                    class="action-button completed-button"
+                    @click.stop="handleMarkAsCompleted(appointment.id)"
+                    :title="$t('doctor.appointments.actions.visitCompleted')"
+                  >
+                    <CheckCircleIcon class="icon-md" />
+                    <span>{{ $t('doctor.appointments.actions.visitCompleted') }}</span>
+                  </button>
+                  <button
+                    v-if="appointment.tags && appointment.tags.includes('SCHEDULED') && isAppointmentCurrentOrFuture(appointment)"
+                    class="action-button noshow-button"
+                    @click.stop="handleMarkAsNoShow(appointment.id)"
+                    :title="$t('doctor.appointments.actions.patientNoShow')"
+                  >
+                    <XCircleIcon class="icon-md" />
+                    <span>{{ $t('doctor.appointments.actions.patientNoShow') }}</span>
                   </button>
                 </template>
               </BaseCard>
@@ -732,6 +803,48 @@ onMounted(() => {
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
   box-shadow: 0 6px 24px rgba(245, 158, 11, 0.4),
+              0 3px 8px rgba(0, 0, 0, 0.15),
+              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.completed-button {
+  background: rgba(5, 150, 105, 0.8);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(5, 150, 105, 0.3),
+              0 2px 4px rgba(0, 0, 0, 0.1),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.completed-button:hover {
+  background: rgba(4, 120, 87, 0.85);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(5, 150, 105, 0.4),
+              0 3px 8px rgba(0, 0, 0, 0.15),
+              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.noshow-button {
+  background: rgba(220, 38, 38, 0.8);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3),
+              0 2px 4px rgba(0, 0, 0, 0.1),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.noshow-button:hover {
+  background: rgba(185, 28, 28, 0.85);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(220, 38, 38, 0.4),
               0 3px 8px rgba(0, 0, 0, 0.15),
               inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }

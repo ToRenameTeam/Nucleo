@@ -363,6 +363,12 @@
         "notFound": "Appuntamento non trovato",
         "loadFailed": "Errore nel caricamento dei dettagli dell'appuntamento"
       },
+      "actions": {
+        "visitCompleted": "Visita completata",
+        "patientNoShow": "Paziente non presentato",
+        "statusUpdateSuccess": "Stato aggiornato con successo",
+        "statusUpdateError": "Errore nell'aggiornamento dello stato"
+      },
       "reschedule": {
         "title": "Ripianifica Appuntamento",
         "subtitle": "Seleziona una nuova disponibilità per l'appuntamento",
