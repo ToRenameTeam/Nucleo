@@ -23,28 +23,33 @@ interface AppointmentResponse {
   status: string
   createdAt: string
   updatedAt: string
-  availability?: {
-    id: string
-    doctorId: string
-    facilityId: string
-    serviceTypeId: string
-    timeSlot: {
-      startDateTime: string
-      durationMinutes: number
-    }
-    status: string
+  // Additional fields from /details endpoint
+  doctorId?: string
+  facilityId?: string
+  serviceTypeId?: string
+  timeSlot?: {
+    startDateTime: string
+    durationMinutes: number
   }
+  availabilityStatus?: string
 }
 
 async function mapAppointmentResponse(response: AppointmentResponse): Promise<Appointment> {
-  // Get availability details if not embedded
+  // Get availability details from response or fetch from API
   let availability: Availability | undefined
-  if (response.availability) {
+  
+  // If we have availability fields in the response (/details endpoint)
+  if (response.doctorId && response.facilityId && response.serviceTypeId && response.timeSlot) {
     availability = {
-      ...response.availability,
-      status: response.availability.status as AvailabilityStatus
+      availabilityId: response.availabilityId,
+      doctorId: response.doctorId,
+      facilityId: response.facilityId,
+      serviceTypeId: response.serviceTypeId,
+      timeSlot: response.timeSlot,
+      status: (response.availabilityStatus || 'AVAILABLE') as AvailabilityStatus
     }
   } else if (response.availabilityId) {
+    // Otherwise fetch from availabilities API
     console.log('[Appointments API] Fetching availability:', response.availabilityId)
     const fetchedAvailability = await getAvailabilityByIdRaw(response.availabilityId)
     if (fetchedAvailability) {
@@ -172,7 +177,7 @@ export const appointmentsApi = {
   },
 
   async getAppointmentById(id: string): Promise<Appointment | null> {
-    const response = await fetch(`${BASE_URL}/${id}`, {
+    const response = await fetch(`${BASE_URL}/${id}/details`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
