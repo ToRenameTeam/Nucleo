@@ -200,7 +200,7 @@ function formatDate(date: Date): string {
 
 function parseDateString(dateStr: string): Date {
   const [day, month, year] = dateStr.split('/').map(Number)
-  return new Date(year, month - 1, day)
+  return new Date(year || 0, (month || 1) - 1, day || 1)
 }
 
 function formatTime(date: Date): string {
@@ -212,7 +212,7 @@ function formatTime(date: Date): string {
 function formatDayName(dateStr: string): string {
   const date = parseDateString(dateStr)
   const days = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
-  return days[date.getDay()]
+  return days[date.getDay()] || ''
 }
 
 function selectAvailability(availabilityId: string) {
