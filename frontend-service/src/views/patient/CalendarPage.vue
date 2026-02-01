@@ -102,7 +102,7 @@ function getBadgeIcon(tag: string): string {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
 
-  return TAG_ICON_MAP[normalizedTag] || '🧑‍⚕️'
+  return TAG_ICON_MAP[normalizedTag] || ''
 }
 
 // Get metadata for appointment card
@@ -563,4 +563,4 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
     font-size: 0.8125rem;
   }
 }
-
+</style>
