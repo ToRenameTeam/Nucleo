@@ -17,7 +17,7 @@ interface GetAppointmentsFilters {
 }
 
 interface AppointmentResponse {
-  id: string
+  appointmentId: string
   patientId: string
   availabilityId: string
   status: string
@@ -37,8 +37,6 @@ interface AppointmentResponse {
 }
 
 async function mapAppointmentResponse(response: AppointmentResponse): Promise<Appointment> {
-  console.log('[Appointments API] Mapping appointment:', response.id)
-  
   // Get availability details if not embedded
   let availability: Availability | undefined
   if (response.availability) {
@@ -66,9 +64,9 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
   }
   
   if (!availability) {
-    console.warn('[Appointments API] No availability found for appointment:', response.id)
+    console.warn('[Appointments API] No availability found for appointment:', response.appointmentId)
     return {
-      id: response.id,
+      id: response.appointmentId,
       title: 'Appuntamento',
       description: `Paziente: ${patientName}`,
       date: new Date().toLocaleDateString('it-IT'),
@@ -103,7 +101,7 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
   }
   
   return {
-    id: response.id,
+    id: response.appointmentId,
     title: serviceTypeName,
     description: `Paziente: ${patientName}`,
     date: startTime.toLocaleDateString('it-IT'),

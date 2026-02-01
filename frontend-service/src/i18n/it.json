@@ -352,6 +352,21 @@
         "pending": "In attesa",
         "completed": "Completati",
         "cancelled": "Annullati"
+      },
+      "errors": {
+        "notFound": "Appuntamento non trovato",
+        "loadFailed": "Errore nel caricamento dei dettagli dell'appuntamento"
+      },
+      "reschedule": {
+        "title": "Ripianifica Appuntamento",
+        "subtitle": "Seleziona una nuova disponibilità per l'appuntamento",
+        "currentAppointment": "Appuntamento Corrente",
+        "selectNewSlot": "Seleziona Nuovo Orario",
+        "noAvailabilities": "Nessuna disponibilità trovata",
+        "errorLoading": "Errore nel caricamento delle disponibilità",
+        "confirm": "Conferma Ripianificazione",
+        "success": "Appuntamento ripianificato con successo",
+        "error": "Errore durante la ripianificazione dell'appuntamento"
       }
     },
     "availabilities": {
@@ -416,6 +431,7 @@
   },
   "common": {
     "loading": "Caricamento...",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "cancel": "Annulla"
   }
 }

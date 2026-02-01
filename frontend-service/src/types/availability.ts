@@ -52,8 +52,15 @@ export interface WeeklyCalendarProps {
 
 export interface AvailabilityModalProps {
   isOpen: boolean
-  mode: 'create' | 'edit'
+  mode: 'create' | 'edit' | 'select'
   availability?: AvailabilityDisplay | null
   preselectedDate?: Date | null
   preselectedHour?: number | null
+  doctorId?: string  // Required for 'select' mode
+  currentAppointment?: {  // Show current appointment info in 'select' mode
+    user?: string
+    date: string
+    time?: string
+    location?: string
+  } | null
 }

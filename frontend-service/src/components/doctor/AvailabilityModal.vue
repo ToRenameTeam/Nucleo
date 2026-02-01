@@ -5,18 +5,23 @@ import {
   CalendarIcon,
   ClockIcon,
   BuildingOffice2Icon,
-  ClipboardDocumentListIcon
+  ClipboardDocumentListIcon,
+  UserIcon,
+  MapPinIcon
 } from '@heroicons/vue/24/outline'
 import BaseModal from '../shared/BaseModal.vue'
-import type { AvailabilityModalProps } from '../../types/availability'
+import type { AvailabilityModalProps, AvailabilityDisplay } from '../../types/availability'
 import type { Facility, ServiceType } from '../../api/masterData'
 import { masterDataApi } from '../../api/masterData'
+import { availabilitiesApi } from '../../api/availabilities'
 
 const props = withDefaults(defineProps<AvailabilityModalProps>(), {
   mode: 'create',
   availability: null,
   preselectedDate: null,
-  preselectedHour: null
+  preselectedHour: null,
+  doctorId: undefined,
+  currentAppointment: null
 })
 
 const emit = defineEmits<{
@@ -27,11 +32,12 @@ const emit = defineEmits<{
     startDateTime: string
     durationMinutes: number
   }]
+  selectAvailability: [availabilityId: string]
 }>()
 
 const { t } = useI18n()
 
-// Form state
+// Form state (for create/edit modes)
 const selectedDate = ref('')
 const selectedTime = ref('')
 const selectedFacilityId = ref('')
@@ -39,6 +45,10 @@ const selectedServiceTypeId = ref('')
 const selectedDuration = ref(30)
 const isLoading = ref(false)
 const isSaving = ref(false)
+
+// Selection state (for select mode)
+const availabilitiesList = ref<AvailabilityDisplay[]>([])
+const selectedAvailabilityId = ref<string | null>(null)
 
 const facilities = ref<Facility[]>([])
 const serviceTypes = ref<ServiceType[]>([])
@@ -53,17 +63,58 @@ const durationOptions = [
 ]
 
 const modalTitle = computed(() => {
+  if (props.mode === 'select') {
+    return t('doctor.appointments.reschedule.title')
+  }
   return props.mode === 'create' 
     ? t('doctor.availabilities.modal.titleCreate')
     : t('doctor.availabilities.modal.titleEdit')
 })
 
+const modalSubtitle = computed(() => {
+  if (props.mode === 'select') {
+    return t('doctor.appointments.reschedule.subtitle')
+  }
+  return t('doctor.availabilities.modal.subtitle')
+})
+
 const isFormValid = computed(() => {
+  if (props.mode === 'select') {
+    return selectedAvailabilityId.value !== null
+  }
   return selectedDate.value && 
          selectedTime.value && 
          selectedFacilityId.value && 
          selectedServiceTypeId.value &&
          selectedDuration.value > 0
+})
+
+// Group availabilities by date for select mode
+const availableDates = computed(() => {
+  if (props.mode !== 'select') return []
+  
+  const dateMap = new Map<string, AvailabilityDisplay[]>()
+  
+  availabilitiesList.value
+    .filter(a => a.status === 'AVAILABLE' && !a.isBooked)
+    .forEach(availability => {
+      const dateKey = formatDate(availability.startDateTime)
+      if (!dateMap.has(dateKey)) {
+        dateMap.set(dateKey, [])
+      }
+      dateMap.get(dateKey)!.push(availability)
+    })
+  
+  return Array.from(dateMap.entries())
+    .map(([date, slots]) => ({
+      date,
+      slots: slots.sort((a, b) => a.startDateTime.getTime() - b.startDateTime.getTime())
+    }))
+    .sort((a, b) => {
+      const dateA = parseDateString(a.date)
+      const dateB = parseDateString(b.date)
+      return dateA.getTime() - dateB.getTime()
+    })
 })
 
 async function loadMasterData() {
@@ -77,6 +128,20 @@ async function loadMasterData() {
     serviceTypes.value = serviceTypesData
   } catch (error) {
     console.error('Error loading master data:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+async function loadAvailabilities() {
+  if (props.mode !== 'select' || !props.doctorId) return
+  
+  isLoading.value = true
+  try {
+    const fetchedAvailabilities = await availabilitiesApi.getAvailabilitiesByDoctor(props.doctorId)
+    availabilitiesList.value = fetchedAvailabilities
+  } catch (error) {
+    console.error('Error loading availabilities:', error)
   } finally {
     isLoading.value = false
   }
@@ -108,6 +173,9 @@ function initializeForm() {
     selectedServiceTypeId.value = ''
     selectedDuration.value = 30
   }
+  
+  // Reset selection state
+  selectedAvailabilityId.value = null
 }
 
 function formatDateForInput(date: Date): string {
@@ -123,8 +191,44 @@ function formatTimeForInput(date: Date): string {
   return `${hours}:${minutes}`
 }
 
+function formatDate(date: Date): string {
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}/${month}/${year}`
+}
+
+function parseDateString(dateStr: string): Date {
+  const [day, month, year] = dateStr.split('/').map(Number)
+  return new Date(year, month - 1, day)
+}
+
+function formatTime(date: Date): string {
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${hours}:${minutes}`
+}
+
+function formatDayName(dateStr: string): string {
+  const date = parseDateString(dateStr)
+  const days = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
+  return days[date.getDay()]
+}
+
+function selectAvailability(availabilityId: string) {
+  selectedAvailabilityId.value = availabilityId
+}
+
 async function handleSave() {
   if (!isFormValid.value) return
+  
+  if (props.mode === 'select') {
+    // Emit the selected availability
+    if (selectedAvailabilityId.value) {
+      emit('selectAvailability', selectedAvailabilityId.value)
+    }
+    return
+  }
   
   isSaving.value = true
   
@@ -154,7 +258,9 @@ function handleClose() {
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen) {
     initializeForm()
-    if (facilities.value.length === 0) {
+    if (props.mode === 'select') {
+      loadAvailabilities()
+    } else if (facilities.value.length === 0) {
       loadMasterData()
     }
   }
@@ -163,7 +269,11 @@ watch(() => props.isOpen, (isOpen) => {
 onMounted(() => {
   if (props.isOpen) {
     initializeForm()
-    loadMasterData()
+    if (props.mode === 'select') {
+      loadAvailabilities()
+    } else {
+      loadMasterData()
+    }
   }
 })
 </script>
@@ -172,17 +282,87 @@ onMounted(() => {
   <BaseModal
     :is-open="isOpen"
     :title="modalTitle"
-    :subtitle="t('doctor.availabilities.modal.subtitle')"
-    max-width="md"
+    :subtitle="modalSubtitle"
+    :max-width="mode === 'select' ? 'lg' : 'md'"
     :close-on-backdrop="true"
     @close="handleClose"
   >
     <div class="availability-form">
       <!-- Loading State -->
       <div v-if="isLoading" class="loading-state">
+        <div class="spinner"></div>
         <p>{{ t('common.loading') }}</p>
       </div>
 
+      <!-- SELECT MODE: Show current appointment and available slots -->
+      <template v-else-if="mode === 'select'">
+        <!-- Current Appointment Info -->
+        <div v-if="currentAppointment" class="appointment-info">
+          <h3 class="info-title">{{ t('doctor.appointments.reschedule.currentAppointment') }}</h3>
+          <div class="info-grid">
+            <div v-if="currentAppointment.user" class="info-item">
+              <UserIcon class="info-icon" />
+              <span>{{ currentAppointment.user }}</span>
+            </div>
+            <div class="info-item">
+              <CalendarIcon class="info-icon" />
+              <span>{{ currentAppointment.date }}</span>
+            </div>
+            <div v-if="currentAppointment.time" class="info-item">
+              <ClockIcon class="info-icon" />
+              <span>{{ currentAppointment.time }}</span>
+            </div>
+            <div v-if="currentAppointment.location" class="info-item">
+              <MapPinIcon class="info-icon" />
+              <span>{{ currentAppointment.location }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Available Slots -->
+        <div class="availabilities-section">
+          <h3 class="section-title">{{ t('doctor.appointments.reschedule.selectNewSlot') }}</h3>
+          
+          <div v-if="availableDates.length === 0" class="empty-state">
+            <p>{{ t('doctor.appointments.reschedule.noAvailabilities') }}</p>
+          </div>
+
+          <div v-else class="dates-list">
+            <div
+              v-for="dateGroup in availableDates"
+              :key="dateGroup.date"
+              class="date-group"
+            >
+              <div class="date-header">
+                <CalendarIcon class="date-icon" />
+                <div>
+                  <p class="date-day">{{ formatDayName(dateGroup.date) }}</p>
+                  <p class="date-text">{{ dateGroup.date }}</p>
+                </div>
+              </div>
+
+              <div class="time-slots">
+                <button
+                  v-for="slot in dateGroup.slots"
+                  :key="slot.id"
+                  class="time-slot"
+                  :class="{ selected: selectedAvailabilityId === slot.id }"
+                  @click="selectAvailability(slot.id)"
+                >
+                  <ClockIcon class="slot-icon" />
+                  <div class="slot-content">
+                    <span class="slot-time">{{ formatTime(slot.startDateTime) }}</span>
+                    <span class="slot-facility">{{ slot.facilityName }}</span>
+                    <span class="slot-service">{{ slot.serviceTypeName }}</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- CREATE/EDIT MODE: Show form -->
       <template v-else>
         <!-- Date Field -->
         <div class="form-group">
@@ -278,7 +458,7 @@ onMounted(() => {
           @click="handleClose"
           :disabled="isSaving"
         >
-          {{ t('doctor.availabilities.modal.cancel') }}
+          {{ mode === 'select' ? t('common.cancel') : t('doctor.availabilities.modal.cancel') }}
         </button>
         <button 
           class="btn btn-primary" 
@@ -286,7 +466,7 @@ onMounted(() => {
           :disabled="!isFormValid || isSaving"
         >
           <span v-if="isSaving">{{ t('common.loading') }}</span>
-          <span v-else>{{ t('doctor.availabilities.modal.save') }}</span>
+          <span v-else>{{ mode === 'select' ? t('doctor.appointments.reschedule.confirm') : t('doctor.availabilities.modal.save') }}</span>
         </button>
       </div>
     </template>
@@ -303,10 +483,185 @@ onMounted(() => {
 
 .loading-state {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  gap: 1rem;
+  padding: 3rem;
   color: var(--gray-525252);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--white-30);
+  border-top-color: var(--sky-0ea5e9);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Select Mode Styles */
+.appointment-info {
+  padding: 1.5rem;
+  background: var(--white-25);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--white-30);
+  border-radius: 1rem;
+}
+
+.info-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gray-171717);
+  margin: 0 0 1rem 0;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--gray-525252);
+}
+
+.info-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--sky-0ea5e9);
+}
+
+.availabilities-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--gray-171717);
+  margin: 0;
+}
+
+.empty-state {
+  padding: 3rem;
+  text-align: center;
+  background: var(--white-15);
+  border: 1px solid var(--white-20);
+  border-radius: 1rem;
+  color: var(--gray-525252);
+}
+
+.dates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.date-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.date-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--white-30);
+}
+
+.date-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--sky-0ea5e9);
+}
+
+.date-day {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-171717);
+  margin: 0;
+}
+
+.date-text {
+  font-size: 0.8125rem;
+  color: var(--gray-525252);
+  margin: 0;
+}
+
+.time-slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+.time-slot {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--white-20);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid var(--white-30);
+  border-radius: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+  text-align: left;
+}
+
+.time-slot:hover {
+  background: var(--white-30);
+  border-color: var(--sky-0ea5e9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--black-8);
+}
+
+.time-slot.selected {
+  background: var(--sky-0ea5e9-20);
+  border-color: var(--sky-0ea5e9);
+  box-shadow: 0 4px 16px var(--sky-0ea5e9-30);
+}
+
+.slot-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--sky-0ea5e9);
+  flex-shrink: 0;
+}
+
+.slot-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.slot-time {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gray-171717);
+}
+
+.slot-facility {
+  font-size: 0.8125rem;
+  color: var(--gray-525252);
+}
+
+.slot-service {
+  font-size: 0.75rem;
+  color: var(--gray-737373);
 }
 
 .form-group {
@@ -415,5 +770,23 @@ onMounted(() => {
 
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .time-slots {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn {
+    width: 100%;
+  }
 }
 </style>

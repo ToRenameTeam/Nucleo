@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { CalendarIcon, ListBulletIcon, UserIcon, ClockIcon, MapPinIcon, PencilIcon, XCircleIcon } from '@heroicons/vue/24/outline'
+import { CalendarIcon, ListBulletIcon, UserIcon, ClockIcon, MapPinIcon, PencilIcon } from '@heroicons/vue/24/outline'
 import TagBar from '../../components/shared/TagBar.vue'
 import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue'
 import BaseCard from '../../components/shared/BaseCard.vue'
 import CardList from '../../components/shared/CardList.vue'
+import AvailabilityModal from '../../components/doctor/AvailabilityModal.vue'
+import Toast from '../../components/shared/Toast.vue'
 import type { Tag } from '../../types/tag'
 import type { Appointment } from '../../types/appointment'
 import type { CardMetadata } from '../../types/shared'
 import { appointmentsApi } from '../../api/appointments'
-import { MOCK_APPOINTMENTS } from '../../constants/mockData'
 import { TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/mockData'
 import type { BadgeColors } from '../../types/document'
 
@@ -25,6 +26,13 @@ const isLoading = ref(false)
 const error = ref<string | null>(null)
 const selectedAppointmentId = ref<string | null>(null)
 const selectedTag = ref('all')
+const isRescheduleModalOpen = ref(false)
+const appointmentToReschedule = ref<Appointment | null>(null)
+
+// Toast state
+const showToast = ref(false)
+const toastMessage = ref('')
+const toastType = ref<'success' | 'error' | 'info'>('success')
 
 // Mock doctor ID (in produzione verrebbe dal contesto/store)
 const doctorId = 'doc-001'
@@ -55,6 +63,17 @@ const filteredAppointments = computed(() => {
     const dateB = parseDateForSorting(b.date, b.time)
     return dateA.getTime() - dateB.getTime()
   })
+})
+
+// Current appointment info for reschedule modal
+const currentAppointmentInfo = computed(() => {
+  if (!appointmentToReschedule.value) return null
+  return {
+    user: appointmentToReschedule.value.user,
+    date: appointmentToReschedule.value.date,
+    time: appointmentToReschedule.value.time,
+    location: appointmentToReschedule.value.location
+  }
 })
 
 // Parse date and time for sorting
@@ -135,21 +154,12 @@ async function loadAppointments() {
   error.value = null
   
   try {
-    // Try to fetch from API
     const fetchedAppointments = await appointmentsApi.getAppointmentsByDoctor(doctorId)
     appointments.value = fetchedAppointments
-    
-    // If no appointments from API, use mock data for development
-    if (fetchedAppointments.length === 0) {
-      console.warn('No appointments from API, using mock data')
-      appointments.value = MOCK_APPOINTMENTS
-    }
   } catch (err) {
-    console.error('Error loading appointments:', err)
+    console.error('[DoctorAppointmentsPage] Error loading appointments:', err)
     error.value = t('doctor.appointments.errorLoading')
-    
-    // Fallback to mock data in case of error
-    appointments.value = MOCK_APPOINTMENTS
+    appointments.value = []
   } finally {
     isLoading.value = false
   }
@@ -184,19 +194,67 @@ function handleCalendarEventClick(appointmentId: string) {
   }
 }
 
-function handleEditAppointment(id: string) {
-  console.log('Edit appointment:', id)
-  // TODO: Implementare dialog di modifica
+async function handleEditAppointment(id: string) {
+  try {
+    isLoading.value = true
+    
+    const appointment = await appointmentsApi.getAppointmentById(id)
+    
+    if (appointment) {
+      appointmentToReschedule.value = appointment
+      isRescheduleModalOpen.value = true
+    } else {
+      console.error('[DoctorAppointmentsPage] Appuntamento non trovato:', id)
+      showToastMessage(t('doctor.appointments.errors.notFound'), 'error')
+    }
+  } catch (err) {
+    console.error('[DoctorAppointmentsPage] Errore nel recupero dei dettagli:', err)
+    showToastMessage(t('doctor.appointments.errors.loadFailed'), 'error')
+  } finally {
+    isLoading.value = false
+  }
 }
 
-function handleCancelAppointment(id: string) {
-  console.log('Cancel appointment:', id)
-  // TODO: Implementare conferma e cancellazione
+async function handleSelectAvailability(availabilityId: string) {
+  if (!appointmentToReschedule.value) return
+  
+  try {
+    isLoading.value = true
+    
+    await appointmentsApi.updateAppointment(
+      appointmentToReschedule.value.id,
+      undefined,
+      availabilityId
+    )
+    
+    isRescheduleModalOpen.value = false
+    appointmentToReschedule.value = null
+    
+    showToastMessage(t('doctor.appointments.reschedule.success'), 'success')
+    
+    await loadAppointments()
+  } catch (err) {
+    console.error('Errore durante la ripianificazione:', err)
+    showToastMessage(t('doctor.appointments.reschedule.error'), 'error')
+  } finally {
+    isLoading.value = false
+  }
 }
 
 function handleDateSelect(dateRange: { start: string; end: string }) {
   console.log('Date range selected:', dateRange)
   // TODO: Implementare selezione data per creare nuovo appuntamento
+}
+
+// Toast helper
+function showToastMessage(message: string, type: 'success' | 'error' | 'info' = 'success') {
+  toastMessage.value = message
+  toastType.value = type
+  showToast.value = true
+}
+
+function closeToast() {
+  showToast.value = false
 }
 
 // Load appointments on mount
@@ -296,20 +354,13 @@ onMounted(() => {
 
               <template #actions>
                 <button
+                  v-if="appointment.tags && appointment.tags.includes('SCHEDULED')"
                   class="action-button edit-button"
                   @click.stop="handleEditAppointment(appointment.id)"
                   :title="$t('appointments.editAppointment')"
                 >
                   <PencilIcon class="icon-md" />
                   <span>{{ $t('appointments.editAppointment') }}</span>
-                </button>
-                <button
-                  class="action-button cancel-button"
-                  @click.stop="handleCancelAppointment(appointment.id)"
-                  :title="$t('appointments.cancelAppointment')"
-                >
-                  <XCircleIcon class="icon-md" />
-                  <span>{{ $t('appointments.cancelAppointment') }}</span>
                 </button>
               </template>
             </BaseCard>
@@ -366,20 +417,13 @@ onMounted(() => {
 
                 <template #actions>
                   <button
+                    v-if="appointment.tags && appointment.tags.includes('SCHEDULED')"
                     class="action-button edit-button"
                     @click.stop="handleEditAppointment(appointment.id)"
                     :title="$t('appointments.editAppointment')"
                   >
                     <PencilIcon class="icon-md" />
                     <span>{{ $t('appointments.editAppointment') }}</span>
-                  </button>
-                  <button
-                    class="action-button cancel-button"
-                    @click.stop="handleCancelAppointment(appointment.id)"
-                    :title="$t('appointments.cancelAppointment')"
-                  >
-                    <XCircleIcon class="icon-md" />
-                    <span>{{ $t('appointments.cancelAppointment') }}</span>
                   </button>
                 </template>
               </BaseCard>
@@ -392,6 +436,24 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- Reschedule Modal -->
+    <AvailabilityModal
+      :is-open="isRescheduleModalOpen"
+      mode="select"
+      :doctor-id="doctorId"
+      :current-appointment="currentAppointmentInfo"
+      @close="isRescheduleModalOpen = false"
+      @select-availability="handleSelectAvailability"
+    />
+
+    <!-- Toast Notification -->
+    <Toast 
+      :show="showToast"
+      :message="toastMessage"
+      :type="toastType"
+      @close="closeToast"
+    />
   </div>
 </template>
 
@@ -665,27 +727,6 @@ onMounted(() => {
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
   box-shadow: 0 6px 24px rgba(245, 158, 11, 0.4),
-              0 3px 8px rgba(0, 0, 0, 0.15),
-              inset 0 1px 1px rgba(255, 255, 255, 0.3);
-}
-
-.cancel-button {
-  background: rgba(239, 68, 68, 0.8);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3),
-              0 2px 4px rgba(0, 0, 0, 0.1),
-              inset 0 1px 1px rgba(255, 255, 255, 0.25),
-              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
-}
-
-.cancel-button:hover {
-  background: rgba(220, 38, 38, 0.85);
-  border-color: rgba(255, 255, 255, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(239, 68, 68, 0.4),
               0 3px 8px rgba(0, 0, 0, 0.15),
               inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
