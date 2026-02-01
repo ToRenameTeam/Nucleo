@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useAuth } from '../../composables/useAuth'
-import type { CalendarOptions, EventClickArg, DateSelectArg } from '@fullcalendar/core'
-import FullCalendar from '@fullcalendar/vue3'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin from '@fullcalendar/interaction'
 import TagBar from '../../components/shared/TagBar.vue'
 import type { Tag } from '../../types/tag'
 import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue'
