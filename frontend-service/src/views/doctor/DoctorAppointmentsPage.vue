@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { CalendarIcon, ListBulletIcon, UserIcon, ClockIcon, MapPinIcon, PencilIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/vue/24/outline'
+import { CalendarIcon, ListBulletIcon, UserIcon, ClockIcon, MapPinIcon, PencilIcon, CheckCircleIcon, XCircleIcon, DocumentPlusIcon } from '@heroicons/vue/24/outline'
 import TagBar from '../../components/shared/TagBar.vue'
 import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue'
 import BaseCard from '../../components/shared/BaseCard.vue'
 import CardList from '../../components/shared/CardList.vue'
 import AvailabilityModal from '../../components/doctor/AvailabilityModal.vue'
+import CreateDocumentModal from '../../components/doctor/CreateDocumentModal.vue'
 import Toast from '../../components/shared/Toast.vue'
 import type { Tag } from '../../types/tag'
 import type { Appointment } from '../../types/appointment'
@@ -27,6 +28,10 @@ const selectedAppointmentId = ref<string | null>(null)
 const selectedTag = ref('scheduled')
 const isRescheduleModalOpen = ref(false)
 const appointmentToReschedule = ref<Appointment | null>(null)
+
+// Document modal state
+const isCreateDocumentModalOpen = ref(false)
+const appointmentForDocument = ref<Appointment | null>(null)
 
 // Toast state
 const showToast = ref(false)
@@ -287,6 +292,23 @@ async function handleSelectAvailability(availabilityId: string) {
   }
 }
 
+// Document management
+function handleAddDocument(appointment: Appointment) {
+  appointmentForDocument.value = appointment
+  isCreateDocumentModalOpen.value = true
+}
+
+function handleDocumentCreated(documentId: string) {
+  isCreateDocumentModalOpen.value = false
+  appointmentForDocument.value = null
+  showToastMessage(`Document created successfully (ID: ${documentId})`, 'success')
+}
+
+function closeDocumentModal() {
+  isCreateDocumentModalOpen.value = false
+  appointmentForDocument.value = null
+}
+
 // Toast helper
 function showToastMessage(message: string, type: 'success' | 'error' | 'info' = 'success') {
   toastMessage.value = message
@@ -421,6 +443,15 @@ onMounted(() => {
                   <XCircleIcon class="icon-md" />
                   <span>{{ $t('doctor.appointments.actions.patientNoShow') }}</span>
                 </button>
+                <button
+                  v-if="appointment.tags && appointment.tags.includes('COMPLETED')"
+                  class="action-button document-button"
+                  @click.stop="handleAddDocument(appointment)"
+                  :title="$t('doctor.appointments.actions.addDocument')"
+                >
+                  <DocumentPlusIcon class="icon-md" />
+                  <span>{{ $t('doctor.appointments.actions.addDocument') }}</span>
+                </button>
               </template>
             </BaseCard>
           </CardList>
@@ -501,6 +532,15 @@ onMounted(() => {
                     <XCircleIcon class="icon-md" />
                     <span>{{ $t('doctor.appointments.actions.patientNoShow') }}</span>
                   </button>
+                  <button
+                    v-if="appointment.tags && appointment.tags.includes('COMPLETED')"
+                    class="action-button document-button"
+                    @click.stop="handleAddDocument(appointment)"
+                    :title="$t('doctor.appointments.actions.addDocument')"
+                  >
+                    <DocumentPlusIcon class="icon-md" />
+                    <span>{{ $t('doctor.appointments.actions.addDocument') }}</span>
+                  </button>
                 </template>
               </BaseCard>
             </CardList>
@@ -521,6 +561,16 @@ onMounted(() => {
       :current-appointment="currentAppointmentInfo"
       @close="isRescheduleModalOpen = false"
       @select-availability="handleSelectAvailability"
+    />
+
+    <!-- Create Document Modal -->
+    <CreateDocumentModal
+      v-if="appointmentForDocument"
+      :is-open="isCreateDocumentModalOpen"
+      :patient-id="appointmentForDocument.patientId || 'unknown'"
+      :appointment-id="appointmentForDocument.id"
+      @close="closeDocumentModal"
+      @document-created="handleDocumentCreated"
     />
 
     <!-- Toast Notification -->
@@ -845,6 +895,27 @@ onMounted(() => {
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
   box-shadow: 0 6px 24px rgba(220, 38, 38, 0.4),
+              0 3px 8px rgba(0, 0, 0, 0.15),
+              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.document-button {
+  background: rgba(14, 165, 233, 0.8);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3),
+              0 2px 4px rgba(0, 0, 0, 0.1),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.document-button:hover {
+  background: rgba(2, 132, 199, 0.85);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(14, 165, 233, 0.4),
               0 3px 8px rgba(0, 0, 0, 0.15),
               inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }

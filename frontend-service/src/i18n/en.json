@@ -357,6 +357,13 @@
         "notFound": "Appointment not found",
         "loadFailed": "Error loading appointment details"
       },
+      "actions": {
+        "visitCompleted": "Visit Completed",
+        "patientNoShow": "Patient No Show",
+        "addDocument": "Add Document",
+        "statusUpdateSuccess": "Status updated successfully",
+        "statusUpdateError": "Error updating status"
+      },
       "reschedule": {
         "title": "Reschedule Appointment",
         "subtitle": "Select a new availability for the appointment",

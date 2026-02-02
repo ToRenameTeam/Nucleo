@@ -366,6 +366,7 @@
       "actions": {
         "visitCompleted": "Visita completata",
         "patientNoShow": "Paziente non presentato",
+        "addDocument": "Aggiungi documento",
         "statusUpdateSuccess": "Stato aggiornato con successo",
         "statusUpdateError": "Errore nell'aggiornamento dello stato"
       },

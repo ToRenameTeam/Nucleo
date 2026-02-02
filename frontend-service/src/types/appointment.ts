@@ -8,6 +8,7 @@ export interface Appointment {
   user?: string;
   fiscalCode?: string;
   location?: string;
+  patientId?: string;
 }
 
 export interface AppointmentCard {
