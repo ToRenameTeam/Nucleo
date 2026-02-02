@@ -96,7 +96,7 @@ VITE_USERS_API_URL=http://localhost:3030
 VITE_DELEGATIONS_API_URL=http://localhost:3030
 "
 
-# setup_env_file "documents-service" "documents-service" """
+setup_env_file "documents-service" "documents-service" "GROQ_API_KEY=your_groq_api_key_here"
 
 echo -e "${GREEN}✅ Configurazione .env completata per tutti i servizi${NC}"
 echo ""
@@ -149,7 +149,7 @@ if [ ${#failed_services[@]} -eq 0 ]; then
     echo -e "${GREEN}✅ Tutti i servizi sono stati avviati correttamente!${NC}"
     echo ""
     echo -e "${CYAN}🌐 Servizi disponibili su:${NC}"
-    echo -e "${WHITE}  • Frontend Service:        http://localhost:80${NC}"
+    echo -e "${WHITE}  • Frontend Service:        http://localhost:3000${NC}"
     echo -e "${WHITE}  • Users Service:           http://localhost:3030${NC}"
     echo -e "${WHITE}  • Master Data Service:     http://localhost:3040${NC}"
     echo -e "${WHITE}  • Appointments Service:    http://localhost:8080${NC}"

@@ -19,7 +19,7 @@ services=(
     "users-service"
     "master-data-service"
     "frontend-service"
-    # "documents-service"
+    "documents-service"
 )
 
 failed_services=()
