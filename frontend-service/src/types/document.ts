@@ -1,4 +1,3 @@
-// Base document interface with common fields
 export interface Document {
   id: string
   title: string
@@ -10,12 +9,12 @@ export interface Document {
 }
 
 export interface ValidityUntilDate {
-  _t: 'until_date'
+  type: 'until_date'
   date: string
 }
 
 export interface ValidityUntilExecution {
-  _t: 'until_execution'
+  type: 'until_execution'
 }
 
 export type Validity = ValidityUntilDate | ValidityUntilExecution
@@ -44,13 +43,13 @@ export interface Dosage {
 
 // Specific document types
 export interface MedicinePrescription extends Document {
-  _t: 'medicine_prescription'
+  type: 'medicine_prescription'
   validity: Validity
   dosage: Dosage
 }
 
 export interface ServicePrescription extends Document {
-  _t: 'service_prescription'
+  type: 'service_prescription'
   validity: Validity
   serviceId: string
   facilityId: string
@@ -58,7 +57,7 @@ export interface ServicePrescription extends Document {
 }
 
 export interface Report extends Document {
-  _t: 'report'
+  type: 'report'
   servicePrescription: ServicePrescription
   executionDate: string
   clinicalQuestion?: string
