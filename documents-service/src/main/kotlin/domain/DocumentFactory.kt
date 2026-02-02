@@ -15,9 +15,13 @@ import it.nucleo.domain.report.Findings
 import it.nucleo.domain.report.Recommendations
 import it.nucleo.domain.report.Report
 import it.nucleo.domain.report.implementation.DefaultReport
+import it.nucleo.domain.uploaded.UploadedDocument
+import it.nucleo.domain.uploaded.UploadedDocumentType
 import java.util.UUID
 
 object DocumentFactory {
+
+    private val UNKNOWN_DOCTOR_ID = DoctorId("UNKNOWN")
 
     fun createMedicinePrescription(
         id: DocumentId = generateDocumentId(),
@@ -86,6 +90,24 @@ object DocumentFactory {
             findings = findings,
             conclusion = conclusion,
             recommendations = recommendations
+        )
+
+    fun createUploadedDocument(
+        id: DocumentId = generateDocumentId(),
+        patientId: PatientId,
+        filename: String,
+        metadata: FileMetadata,
+        documentType: UploadedDocumentType = UploadedDocumentType.OTHER,
+        issueDate: IssueDate = IssueDate()
+    ): UploadedDocument =
+        UploadedDocument(
+            id = id,
+            doctorId = UNKNOWN_DOCTOR_ID,
+            patientId = patientId,
+            issueDate = issueDate,
+            metadata = metadata,
+            filename = filename,
+            documentType = documentType
         )
 
     private fun generateDocumentId(): DocumentId = DocumentId(UUID.randomUUID().toString())
