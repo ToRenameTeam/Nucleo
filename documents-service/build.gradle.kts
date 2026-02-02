@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.logback)
     implementation(libs.minio)
     implementation(libs.pdfbox)
+    implementation(libs.ktor.server.cors)
 
     testImplementation(libs.kotest)
     testImplementation(libs.ktor.server.test.host)

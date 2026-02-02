@@ -1,8 +1,10 @@
 package it.nucleo
 
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.cors.routing.*
 import it.nucleo.api.plugins.configureRouting
 import it.nucleo.api.plugins.configureSerialization
 import it.nucleo.api.plugins.configureStatusPages
@@ -26,6 +28,18 @@ fun Application.module() {
     logger.info("Configuring application plugins")
     configureSerialization()
     configureStatusPages()
+    install(CORS) {
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Patch)
+        allowHeader(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader("X-Requested-With")
+        anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
+    }
 
     logger.info("Initializing MongoDB connection")
     val database =
