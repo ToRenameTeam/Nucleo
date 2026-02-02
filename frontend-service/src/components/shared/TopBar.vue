@@ -2,11 +2,11 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { useAuth } from '../../authentication/useAuth'
+import { useAuth } from '../../composables/useAuth'
 
 const { t, locale } = useI18n()
 const router = useRouter()
-const { currentUser, logout: authLogout } = useAuth()
+const { currentPatientProfile, logout: authLogout } = useAuth()
 const showUserMenu = ref(false)
 const showLanguageMenu = ref(false)
 
@@ -35,7 +35,7 @@ const logout = () => {
 
 const changeUser = () => {
   showUserMenu.value = false
-  router.push('/login')
+  router.push('/patient-choice')
 }
 
 </script>
@@ -43,7 +43,7 @@ const changeUser = () => {
 <template>
   <div class="topbar-container">
     <div class="topbar-title-container">
-      <h1 class="topbar-title" @click="router.push('/home')">{{ t('app.title') }}</h1>
+      <h1 class="topbar-title" @click="router.push('/patient/home')">{{ t('app.title') }}</h1>
     </div>
     <div class="topbar-actions">
       <button 
@@ -97,7 +97,7 @@ const changeUser = () => {
       <div class="user-menu-container">
         <button 
           class="topbar-icon-button user-menu-button"
-          :aria-label="t('topbar.userMenuAria', { user: currentUser?.name || t('topbar.user') })"
+          :aria-label="t('topbar.userMenuAria', { user: currentPatientProfile?.name || t('topbar.user') })"
           :aria-expanded="showUserMenu"
           @click="toggleUserMenu"
         >
@@ -106,7 +106,7 @@ const changeUser = () => {
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
             </svg>
           </div>
-          <span class="user-name-text topbar-text">{{ currentUser?.name || t('topbar.user') }}</span>
+          <span class="user-name-text topbar-text">{{ currentPatientProfile?.name || t('topbar.user') }}</span>
           <svg class="topbar-icon-secondary user-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <polyline points="6 9 12 15 18 9"/>
           </svg>
@@ -117,7 +117,7 @@ const changeUser = () => {
         >
           <button 
             class="user-menu-profile"
-            :aria-label="t('topbar.userProfileAria', { user: currentUser?.name || t('topbar.user') })"
+            :aria-label="t('topbar.userProfileAria', { user: currentPatientProfile?.name || t('topbar.user') })"
             @click="changeUser"
           >
             <div class="user-profile-content">
@@ -127,8 +127,7 @@ const changeUser = () => {
                 </svg>
               </div>
               <div class="user-profile-details">
-                <div class="user-profile-name">{{ currentUser?.name }}</div>
-                <div class="user-profile-role">{{ currentUser?.role }}</div>
+                <div class="user-profile-name">{{ currentPatientProfile?.name }}</div>
               </div>
             </div>
           </button>
@@ -381,10 +380,6 @@ const changeUser = () => {
   color: var(--glass-menu-text-primary);
   font-size: 1rem;
   font-weight: 600;
-}
-.user-profile-role {
-  color: var(--glass-menu-text-secondary);
-  font-size: 0.875rem;
 }
 .user-menu-logout {
   width: 100%;

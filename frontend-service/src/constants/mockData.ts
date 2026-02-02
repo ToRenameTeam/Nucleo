@@ -1,98 +1,5 @@
-import type { WidgetOption } from '../types/widget'
 import type { Document } from '../types/document'
 import type { Appointment } from '../types/appointment'
-import type { HealthParameter, HealthAlert, HealthMetricHistory } from '../types/health'
-import type { SymptomSuggestion } from '../types/symptom-suggestion'
-
-// Intelligent search: symptom to visit mapping
-export const SYMPTOM_SUGGESTIONS: SymptomSuggestion[] = [
-  {
-    id: 'back-pain',
-    symptom: 'mal di schiena',
-    keywords: ['schiena', 'lombare', 'dorsale', 'vertebrale', 'colonna'],
-    suggestedVisit: 'Visita Ortopedica',
-    visitType: 'Ortopedia',
-    visitTypeId: 'orthopedics',
-    description: 'Valutazione specialistica per dolore alla schiena e problemi vertebrali',
-    urgency: 'medium',
-    icon: '🦴'
-  },
-  {
-    id: 'chest-pain',
-    symptom: 'dolore al petto',
-    keywords: ['petto', 'torace', 'cuore', 'cardiaco', 'oppressione'],
-    suggestedVisit: 'Visita Cardiologica',
-    visitType: 'Cardiologia',
-    visitTypeId: 'cardiology',
-    description: 'Controllo cardiologico per dolore toracico e problemi cardiaci',
-    urgency: 'high',
-    icon: '❤️'
-  },
-  {
-    id: 'headache',
-    symptom: 'mal di testa',
-    keywords: ['testa', 'cefalea', 'emicrania', 'cranio'],
-    suggestedVisit: 'Visita Neurologica',
-    visitType: 'Neurologia',
-    visitTypeId: 'neurology',
-    description: 'Valutazione neurologica per mal di testa ricorrenti',
-    urgency: 'medium',
-    icon: '🧠'
-  },
-  {
-    id: 'vision-problems',
-    symptom: 'problemi di vista',
-    keywords: ['vista', 'occhi', 'vedere', 'visione', 'oculare', 'miopia'],
-    suggestedVisit: 'Visita Oculistica',
-    visitType: 'Oculistica',
-    visitTypeId: 'ophthalmology',
-    description: 'Controllo della vista e valutazione oftalmologica',
-    urgency: 'low',
-    icon: '👁️'
-  },
-  {
-    id: 'skin-issues',
-    symptom: 'problemi alla pelle',
-    keywords: ['pelle', 'derma', 'eruzione', 'prurito', 'macchie', 'nei'],
-    suggestedVisit: 'Visita Dermatologica',
-    visitType: 'Dermatologia',
-    visitTypeId: 'dermatology',
-    description: 'Controllo dermatologico per problemi cutanei',
-    urgency: 'low',
-    icon: '🔬'
-  },
-  {
-    id: 'joint-pain',
-    symptom: 'dolore alle articolazioni',
-    keywords: ['articolazioni', 'ginocchio', 'anca', 'spalla', 'gomito', 'caviglia'],
-    suggestedVisit: 'Visita Ortopedica',
-    visitType: 'Ortopedia',
-    visitTypeId: 'orthopedics',
-    description: 'Valutazione ortopedica per dolori articolari',
-    urgency: 'medium',
-    icon: '🦴'
-  },
-  {
-    id: 'breathing-issues',
-    symptom: 'difficoltà respiratorie',
-    keywords: ['respiro', 'respirare', 'polmoni', 'tosse', 'asma', 'affanno'],
-    suggestedVisit: 'Visita Pneumologica',
-    visitType: 'Pneumologia',
-    visitTypeId: 'general',
-    description: 'Valutazione pneumologica per problemi respiratori',
-    urgency: 'high',
-    icon: '🫁'
-  },
-  {
-    id: 'stomach-pain',
-    symptom: 'dolore allo stomaco',
-    keywords: ['stomaco', 'pancia', 'addome', 'gastrico', 'digestione'],
-    suggestedVisit: 'Visita Gastroenterologica',
-    visitType: 'Gastroenterologia',    visitTypeId: 'general',    description: 'Consulto gastroenterologico per problemi digestivi',
-    urgency: 'medium',
-    icon: '🩺'
-  }
-]
 
 // Documenti centralizzati
 export const MOCK_DOCUMENTS: Document[] = [
@@ -121,10 +28,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     tags: ['Prescrizione', 'Farmaci'],
     date: '27 Dic 2025',
     doctor: 'Dr. Mario Rossi',
-    hospital: 'Ospedale San Raffaele',
-    isPrescription: true,
-    prescriptionCode: '8234567890123',
-    expirationDays: 20,
+    hospital: 'Ospedale San Raffaele'
   },
   {
     id: '3',
@@ -142,11 +46,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     tags: ['Prescrizione', 'Cardiologia'],
     date: '1 Nov 2025',
     doctor: 'Dr. Antonio Ferrari',
-    hospital: 'Poliambulatorio Salute',
-    isPrescription: true,
-    prescriptionCode: '8234567890123',
-    expirationDays: 20,
-    usedDate : '10 Nov 2025'
+    hospital: 'Poliambulatorio Salute'
   },
   {
     id: '4',
@@ -173,10 +73,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     tags: ['Prescrizione', 'Analisi'],
     date: '20 Ott 2025',
     doctor: 'Dr.ssa Laura Bianchi',
-    hospital: 'Laboratorio Analisi Medicon',
-    isPrescription: true,
-    prescriptionCode: '8234567890123',
-    expirationDays: 20
+    hospital: 'Laboratorio Analisi Medicon'
   },
   {
     id: '6',
@@ -266,10 +163,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     tags: ['Prescrizione', 'Diabete', 'Farmaci'],
     date: '10 Set 2025',
     doctor: 'Dr. Paolo Santini',
-    hospital: 'Centro Diabetologico Milano',
-    isPrescription: true,
-    prescriptionCode: '8234567890456',
-    expirationDays: 180
+    hospital: 'Centro Diabetologico Milano'
   },
   {
     id: '15',
@@ -356,230 +250,6 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
   }
 ]
 
-export const HEALTH_PARAMETERS: HealthParameter[] = [
-  {
-    id: 'cholesterol',
-    name: 'Colesterolo',
-    value: 185,
-    unit: 'mg/dL',
-    normalRange: { min: 120, max: 200 },
-    trend: 'up',
-    sourceDocuments: [
-      {
-        id: '2',
-        title: 'Esami del sangue - Emocromo completo',
-        date: '29 Dic 2025',
-      },
-      {
-        id: '7',
-        title: 'Esami funzionalità tiroidea - TSH, FT3, FT4',
-        date: '8 Ott 2025',
-      }
-    ],
-  },
-  {
-    id: 'blood-pressure-sys',
-    name: 'Pressione sistolica',
-    value: 120,
-    unit: 'mmHg',
-    normalRange: { min: 90, max: 120 },
-    trend: 'stable',
-    sourceDocuments: [
-      {
-        id: '1',
-        title: 'Referto ECG - Controllo cardiologico',
-        date: '7 Gen 2026',
-      }
-    ],
-  },
-  {
-    id: 'blood-pressure-dia',
-    name: 'Pressione diastolica',
-    value: 80,
-    unit: 'mmHg',
-    normalRange: { min: 60, max: 80 },
-    trend: 'stable',
-    sourceDocuments: [
-      {
-        id: '1',
-        title: 'Referto ECG - Controllo cardiologico',
-        date: '7 Gen 2026',
-      }
-    ],
-  },
-  {
-    id: 'heart-rate',
-    name: 'Frequenza cardiaca',
-    value: 72,
-    unit: 'bpm',
-    normalRange: { min: 60, max: 100 },
-    trend: 'down',
-    sourceDocuments: [
-      {
-        id: '1',
-        title: 'Referto ECG - Controllo cardiologico',
-        date: '7 Gen 2026',
-      }
-    ],
-  },
-  {
-    id: 'glucose',
-    name: 'Glicemia',
-    value: 105,
-    unit: 'mg/dL',
-    normalRange: { min: 70, max: 100 },
-    trend: 'up',
-    sourceDocuments: [
-      {
-        id: '2',
-        title: 'Esami del sangue - Emocromo completo',
-        date: '29 Dic 2025',
-      }
-    ],
-  },
-  {
-    id: 'oxygen',
-    name: 'Saturazione O₂',
-    value: 98,
-    unit: '%',
-    normalRange: { min: 95, max: 100 },
-    trend: 'stable',
-    sourceDocuments: [
-      {
-        id: '1',
-        title: 'Referto ECG - Controllo cardiologico',
-        date: '7 Gen 2026',
-      }
-    ],
-  }
-]
-
-export const HEALTH_ALERTS: HealthAlert[] = [
-  {
-    id: 'alert-1',
-    parameterId: 'glucose',
-    parameterName: 'Glicemia leggermente elevata',
-    severity: 'warning',
-    message: 'Il tuo livello di glicemia è di 105 mg/dL, leggermente sopra il range ottimale.',
-    recommendation: 'Riduci il consumo di zuccheri e carboidrati raffinati. Aumenta l\'attività fisica.',
-  },
-]
-
-// Widget storico parametri salute
-export const CHOLESTEROL_HISTORY: HealthMetricHistory = {
-  parameterId: 'cholesterol',
-  data: [
-    { date: '15 Gen', value: 160 },
-    { date: '20 Apr', value: 168 },
-    { date: '18 Giu', value: 172 },
-    { date: '8 Ott', value: 182 },
-    { date: '29 Dic', value: 185 },
-  ],
-  sourceDocuments: [
-    {
-      id: '2',
-      title: 'Esami del sangue - Emocromo completo',
-      date: '29 Dic 2025',
-    },
-    {
-      id: '7',
-      title: 'Esami funzionalità tiroidea - TSH, FT3, FT4',
-      date: '8 Ott 2025',
-    }
-  ],
-}
-
-export const BLOOD_PRESSURE_SYS_HISTORY: HealthMetricHistory = {
-  parameterId: 'blood-pressure-sys',
-  data: [
-    { date: '10 Gen', value: 122 },
-    { date: '18 Feb', value: 121 },
-    { date: '5 Apr', value: 120 },
-    { date: '28 Mag', value: 119 },
-    { date: '25 Lug', value: 118 },
-    { date: '15 Set', value: 122 },
-    { date: '20 Ott', value: 119 },
-    { date: '7 Dic', value: 120 },
-  ],
-  sourceDocuments: [
-    {
-      id: '1',
-      title: 'Referto ECG - Controllo cardiologico',
-      date: '7 Gen 2026',
-    }
-  ],
-}
-
-export const HEART_RATE_HISTORY: HealthMetricHistory = {
-  parameterId: 'heart-rate',
-  data: [
-    { date: '20 Feb', value: 77 },
-    { date: '10 Apr', value: 77 },
-    { date: '15 Mag', value: 75 },
-    { date: '22 Giu', value: 76 },
-    { date: '5 Set', value: 73 },
-    { date: '12 Ott', value: 74 },
-    { date: '18 Nov', value: 73 },
-  ],
-  sourceDocuments: [
-    {
-      id: '1',
-      title: 'Referto ECG - Controllo cardiologico',
-      date: '7 Gen 2026',
-    }
-  ],
-}
-
-export const GLUCOSE_HISTORY: HealthMetricHistory = {
-  parameterId: 'glucose',
-  data: [
-    { date: '20 Gen', value: 88 },
-    { date: '25 Mar', value: 92 },
-    { date: '15 Apr', value: 94 },
-    { date: '5 Giu', value: 97 },
-    { date: '18 Lug', value: 98 },
-    { date: '12 Nov', value: 104 },
-    { date: '22 Dic', value: 105 },
-  ],
-  sourceDocuments: [
-    {
-      id: '2',
-      title: 'Esami del sangue - Emocromo completo',
-      date: '29 Dic 2025',
-    }
-  ],
-}
-
-// Helper per ottenere un parametro specifico
-export const getHealthParameter = (id: string): HealthParameter | undefined => {
-  return HEALTH_PARAMETERS.find(p => p.id === id)
-}
-
-// Helper per ottenere lo storico di un parametro
-export const getHealthHistory = (id: string): HealthMetricHistory | undefined => {
-  const histories: Record<string, HealthMetricHistory> = {
-    'cholesterol': CHOLESTEROL_HISTORY,
-    'blood-pressure-sys': BLOOD_PRESSURE_SYS_HISTORY,
-    'heart-rate': HEART_RATE_HISTORY,
-    'glucose': GLUCOSE_HISTORY,
-  }
-  return histories[id]
-}
-
-// Dati widget aggiuntivi
-export const WIDGET_DATA = {
-  nextMedicationReminder: {
-    medication: 'Vitamina D',
-    time: '20:00',
-    daysLeft: 0, // oggi
-  },
-  nextVaccine: {
-    name: 'Antinfluenzale',
-    date: '15 Gen 2025',
-    daysLeft: 16,
-  },
-}
-
 // Tipi di visite disponibili
 export const VISIT_TYPES = [
   { id: 'cardiology', key: 'cardiology'},
@@ -639,109 +309,6 @@ export function getAppointmentDetails(date: string, time: string): AppointmentDe
     doctor: doctors[doctorIndex]!,
     location: locations[locationIndex]!
   }
-}
-
-export function getAvailableWidgets(t: (key: string) => string): WidgetOption[] {
-  return [
-    {
-      id: 'next-visit',
-      name: t('widgets.items.nextVisit.name'),
-      description: t('widgets.items.nextVisit.description'),
-      icon: '📅',
-      category: 'quick',
-    },
-    {
-      id: 'new-docs',
-      name: t('widgets.items.newDocs.name'),
-      description: t('widgets.items.newDocs.description'),
-      icon: '🔔',
-      category: 'quick',
-    },
-    {
-      id: 'medication-reminder',
-      name: t('widgets.items.medicationReminder.name'),
-      description: t('widgets.items.medicationReminder.description'),
-      icon: '💊',
-      category: 'quick',
-    },
-    {
-      id: 'next-vaccine',
-      name: t('widgets.items.nextVaccine.name'),
-      description: t('widgets.items.nextVaccine.description'),
-      icon: '💉',
-      category: 'quick',
-    },
-    {
-      id: 'heart-rate',
-      name: t('widgets.items.heartRate.name'),
-      description: t('widgets.items.heartRate.description'),
-      icon: '❤️',
-      category: 'health-metric',
-    },
-    {
-      id: 'blood-pressure-sys',
-      name: t('widgets.items.bloodPressureSys.name'),
-      description: t('widgets.items.bloodPressureSys.description'),
-      icon: '🩺',
-      category: 'health-metric',
-    },
-    {
-      id: 'blood-pressure-dia',
-      name: t('widgets.items.bloodPressureDia.name'),
-      description: t('widgets.items.bloodPressureDia.description'),
-      icon: '💉',
-      category: 'health-metric',
-    },
-    {
-      id: 'glucose',
-      name: t('widgets.items.glucose.name'),
-      description: t('widgets.items.glucose.description'),
-      icon: '🩸',
-      category: 'health-metric',
-    },
-    {
-      id: 'oxygen',
-      name: t('widgets.items.oxygen.name'),
-      description: t('widgets.items.oxygen.description'),
-      icon: '🫁',
-      category: 'health-metric',
-    },
-    {
-      id: 'cholesterol',
-      name: t('widgets.items.cholesterol.name'),
-      description: t('widgets.items.cholesterol.description'),
-      icon: '🧪',
-      category: 'health-metric',
-    },
-    {
-      id: 'heart-rate-chart',
-      name: t('widgets.items.heartRateChart.name'),
-      description: t('widgets.items.heartRateChart.description'),
-      icon: '📊',
-      category: 'health-chart',
-    },
-    {
-      id: 'glucose-chart',
-      name: t('widgets.items.glucoseChart.name'),
-      description: t('widgets.items.glucoseChart.description'),
-      icon: '📈',
-      category: 'health-chart',
-    },
-    {
-      id: 'blood-pressure-sys-chart',
-      name: t('widgets.items.bloodPressureSysChart.name'),
-      description: t('widgets.items.bloodPressureSysChart.description'),
-      icon: '📉',
-      category: 'health-chart',
-    },
-    {
-      id: 'cholesterol-chart',
-      name: t('widgets.items.cholesterolChart.name'),
-      description: t('widgets.items.cholesterolChart.description'),
-      icon: '📈',
-      category: 'health-chart',
-    },
-  ]
 }
 
 // Tag to color key mapping

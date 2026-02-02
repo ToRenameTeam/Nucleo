@@ -9,6 +9,7 @@ repositories {
 
 dependencies {
     implementation(libs.plugins.kotlin.jvm.asDependency())
+    implementation(libs.plugins.kotlin.serialization.asDependency())
     implementation(libs.plugins.ktfmt.asDependency())
 }
 

@@ -1,45 +1,30 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import {
-  HomeIcon,
-  DocumentTextIcon,
-  HeartIcon,
-  CalendarIcon,
-  Cog6ToothIcon
-} from '@heroicons/vue/24/outline'
-import {
-  HomeIcon as HomeIconSolid,
-  DocumentTextIcon as DocumentTextIconSolid,
-  HeartIcon as HeartIconSolid,
-  CalendarIcon as CalendarIconSolid,
-  Cog6ToothIcon as Cog6ToothIconSolid
-} from '@heroicons/vue/24/solid'
+import type { Component } from 'vue'
 
-const { t } = useI18n()
+interface TabIcon {
+  outline: Component
+  solid: Component
+}
+
+interface Tab {
+  id: string
+  label: string
+  icon: TabIcon
+}
+
+interface Props {
+  tabs: Tab[]
+}
+
+const props = defineProps<Props>()
 const router = useRouter()
 const route = useRoute()
 
-const tabIcons = {
-  home: { outline: HomeIcon, solid: HomeIconSolid },
-  documents: { outline: DocumentTextIcon, solid: DocumentTextIconSolid },
-  health: { outline: HeartIcon, solid: HeartIconSolid },
-  calendar: { outline: CalendarIcon, solid: CalendarIconSolid },
-  settings: { outline: Cog6ToothIcon, solid: Cog6ToothIconSolid }
-}
-
-const tabsData = computed(() => [
-  { id: 'home', label: t('tabs.home'), icon: tabIcons.home },
-  { id: 'documents', label: t('tabs.documents'), icon: tabIcons.documents },
-  { id: 'health', label: t('tabs.health'), icon: tabIcons.health },
-  { id: 'calendar', label: t('tabs.calendar'), icon: tabIcons.calendar },
-  { id: 'settings', label: t('tabs.settings'), icon: tabIcons.settings }
-])
-
 const activeTab = computed(() => route.name as string)
 
-const setActiveTab = (tabId: string) => {
+function setActiveTab(tabId: string) {
   router.push({ name: tabId })
 }
 </script>
@@ -47,7 +32,7 @@ const setActiveTab = (tabId: string) => {
 <template>
   <div class="bottombar-wrapper">
     <div class="bottombar-container">
-      <button v-for="tab in tabsData" :key="tab.id" :class="['tab-button', { active: activeTab === tab.id }]"
+      <button v-for="tab in tabs" :key="tab.id" :class="['tab-button', { active: activeTab === tab.id }]"
         :aria-label="`Vai alla sezione ${tab.label}`" :aria-current="activeTab === tab.id ? 'page' : undefined"
         @click="setActiveTab(tab.id)">
         <component :is="activeTab === tab.id ? tab.icon.solid : tab.icon.outline" class="tab-icon" aria-hidden="true" />

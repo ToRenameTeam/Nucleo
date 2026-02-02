@@ -171,7 +171,7 @@ const handleCancel = (event: Event) => {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
+  padding: 0.625rem 0.875rem;
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: 0.625rem;
@@ -182,40 +182,56 @@ const handleCancel = (event: Event) => {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   width: 100%;
+  line-height: 1;
 }
 
 .edit-button {
-  background: var(--white-60);
-  border-color: var(--white-50);
-  color: var(--text-primary);
-  box-shadow: 0 2px 8px var(--shadow), inset 0 1px 0 var(--white-80);
+  background: rgba(245, 158, 11, 0.8);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3),
+              0 2px 4px rgba(0, 0, 0, 0.1),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .edit-button:hover {
-  background: var(--white-80);
-  border-color: var(--white-70);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--shadow), inset 0 1px 0 var(--white-90);
+  background: rgba(217, 119, 6, 0.85);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(245, 158, 11, 0.4),
+              0 3px 8px rgba(0, 0, 0, 0.15),
+              inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .cancel-button {
-  background: var(--white-50);
-  border-color: var(--error-40);
-  color: var(--error);
-  box-shadow: 0 2px 8px var(--error-10), inset 0 1px 0 var(--white-60);
+  background: rgba(239, 68, 68, 0.8);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3),
+              0 2px 4px rgba(0, 0, 0, 0.1),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .cancel-button:hover {
-  background: var(--white-70);
-  border-color: var(--error-60);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--error-20), inset 0 1px 0 var(--white-80);
+  background: rgba(220, 38, 38, 0.85);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(239, 68, 68, 0.4),
+              0 3px 8px rgba(0, 0, 0, 0.15),
+              inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .icon-md {
   width: 1.25rem;
   height: 1.25rem;
-  display: inline-block;
+  display: block;
+  flex-shrink: 0;
 }
 
 @keyframes fadeInScale {

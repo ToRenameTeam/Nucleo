@@ -2,9 +2,35 @@
   "app": {
     "title": "Nucleo"
   },
-  "login": {
+  "auth": {
+    "loginSubtitle": "Accedi al tuo account",
+    "fiscalCode": "Codice Fiscale",
+    "fiscalCodePlaceholder": "Inserisci il tuo codice fiscale",
+    "password": "Password",
+    "passwordPlaceholder": "Inserisci la tua password",
+    "loginButton": "Accedi",
+    "showPassword": "Mostra password",
+    "hidePassword": "Nascondi password",
+    "invalidCredentials": "Codice fiscale o password non validi",
+    "loginError": "Errore durante l'accesso. Riprova.",
+    "networkError": "Errore di connessione. Verifica la tua connessione."
+  },
+  "patientChoice": {
     "subtitle": "Chi sta usando l'app?",
-    "addProfile": "Aggiungi"
+    "loadingProfiles": "Caricamento profili...",
+    "retry": "Riprova",
+    "manageDelegations": "Gestione Deleghe"
+  },
+  "doctorPatientChoice": {
+    "subtitle": "Come vuoi accedere oggi?",
+    "doctorArea": {
+      "title": "Area Medico",
+      "description": "Gestisci visite, pazienti e prescrizioni"
+    },
+    "patientArea": {
+      "title": "Area Paziente",
+      "description": "Accedi ai tuoi documenti e appuntamenti"
+    }
   },
   "topbar": {
     "notifications": "Notifiche",
@@ -18,9 +44,11 @@
   "tabs": {
     "home": "Home",
     "documents": "Documenti",
-    "health": "Salute",
     "calendar": "Calendario",
-    "settings": "Impostazioni"
+    "appointments": "Appuntamenti",
+    "settings": "Impostazioni",
+    "patients": "Pazienti",
+    "availability": "Disponibilità"
   },
   "tags": {
     "all": "Tutti",
@@ -30,19 +58,8 @@
   "documents": {
     "title": "Archivio documenti",
     "subtitle": "15 documenti",
-    "documentComparison": "Confronto documenti",
     "searchPlaceholder": "Cerca documenti, sintomi, medici...",
     "noResults": "Nessun documento trovato",
-    "showBarcode": "Mostra codice",
-    "prescriptionCode": "Codice prescrizione",
-    "prescriptionCodeSubtitle": "Mostra questo codice in farmacia o al centro prelievi",
-    "issuedOn": "Emessa il",
-    "expiresIn": "Scade dopo {days} giorni dalla data di emissione",
-    "barcodeInstruction": "Presenta questo codice a barre per ritirare i farmaci o prenotare la visita prescritta",
-    "barcodeNotAvailable": "Codice a barre non disponibile",
-    "usedOn": "Utilizzata il {date}",
-    "expiredOn": "Scaduta il {date}",
-    "downloadBarcode": "Scarica codice a barre",
     "close": "Chiudi",
     "selection": {
       "selectMode": "Seleziona documenti",
@@ -69,7 +86,7 @@
       "last6Months": "Ultimi 6 mesi",
       "lastYear": "Ultimo anno"
     },
-    "comparison": {
+    "viewer": {
       "title": "Confronto Documenti",
       "subtitle": "Seleziona due documenti diversi per confrontarli",
       "selectDocument": "Seleziona documento",
@@ -92,7 +109,6 @@
   "calendar": {
     "title": "Calendario",
     "subtitle": "Calendario condiviso della tua famiglia",
-    "newAppointment": "Nuovo appuntamento",
     "appointments": "Appuntamenti",
     "noAppointments": "Nessun appuntamento trovato",
     "today": "Oggi",
@@ -112,17 +128,15 @@
     }
   },
   "appointments": {
-    "editAppointment": "Modifica appuntamento",
-    "cancelAppointment": "Disdici appuntamento"
+    "editAppointment": "Modifica",
+    "cancelAppointment": "Disdici"
   },
   "home": {
     "uploadDocument": "Carica documento",
     "newAppointment": "Prenota visita",
     "upcomingAppointments": "Prossimi appuntamenti",
     "noAppointments": "Nessun appuntamento in programma",
-    "recentDocuments": "Documenti recenti",
-    "searchHint": "Prova: \"mal di schiena\", \"dolore al petto\" o \"esami del sangue di Marco\"",
-    "quickOverview": "I miei widget"
+    "recentDocuments": "Documenti recenti"
   },
   "appointmentBooking": {
     "title": "Prenota una visita",
@@ -175,14 +189,6 @@
       "myProfile": {
         "title": "Il mio profilo",
         "subtitle": "Anagrafica e stato dei servizi"
-      },
-      "familyManagement": {
-        "title": "Gestione famiglia",
-        "subtitle": "Aggiungi o modifica i conti dei familiari"
-      },
-      "permissions": {
-        "title": "Permessi e accessi",
-        "subtitle": "Chi può vedere i tuoi documenti"
       }
     },
     "app": {
@@ -190,14 +196,6 @@
       "notifications": {
         "title": "Notifiche",
         "subtitle": "Promemoria appuntamenti e scadenze"
-      },
-      "privacy": {
-        "title": "Privacy e sicurezza",
-        "subtitle": "Face ID, biometria, blocco schermo"
-      },
-      "accessibility": {
-        "title": "Accessibilità",
-        "subtitle": "Screen reader, comandi vocali, riduzione movimento"      
       },
       "appearance": {
         "title": "Aspetto",
@@ -219,20 +217,9 @@
     },
     "dataPrivacy": {
       "title": "Dati e privacy",
-      "exportData": {
-        "title": "Esporta i miei dati",
-        "subtitle": "Scarica tutti i tuoi documenti"
-      },
       "terms": {
         "title": "Termini e condizioni",
         "subtitle": "Leggi i termini di servizio"
-      }
-    },
-    "support": {
-      "title": "Centro assistenza",
-      "helpCenter": {
-        "title": "Centro assistenza",
-        "subtitle": "FAQ, tutorial, contatti"
       }
     },
     "logout": "Esci dall'account",
@@ -240,121 +227,8 @@
       "version": "Nucleo v0.1 · Prototipo"
     }
   },
-  "widgets": {
-    "selector": {
-      "title": "Personalizza i tuoi widget",
-      "subtitle": "Selezionati: {count} / {total}",
-      "close": "Chiudi",
-      "cancel": "Annulla",
-      "save": "Salva",
-      "selected": "Selezionato",
-      "select": "Seleziona"
-    },
-    "loading": {
-      "title": "Caricamento widget...",
-      "description": "Recupero dati dai documenti"
-    },
-    "categories": {
-      "quick": "Widget rapidi",
-      "healthMetric": "Parametri vitali",
-      "healthChart": "Grafici andamento"
-    },
-    "items": {
-      "nextVisit": {
-        "name": "Prossima visita",
-        "description": "Giorni alla prossima visita medica"
-      },
-      "newDocs": {
-        "name": "Documenti nuovi",
-        "description": "Numero di documenti aggiunti recentemente"
-      },
-      "medicationReminder": {
-        "name": "Promemoria farmaci",
-        "description": "Prossimo farmaco da assumere oggi"
-      },
-      "nextVaccine": {
-        "name": "Prossimo vaccino",
-        "description": "Giorni al prossimo richiamo vaccinale"
-      },
-      "heartRate": {
-        "name": "Frequenza cardiaca",
-        "description": "Battiti cardiaci al minuto"
-      },
-      "bloodPressureSys": {
-        "name": "Pressione sistolica",
-        "description": "Pressione arteriosa massima"
-      },
-      "bloodPressureDia": {
-        "name": "Pressione diastolica",
-        "description": "Pressione arteriosa minima"
-      },
-      "glucose": {
-        "name": "Glicemia",
-        "description": "Livello di glucosio nel sangue"
-      },
-      "oxygen": {
-        "name": "Saturazione O₂",
-        "description": "Percentuale ossigeno nel sangue"
-      },
-      "cholesterol": {
-        "name": "Colesterolo",
-        "description": "Livello colesterolo totale"
-      },
-      "heartRateChart": {
-        "name": "Grafico frequenza cardiaca",
-        "description": "Andamento battito cardiaco ultimi 6 giorni"
-      },
-      "glucoseChart": {
-        "name": "Grafico glicemia",
-        "description": "Andamento livello glucosio"
-      },
-      "bloodPressureSysChart": {
-        "name": "Grafico pressione sistolica",
-        "description": "Trend pressione massima"
-      },
-      "cholesterolChart": {
-        "name": "Grafico colesterolo",
-        "description": "Trend colesterolo totale"
-      }
-    },
-    "emptyState": {
-      "title": "Nessun widget selezionato",
-      "description": "Clicca sul pulsante + per aggiungere widget alla tua dashboard",
-      "addButton": "Aggiungi widget"
-    }
-  },
-  "health": {
-    "title": "Salute",
-    "subtitle": "Monitora i tuoi parametri vitali e ricevi consigli personalizzati per mantenerti in salute.",
-    "alerts": {
-      "title": "⚠️ Avvisi importanti"
-    },
-    "parameters": {
-      "title": "📊 I tuoi parametri",
-      "cholesterol": "Colesterolo",
-      "bloodPressureSys": "Pressione sistolica",
-      "bloodPressureDia": "Pressione diastolica",
-      "heartRate": "Frequenza cardiaca",
-      "glucose": "Glicemia",
-      "oxygen": "Saturazione O₂"
-    },
-    "charts": {
-      "title": "📈 Andamento storico"
-    },
-    "normalRange": "Range normale",
-    "info": {
-      "title": "Informazioni sui dati",
-      "description": "I dati mostrati provengono dai tuoi dispositivi connessi e dalle misurazioni registrate. Ricorda di consultare sempre il tuo medico per una valutazione professionale."
-    },
-    "sourceDocuments": {
-      "title": "Documenti sorgente",
-      "showDetails": "Mostra dettagli",
-      "hideDetails": "Nascondi dettagli",
-      "description": "Questi valori sono stati estratti dai seguenti documenti:",
-      "noDocuments": "Nessun documento collegato"
-    }
-  },
-    "legalFooter": {
+  
+  "footer": {
     "privacy": "Privacy",
     "privacyAria": "Apri informativa privacy e cookie policy",
     "legalNotes": "Note Legali",
@@ -377,22 +251,199 @@
   },
   "breadcrumbs": {
     "home": "Home",
-    "documents": "Documenti",
-    "health": "Salute",
-    "calendar": "Calendario",
-    "settings": "Impostazioni",
+    "patient-home": "Home",
+    "patient-documents": "Documenti",
+    "patient-calendar": "Calendario",
+    "patient-settings": "Impostazioni",
+    "doctor-appointments": "Appuntamenti",
+    "doctor-availabilities": "Disponibilità",
+    "doctor-documents": "Documenti",
+    "doctor-patients": "Pazienti",
+    "doctor-settings": "Impostazioni",
     "goTo": "Vai a"
   },
-    "searchSuggestionCard": {
-    "smartSuggestion": "Suggerimento intelligente",
-    "basedOnSearch": "Basato sulla tua ricerca: \"{symptom}\"",
-    "urgencyHigh": "Urgente",
-    "urgencyMedium": "Medio",
-    "urgencyLow": "Non urgente",
-    "bookVisit": "Prenota visita"
+  "delegations": {
+    "loading": "Caricamento deleghe...",
+    "noResults": "Nessuna delega trovata",
+    "menu": {
+      "title": "Gestione Deleghe",
+      "subtitle": "Scegli cosa vuoi fare",
+      "newDelegation": {
+        "title": "Nuova Delega",
+        "subtitle": "Cerca un utente e invia una richiesta"
+      },
+      "receivedDelegations": {
+        "title": "Deleghe Ricevute",
+        "subtitle": "{count} deleghe totali"
+      },
+      "sentDelegations": {
+        "title": "Deleghe Inviate",
+        "subtitle": "{count} deleghe totali"
+      }
+    },
+    "newDelegation": {
+      "title": "Nuova Delega",
+      "subtitle": "Inserisci il codice fiscale",
+      "back": "Indietro",
+      "fiscalCodeLabel": "Codice Fiscale",
+      "fiscalCodePlaceholder": "RSSMRA88A41H501Z",
+      "search": "Cerca",
+      "characters": "caratteri",
+      "userFound": "UTENTE TROVATO",
+      "sendRequest": "Invia Richiesta"
+    },
+    "receivedList": {
+      "title": "Deleghe Ricevute",
+      "subtitle": "{count} deleghe"
+    },
+    "sentList": {
+      "title": "Deleghe Inviate",
+      "subtitle": "{count} deleghe"
+    },
+    "status": {
+      "pending": "In attesa",
+      "active": "Attiva",
+      "declined": "Rifiutata",
+      "deleted": "Eliminata"
+    },
+    "actions": {
+      "accept": "Accetta",
+      "decline": "Rifiuta",
+      "revoke": "Revoca",
+      "cancel": "Annulla",
+      "remove": "Rimuovi accesso"
+    },
+    "back": "Indietro",
+    "errors": {
+      "searchNotImplemented": "La ricerca per codice fiscale non è ancora implementata. Contatta il supporto.",
+      "loadingFailed": "Errore nel caricamento delle deleghe",
+      "actionFailed": "Azione fallita. Riprova.",
+      "delegationAlreadyExists": "Esiste già una delega tra questi utenti",
+      "userNotFound": "Utente non trovato",
+      "cannotDelegateToYourself": "Non puoi delegare a te stesso"
+    },
+    "toast": {
+      "delegationSent": "Richiesta di delega inviata a {name}",
+      "delegationAccepted": "Delega accettata con successo",
+      "delegationDeclined": "Delega rifiutata",
+      "delegationRemoved": "Delega rimossa con successo"
+    }
   },
   "toast": {
     "closeNotification": "Chiudi notifica",
     "bookingConfirmed": "Prenotazione confermata con successo!"
+  },
+  "doctor": {
+    "home": {
+      "title": "Area Medico",
+      "subtitle": "Benvenuto nella tua area di lavoro"
+    },
+    "appointments": {
+      "title": "Appuntamenti",
+      "subtitle": "Gestisci tutti gli appuntamenti dei tuoi pazienti",
+      "appointmentsList": "Lista Appuntamenti",
+      "noAppointments": "Nessun appuntamento trovato",
+      "listView": "Lista",
+      "calendarView": "Calendario",
+      "errorLoading": "Errore nel caricamento degli appuntamenti",
+      "categories": {
+        "all": "Tutti",
+        "scheduled": "Programmati",
+        "completed": "Completati",
+        "noShow": "Paziente Non Presentato",
+        "cancelled": "Annullati"
+      },
+      "status": {
+        "SCHEDULED": "Programmato",
+        "COMPLETED": "Completato",
+        "NO_SHOW": "Paziente Non Presentato",
+        "CANCELLED": "Annullato"
+      },
+      "errors": {
+        "notFound": "Appuntamento non trovato",
+        "loadFailed": "Errore nel caricamento dei dettagli dell'appuntamento"
+      },
+      "actions": {
+        "visitCompleted": "Visita completata",
+        "patientNoShow": "Paziente non presentato",
+        "statusUpdateSuccess": "Stato aggiornato con successo",
+        "statusUpdateError": "Errore nell'aggiornamento dello stato"
+      },
+      "reschedule": {
+        "title": "Ripianifica Appuntamento",
+        "subtitle": "Seleziona una nuova disponibilità per l'appuntamento",
+        "currentAppointment": "Appuntamento Corrente",
+        "selectNewSlot": "Seleziona Nuovo Orario",
+        "noAvailabilities": "Nessuna disponibilità trovata",
+        "errorLoading": "Errore nel caricamento delle disponibilità",
+        "confirm": "Conferma Ripianificazione",
+        "success": "Appuntamento ripianificato con successo",
+        "error": "Errore durante la ripianificazione dell'appuntamento"
+      }
+    },
+    "availabilities": {
+      "title": "Gestione Disponibilità",
+      "subtitle": "Crea e gestisci le tue disponibilità per le visite",
+      "addAvailability": "Inserisci disponibilità",
+      "errorLoading": "Errore nel caricamento delle disponibilità",
+      "cannotEditBooked": "Non puoi modificare una disponibilità già prenotata",
+      "cannotDeleteBooked": "Non puoi eliminare una disponibilità già prenotata",
+      "stats": {
+        "total": "Totale",
+        "available": "Disponibili",
+        "booked": "Prenotate"
+      },
+      "calendar": {
+        "previousWeek": "Settimana precedente",
+        "nextWeek": "Settimana successiva",
+        "today": "Oggi"
+      },
+      "legend": {
+        "available": "Disponibile",
+        "booked": "Prenotato"
+      },
+      "actions": {
+        "edit": "Modifica disponibilità",
+        "delete": "Elimina disponibilità"
+      },
+      "modal": {
+        "titleCreate": "Nuova Disponibilità",
+        "titleEdit": "Modifica Disponibilità",
+        "subtitle": "Compila i campi per definire la tua disponibilità",
+        "date": "Data",
+        "time": "Ora di inizio",
+        "duration": "Durata",
+        "facility": "Struttura",
+        "selectFacility": "Seleziona una struttura",
+        "serviceType": "Tipo di visita",
+        "selectServiceType": "Seleziona un tipo di visita",
+        "cancel": "Annulla",
+        "save": "Salva"
+      },
+      "deleteConfirm": {
+        "title": "Conferma eliminazione",
+        "message": "Sei sicuro di voler eliminare questa disponibilità? L'azione non può essere annullata.",
+        "cancel": "Annulla",
+        "confirm": "Elimina"
+      },
+      "toast": {
+        "created": "Disponibilità creata con successo",
+        "updated": "Disponibilità aggiornata con successo",
+        "deleted": "Disponibilità eliminata con successo",
+        "error": "Si è verificato un errore. Riprova."
+      },
+      "errors": {
+        "OVERLAP_ERROR": "Esiste già una disponibilità che si sovrappone all'orario selezionato. Scegli un altro orario.",
+        "ALREADY_BOOKED": "Questa disponibilità è già stata prenotata e non può essere modificata o eliminata.",
+        "NOT_FOUND": "La disponibilità richiesta non è stata trovata.",
+        "INVALID_TIME_SLOT": "L'orario selezionato non è valido. Verifica data, ora e durata.",
+        "GENERIC_ERROR": "Si è verificato un errore. Riprova più tardi."
+      }
+    }
+  },
+  "common": {
+    "loading": "Caricamento...",
+    "retry": "Riprova",
+    "cancel": "Annulla"
   }
 }
