@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useAuth } from '../../composables/useAuth'
 import { DocumentPlusIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import SearchBar from '../../components/shared/SearchBar.vue'
 import Toast from '../../components/shared/Toast.vue'
@@ -8,17 +9,51 @@ import DocumentCard from '../../components/shared/DocumentCard.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
 import AppointmentBooking from '../../components/patient/home/AppointmentBooking.vue'
 import CardList from '../../components/shared/CardList.vue'
-import { MOCK_DOCUMENTS, MOCK_APPOINTMENTS } from '../../constants/mockData'
 import type { Document } from '../../types/document'
+import type { Appointment } from '../../types/appointment'
+import { appointmentsApi } from '../../api/appointments'
+import { documentsApiService } from '../../api/documents'
+
+const { currentUser } = useAuth()
 
 const searchQuery = ref('')
-const appointments = computed(() => MOCK_APPOINTMENTS.slice(0, 2))
-const recentDocuments = computed(() => MOCK_DOCUMENTS.slice(0, 2))
+const appointmentsData = ref<Appointment[]>([])
+const documentsData = ref<Document[]>([])
+const isLoading = ref(false)
+const appointments = computed(() => appointmentsData.value.slice(0, 2))
+const recentDocuments = computed(() => documentsData.value.slice(0, 2))
 const isBookingOpen = ref(false)
 const selectedDocument = ref<Document | null>(null)
 const isDocumentModalOpen = ref(false)
 const preselectedVisitType = ref<string | null>(null)
 const showSuccessToast = ref(false)
+
+async function loadData() {
+  if (!currentUser.value?.userId) {
+    console.log('[PatientHomePage] No current user ID available')
+    return
+  }
+
+  isLoading.value = true
+  
+  try {
+    const [fetchedAppointments, fetchedDocuments] = await Promise.all([
+      appointmentsApi.getAppointmentsByPatient(currentUser.value.userId),
+      documentsApiService.getDocumentsByPatient(currentUser.value.userId)
+    ])
+    
+    appointmentsData.value = fetchedAppointments
+    documentsData.value = fetchedDocuments
+  } catch (err) {
+    console.error('[PatientHomePage] Error loading data:', err)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadData()
+})
 
 const handleSearch = (query: string) => {
   searchQuery.value = query

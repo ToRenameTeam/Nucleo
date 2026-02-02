@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAuth } from '../../composables/useAuth'
 import { 
   PlusIcon, 
   CalendarDaysIcon,
@@ -13,6 +14,7 @@ import type { AvailabilityDisplay } from '../../types/availability'
 import { availabilitiesApi } from '../../api/availabilities'
 
 const { t } = useI18n()
+const { currentUser } = useAuth()
 
 // State
 const availabilities = ref<AvailabilityDisplay[]>([])
@@ -39,9 +41,6 @@ const toastType = ref<'success' | 'error' | 'info'>('success')
 const showDeleteConfirm = ref(false)
 const availabilityToDelete = ref<AvailabilityDisplay | null>(null)
 
-// Mock doctor ID (in production this would come from auth context)
-const doctorId = 'doc-001'
-
 // Get Monday of the current week
 function getMonday(date: Date): Date {
   const d = new Date(date)
@@ -64,6 +63,11 @@ const stats = computed(() => {
 
 // Load availabilities
 async function loadAvailabilities() {
+  if (!currentUser.value?.userId) {
+    console.log('[DoctorAvailabilitiesPage] No current user ID available')
+    return
+  }
+
   isLoading.value = true
   error.value = null
   
@@ -75,7 +79,7 @@ async function loadAvailabilities() {
     const endDate = endOfWeek.toISOString().split('T')[0]
     
     const fetchedAvailabilities = await availabilitiesApi.getAvailabilitiesByDoctor(
-      doctorId,
+      currentUser.value.userId,
       startDate,
       endDate
     )
@@ -148,7 +152,7 @@ async function handleSave(data: {
   try {
     if (modalMode.value === 'create') {
       await availabilitiesApi.createAvailability({
-        doctorId,
+        doctorId: currentUser.value?.userId || '',
         facilityId: data.facilityId,
         serviceTypeId: data.serviceTypeId,
         startDateTime: data.startDateTime,

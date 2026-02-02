@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAuth } from '../../composables/useAuth'
 import { CalendarIcon, ListBulletIcon, UserIcon, ClockIcon, MapPinIcon, PencilIcon, CheckCircleIcon, XCircleIcon, DocumentPlusIcon } from '@heroicons/vue/24/outline'
 import TagBar from '../../components/shared/TagBar.vue'
 import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue'
@@ -17,6 +18,7 @@ import { TAG_COLOR_MAP } from '../../constants/mockData'
 import type { BadgeColors } from '../../types/document'
 
 const { t } = useI18n()
+const { currentUser } = useAuth()
 
 const viewMode = ref<'list' | 'calendar'>('list')
 
@@ -37,9 +39,6 @@ const appointmentForDocument = ref<Appointment | null>(null)
 const showToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref<'success' | 'error' | 'info'>('success')
-
-// Mock doctor ID (in produzione verrebbe dal contesto/store)
-const doctorId = 'doc-001'
 
 // Computed tags based on appointments
 const tags = computed<Tag[]>(() => [
@@ -201,11 +200,16 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
 }
 
 async function loadAppointments() {
+  if (!currentUser.value?.userId) {
+    console.log('[DoctorAppointmentsPage] No current user ID available')
+    return
+  }
+
   isLoading.value = true
   error.value = null
   
   try {
-    const fetchedAppointments = await appointmentsApi.getAppointmentsByDoctor(doctorId)
+    const fetchedAppointments = await appointmentsApi.getAppointmentsByDoctor(currentUser.value.userId)
     appointments.value = fetchedAppointments
   } catch (err) {
     console.error('[DoctorAppointmentsPage] Error loading appointments:', err)
@@ -557,7 +561,7 @@ onMounted(() => {
     <AvailabilityModal
       :is-open="isRescheduleModalOpen"
       mode="select"
-      :doctor-id="doctorId"
+      :doctor-id="currentUser?.userId || ''"
       :current-appointment="currentAppointmentInfo"
       @close="isRescheduleModalOpen = false"
       @select-availability="handleSelectAvailability"
