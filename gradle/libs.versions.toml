@@ -1,14 +1,17 @@
-# Contains version catalog for dependencies
 [versions]
 kotlin = "2.2.20"
 kotest = "6.1.1"
-ktfmt = "0.18.0" # cannot use latest version (0.25.0 at the moment) due to version conflicts with kotlin-dsl. This is getting ridiculous...
-ktor = "3.0.3"
+ktfmt = "0.18.0"
+ktor = "3.4.0"
 exposed = "0.57.0"
 hikari = "6.2.1"
 postgresql = "42.7.4"
 logback = "1.5.15"
 kotlinx-datetime = "0.6.1"
+kotlinx-serialization = "1.8.1"
+mongodb = "5.5.0"
+minio = "8.6.0"
+pdfbox = "3.0.4"
 
 [libraries]
 kotest = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
@@ -28,6 +31,13 @@ hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+mongodb-driver-kotlin-coroutine = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version.ref = "mongodb" }
+mongodb-bson-kotlinx = { module = "org.mongodb:bson-kotlinx", version.ref = "mongodb" }
+minio = { module = "io.minio:minio", version.ref = "minio" }
+pdfbox = { module = "org.apache.pdfbox:pdfbox", version.ref = "pdfbox" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
