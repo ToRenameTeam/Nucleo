@@ -44,18 +44,29 @@ class DocumentMetadata:
     tags: list[str]
 
 
-SYSTEM_PROMPT = """You are a medical document analysis assistant specialized in healthcare documentation. Your task is to analyze medical documents (reports, prescriptions, clinical notes) and extract structured metadata.
+SYSTEM_PROMPT = """You are a medical document analysis assistant specialized in healthcare documentation. Your task is to analyze documents and determine if they are medical-related.
 
 You MUST respond with ONLY a valid JSON object, no markdown formatting, no explanations, no additional text. The response must be parseable by Python's json.loads() function.
 
-Analyze the provided medical document and:
+IMPORTANT: First, determine if the document is medical-related. A document is considered medical if it contains:
+- Medical diagnoses, conditions, or symptoms
+- Prescriptions, medications, or treatments
+- Medical procedures, tests, or examinations
+- Clinical findings or health assessments
+- Medical reports or healthcare provider documentation
+
+If the document is NOT medical-related (e.g., invoice, contract, personal letter, receipt, general business document):
+- Return EMPTY string for summary: ""
+- Return EMPTY list for tags: []
+
+If the document IS medical-related, analyze it and:
 1. Generate a concise, professional summary (2-3 sentences) that captures:
-   - The type of document (prescription, report, clinical note, etc.)
+   - The type of document (prescription, report)
    - Key medical information (diagnoses, medications, procedures, findings)
    - Patient-relevant outcomes or recommendations
 
-2. Extract relevant tags (5-15 tags) including:
-   - Document type (e.g., "prescription", "medical_report", "lab_results")
+2. Extract relevant tags (3-10 tags) including:
+   - Document type (e.g., "prescription", "report")
    - Medical specialties involved (e.g., "cardiology", "radiology", "general_medicine")
    - Diagnoses or conditions mentioned
    - Medications prescribed (generic names preferred)
@@ -70,8 +81,11 @@ Guidelines for tags:
 - Avoid patient-identifying information in tags
 - Focus on clinically relevant terms
 
-Your response format MUST be exactly:
-{"summary": "Your summary here.", "tags": ["tag1", "tag2", "tag3"]}"""
+Response format for MEDICAL documents:
+{"summary": "Your summary here.", "tags": ["tag1", "tag2", "tag3"]}
+
+Response format for NON-MEDICAL documents:
+{"summary": "", "tags": []}"""
 
 
 USER_PROMPT_TEMPLATE = """Analyze the following medical document and provide a summary and tags.
@@ -202,7 +216,7 @@ class AiAnalyzer:
             content: The raw AI response content.
 
         Returns:
-            Parsed DocumentMetadata.
+            Parsed DocumentMetadata. If document is not medical, returns empty summary and tags.
 
         Raises:
             AiResponseParsingError: If parsing fails.
@@ -223,7 +237,7 @@ class AiAnalyzer:
 
             data = json.loads(content)
 
-            # Validate required fields
+            # Validate required fields exist (even if empty)
             if "summary" not in data:
                 raise AiResponseParsingError("Missing 'summary' field in AI response")
             if "tags" not in data:
@@ -232,11 +246,16 @@ class AiAnalyzer:
             summary = str(data["summary"]).strip()
             tags = data["tags"]
 
+            # Handle empty summary/tags (non-medical document)
+            if not summary and not tags:
+                logger.info("Document identified as non-medical (empty metadata)")
+                return DocumentMetadata(summary="", tags=[])
+
             # Ensure tags is a list
             if isinstance(tags, str):
-                tags = [tags]
+                tags = [tags] if tags else []
             elif not isinstance(tags, list):
-                tags = list(tags)
+                tags = list(tags) if tags else []
 
             # Clean and validate tags
             cleaned_tags = []
