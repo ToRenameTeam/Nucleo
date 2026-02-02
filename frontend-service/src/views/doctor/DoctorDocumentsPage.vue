@@ -15,7 +15,7 @@ import type { DateRange } from '../../types/date-range'
 import type { Tag } from '../../types/tag'
 import type { AnyDocument, MedicinePrescription } from '../../types/document'
 import { parseItalianDate } from '../../utils/dateUtils'
-import { doctorDocumentsApi } from '../../api/doctorDocuments'
+import { documentsApiService } from '../../api/documents'
 import { useAuth } from '../../composables/useAuth'
 
 const { t } = useI18n()
@@ -42,7 +42,7 @@ const loadDocuments = async () => {
     try {
         console.log('[DoctorDocumentsPage] Loading documents for doctor:', currentUser.value.userId)
 
-        let fetchedDocuments: AnyDocument[] = await doctorDocumentsApi.getDocumentsByDoctor(currentUser.value.userId)
+        let fetchedDocuments: AnyDocument[] = await documentsApiService.getDocumentsByDoctor(currentUser.value.userId)
         documents.value = fetchedDocuments
         console.log('[DoctorDocumentsPage] Loaded', fetchedDocuments.length, 'documents')
     } catch (error) {

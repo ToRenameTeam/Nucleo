@@ -1,4 +1,13 @@
 import { DOCUMENTS_API_URL } from './config'
+import type { 
+  Document, 
+  MedicinePrescription, 
+  ServicePrescription, 
+  Report, 
+  AnyDocument, 
+  Validity, 
+  Dosage 
+} from '../types/document'
 
 const BASE_URL = DOCUMENTS_API_URL
 
@@ -70,6 +79,32 @@ export interface DocumentResponse {
   metadata: FileMetadata
 }
 
+export interface MedicinePrescriptionResponse extends DocumentResponse {
+  type: 'medicine_prescription'
+  validity: Validity
+  dosage: Dosage
+}
+
+export interface ServicePrescriptionResponse extends DocumentResponse {
+  type: 'service_prescription'
+  validity: Validity
+  serviceId: string
+  facilityId: string
+  priority: string
+}
+
+export interface ReportResponse extends DocumentResponse {
+  type: 'report'
+  servicePrescription: ServicePrescriptionResponse
+  executionDate: string
+  clinicalQuestion?: string
+  findings: string
+  conclusion?: string
+  recommendations?: string
+}
+
+export type DocumentApiResponse = MedicinePrescriptionResponse | ServicePrescriptionResponse | ReportResponse
+
 export interface UploadDocumentRequest {
   file: File
 }
@@ -78,6 +113,81 @@ export interface UploadResponse {
   success: boolean
   message: string
   documentId?: string
+}
+
+// Helper functions
+function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {  
+  const baseDocument: Document = {
+    id: response.id,
+    title: response.metadata.summary || getDocumentTypeLabel(response.type),
+    description: response.metadata.summary || '',
+    date: response.issueDate,
+    tags: response.metadata.tags || []
+  }
+  
+  // Map to specific document types
+  switch (response.type) {
+    case 'medicine_prescription': {
+      const medicinePrescription: MedicinePrescription = {
+        ...baseDocument,
+        type: 'medicine_prescription',
+        validity: response.validity,
+        dosage: response.dosage
+      }
+      return medicinePrescription
+    }
+    
+    case 'service_prescription': {
+      const servicePrescription: ServicePrescription = {
+        ...baseDocument,
+        type: 'service_prescription',
+        validity: response.validity,
+        serviceId: response.serviceId,
+        facilityId: response.facilityId,
+        priority: response.priority
+      }
+      return servicePrescription
+    }
+    
+    case 'report': {
+      const report: Report = {
+        ...baseDocument,
+        type: 'report',
+        servicePrescription: mapDocumentResponse(response.servicePrescription) as ServicePrescription,
+        executionDate: response.executionDate,
+        clinicalQuestion: response.clinicalQuestion,
+        findings: response.findings,
+        conclusion: response.conclusion,
+        recommendations: response.recommendations
+      }
+      return report
+    }
+    
+    default:
+      return baseDocument
+  }
+}
+
+async function handleResponse<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
+    throw new Error(errorData.message || `Request failed with status ${response.status}`)
+  }
+  
+  return response.json()
+}
+
+function getDocumentTypeLabel(type: string): string {
+  switch (type) {
+    case 'medicine_prescription':
+      return 'Prescrizione Farmaci'
+    case 'service_prescription':
+      return 'Prescrizione Esami/Visite'
+    case 'report':
+      return 'Referto'
+    default:
+      return 'Documento'
+  }
 }
 
 export const documentsApiService = {
@@ -170,5 +280,109 @@ export const documentsApiService = {
     }
 
     return await response.json()
+  },
+
+  /**
+   * Get all documents issued by a specific doctor
+   */
+  async getDocumentsByDoctor(doctorId: string): Promise<AnyDocument[]> {
+    const queryParams = new URLSearchParams()
+    queryParams.append('doctorId', doctorId)
+    const url = `${BASE_URL}/documents?${queryParams.toString()}`
+    
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      const documents = await handleResponse<DocumentApiResponse[]>(response)
+      return documents.map(doc => mapDocumentResponse(doc))
+    } catch (error) {
+      console.error('[Documents API] Error fetching documents by doctor:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Delete a document
+   */
+  async deleteDocument(documentId: string): Promise<boolean> {
+    const url = `${BASE_URL}/documents/${documentId}`
+    
+    try {
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      return response.status === 200 || response.status === 204
+    } catch (error) {
+      console.error('[Documents API] Error deleting document:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Create a medicine prescription
+   */
+  async createMedicinePrescription(patientId: string, request: CreateMedicinePrescriptionRequest): Promise<MedicinePrescription> {
+    const url = `${BASE_URL}/patients/${patientId}/documents`
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
+        throw new Error(errorData.message || `Request failed with status ${response.status}`)
+      }
+      
+      const document = await response.json()
+      return mapDocumentResponse(document) as MedicinePrescription
+    } catch (error) {
+      console.error('[Documents API] Error creating medicine prescription:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Create a service prescription
+   */
+  async createServicePrescription(patientId: string, request: CreateServicePrescriptionRequest): Promise<ServicePrescription> {
+    const url = `${BASE_URL}/patients/${patientId}/documents`
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
+        throw new Error(errorData.message || `Request failed with status ${response.status}`)
+      }
+      
+      const document = await response.json()
+      return mapDocumentResponse(document) as ServicePrescription
+    } catch (error) {
+      console.error('[Documents API] Error creating service prescription:', error)
+      throw error
+    }
   }
 }
+
+// Backward compatibility alias
+export const doctorDocumentsApi = documentsApiService
