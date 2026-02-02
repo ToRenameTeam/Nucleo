@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import { USER_IDS } from './users.seed.js';
 
 interface DelegationSeed {
@@ -8,96 +7,37 @@ interface DelegationSeed {
     status: 'Pending' | 'Active' | 'Declined' | 'Deleted';
 }
 
-const generateUUID = () => crypto.randomUUID();
-
+// Hardcoded delegation IDs for consistency
 export const delegationSeeds: DelegationSeed[] = [
+    // Giulia delegata da Mario (ACTIVE)
     {
-        delegationId: generateUUID(),
+        delegationId: 'd1e1a1b1-1111-4111-a111-111111111111',
         delegatingUserId: USER_IDS.GIULIA_BIANCHI,
         delegatorUserId: USER_IDS.MARIO_ROSSI,
         status: 'Active',
     },
+    // Giulia delegata da Maria (ACTIVE)
     {
-        delegationId: generateUUID(),
-        delegatingUserId: USER_IDS.LUCA_ROMANO,
-        delegatorUserId: USER_IDS.ELENA_FERRARI,
-        status: 'Pending',
-    },
-    {
-        delegationId: generateUUID(),
-        delegatingUserId: USER_IDS.ANNA_MARINO,
-        delegatorUserId: USER_IDS.ALESSANDRO_RICCI,
-        status: 'Active',
-    },
-    {
-        delegationId: generateUUID(),
-        delegatingUserId: USER_IDS.CHIARA_BRUNO,
-        delegatorUserId: USER_IDS.ROBERTO_GALLO,
-        status: 'Declined',
-    },
-    {
-        delegationId: generateUUID(),
+        delegationId: 'd2e2a2b2-2222-4222-a222-222222222222',
         delegatingUserId: USER_IDS.GIULIA_BIANCHI,
         delegatorUserId: USER_IDS.MARIA_CONTI,
         status: 'Active',
     },
+    // Luca delegato su Alessandro (ACTIVE)
     {
-        delegationId: generateUUID(),
-        delegatingUserId: USER_IDS.MARIO_ROSSI,
-        delegatorUserId: USER_IDS.VALENTINA_MANCINI,
-        status: 'Pending',
-    },
-    {
-        delegationId: generateUUID(),
-        delegatingUserId: USER_IDS.ELENA_FERRARI,
-        delegatorUserId: USER_IDS.ROBERTO_GALLO,
-        status: 'Deleted',
-    },
-    {
-        delegationId: generateUUID(),
-        delegatingUserId: USER_IDS.SARA_COLOMBO,
-        delegatorUserId: USER_IDS.LUCA_ROMANO,
-        status: 'Active',
-    },
-    {
-        delegationId: generateUUID(),
-        delegatingUserId: USER_IDS.ANNA_MARINO,
-        delegatorUserId: USER_IDS.CHIARA_BRUNO,
-        status: 'Pending',
-    },
-    {
-        delegationId: generateUUID(),
-        delegatingUserId: USER_IDS.MARIO_ROSSI,
-        delegatorUserId: USER_IDS.ELENA_FERRARI,
-        status: 'Declined',
-    },
-    {
-        delegationId: generateUUID(),
+        delegationId: 'd3e3a3b3-3333-4333-a333-333333333333',
         delegatingUserId: USER_IDS.LUCA_ROMANO,
         delegatorUserId: USER_IDS.ALESSANDRO_RICCI,
         status: 'Active',
     },
+    // Sara delegata su Alessandro (ACTIVE)
     {
-        delegationId: generateUUID(),
-        delegatingUserId: USER_IDS.CHIARA_BRUNO,
-        delegatorUserId: USER_IDS.VALENTINA_MANCINI,
-        status: 'Deleted',
-    },
-    {
-        delegationId: generateUUID(),
-        delegatingUserId: USER_IDS.VALENTINA_MANCINI,
-        delegatorUserId: USER_IDS.ROBERTO_GALLO,
-        status: 'Pending',
-    },
-    {
-        delegationId: generateUUID(),
-        delegatingUserId: USER_IDS.ALESSANDRO_RICCI,
-        delegatorUserId: USER_IDS.MARIA_CONTI,
+        delegationId: 'd4e4a4b4-4444-4444-a444-444444444444',
+        delegatingUserId: USER_IDS.SARA_COLOMBO,
+        delegatorUserId: USER_IDS.ALESSANDRO_RICCI,
         status: 'Active',
     },
-    {
-        delegationId: generateUUID(),
-        delegatingUserId: USER_IDS.ANNA_MARINO,
+];
         delegatorUserId: USER_IDS.LUCA_ROMANO,
         status: 'Declined',
     },
