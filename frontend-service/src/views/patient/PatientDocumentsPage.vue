@@ -223,7 +223,7 @@ const handleCloseModal = () => {
     <!-- Search Bar & Date Range Filter -->
     <div class="section-spacing">
       <div class="filters-row">
-        <SearchBar @search="handleSearch" />
+        <SearchBar @search="handleSearch" :placeholder="$t('documents.searchPlaceholder')"/>
         <DateRangeFilter v-model="dateRange" />
       </div>
     </div>
