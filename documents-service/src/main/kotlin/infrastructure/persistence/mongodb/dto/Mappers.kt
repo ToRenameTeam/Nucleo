@@ -28,6 +28,8 @@ import it.nucleo.domain.report.Findings
 import it.nucleo.domain.report.Recommendations
 import it.nucleo.domain.report.Report
 import it.nucleo.domain.report.implementation.DefaultReport
+import it.nucleo.domain.uploaded.UploadedDocument
+import it.nucleo.domain.uploaded.UploadedDocumentType
 import java.time.LocalDate
 
 fun Document.toDto(): DocumentDto =
@@ -70,6 +72,17 @@ fun Document.toDto(): DocumentDto =
                 findings = findings.text,
                 conclusion = conclusion?.text,
                 recommendations = recommendations?.text
+            )
+        is UploadedDocument ->
+            UploadedDocumentDto(
+                id = id.id,
+                doctorId = doctorId.id,
+                patientId = patientId.id,
+                issueDate = issueDate.date.toString(),
+                summary = metadata.summary.summary,
+                tags = metadata.tags.map { it.tag }.toSet(),
+                filename = filename,
+                documentType = documentType.name
             )
         else -> throw IllegalArgumentException("Unknown document type: ${this::class.simpleName}")
     }
@@ -131,6 +144,17 @@ fun DocumentDto.toDomain(): Document =
                 findings = Findings(findings),
                 conclusion = conclusion?.let { Conclusion(it) },
                 recommendations = recommendations?.let { Recommendations(it) }
+            )
+        is UploadedDocumentDto ->
+            UploadedDocument(
+                id = DocumentId(id),
+                doctorId = DoctorId(doctorId),
+                patientId = PatientId(patientId),
+                issueDate = IssueDate(LocalDate.parse(issueDate)),
+                metadata =
+                    FileMetadata(summary = Summary(summary), tags = tags.map { Tag(it) }.toSet()),
+                filename = filename,
+                documentType = UploadedDocumentType.valueOf(documentType)
             )
     }
 

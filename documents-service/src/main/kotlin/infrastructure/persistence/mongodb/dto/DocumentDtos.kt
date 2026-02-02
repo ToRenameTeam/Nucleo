@@ -68,6 +68,19 @@ data class ReportDto(
 ) : DocumentDto()
 
 @Serializable
+@SerialName("uploaded_document")
+data class UploadedDocumentDto(
+    override val id: String,
+    override val doctorId: String,
+    override val patientId: String,
+    override val issueDate: String,
+    override val summary: String,
+    override val tags: Set<String>,
+    val filename: String,
+    val documentType: String
+) : DocumentDto()
+
+@Serializable
 sealed class ValidityDto {
     @Serializable @SerialName("until_date") data class UntilDate(val date: String) : ValidityDto()
 
