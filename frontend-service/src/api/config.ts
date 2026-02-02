@@ -7,6 +7,7 @@ export const APPOINTMENTS_API_URL = import.meta.env.VITE_APPOINTMENTS_API_URL ||
 export const MASTER_DATA_API_URL = import.meta.env.VITE_MASTER_DATA_API_URL || 'http://localhost:3040'
 export const USERS_API_URL = import.meta.env.VITE_USERS_API_URL || 'http://localhost:3030'
 export const DELEGATIONS_API_URL = import.meta.env.VITE_DELEGATIONS_API_URL || 'http://localhost:3030'
+export const DOCUMENTS_API_URL = import.meta.env.VITE_DOCUMENTS_API_URL || 'http://localhost:8090'
 
 /**
  * API Endpoints
