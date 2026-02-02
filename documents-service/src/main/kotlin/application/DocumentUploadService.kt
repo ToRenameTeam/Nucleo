@@ -97,6 +97,24 @@ class DocumentUploadService(
             // Step 2: Analyze document with AI to extract metadata
             val metadata = analyzeDocumentWithAi(command.patientId, documentId)
 
+            // Step 2.5: Validate that document is medical-related
+            if (metadata.summary.summary.isBlank() && metadata.tags.isEmpty()) {
+                logger.warn(
+                    "Document ${documentId.id} identified as non-medical by AI. Rejecting upload."
+                )
+                // Delete the PDF from MinIO since we're rejecting it
+                try {
+                    fileStorageRepository.delete(command.patientId, documentId)
+                    logger.debug("Deleted non-medical PDF from MinIO: ${documentId.id}")
+                } catch (e: Exception) {
+                    logger.error("Failed to delete non-medical PDF from MinIO: ${documentId.id}", e)
+                }
+                return UploadResult.ValidationError(
+                    "The uploaded document does not appear to be a medical document. " +
+                        "Only medical documents (reports, prescriptions, clinical notes) are accepted."
+                )
+            }
+
             // Step 3: Create document entity with AI-generated metadata and default values
             val document =
                 DocumentFactory.createUploadedDocument(

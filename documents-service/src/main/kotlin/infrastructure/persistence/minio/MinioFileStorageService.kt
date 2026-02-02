@@ -6,6 +6,7 @@ import io.minio.ListObjectsArgs
 import io.minio.MakeBucketArgs
 import io.minio.MinioClient
 import io.minio.PutObjectArgs
+import io.minio.RemoveObjectArgs
 import io.minio.StatObjectArgs
 import io.minio.errors.ErrorResponseException
 import it.nucleo.domain.DocumentId
@@ -109,6 +110,40 @@ class MinioFileStorageRepository(
         } catch (e: Exception) {
             logger.error("Failed to retrieve document: ${documentId.id}", e)
             throw FileStorageException("Failed to retrieve document: ${e.message}", e)
+        }
+    }
+
+    override fun delete(patientId: PatientId, documentId: DocumentId) {
+        val prefix = "patients/${patientId.id}/documents/${documentId.id}/"
+        logger.debug("Deleting document with prefix: $prefix")
+
+        try {
+            // List all objects in the document folder
+            val objects =
+                minioClient.listObjects(
+                    ListObjectsArgs.builder().bucket(bucketName).prefix(prefix).build()
+                )
+
+            var deletedCount = 0
+            for (result in objects) {
+                val objectKey = result.get().objectName()
+                minioClient.removeObject(
+                    RemoveObjectArgs.builder().bucket(bucketName).`object`(objectKey).build()
+                )
+                deletedCount++
+                logger.debug("Deleted object: $objectKey")
+            }
+
+            if (deletedCount > 0) {
+                logger.info(
+                    "Document deleted successfully: ${documentId.id} ($deletedCount file(s) removed)"
+                )
+            } else {
+                logger.warn("No files found to delete for document: ${documentId.id}")
+            }
+        } catch (e: Exception) {
+            logger.error("Failed to delete document: ${documentId.id}", e)
+            throw FileStorageException("Failed to delete document: ${e.message}", e)
         }
     }
 

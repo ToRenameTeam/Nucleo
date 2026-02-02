@@ -14,6 +14,8 @@ interface FileStorageRepository {
     )
 
     fun retrieve(patientId: PatientId, documentId: DocumentId): StoredFile
+
+    fun delete(patientId: PatientId, documentId: DocumentId)
 }
 
 data class StoredFile(
