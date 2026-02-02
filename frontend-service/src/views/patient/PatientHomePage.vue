@@ -64,7 +64,7 @@ const handleCloseToast = () => {
     <div class="content-grid">
       <div class="main-column">
         <div class="section-card">
-          <SearchBar @search="handleSearch" />
+          <SearchBar @search="handleSearch" :placeholder="$t('documents.searchPlaceholder')"/>
         </div>
 
         <div class="quick-actions">

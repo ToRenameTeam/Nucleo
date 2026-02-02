@@ -27,6 +27,9 @@ export const API_ENDPOINTS = {
   
   // Delegations Service
   DELEGATIONS: '/api/delegations',
+
+  // Documents Service
+  DOCUMENTS: '/api/documents',
 } as const
 
 /**

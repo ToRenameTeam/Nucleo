@@ -136,6 +136,32 @@ export const userApi = {
     }
     return userId
   },
+
+  /**
+   * Get all users
+   */
+  async getAllUsers(): Promise<UserInfo[]> {
+    console.log('[User API] getAllUsers called')
+    const url = `${USERS_BASE_URL}`
+    console.log('[User API] Fetching from:', url)
+    
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      console.log('[User API] Response status:', response.status, response.statusText)
+      const data = await handleApiResponse<{ users: UserInfo[] }>(response)
+      console.log('[User API] Users received:', data.users.length)
+      return data.users
+    } catch (error) {
+      console.error('[User API] Error fetching users:', error)
+      return []
+    }
+  },
 }
 
 export { ApiError as AuthApiError }

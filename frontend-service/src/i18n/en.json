@@ -434,10 +434,84 @@
         "INVALID_TIME_SLOT": "The selected time is invalid. Please check the date, time, and duration.",
         "GENERIC_ERROR": "An error occurred. Please try again later."
       }
+    },
+    "documents": {
+      "title": "Documents",
+      "subtitle": "View and manage your patients' documents",
+      "searchPlaceholder": "Search documents, symptoms, patients...",
+      "errorLoading": "Error loading documents",
+      "noResults": "No documents found",
+      "medicine": "Medicine",
+      "dosage": "Dosage",
+      "categories": {
+        "all": "All",
+        "reports": "Reports",
+        "medicinePrescriptions": "Medicine Prescriptions",
+        "servicePrescriptions": "Visit Prescriptions"
+      },
+      "prescriptions": {
+      "addPrescription": "Add Prescription",
+      "noPatientResults": "No patients found",
+      "menu": {
+        "title": "New Prescription",
+        "subtitle": "Select the type of prescription you want to create",
+        "medicine": {
+          "title": "Medicine Prescription",
+          "subtitle": "Create a prescription for medications"
+        },
+        "service": {
+          "title": "Visit Prescription",
+          "subtitle": "Request visits or diagnostic exams"
+        }
+      },
+      "medicine": {
+        "title": "New Medicine Prescription",
+        "subtitle": "Fill in the details for the medicine prescription",
+        "patientName": "Patient Name and/or Surname",
+        "patientNamePlaceholder": "Enter patient's name and/or surname",
+        "medicineName": "Medicine Name",
+        "medicineNamePlaceholder": "e.g., Amoxicillin",
+        "dosage": "Dosage",
+        "dosagePlaceholder": "e.g., 500mg",
+        "frequency": "Frequency",
+        "frequencyPlaceholder": "e.g., 3 times a day",
+        "duration": "Duration",
+        "durationPlaceholder": "e.g., 7 days",
+        "notes": "Notes",
+        "notesPlaceholder": "Additional instructions or notes..."
+      },
+      "service": {
+        "title": "New Visit Prescription",
+        "subtitle": "Fill in the details for the visit prescription",
+        "patientName": "Patient Name and/or Surname",
+        "patientNamePlaceholder": "Enter patient's name and/or surname",
+        "serviceType": "Visit/Exam Type",
+        "serviceTypePlaceholder": "e.g., Cardiology visit, X-ray",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe the visit or exam needed...",
+        "urgency": "Urgency",
+        "urgencyLow": "Low",
+        "urgencyMedium": "Medium",
+        "urgencyHigh": "High",
+        "notes": "Notes",
+        "notesPlaceholder": "Additional instructions or notes..."
+      },
+      "toast": {
+        "medicineSaved": "Medicine prescription created successfully",
+        "serviceSaved": "Visit prescription created successfully"
+      },
+      "errors": {
+        "saveFailed": "Error saving prescription. Please try again."
+      }
+    }
     }
   },
   "common": {
     "loading": "Loading...",
-    "retry": "Retry"
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "back": "Back"
   }
 }

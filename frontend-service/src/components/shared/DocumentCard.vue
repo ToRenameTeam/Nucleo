@@ -21,7 +21,7 @@ const handleCardClick = () => {
     emit('toggleSelect')
     return
   }
-  
+
   emit('click')
 }
 
@@ -101,6 +101,9 @@ const metadata = computed<CardMetadata[]>(() => {
           <span class="badge-label">{{ tag }}</span>
         </div>
       </div>
+
+      <!-- Slot for custom document details (e.g., prescription info) -->
+      <slot name="details"></slot>
     </template>
   </BaseCard>
 </template>
@@ -138,7 +141,7 @@ const metadata = computed<CardMetadata[]>(() => {
   font-weight: 600;
   letter-spacing: 0.01em;
   font-size: 0.8125rem;
-} 
+}
 
 @keyframes fadeInScale {
   from {
