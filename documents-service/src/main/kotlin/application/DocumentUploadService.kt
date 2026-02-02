@@ -1,9 +1,17 @@
 package it.nucleo.application
 
+import it.nucleo.domain.DocumentFactory
 import it.nucleo.domain.DocumentId
+import it.nucleo.domain.DocumentRepository
+import it.nucleo.domain.FileMetadata
 import it.nucleo.domain.FileStorageException
 import it.nucleo.domain.FileStorageRepository
 import it.nucleo.domain.PatientId
+import it.nucleo.domain.Summary
+import it.nucleo.domain.Tag
+import it.nucleo.domain.uploaded.UploadedDocumentType
+import it.nucleo.infrastructure.ai.AiAnalysisResult
+import it.nucleo.infrastructure.ai.AiServiceClient
 import it.nucleo.infrastructure.logging.logger
 import java.util.UUID
 
@@ -38,9 +46,15 @@ sealed class UploadResult {
     data class ValidationError(val message: String) : UploadResult()
 
     data class StorageError(val message: String) : UploadResult()
+
+    data class AiAnalysisError(val message: String) : UploadResult()
 }
 
-class DocumentUploadService(private val fileStorageRepository: FileStorageRepository) {
+class DocumentUploadService(
+    private val fileStorageRepository: FileStorageRepository,
+    private val documentRepository: DocumentRepository,
+    private val aiServiceClient: AiServiceClient? = null
+) {
 
     private val logger = logger()
 
@@ -48,9 +62,13 @@ class DocumentUploadService(private val fileStorageRepository: FileStorageReposi
         const val MAX_FILE_SIZE = 50 * 1024 * 1024L // 50 MB
         const val PDF_CONTENT_TYPE = "application/pdf"
         private val PDF_MAGIC_BYTES = byteArrayOf(0x25, 0x50, 0x44, 0x46) // %PDF
+
+        // Default metadata when AI analysis is not available or fails
+        private const val DEFAULT_SUMMARY = "Document uploaded - AI analysis not available"
+        private val DEFAULT_TAGS = setOf("uploaded", "unprocessed")
     }
 
-    fun upload(command: UploadDocumentCommand): UploadResult {
+    suspend fun upload(command: UploadDocumentCommand): UploadResult {
         logger.debug(
             "Processing upload for patient: ${command.patientId.id}, filename: ${command.filename}"
         )
@@ -62,6 +80,7 @@ class DocumentUploadService(private val fileStorageRepository: FileStorageReposi
 
         val documentId = DocumentId(UUID.randomUUID().toString())
 
+        // Step 1: Store PDF file in MinIO
         return try {
             fileStorageRepository.store(
                 patientId = command.patientId,
@@ -72,12 +91,92 @@ class DocumentUploadService(private val fileStorageRepository: FileStorageReposi
                 contentType = PDF_CONTENT_TYPE
             )
             logger.info(
-                "Document uploaded successfully with ID: ${documentId.id}, filename: ${command.filename}"
+                "PDF uploaded successfully with ID: ${documentId.id}, filename: ${command.filename}"
             )
+
+            // Step 2: Analyze document with AI to extract metadata
+            val metadata = analyzeDocumentWithAi(command.patientId, documentId)
+
+            // Step 3: Create document entity with AI-generated metadata and default values
+            val document =
+                DocumentFactory.createUploadedDocument(
+                    id = documentId,
+                    patientId = command.patientId,
+                    filename = command.filename,
+                    metadata = metadata,
+                    documentType = inferDocumentType(metadata)
+                )
+
+            // Step 4: Save document entity to MongoDB
+            documentRepository.addDocument(command.patientId, document)
+            logger.info(
+                "Document entity created and saved successfully: ${documentId.id}, type: ${document.documentType}"
+            )
+
             UploadResult.Success(documentId)
         } catch (e: FileStorageException) {
             logger.error("Failed to upload document for patient: ${command.patientId.id}", e)
             UploadResult.StorageError(e.message ?: "Unknown storage error")
+        } catch (e: Exception) {
+            logger.error("Failed to create document entity for patient: ${command.patientId.id}", e)
+            UploadResult.StorageError("Failed to create document: ${e.message}")
+        }
+    }
+
+    private suspend fun analyzeDocumentWithAi(
+        patientId: PatientId,
+        documentId: DocumentId
+    ): FileMetadata {
+        if (aiServiceClient == null) {
+            logger.warn("AI service client not configured, using default metadata")
+            return createDefaultMetadata()
+        }
+
+        return try {
+            logger.debug("Requesting AI analysis for uploaded document: ${documentId.id}")
+
+            val result =
+                aiServiceClient.analyzeDocument(
+                    patientId = patientId.id,
+                    documentId = documentId.id
+                )
+
+            when (result) {
+                is AiAnalysisResult.Success -> {
+                    logger.info(
+                        "AI analysis successful for uploaded document ${documentId.id}: " +
+                            "summary_length=${result.metadata.summary.summary.length}, " +
+                            "tags_count=${result.metadata.tags.size}"
+                    )
+                    result.metadata
+                }
+                is AiAnalysisResult.Failure -> {
+                    logger.warn(
+                        "AI analysis failed for uploaded document ${documentId.id}: " +
+                            "${result.errorCode} - ${result.message}. Using default metadata."
+                    )
+                    createDefaultMetadata()
+                }
+            }
+        } catch (e: Exception) {
+            logger.error("Error during AI analysis for uploaded document ${documentId.id}", e)
+            createDefaultMetadata()
+        }
+    }
+
+    private fun createDefaultMetadata(): FileMetadata {
+        return FileMetadata(
+            summary = Summary(DEFAULT_SUMMARY),
+            tags = DEFAULT_TAGS.map { Tag(it) }.toSet()
+        )
+    }
+
+    private fun inferDocumentType(metadata: FileMetadata): UploadedDocumentType {
+        val tags = metadata.tags.map { it.tag.lowercase() }.toSet()
+        return when {
+            tags.contains("prescription") -> UploadedDocumentType.PRESCRIPTION
+            tags.contains("report") -> UploadedDocumentType.REPORT
+            else -> UploadedDocumentType.OTHER
         }
     }
 

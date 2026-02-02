@@ -54,6 +54,18 @@ data class ReportResponse(
     val recommendations: String?
 ) : DocumentResponse()
 
+@Serializable
+@SerialName("uploaded_document")
+data class UploadedDocumentResponse(
+    override val id: String,
+    override val doctorId: String,
+    override val patientId: String,
+    override val issueDate: String,
+    override val metadata: FileMetadataDto,
+    val filename: String,
+    val documentType: String
+) : DocumentResponse()
+
 @Serializable data class FileMetadataDto(val summary: String, val tags: Set<String>)
 
 @Serializable

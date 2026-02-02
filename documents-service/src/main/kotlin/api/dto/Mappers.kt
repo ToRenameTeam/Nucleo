@@ -4,6 +4,7 @@ import it.nucleo.domain.*
 import it.nucleo.domain.prescription.Validity
 import it.nucleo.domain.prescription.implementation.*
 import it.nucleo.domain.report.*
+import it.nucleo.domain.uploaded.UploadedDocument
 import java.time.LocalDate
 
 fun Document.toResponse(): DocumentResponse =
@@ -44,6 +45,16 @@ fun Document.toResponse(): DocumentResponse =
                 findings = findings.text,
                 conclusion = conclusion?.text,
                 recommendations = recommendations?.text
+            )
+        is UploadedDocument ->
+            UploadedDocumentResponse(
+                id = id.id,
+                doctorId = doctorId.id,
+                patientId = patientId.id,
+                issueDate = issueDate.date.toString(),
+                metadata = metadata.toDto(),
+                filename = filename,
+                documentType = documentType.name
             )
         else -> throw IllegalArgumentException("Unknown document type: ${this::class.simpleName}")
     }

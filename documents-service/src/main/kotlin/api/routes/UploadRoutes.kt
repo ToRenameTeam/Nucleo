@@ -109,6 +109,19 @@ private fun Route.uploadDocument(uploadService: DocumentUploadService) {
                                         )
                                     )
                                 }
+                                is UploadResult.AiAnalysisError -> {
+                                    logger.error(
+                                        "POST /patients/$patientId/documents/upload - AI analysis failed: ${result.message}"
+                                    )
+                                    call.respond(
+                                        HttpStatusCode.InternalServerError,
+                                        ErrorResponse(
+                                            "ai_analysis_error",
+                                            "Failed to analyze document with AI",
+                                            result.message
+                                        )
+                                    )
+                                }
                             }
                         }
                     }
