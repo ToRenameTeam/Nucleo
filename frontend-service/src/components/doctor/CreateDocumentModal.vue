@@ -93,7 +93,7 @@ function removeTag(index: number) {
 function handleFileChange(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.files && target.files.length > 0) {
-    uploadFile.value = target.files[0]
+    uploadFile.value = target.files[0] ?? null
   }
 }
 
@@ -116,7 +116,7 @@ async function handleSubmit() {
           tags: reportForm.value.tags
         },
         servicePrescriptionId: reportForm.value.servicePrescriptionId || 'default-prescription-id',
-        executionDate: reportForm.value.executionDate || new Date().toISOString().split('T')[0],
+        executionDate: reportForm.value.executionDate || (new Date().toISOString().split('T')[0] ?? ''),
         findings: reportForm.value.findings,
         ...(reportForm.value.clinicalQuestion && { clinicalQuestion: reportForm.value.clinicalQuestion }),
         ...(reportForm.value.conclusion && { conclusion: reportForm.value.conclusion }),
