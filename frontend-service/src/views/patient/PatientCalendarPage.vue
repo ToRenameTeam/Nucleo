@@ -27,7 +27,7 @@ const appointmentToReschedule = ref<Appointment | null>(null)
 
 async function loadAppointments() {
   if (!currentUser.value?.userId) {
-    console.log('[CalendarPage] No current user ID available')
+    console.log('[PatientCalendarPage] No current user ID available')
     return
   }
 
@@ -35,13 +35,13 @@ async function loadAppointments() {
   error.value = null
   
   try {
-    console.log('[CalendarPage] Fetching appointments for patient:', currentUser.value.userId)
+    console.log('[PatientCalendarPage] Fetching appointments for patient:', currentUser.value.userId)
     const data = await appointmentsApi.getAppointmentsByPatient(currentUser.value.userId)
     // Filter only appointments with SCHEDULED status
     appointments.value = data.filter(apt => apt.status === 'SCHEDULED')
-    console.log('[CalendarPage] Loaded appointments:', data.length, 'Scheduled:', appointments.value.length)
+    console.log('[PatientCalendarPage] Loaded appointments:', data.length, 'Scheduled:', appointments.value.length)
   } catch (err) {
-    console.error('[CalendarPage] Error loading appointments:', err)
+    console.error('[PatientCalendarPage] Error loading appointments:', err)
     error.value = err instanceof Error ? err.message : t('calendar.errors.loadingAppointments')
   } finally {
     isLoading.value = false
@@ -118,11 +118,11 @@ async function handleEditAppointment(id: string) {
       appointmentToReschedule.value = appointment
       isRescheduleModalOpen.value = true
     } else {
-      console.error('[CalendarPage] Appointment not found:', id)
+      console.error('[PatientCalendarPage] Appointment not found:', id)
       error.value = t('calendar.errors.appointmentNotFound')
     }
   } catch (err) {
-    console.error('[CalendarPage] Error loading appointment details:', err)
+    console.error('[PatientCalendarPage] Error loading appointment details:', err)
     error.value = t('calendar.errors.loadingDetails')
   } finally {
     isLoading.value = false
@@ -140,7 +140,7 @@ async function handleCancelAppointment(id: string) {
     // Reload appointments after cancellation
     await loadAppointments()
   } catch (err) {
-    console.error('[CalendarPage] Error cancelling appointment:', err)
+    console.error('[PatientCalendarPage] Error cancelling appointment:', err)
     error.value = t('calendar.errors.cancellingAppointment')
   }
 }
@@ -163,7 +163,7 @@ async function handleSelectAvailability(availabilityId: string) {
     // Reload appointments after rescheduling
     await loadAppointments()
   } catch (err) {
-    console.error('[CalendarPage] Error rescheduling appointment:', err)
+    console.error('[PatientCalendarPage] Error rescheduling appointment:', err)
     error.value = t('calendar.errors.reschedulingAppointment')
   } finally {
     isLoading.value = false
