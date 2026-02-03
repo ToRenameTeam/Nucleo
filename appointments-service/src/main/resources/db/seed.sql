@@ -1,14 +1,9 @@
--- Seed data for appointments-service
--- Clear existing data
 TRUNCATE TABLE appointments CASCADE;
 TRUNCATE TABLE availabilities CASCADE;
 
 -- ============================================
 -- AVAILABILITIES SEED DATA
 -- ============================================
--- All availabilities are between 8:00 and 18:00
--- Doctors: Francesco (Cardiologo), Paolo (Ortopedico), Giorgio (Neurologo), Stefano (Dermatologo), Sara (Pediatra)
-
 -- Doctor IDs from users-service
 -- Francesco Verdi (Cardiologo): f0aa4140-8d57-425d-b880-e8cf2008f265
 -- Paolo Greco (Ortopedico): 417bf5ac-9fd3-43ca-a160-775b6463eebc
@@ -126,7 +121,7 @@ VALUES
 -- Current and future availabilities
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status) 
 VALUES 
-    ('c3d4e5f6-2001-4cc2-9dd2-200100000000', 'c225b306-63de-4e82-af11-76e8ed3f5926', 'facility-002', 'service-004', '2026-02-05 08:00:00', 45, 'AVAILABLE'),
+    ('c3d4e5f6-2001-4cc2-9dd2-200100000000', 'c225b306-63de-4e82-af11-76e8ed3f5926', 'facility-002', 'service-004', '2026-02-05 08:00:00', 45, 'BOOKED'),
     ('c3d4e5f6-2002-4cc2-9dd2-200200000000', 'c225b306-63de-4e82-af11-76e8ed3f5926', 'facility-002', 'service-004', '2026-02-05 08:45:00', 45, 'AVAILABLE'),
     ('c3d4e5f6-2003-4cc2-9dd2-200300000000', 'c225b306-63de-4e82-af11-76e8ed3f5926', 'facility-002', 'service-004', '2026-02-05 09:30:00', 45, 'AVAILABLE'),
     ('c3d4e5f6-2004-4cc2-9dd2-200400000000', 'c225b306-63de-4e82-af11-76e8ed3f5926', 'facility-002', 'service-004', '2026-02-05 10:15:00', 45, 'AVAILABLE'),
@@ -141,7 +136,7 @@ VALUES
 
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status) 
 VALUES 
-    ('c3d4e5f6-3001-4cc3-9dd3-300100000000', 'c225b306-63de-4e82-af11-76e8ed3f5926', 'facility-002', 'service-004', '2026-02-12 08:00:00', 45, 'AVAILABLE'),
+    ('c3d4e5f6-3001-4cc3-9dd3-300100000000', 'c225b306-63de-4e82-af11-76e8ed3f5926', 'facility-002', 'service-004', '2026-02-12 08:00:00', 45, 'BOOKED'),
     ('c3d4e5f6-3002-4cc3-9dd3-300200000000', 'c225b306-63de-4e82-af11-76e8ed3f5926', 'facility-002', 'service-004', '2026-02-12 08:45:00', 45, 'AVAILABLE'),
     ('c3d4e5f6-3003-4cc3-9dd3-300300000000', 'c225b306-63de-4e82-af11-76e8ed3f5926', 'facility-002', 'service-004', '2026-02-12 09:30:00', 45, 'AVAILABLE'),
     ('c3d4e5f6-3004-4cc3-9dd3-300400000000', 'c225b306-63de-4e82-af11-76e8ed3f5926', 'facility-002', 'service-004', '2026-02-12 10:15:00', 45, 'AVAILABLE'),
@@ -228,162 +223,47 @@ VALUES
 -- Status: SCHEDULED (future), COMPLETED (past), NO_SHOW (past), CANCELLED (past, availability returns to AVAILABLE)
 
 -- COMPLETED APPOINTMENTS (past)
-INSERT INTO appointments (appointment_id, availability_id, patient_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status, notes, created_at, updated_at)
+INSERT INTO appointments (appointment_id, availability_id, patient_id, status, created_at, updated_at)
 VALUES 
     -- Francesco Verdi appointments
-    ('f1a2b3c4-1111-4ff1-9aa1-111111111111', 'a1b2c3d4-1111-4aa1-8bb1-111111111111', 'c5d33946-678f-4f3a-a0d6-b3d40eee4a97', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', '2026-01-15 09:00:00', 30, 'COMPLETED', 'Visita cardiologica di controllo - Esito positivo', '2026-01-10 14:30:00', '2026-01-15 09:35:00'),
-    ('f1a2b3c4-2222-4ff2-9aa2-222222222222', 'a1b2c3d4-2222-4aa2-8bb2-222222222222', 'a5ca3979-1359-4a17-b81f-eac3e36064bc', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', '2026-01-20 10:30:00', 30, 'COMPLETED', 'Controllo parametri cardiovascolari - Tutto nella norma', '2026-01-15 11:20:00', '2026-01-20 11:05:00'),
-    ('f1a2b3c4-3333-4ff3-9aa3-333333333333', 'a1b2c3d4-3333-4aa3-8bb3-333333333333', 'c5d33946-678f-4f3a-a0d6-b3d40eee4a97', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', '2026-01-22 14:00:00', 30, 'COMPLETED', 'Prescrizione ECG - Esito nella norma', '2026-01-18 09:45:00', '2026-01-22 14:35:00'),
+    ('f1a2b3c4-1111-4ff1-9aa1-111111111111', 'a1b2c3d4-1111-4aa1-8bb1-111111111111', 'c5d33946-678f-4f3a-a0d6-b3d40eee4a97', 'COMPLETED', '2026-01-10 14:30:00', '2026-01-15 09:35:00'),
+    ('f1a2b3c4-2222-4ff2-9aa2-222222222222', 'a1b2c3d4-2222-4aa2-8bb2-222222222222', 'a5ca3979-1359-4a17-b81f-eac3e36064bc', 'COMPLETED', '2026-01-15 11:20:00', '2026-01-20 11:05:00'),
+    ('f1a2b3c4-3333-4ff3-9aa3-333333333333', 'a1b2c3d4-3333-4aa3-8bb3-333333333333', 'c5d33946-678f-4f3a-a0d6-b3d40eee4a97', 'COMPLETED', '2026-01-18 09:45:00', '2026-01-22 14:35:00'),
     
     -- Paolo Greco appointments
-    ('f1a2b3c4-4444-4ff4-9aa4-444444444444', 'b2c3d4e5-1111-4bb1-9cc1-111111111111', '61f38542-ccd6-44ee-acbb-eb72d6824b05', '417bf5ac-9fd3-43ca-a160-775b6463eebc', 'facility-001', 'service-003', '2026-01-10 09:00:00', 60, 'COMPLETED', 'Prima visita ortopedica per dolore ginocchio - Prescrizione RMN', '2026-01-05 16:30:00', '2026-01-10 10:05:00'),
-    ('f1a2b3c4-5555-4ff5-9aa5-555555555555', 'b2c3d4e5-2222-4bb2-9cc2-222222222222', 'aeb4d41d-c6d1-4784-997e-b06cc62df64b', '417bf5ac-9fd3-43ca-a160-775b6463eebc', 'facility-001', 'service-003', '2026-01-17 10:00:00', 60, 'COMPLETED', 'Controllo densitometria ossea - Osteoporosi moderata', '2026-01-12 10:15:00', '2026-01-17 11:10:00'),
+    ('f1a2b3c4-4444-4ff4-9aa4-444444444444', 'b2c3d4e5-1111-4bb1-9cc1-111111111111', '61f38542-ccd6-44ee-acbb-eb72d6824b05', 'COMPLETED', '2026-01-05 16:30:00', '2026-01-10 10:05:00'),
+    ('f1a2b3c4-5555-4ff5-9aa5-555555555555', 'b2c3d4e5-2222-4bb2-9cc2-222222222222', 'aeb4d41d-c6d1-4784-997e-b06cc62df64b', 'COMPLETED', '2026-01-12 10:15:00', '2026-01-17 11:10:00'),
     
     -- Giorgio Costa appointments
-    ('f1a2b3c4-6666-4ff6-9aa6-666666666666', 'c3d4e5f6-1111-4cc1-9dd1-111111111111', 'ccce3cb4-8c3f-467c-9814-7a9076f60ae1', 'c225b306-63de-4e82-af11-76e8ed3f5926', 'facility-002', 'service-004', '2026-01-18 09:30:00', 45, 'COMPLETED', 'Visita neurologica per emicrania - Terapia preventiva', '2026-01-14 15:20:00', '2026-01-18 10:20:00'),
+    ('f1a2b3c4-6666-4ff6-9aa6-666666666666', 'c3d4e5f6-1111-4cc1-9dd1-111111111111', 'ccce3cb4-8c3f-467c-9814-7a9076f60ae1', 'COMPLETED', '2026-01-14 15:20:00', '2026-01-18 10:20:00'),
     
     -- Stefano Lombardi appointments
-    ('f1a2b3c4-7777-4ff7-9aa7-777777777777', 'd4e5f6a7-1111-4dd1-9ee1-111111111111', 'a5ca3979-1359-4a17-b81f-eac3e36064bc', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', '2026-01-25 14:00:00', 30, 'COMPLETED', 'Visita dermatologica - Prescrizione crema per dermatite', '2026-01-20 11:45:00', '2026-01-25 14:35:00'),
+    ('f1a2b3c4-7777-4ff7-9aa7-777777777777', 'd4e5f6a7-1111-4dd1-9ee1-111111111111', 'a5ca3979-1359-4a17-b81f-eac3e36064bc', 'COMPLETED', '2026-01-20 11:45:00', '2026-01-25 14:35:00'),
     
     -- Sara Colombo appointments
-    ('f1a2b3c4-8888-4ff8-9aa8-888888888888', 'e5f6a7b8-1111-4ee1-9ff1-111111111111', '3ba5e003-a3d6-4c9c-9b67-db1388b9b5f9', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', '2026-01-22 10:00:00', 45, 'COMPLETED', 'Visita pediatrica - Faringite acuta, prescritto antibiotico', '2026-01-19 14:30:00', '2026-01-22 10:50:00');
+    ('f1a2b3c4-8888-4ff8-9aa8-888888888888', 'e5f6a7b8-1111-4ee1-9ff1-111111111111', '3ba5e003-a3d6-4c9c-9b67-db1388b9b5f9', 'COMPLETED', '2026-01-19 14:30:00', '2026-01-22 10:50:00');
 
 -- NO_SHOW APPOINTMENT
-INSERT INTO appointments (appointment_id, availability_id, patient_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status, notes, created_at, updated_at)
+INSERT INTO appointments (appointment_id, availability_id, patient_id, status, created_at, updated_at)
 VALUES 
-    ('f1a2b3c4-9999-4ff9-9aa9-999999999999', 'a1b2c3d4-4444-4aa4-8bb4-444444444444', 'ccce3cb4-8c3f-467c-9814-7a9076f60ae1', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', '2026-01-25 11:00:00', 30, 'NO_SHOW', 'Paziente non si è presentato senza preavviso', '2026-01-22 16:45:00', '2026-01-25 11:35:00');
+    ('f1a2b3c4-9999-4ff9-9aa9-999999999999', 'a1b2c3d4-4444-4aa4-8bb4-444444444444', 'ccce3cb4-8c3f-467c-9814-7a9076f60ae1', 'NO_SHOW', '2026-01-22 16:45:00', '2026-01-25 11:35:00');
 
 -- CANCELLED APPOINTMENT (availability tornata AVAILABLE)
-INSERT INTO appointments (appointment_id, availability_id, patient_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status, notes, created_at, updated_at)
+INSERT INTO appointments (appointment_id, availability_id, patient_id, status, created_at, updated_at)
 VALUES 
-    ('f1a2b3c4-aaaa-4ffa-9aaa-aaaaaaaaaaaa', 'a1b2c3d4-5555-4aa5-8bb5-555555555555', '3ba5e003-a3d6-4c9c-9b67-db1388b9b5f9', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', '2026-01-27 15:30:00', 30, 'CANCELLED', 'Cancellato dal paziente per impegno improvviso', '2026-01-23 10:15:00', '2026-01-26 18:30:00');
+    ('f1a2b3c4-aaaa-4ffa-9aaa-aaaaaaaaaaaa', 'a1b2c3d4-5555-4aa5-8bb5-555555555555', '3ba5e003-a3d6-4c9c-9b67-db1388b9b5f9', 'CANCELLED', '2026-01-23 10:15:00', '2026-01-26 18:30:00');
 
 -- SCHEDULED APPOINTMENTS (future)
-INSERT INTO appointments (appointment_id, availability_id, patient_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status, notes, created_at, updated_at)
+INSERT INTO appointments (appointment_id, availability_id, patient_id, status, created_at, updated_at)
 VALUES 
     -- Francesco Verdi scheduled appointments
-    ('f1a2b3c4-bbbb-4ffb-9aab-bbbbbbbbbbbb', 'a1b2c3d4-6003-4aa6-8bb6-600300000000', 'a5ca3979-1359-4a17-b81f-eac3e36064bc', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', '2026-02-03 09:00:00', 30, 'SCHEDULED', 'Controllo pressione arteriosa', '2026-01-28 10:20:00', '2026-01-28 10:20:00'),
-    ('f1a2b3c4-cccc-4ffc-9aac-cccccccccccc', 'a1b2c3d4-7002-4aa7-8bb7-700200000000', 'c5d33946-678f-4f3a-a0d6-b3d40eee4a97', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', '2026-02-10 08:30:00', 30, 'SCHEDULED', 'Visita cardiologica di controllo', '2026-01-29 15:45:00', '2026-01-29 15:45:00'),
+    ('f1a2b3c4-bbbb-4ffb-9aab-bbbbbbbbbbbb', 'a1b2c3d4-6003-4aa6-8bb6-600300000000', 'a5ca3979-1359-4a17-b81f-eac3e36064bc', 'SCHEDULED', '2026-01-28 10:20:00', '2026-01-28 10:20:00'),
+    ('f1a2b3c4-cccc-4ffc-9aac-cccccccccccc', 'a1b2c3d4-7002-4aa7-8bb7-700200000000', 'c5d33946-678f-4f3a-a0d6-b3d40eee4a97', 'SCHEDULED', '2026-01-29 15:45:00', '2026-01-29 15:45:00'),
     
     -- Paolo Greco scheduled appointments
-    ('f1a2b3c4-dddd-4ffd-9aad-dddddddddddd', 'b2c3d4e5-3003-4bb3-9cc3-300300000000', '61f38542-ccd6-44ee-acbb-eb72d6824b05', '417bf5ac-9fd3-43ca-a160-775b6463eebc', 'facility-001', 'service-003', '2026-02-04 10:00:00', 60, 'SCHEDULED', 'Controllo post-RMN ginocchio', '2026-01-30 09:30:00', '2026-01-30 09:30:00'),
-    ('f1a2b3c4-eeee-4ffe-9aae-eeeeeeeeeeee', 'b2c3d4e5-4006-4bb4-9cc4-400600000000', 'aeb4d41d-c6d1-4784-997e-b06cc62df64b', '417bf5ac-9fd3-43ca-a160-775b6463eebc', 'facility-001', 'service-003', '2026-02-11 15:00:00', 60, 'SCHEDULED', 'Controllo terapia osteoporosi', '2026-01-30 14:15:00', '2026-01-30 14:15:00');
-
--- SUMMARY FOR VERIFICATION:
--- Francesco Verdi: 3 COMPLETED + 1 NO_SHOW + 1 CANCELLED + 2 SCHEDULED = 7 appointments
---   BOOKED availabilities: 3 (past completed) + 1 (past no_show) + 1 (current scheduled) + 1 (future scheduled) = 6 BOOKED
---   This matches: 3 COMPLETED + 1 NO_SHOW + 2 SCHEDULED = 6 (CANCELLED excluded)
---
--- Paolo Greco: 2 COMPLETED + 2 SCHEDULED = 4 appointments
---   BOOKED availabilities: 2 (past) + 1 (current) + 1 (future) = 4 BOOKED
---   This matches: 2 COMPLETED + 2 SCHEDULED = 4
---
--- Giorgio Costa: 1 COMPLETED + 0 SCHEDULED = 1 appointment
---   BOOKED availabilities: 1 (past) = 1 BOOKED
---   This matches: 1 COMPLETED
---
--- Stefano Lombardi: 1 COMPLETED + 0 SCHEDULED = 1 appointment
---   BOOKED availabilities: 1 (past) = 1 BOOKED
---   This matches: 1 COMPLETED
---
--- Sara Colombo: 1 COMPLETED + 0 SCHEDULED = 1 appointment
---   BOOKED availabilities: 1 (past) = 1 BOOKED
---   This matches: 1 COMPLETED
---
--- TOTAL BOOKED AVAILABILITIES: 6 + 4 + 1 + 1 + 1 = 13
--- TOTAL APPOINTMENTS (excluding CANCELLED): 3 + 1 + 2 + 2 + 2 + 1 + 1 + 1 = 13 ✓
-
-
--- Insert sample availabilities for testing
--- Doctor: doc-001 (Cardiologo)
-INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status) 
-VALUES 
-    ('a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6', 'doc-001', 'facility-001', 'service-001', '2026-02-01 09:00:00', 30, 'AVAILABLE'),
-    ('b2c3d4e5-f6a7-48b9-c0d1-e2f3a4b5c6d7', 'doc-001', 'facility-001', 'service-001', '2026-02-01 09:30:00', 30, 'AVAILABLE'),
-    ('c3d4e5f6-a7b8-49c0-d1e2-f3a4b5c6d7e8', 'doc-001', 'facility-001', 'service-001', '2026-02-01 10:00:00', 30, 'AVAILABLE'),
-    ('d4e5f6a7-b8c9-40d1-e2f3-a4b5c6d7e8f9', 'doc-001', 'facility-001', 'service-001', '2026-02-01 10:30:00', 30, 'BOOKED'),
-    ('e5f6a7b8-c9d0-41e2-f3a4-b5c6d7e8f9a0', 'doc-001', 'facility-001', 'service-001', '2026-02-01 11:00:00', 30, 'AVAILABLE');
-
--- Doctor: doc-002 (Dermatologo)
-INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status) 
-VALUES 
-    ('f6a7b8c9-d0e1-42f3-a4b5-c6d7e8f9a0b1', 'doc-002', 'facility-002', 'service-002', '2026-02-02 14:00:00', 45, 'AVAILABLE'),
-    ('a7b8c9d0-e1f2-43a4-b5c6-d7e8f9a0b1c2', 'doc-002', 'facility-002', 'service-002', '2026-02-02 14:45:00', 45, 'AVAILABLE'),
-    ('b8c9d0e1-f2a3-44b5-c6d7-e8f9a0b1c2d3', 'doc-002', 'facility-002', 'service-002', '2026-02-02 15:30:00', 45, 'AVAILABLE');
-
--- Doctor: doc-003 (Ortopedico)
-INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status) 
-VALUES 
-    ('c9d0e1f2-a3b4-45c6-d7e8-f9a0b1c2d3e4', 'doc-003', 'facility-001', 'service-003', '2026-02-03 08:00:00', 60, 'AVAILABLE'),
-    ('d0e1f2a3-b4c5-46d7-e8f9-a0b1c2d3e4f5', 'doc-003', 'facility-001', 'service-003', '2026-02-03 09:00:00', 60, 'AVAILABLE'),
-    ('e1f2a3b4-c5d6-47e8-f9a0-b1c2d3e4f5a6', 'doc-003', 'facility-001', 'service-003', '2026-02-03 10:00:00', 60, 'BOOKED');
-
--- Some future availabilities
-INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status) 
-VALUES 
-    ('f2a3b4c5-d6e7-48f9-a0b1-c2d3e4f5a6b7', 'doc-001', 'facility-001', 'service-001', '2026-02-15 09:00:00', 30, 'AVAILABLE'),
-    ('a3b4c5d6-e7f8-49a0-b1c2-d3e4f5a6b7c8', 'doc-001', 'facility-001', 'service-001', '2026-02-15 09:30:00', 30, 'AVAILABLE'),
-    ('b4c5d6e7-f8a9-40b1-c2d3-e4f5a6b7c8d9', 'doc-002', 'facility-002', 'service-002', '2026-02-20 14:00:00', 45, 'AVAILABLE'),
-    ('c5d6e7f8-a9b0-41c2-d3e4-f5a6b7c8d9e0', 'doc-003', 'facility-003', 'service-003', '2026-02-25 10:00:00', 60, 'AVAILABLE');
-
--- Sample cancelled availability
-INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status) 
-VALUES 
-    ('d6e7f8a9-b0c1-42d3-e4f5-a6b7c8d9e0f1', 'doc-001', 'facility-001', 'service-001', '2026-02-01 16:00:00', 30, 'CANCELLED');
-
--- Past availabilities (already used for completed/no-show/cancelled appointments)
-INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status) 
-VALUES 
-    ('11111111-1111-4111-a111-111111111111', 'doc-002', 'facility-002', 'service-002', '2026-01-15 14:00:00', 45, 'BOOKED'),
-    ('22222222-2222-4222-a222-222222222222', 'doc-001', 'facility-001', 'service-001', '2026-01-20 09:00:00', 30, 'BOOKED'),
-    ('33333333-3333-4333-a333-333333333333', 'doc-002', 'facility-002', 'service-002', '2026-01-22 15:30:00', 45, 'BOOKED'),
-    ('44444444-4444-4444-a444-444444444444', 'doc-003', 'facility-003', 'service-003', '2026-01-25 10:00:00', 60, 'BOOKED');
-
--- Future availabilities for scheduled appointments
-INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status) 
-VALUES 
-    ('55555555-5555-4555-a555-555555555555', 'doc-001', 'facility-001', 'service-001', '2026-02-10 11:00:00', 30, 'BOOKED'),
-    ('66666666-6666-4666-a666-666666666666', 'doc-002', 'facility-002', 'service-002', '2026-02-12 16:00:00', 45, 'BOOKED'),
-    ('77777777-7777-4777-a777-777777777777', 'doc-003', 'facility-001', 'service-003', '2026-02-18 09:00:00', 60, 'BOOKED');
-
--- ============================================
--- APPOINTMENTS SEED DATA
--- ============================================
-
--- Sample patients (IDs should match User Context)
--- pat-001: Mario Rossi
--- pat-002: Laura Bianchi
--- pat-003: Giuseppe Verdi
-
--- Appointment for booked availability d4e5f6a7-b8c9-40d1-e2f3-a4b5c6d7e8f9
-INSERT INTO appointments (appointment_id, availability_id, patient_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status, notes, created_at, updated_at)
-VALUES 
-    ('aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa', 'd4e5f6a7-b8c9-40d1-e2f3-a4b5c6d7e8f9', 'pat-001', 'doc-001', 'facility-001', 'service-001', '2026-02-01 10:30:00', 30, 'SCHEDULED', 'Prima visita cardiologica', '2026-01-20 14:30:00', '2026-01-20 14:30:00');
-
--- Appointment for booked availability e1f2a3b4-c5d6-47e8-f9a0-b1c2d3e4f5a6
-INSERT INTO appointments (appointment_id, availability_id, patient_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status, notes, created_at, updated_at)
-VALUES 
-    ('bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb', 'e1f2a3b4-c5d6-47e8-f9a0-b1c2d3e4f5a6', 'pat-002', 'doc-003', 'facility-001', 'service-003', '2026-02-03 10:00:00', 60, 'SCHEDULED', 'Visita ortopedica ginocchio', '2026-01-22 09:15:00', '2026-01-22 09:15:00');
-
--- Sample completed appointments (past dates)
-INSERT INTO appointments (appointment_id, availability_id, patient_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status, notes, created_at, updated_at)
-VALUES 
-    ('cccccccc-cccc-4ccc-cccc-cccccccccccc', '11111111-1111-4111-a111-111111111111', 'pat-001', 'doc-002', 'facility-002', 'service-002', '2026-01-15 14:00:00', 45, 'COMPLETED', 'Controllo dermatologico - tutto ok', '2026-01-10 11:20:00', '2026-01-15 14:50:00'),
-    ('dddddddd-dddd-4ddd-dddd-dddddddddddd', '22222222-2222-4222-a222-222222222222', 'pat-003', 'doc-001', 'facility-001', 'service-001', '2026-01-20 09:00:00', 30, 'COMPLETED', 'Visita cardiologica di controllo', '2026-01-15 16:45:00', '2026-01-20 09:35:00');
-
--- Sample no-show appointment
-INSERT INTO appointments (appointment_id, availability_id, patient_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status, notes, created_at, updated_at)
-VALUES 
-    ('eeeeeeee-eeee-4eee-eeee-eeeeeeeeeeee', '33333333-3333-4333-a333-333333333333', 'pat-002', 'doc-002', 'facility-002', 'service-002', '2026-01-22 15:30:00', 45, 'NO_SHOW', 'Paziente non si è presentato', '2026-01-18 10:00:00', '2026-01-22 16:00:00');
-
--- Sample cancelled appointment
-INSERT INTO appointments (appointment_id, availability_id, patient_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status, notes, created_at, updated_at)
-VALUES 
-    ('ffffffff-ffff-4fff-ffff-ffffffffffff', '44444444-4444-4444-a444-444444444444', 'pat-003', 'doc-003', 'facility-003', 'service-003', '2026-01-25 10:00:00', 60, 'CANCELLED', 'Cancellato dal paziente per impegni lavorativi', '2026-01-20 08:30:00', '2026-01-24 19:20:00');
-
--- Sample future scheduled appointments
-INSERT INTO appointments (appointment_id, availability_id, patient_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status, notes, created_at, updated_at)
-VALUES 
-    ('10101010-1010-4010-a010-101010101010', '55555555-5555-4555-a555-555555555555', 'pat-002', 'doc-001', 'facility-001', 'service-001', '2026-02-10 11:00:00', 30, 'SCHEDULED', 'Controllo cardiologico', '2026-01-28 10:15:00', '2026-01-28 10:15:00'),
-    ('20202020-2020-4020-a020-202020202020', '66666666-6666-4666-a666-666666666666', 'pat-003', 'doc-002', 'facility-002', 'service-002', '2026-02-12 16:00:00', 45, 'SCHEDULED', 'Prima visita dermatologica', '2026-01-28 15:30:00', '2026-01-28 15:30:00'),
-    ('30303030-3030-4030-a030-303030303030', '77777777-7777-4777-a777-777777777777', 'pat-001', 'doc-003', 'facility-001', 'service-003', '2026-02-18 09:00:00', 60, 'SCHEDULED', 'Controllo post-operatorio', '2026-01-29 08:45:00', '2026-01-29 08:45:00');
+    ('f1a2b3c4-dddd-4ffd-9aad-dddddddddddd', 'b2c3d4e5-3003-4bb3-9cc3-300300000000', '61f38542-ccd6-44ee-acbb-eb72d6824b05', 'SCHEDULED', '2026-01-30 09:30:00', '2026-01-30 09:30:00'),
+    ('f1a2b3c4-eeee-4ffe-9aae-eeeeeeeeeeee', 'b2c3d4e5-4006-4bb4-9cc4-400600000000', 'aeb4d41d-c6d1-4784-997e-b06cc62df64b', 'SCHEDULED', '2026-01-30 14:15:00', '2026-01-30 14:15:00'),
+    
+    -- Giorgio Costa scheduled appointments
+    ('f1a2b3c4-gggg-4ffg-9aag-gggggggggggg', 'c3d4e5f6-2001-4cc2-9dd2-200100000000', '61f38542-ccd6-44ee-acbb-eb72d6824b05', 'SCHEDULED', '2026-01-31 10:00:00', '2026-01-31 10:00:00'),
+    ('f1a2b3c4-hhhh-4ffh-9aah-hhhhhhhhhhhh', 'c3d4e5f6-3001-4cc3-9dd3-300100000000', 'ccce3cb4-8c3f-467c-9814-7a9076f60ae1', 'SCHEDULED', '2026-02-01 11:30:00', '2026-02-01 11:30:00');

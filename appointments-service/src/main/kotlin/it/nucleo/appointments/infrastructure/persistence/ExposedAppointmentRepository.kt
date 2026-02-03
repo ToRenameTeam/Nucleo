@@ -6,7 +6,9 @@ import it.nucleo.appointments.domain.valueobjects.*
 import kotlinx.datetime.toJavaLocalDateTime
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andWhere
+import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
@@ -36,11 +38,24 @@ class ExposedAppointmentRepository : AppointmentRepository {
 
     override suspend fun findByFilters(
         patientId: PatientId?,
+        doctorId: DoctorId?,
         status: AppointmentStatus?
     ): List<Appointment> = dbQuery {
-        var query = AppointmentsTable.selectAll()
+        var query =
+            if (doctorId != null) {
+                // JOIN with availabilities when filtering by doctorId
+                AppointmentsTable.innerJoin(
+                        AvailabilitiesTable,
+                        { AppointmentsTable.availabilityId },
+                        { AvailabilitiesTable.availabilityId }
+                    )
+                    .select(AppointmentsTable.columns)
+                    .where { AvailabilitiesTable.doctorId eq doctorId.value }
+            } else {
+                AppointmentsTable.selectAll()
+            }
 
-        patientId?.let { query = query.where { AppointmentsTable.patientId eq it.value } }
+        patientId?.let { query = query.andWhere { AppointmentsTable.patientId eq it.value } }
         status?.let { query = query.andWhere { AppointmentsTable.status eq it.name } }
 
         query.map { it.toAppointment() }

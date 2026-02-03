@@ -85,15 +85,21 @@ class AppointmentService(
         return AppointmentDetails(appointment, availability)
     }
 
-    suspend fun getAppointmentsByFilters(patientId: String?, status: String?): List<Appointment> {
+    suspend fun getAppointmentsByFilters(
+        patientId: String?,
+        doctorId: String?,
+        status: String?
+    ): List<Appointment> {
         val patientIdValue = patientId?.let { PatientId.fromString(it) }
+        val doctorIdValue = doctorId?.let { DoctorId.fromString(it) }
         val statusValue = status?.let { AppointmentStatus.valueOf(it) }
 
         logger.info(
-            "Fetching appointments with filters - patientId: $patientIdValue, status: $statusValue"
+            "Fetching appointments with filters - patientId: $patientIdValue, doctorId: $doctorIdValue, status: $statusValue"
         )
 
-        val appointments = appointmentRepository.findByFilters(patientIdValue, statusValue)
+        val appointments =
+            appointmentRepository.findByFilters(patientIdValue, doctorIdValue, statusValue)
 
         logger.info("Found ${appointments.size} appointments")
         return appointments

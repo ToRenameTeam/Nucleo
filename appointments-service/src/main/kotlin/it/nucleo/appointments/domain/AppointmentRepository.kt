@@ -9,6 +9,7 @@ interface AppointmentRepository {
 
     suspend fun findByFilters(
         patientId: PatientId? = null,
+        doctorId: DoctorId? = null,
         status: AppointmentStatus? = null
     ): List<Appointment>
 
