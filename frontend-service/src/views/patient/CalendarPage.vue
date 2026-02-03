@@ -13,56 +13,76 @@ import { TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/mockData'
 import { useI18n } from 'vue-i18n'
 import type { BadgeColors } from '../../types/document'
 import { appointmentsApi } from '../../api/appointments'
+import AvailabilityModal from '../../components/shared/AvailabilityModal.vue'
 
 const { t } = useI18n()
 
 const { currentUser } = useAuth()
 
-// State
 const appointments = ref<Appointment[]>([])
 const isLoading = ref(false)
 const error = ref<string | null>(null)
+const isRescheduleModalOpen = ref(false)
+const appointmentToReschedule = ref<Appointment | null>(null)
 
-// Load appointments from API
 async function loadAppointments() {
   if (!currentUser.value?.userId) {
-    console.warn('[Calendar] No user ID available')
+    console.log('[CalendarPage] No current user ID available')
     return
   }
 
   isLoading.value = true
   error.value = null
-
+  
   try {
-    console.log('[Calendar] Loading appointments for patient:', currentUser.value.userId)
+    console.log('[CalendarPage] Fetching appointments for patient:', currentUser.value.userId)
     const data = await appointmentsApi.getAppointmentsByPatient(currentUser.value.userId)
-    appointments.value = data
-    console.log('[Calendar] Loaded appointments:', data.length)
+    // Filter only appointments with SCHEDULED status
+    appointments.value = data.filter(apt => apt.status === 'SCHEDULED')
+    console.log('[CalendarPage] Loaded appointments:', data.length, 'Scheduled:', appointments.value.length)
   } catch (err) {
-    console.error('[Calendar] Error loading appointments:', err)
-    error.value = err instanceof Error ? err.message : t('common.retry')
+    console.error('[CalendarPage] Error loading appointments:', err)
+    error.value = err instanceof Error ? err.message : t('calendar.errors.loadingAppointments')
   } finally {
     isLoading.value = false
   }
 }
 
-const tags = computed<Tag[]>(() => [
-  { id: 'all', label: t('calendar.categories.all'), count: appointments.value.length },
-  { id: 'cardiologia', label: t('calendar.categories.cardiologia'), count: appointments.value.filter(a => a.tags?.includes('Cardiologia')).length },
-  { id: 'analisi', label: t('calendar.categories.analisi'), count: appointments.value.filter(a => a.tags?.includes('Analisi')).length },
-  { id: 'pediatria', label: t('calendar.categories.pediatria'), count: appointments.value.filter(a => a.tags?.includes('Pediatria')).length }
-])
+onMounted(() => {
+  loadAppointments()
+})
+
+const tags = computed<Tag[]>(() => {
+  const allAppointments = appointments.value
+  return [
+    { id: 'all', label: t('calendar.categories.all'), count: allAppointments.length },
+    { id: 'cardiologia', label: t('calendar.categories.cardiologia'), count: allAppointments.filter(a => a.tags?.includes('Cardiologia')).length },
+    { id: 'analisi', label: t('calendar.categories.analisi'), count: allAppointments.filter(a => a.tags?.includes('Analisi')).length },
+    { id: 'pediatria', label: t('calendar.categories.pediatria'), count: allAppointments.filter(a => a.tags?.includes('Pediatria')).length }
+  ]
+})
 
 const selectedTag = ref('all')
 const selectedAppointmentId = ref<string | null>(null)
 
 const filteredAppointments = computed(() => {
+  const allAppointments = appointments.value
   if (selectedTag.value === 'all') {
-    return appointments.value
+    return allAppointments
   }
-  return appointments.value.filter(apt => 
+  return allAppointments.filter(apt => 
     apt.tags?.some(tag => tag.toLowerCase() === selectedTag.value.toLowerCase())
   )
+})
+
+const currentAppointmentInfo = computed(() => {
+  if (!appointmentToReschedule.value) return null
+  return {
+    user: appointmentToReschedule.value.user,
+    date: appointmentToReschedule.value.date,
+    time: appointmentToReschedule.value.time,
+    location: appointmentToReschedule.value.location
+  }
 })
 
 function handleTagSelected(tagId: string) {
@@ -88,14 +108,66 @@ function handleAppointmentClick(id: string) {
   selectedAppointmentId.value = id
 }
 
-function handleEditAppointment(id: string) {
-  console.log('Modifica appuntamento:', id)
-  // Implementare apertura dialog per modifica appuntamento
+async function handleEditAppointment(id: string) {
+  try {
+    isLoading.value = true
+    
+    const appointment = await appointmentsApi.getAppointmentById(id)
+    
+    if (appointment) {
+      appointmentToReschedule.value = appointment
+      isRescheduleModalOpen.value = true
+    } else {
+      console.error('[CalendarPage] Appointment not found:', id)
+      error.value = t('calendar.errors.appointmentNotFound')
+    }
+  } catch (err) {
+    console.error('[CalendarPage] Error loading appointment details:', err)
+    error.value = t('calendar.errors.loadingDetails')
+  } finally {
+    isLoading.value = false
+  }
 }
 
-function handleCancelAppointment(id: string) {
-  console.log('Disdici appuntamento:', id)
-  // Implementare conferma e cancellazione appuntamento
+async function handleCancelAppointment(id: string) {
+  console.log('Cancel appointment:', id)
+  if (!confirm(t('appointments.confirmCancel'))) {
+    return
+  }
+  
+  try {
+    await appointmentsApi.deleteAppointment(id)
+    // Reload appointments after cancellation
+    await loadAppointments()
+  } catch (err) {
+    console.error('[CalendarPage] Error cancelling appointment:', err)
+    error.value = t('calendar.errors.cancellingAppointment')
+  }
+}
+
+async function handleSelectAvailability(availabilityId: string) {
+  if (!appointmentToReschedule.value) return
+  
+  try {
+    isLoading.value = true
+    
+    await appointmentsApi.updateAppointment(
+      appointmentToReschedule.value.id,
+      undefined,
+      availabilityId
+    )
+    
+    isRescheduleModalOpen.value = false
+    appointmentToReschedule.value = null
+    
+    // Reload appointments after rescheduling
+    await loadAppointments()
+  } catch (err) {
+    console.error('[CalendarPage] Error rescheduling appointment:', err)
+    error.value = t('calendar.errors.reschedulingAppointment')
+  } finally {
+    isLoading.value = false
+  }
 }
 
 // Get actions for appointment card
@@ -170,11 +242,6 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   
   return meta
 }
-
-// Load appointments on mount
-onMounted(() => {
-  loadAppointments()
-})
 </script>
 
 <template>
@@ -194,22 +261,8 @@ onMounted(() => {
       <TagBar :tags="tags" @tag-selected="handleTagSelected" />
     </div>
 
-    <!-- Loading State -->
-    <div v-if="isLoading" class="loading-container">
-      <div class="loading-spinner"></div>
-      <p>{{ $t('common.loading') }}</p>
-    </div>
-
-    <!-- Error State -->
-    <div v-else-if="error" class="error-container">
-      <p>{{ error }}</p>
-      <button @click="loadAppointments" class="retry-btn">
-        {{ $t('common.retry') }}
-      </button>
-    </div>
-
     <!-- Calendar and Appointments Section -->
-    <div v-else class="content-section">
+    <div class="content-section">
       <!-- Calendar -->
       <div class="calendar-container">
         <AppointmentsCalendar
@@ -224,7 +277,20 @@ onMounted(() => {
       <div class="appointments-list-container">
         <h2 class="appointments-list-title">{{ $t('calendar.appointments') }}</h2>
         
-        <CardList v-if="filteredAppointments.length > 0" gap="sm">
+        <!-- Loading State -->
+        <div v-if="isLoading" class="loading-state">
+          <div class="spinner"></div>
+          <p class="loading-text">{{ $t('calendar.loading') }}</p>
+        </div>
+        
+        <!-- Error State -->
+        <div v-else-if="error" class="error-state">
+          <p class="error-text">{{ error }}</p>
+          <button class="retry-btn" @click="loadAppointments">{{ $t('calendar.retry') }}</button>
+        </div>
+        
+        <!-- Appointments List -->
+        <CardList v-else-if="filteredAppointments.length > 0" gap="sm">
           <BaseCard
             v-for="appointment in filteredAppointments"
             :key="appointment.id"
@@ -262,6 +328,17 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- Reschedule Modal -->
+    <AvailabilityModal
+      v-if="appointmentToReschedule"
+      :is-open="isRescheduleModalOpen"
+      mode="select"
+      :doctor-id="appointmentToReschedule.doctorId || ''"
+      :current-appointment="currentAppointmentInfo"
+      @close="isRescheduleModalOpen = false"
+      @select-availability="handleSelectAvailability"
+    />
   </div>
 </template>
 
@@ -333,53 +410,6 @@ onMounted(() => {
   animation: fadeIn 0.5s cubic-bezier(0, 0, 0.2, 1);
   animation-delay: 0.1s;
   animation-fill-mode: both;
-}
-
-.loading-container,
-.error-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 4rem 2rem;
-  gap: 1.5rem;
-  text-align: center;
-  background: var(--white-40);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--white-60);
-  border-radius: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8);
-  position: relative;
-  z-index: 1;
-}
-
-.loading-spinner {
-  width: 3rem;
-  height: 3rem;
-  border: 3px solid var(--white-60);
-  border-top-color: var(--sky-0ea5e9);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.retry-btn {
-  padding: 0.75rem 1.5rem;
-  background: var(--sky-0ea5e9);
-  color: white;
-  border: none;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.retry-btn:hover {
-  background: var(--sky-0284c7);
-  transform: translateY(-1px);
 }
 
 .content-section {
@@ -474,6 +504,85 @@ onMounted(() => {
 .empty-state-text {
   color: var(--gray-525252);
   margin: 0;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  text-align: center;
+  background: var(--white-15);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--white-20);
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px var(--black-8);
+  gap: 1rem;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--white-30);
+  border-top-color: var(--sky-0ea5e9);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: var(--gray-525252);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  text-align: center;
+  background: var(--rgba-error-5);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--rgba-error-20);
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px var(--black-8);
+  gap: 1rem;
+}
+
+.error-text {
+  color: var(--error-dc2626);
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.retry-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--sky-0ea5e9-20);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--white-20);
+  border-radius: 0.75rem;
+  color: var(--sky-0ea5e9);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+  box-shadow: 0 2px 8px var(--black-10);
+}
+
+.retry-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--black-12);
+  background: var(--sky-0ea5e9-30);
+}
+
+.retry-btn:active {
+  transform: translateY(0);
 }
 
 @keyframes fadeInScale {

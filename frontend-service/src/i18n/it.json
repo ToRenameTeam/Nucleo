@@ -111,9 +111,18 @@
     "subtitle": "Calendario condiviso della tua famiglia",
     "appointments": "Appuntamenti",
     "noAppointments": "Nessun appuntamento trovato",
+    "loading": "Caricamento appuntamenti...",
+    "retry": "Riprova",
     "today": "Oggi",
     "month": "Mese",
     "week": "Settimana",
+    "errors": {
+      "loadingAppointments": "Errore nel caricamento degli appuntamenti",
+      "appointmentNotFound": "Appuntamento non trovato",
+      "loadingDetails": "Errore nel caricamento dei dettagli dell'appuntamento",
+      "cancellingAppointment": "Errore nella cancellazione dell'appuntamento",
+      "reschedulingAppointment": "Errore nella ripianificazione dell'appuntamento"
+    },
     "categories": {
       "all": "Tutti",
       "cardiologia": "Cardiologia",
@@ -129,7 +138,8 @@
   },
   "appointments": {
     "editAppointment": "Modifica",
-    "cancelAppointment": "Disdici"
+    "cancelAppointment": "Disdici",
+    "confirmCancel": "Sei sicuro di voler disdire questo appuntamento?"
   },
   "home": {
     "uploadDocument": "Carica documento",

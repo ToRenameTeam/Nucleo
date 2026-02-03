@@ -9,6 +9,8 @@ export interface Appointment {
   fiscalCode?: string;
   location?: string;
   patientId?: string;
+  doctorId?: string;
+  status?: string;
 }
 
 export interface AppointmentCard {

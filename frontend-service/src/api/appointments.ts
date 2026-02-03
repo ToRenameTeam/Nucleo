@@ -78,7 +78,10 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
       time: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
       user: patientName,
       location: 'Non specificata',
-      tags: [response.status]
+      tags: [response.status],
+      patientId: response.patientId,
+      doctorId: response.doctorId,
+      status: response.status
     }
   }
   
@@ -113,7 +116,10 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
     time: `${startTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })} - ${endTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`,
     user: patientName,
     location: facilityName,
-    tags: [response.status]
+    tags: [response.status],
+    patientId: response.patientId,
+    doctorId: availability.doctorId,
+    status: response.status
   }
 }
 
