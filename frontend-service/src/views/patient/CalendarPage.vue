@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '../../composables/useAuth'
 import TagBar from '../../components/shared/TagBar.vue'
 import type { Tag } from '../../types/tag'
@@ -9,19 +9,42 @@ import CardList from '../../components/shared/CardList.vue'
 import type { Appointment } from '../../types/appointment'
 import type { CardMetadata, CardAction } from '../../types/shared'
 import { CalendarIcon, ClockIcon, UserIcon, MapPinIcon, PencilIcon, XCircleIcon } from '@heroicons/vue/24/outline'
-import { MOCK_APPOINTMENTS, TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/mockData'
+import { TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/mockData'
 import { useI18n } from 'vue-i18n'
 import type { BadgeColors } from '../../types/document'
+import { appointmentsApi } from '../../api/appointments'
 
 const { t } = useI18n()
 
 const { currentUser } = useAuth()
 
-// TODO: Replace MOCK_APPOINTMENTS with real data from API
-const appointments = computed<Appointment[]>(() => {
-  if (!currentUser.value?.fiscalCode) return []
-  return MOCK_APPOINTMENTS.filter(a => a.fiscalCode === currentUser.value?.fiscalCode)
-})
+// State
+const appointments = ref<Appointment[]>([])
+const isLoading = ref(false)
+const error = ref<string | null>(null)
+
+// Load appointments from API
+async function loadAppointments() {
+  if (!currentUser.value?.userId) {
+    console.warn('[Calendar] No user ID available')
+    return
+  }
+
+  isLoading.value = true
+  error.value = null
+
+  try {
+    console.log('[Calendar] Loading appointments for patient:', currentUser.value.userId)
+    const data = await appointmentsApi.getAppointmentsByPatient(currentUser.value.userId)
+    appointments.value = data
+    console.log('[Calendar] Loaded appointments:', data.length)
+  } catch (err) {
+    console.error('[Calendar] Error loading appointments:', err)
+    error.value = err instanceof Error ? err.message : t('common.retry')
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const tags = computed<Tag[]>(() => [
   { id: 'all', label: t('calendar.categories.all'), count: appointments.value.length },
@@ -147,6 +170,11 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   
   return meta
 }
+
+// Load appointments on mount
+onMounted(() => {
+  loadAppointments()
+})
 </script>
 
 <template>
@@ -166,8 +194,22 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
       <TagBar :tags="tags" @tag-selected="handleTagSelected" />
     </div>
 
+    <!-- Loading State -->
+    <div v-if="isLoading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>{{ $t('common.loading') }}</p>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="error" class="error-container">
+      <p>{{ error }}</p>
+      <button @click="loadAppointments" class="retry-btn">
+        {{ $t('common.retry') }}
+      </button>
+    </div>
+
     <!-- Calendar and Appointments Section -->
-    <div class="content-section">
+    <div v-else class="content-section">
       <!-- Calendar -->
       <div class="calendar-container">
         <AppointmentsCalendar
@@ -291,6 +333,53 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   animation: fadeIn 0.5s cubic-bezier(0, 0, 0.2, 1);
   animation-delay: 0.1s;
   animation-fill-mode: both;
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+  gap: 1.5rem;
+  text-align: center;
+  background: var(--white-40);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--white-60);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 32px var(--black-8);
+  position: relative;
+  z-index: 1;
+}
+
+.loading-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid var(--white-60);
+  border-top-color: var(--sky-0ea5e9);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.retry-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--sky-0ea5e9);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.retry-btn:hover {
+  background: var(--sky-0284c7);
+  transform: translateY(-1px);
 }
 
 .content-section {

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { DocumentPlusIcon, CloudArrowUpIcon } from '@heroicons/vue/24/outline'
 import BaseModal from '../shared/BaseModal.vue'
 import type { CreateReportRequest } from '../../api/documents'
@@ -16,8 +15,6 @@ const emit = defineEmits<{
   close: []
   'document-created': [documentId: string]
 }>()
-
-const { t } = useI18n()
 
 // Form state
 const documentType = ref<'report' | 'upload'>('report')
