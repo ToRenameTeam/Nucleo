@@ -38,7 +38,3 @@ export const delegationSeeds: DelegationSeed[] = [
         status: 'Active',
     },
 ];
-        delegatorUserId: USER_IDS.LUCA_ROMANO,
-        status: 'Declined',
-    },
-];
