@@ -53,7 +53,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'calendar',
         name: 'patient-calendar',
-        component: () => import('../views/patient/CalendarPage.vue')
+        component: () => import('../views/patient/PatientCalendarPage.vue')
       },
       {
         path: 'settings',
