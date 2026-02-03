@@ -50,7 +50,7 @@ export interface WeeklyCalendarProps {
   endHour?: number
 }
 
-export interface AvailabilityModalProps {
+export interface ScheduleModalProps {
   isOpen: boolean
   mode: 'create' | 'edit' | 'select'
   availability?: AvailabilityDisplay | null

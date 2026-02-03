@@ -13,7 +13,7 @@ import { TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/mockData'
 import { useI18n } from 'vue-i18n'
 import type { BadgeColors } from '../../types/document'
 import { appointmentsApi } from '../../api/appointments'
-import AvailabilityModal from '../../components/shared/AvailabilityModal.vue'
+import ScheduleModal from '../../components/shared/ScheduleModal.vue'
 
 const { t } = useI18n()
 
@@ -330,7 +330,7 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
     </div>
 
     <!-- Reschedule Modal -->
-    <AvailabilityModal
+    <ScheduleModal
       v-if="appointmentToReschedule"
       :is-open="isRescheduleModalOpen"
       mode="select"

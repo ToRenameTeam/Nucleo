@@ -7,7 +7,7 @@ import TagBar from '../../components/shared/TagBar.vue'
 import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue'
 import BaseCard from '../../components/shared/BaseCard.vue'
 import CardList from '../../components/shared/CardList.vue'
-import AvailabilityModal from '../../components/shared/AvailabilityModal.vue'
+import ScheduleModal from '../../components/shared/ScheduleModal.vue'
 import CreateDocumentModal from '../../components/doctor/CreateDocumentModal.vue'
 import Toast from '../../components/shared/Toast.vue'
 import type { Tag } from '../../types/tag'
@@ -558,7 +558,7 @@ onMounted(() => {
     </div>
 
     <!-- Reschedule Modal -->
-    <AvailabilityModal
+    <ScheduleModal
       :is-open="isRescheduleModalOpen"
       mode="select"
       :doctor-id="currentUser?.userId || ''"

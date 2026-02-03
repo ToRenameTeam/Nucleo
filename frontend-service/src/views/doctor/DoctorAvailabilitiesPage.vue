@@ -8,7 +8,7 @@ import {
   ExclamationCircleIcon
 } from '@heroicons/vue/24/outline'
 import WeeklyAvailabilityCalendar from '../../components/doctor/weekly-calendar/WeeklyAvailabilityCalendar.vue'
-import AvailabilityModal from '../../components/shared/AvailabilityModal.vue'
+import ScheduleModal from '../../components/shared/ScheduleModal.vue'
 import Toast from '../../components/shared/Toast.vue'
 import type { AvailabilityDisplay } from '../../types/availability'
 import { availabilitiesApi } from '../../api/availabilities'
@@ -317,7 +317,7 @@ onMounted(() => {
     </div>
 
     <!-- Availability Modal -->
-    <AvailabilityModal
+    <ScheduleModal
       :is-open="isModalOpen"
       :mode="modalMode"
       :availability="editingAvailability"
