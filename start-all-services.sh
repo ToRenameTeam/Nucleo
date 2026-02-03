@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Script per avviare tutti i servizi Nucleo
-# Crea i file .env dai template .env.example e avvia tutti i docker-compose
+# Script to start all Nucleo services
+# Creates .env files from .env.example templates and starts all docker-compose
 
-# Colori per output
+# Output colors
 CYAN='\033[0;36m'
 MAGENTA='\033[0;35m'
 GREEN='\033[0;32m'
@@ -12,15 +12,15 @@ GRAY='\033[0;90m'
 WHITE='\033[0;37m'
 NC='\033[0m' # No Color
 
-echo -e "${CYAN}🚀 Nucleo - Avvio di tutti i servizi${NC}"
+echo -e "${CYAN}🚀 Nucleo - Starting all services${NC}"
 echo -e "${CYAN}=====================================${NC}"
 echo ""
 
-# Definizione dei servizi
+# Service definitions
 declare -a service_names=("appointments-service" "users-service" "master-data-service" "frontend-service" "documents-service")
 declare -a service_paths=("appointments-service" "users-service" "master-data-service" "frontend-service" "documents-service")
 
-# Funzione per gestire i file .env interattivamente
+# Function to handle .env files interactively
 setup_env_file() {
     local service_path=$1
     local service_name=$2
@@ -29,29 +29,29 @@ setup_env_file() {
     local env_example_path="${service_path}/.env.example"
     local env_path="${service_path}/.env"
     
-    echo -e "${CYAN}📦 Configurazione ${service_name}${NC}"
-    
+    echo -e "${CYAN}📦 Configuring ${service_name}${NC}"
+
     if [ -f "$env_example_path" ]; then
         if [ -f "$env_path" ]; then
-            echo -e "  ${GREEN}✓ File .env già esistente${NC}"
+            echo -e "  ${GREEN}✓ .env file already exists${NC}"
         else
-            echo -e "  ${YELLOW}📝 File .env non trovato. Lo creo...${NC}"
+            echo -e "  ${YELLOW}📝 .env file not found. Creating it...${NC}"
             echo "$env_content" > "$env_path"
 
         fi
     else
-        echo -e "  ${GRAY}ℹ️  Nessun .env.example trovato (non necessario)${NC}"
+        echo -e "  ${GRAY}ℹ️  No .env.example found (not required)${NC}"
     fi
     
     echo ""
 }
 
-# Step 1: Setup file .env
-echo -e "${MAGENTA}📋 Step 1: Configurazione file .env${NC}"
+# Step 1: Setup .env files
+echo -e "${MAGENTA}📋 Step 1: Configuring .env files${NC}"
 echo -e "${MAGENTA}=====================================${NC}"
 echo ""
-echo -e "${YELLOW}Configureremo i file .env uno per uno.${NC}"
-echo -e "${YELLOW}Per ogni servizio, potrai modificare manualmente la configurazione.${NC}"
+echo -e "${YELLOW}We will configure .env files one by one.${NC}"
+echo -e "${YELLOW}For each service, you can manually modify the configuration.${NC}"
 echo ""
 
 setup_env_file "users-service" "users-service" "
@@ -85,7 +85,7 @@ APP_PORT=8080
 setup_env_file "master-data-service" "master-data-service" "
 PORT=3040
 MONGO_URI=mongodb://admin:password@mongodb:27017/master_data_db?authSource=admin
-MONGODB_PORT=27017
+MONGODB_PORT=27027
 MONGO_INITDB_ROOT_USERNAME=admin
 MONGO_INITDB_ROOT_PASSWORD=password
 "
@@ -96,16 +96,16 @@ VITE_USERS_API_URL=http://localhost:3030
 VITE_DELEGATIONS_API_URL=http://localhost:3030
 "
 
-setup_env_file "documents-service" "documents-service" "GROQ_API_KEY=your_groq_api_key_here"
+setup_env_file "documents-service" "documents-service" "GROQ_API_KEY="
 
-echo -e "${GREEN}✅ Configurazione .env completata per tutti i servizi${NC}"
+echo -e "${GREEN}✅ .env configuration completed for all services${NC}"
 echo ""
-echo -e "${YELLOW}Premi INVIO per procedere con l'avvio dei servizi, o CTRL+C per annullare...${NC}"
+echo -e "${YELLOW}Press ENTER to proceed with starting services, or CTRL+C to cancel...${NC}"
 read -r
 
-# Step 2: Avvio servizi Docker
+# Step 2: Start Docker services
 echo ""
-echo -e "${MAGENTA}🐳 Step 2: Avvio Docker Compose per tutti i servizi${NC}"
+echo -e "${MAGENTA}🐳 Step 2: Starting Docker Compose for all services${NC}"
 echo -e "${MAGENTA}====================================================${NC}"
 echo ""
 
@@ -115,8 +115,8 @@ for i in "${!service_names[@]}"; do
     service_name="${service_names[$i]}"
     service_path="${service_paths[$i]}"
     
-    echo -e "${CYAN}🔧 Avvio ${service_name}...${NC}"
-    
+    echo -e "${CYAN}🔧 Starting ${service_name}...${NC}"
+
     docker_compose_path="${service_path}/docker-compose.yml"
     
     if [ -f "$docker_compose_path" ]; then
@@ -124,48 +124,49 @@ for i in "${!service_names[@]}"; do
         
         echo -e "  ${GRAY}→ docker-compose up -d${NC}"
         if docker-compose up -d; then
-            echo -e "  ${GREEN}✓ ${service_name} avviato con successo!${NC}"
+            echo -e "  ${GREEN}✓ ${service_name} started successfully!${NC}"
         else
-            echo -e "  ${RED}✗ Errore nell'avvio di ${service_name}${NC}"
+            echo -e "  ${RED}✗ Error starting ${service_name}${NC}"
             failed_services+=("$service_name")
         fi
         
         popd > /dev/null || exit
     else
-        echo -e "  ${RED}✗ File docker-compose.yml non trovato in ${service_path}${NC}"
+        echo -e "  ${RED}✗ docker-compose.yml file not found in ${service_path}${NC}"
         failed_services+=("$service_name")
     fi
     
     echo ""
 done
 
-# Riepilogo finale
+# Final summary
 echo -e "${CYAN}=====================================${NC}"
-echo -e "${CYAN}📊 RIEPILOGO AVVIO SERVIZI${NC}"
+echo -e "${CYAN}📊 SERVICES STARTUP SUMMARY${NC}"
 echo -e "${CYAN}=====================================${NC}"
 echo ""
 
 if [ ${#failed_services[@]} -eq 0 ]; then
-    echo -e "${GREEN}✅ Tutti i servizi sono stati avviati correttamente!${NC}"
+    echo -e "${GREEN}✅ All services started successfully!${NC}"
     echo ""
-    echo -e "${CYAN}🌐 Servizi disponibili su:${NC}"
+    echo -e "${CYAN}🌐 Services available at:${NC}"
     echo -e "${WHITE}  • Frontend Service:        http://localhost:3000${NC}"
     echo -e "${WHITE}  • Users Service:           http://localhost:3030${NC}"
     echo -e "${WHITE}  • Master Data Service:     http://localhost:3040${NC}"
     echo -e "${WHITE}  • Appointments Service:    http://localhost:8080${NC}"
+    echo -e "${WHITE}  • Documents Service:       http://localhost:8090${NC}"
 else
-    echo -e "${YELLOW}⚠️  Alcuni servizi hanno avuto problemi durante l'avvio:${NC}"
+    echo -e "${YELLOW}⚠️  Some services encountered problems during startup:${NC}"
     for failed in "${failed_services[@]}"; do
         echo -e "  ${RED}✗ ${failed}${NC}"
     done
     echo ""
-    echo -e "${YELLOW}Controlla i log con: docker-compose logs -f${NC}"
+    echo -e "${YELLOW}Check logs with: docker-compose logs -f${NC}"
 fi
 
 echo ""
-echo -e "${CYAN}📝 Comandi utili:${NC}"
-echo -e "${GRAY}  • Visualizza log:           docker-compose logs -f${NC}"
-echo -e "${GRAY}  • Ferma tutti i servizi:    docker-compose down (in ogni cartella servizio)${NC}"
-echo -e "${GRAY}  • Controlla stato:          docker-compose ps${NC}"
+echo -e "${CYAN}📝 Useful commands:${NC}"
+echo -e "${GRAY}  • View logs:                docker-compose logs -f${NC}"
+echo -e "${GRAY}  • Stop all services:        docker-compose down (in each service folder)${NC}"
+echo -e "${GRAY}  • Check status:             docker-compose ps${NC}"
 echo ""
-echo -e "${YELLOW}🛑 Per fermare tutti i servizi, usa lo script: ./stop-all-services.sh${NC}"
+echo -e "${YELLOW}🛑 To stop all services, use the script: ./stop-all-services.sh${NC}"
