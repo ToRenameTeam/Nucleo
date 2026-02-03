@@ -226,8 +226,7 @@
     "footer": {
       "version": "Nucleo v0.1 · Prototipo"
     }
-  },
-  
+  }, 
   "footer": {
     "privacy": "Privacy",
     "privacyAria": "Apri informativa privacy e cookie policy",
@@ -502,9 +501,26 @@
         "errors": {
           "saveFailed": "Errore nel salvataggio della prescrizione. Riprova."
         }
+      },
+      "medicineDetails": {
+        "units": {
+          "day": "giorno",
+          "mg": "mg"
+        },
+        "periods": {
+          "day": "al giorno",
+          "week": "a settimana"
+        },
+        "durationUnits": {
+          "day": "giorni",
+          "week": "settimane"
+        },
+        "prescription": {
+          "validUntilExecution": "Fino ad esecuzione"
+        }
       }
-    }
-  },
+  }
+},
   "common": {
     "loading": "Caricamento...",
     "retry": "Riprova",
@@ -512,5 +528,17 @@
     "save": "Salva",
     "saving": "Salvataggio...",
     "back": "Indietro"
+  },
+  "prescriptionTags": {
+    "prescription": "prescrizione",
+    "medicines": "farmaci",
+    "services": "visite"
+  },
+  "prescriptionSummary": {
+    "medicine": "Prescrizione: {medicine}",
+    "service": "Prescrizione: {service}"
+  },
+  "facilities": {
+    "default": "Struttura predefinita"
   }
 }

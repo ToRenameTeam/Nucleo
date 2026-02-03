@@ -488,23 +488,52 @@
         "urgencyHigh": "High",
         "notes": "Notes",
         "notesPlaceholder": "Additional instructions or notes..."
-      },
-      "toast": {
-        "medicineSaved": "Medicine prescription created successfully",
-        "serviceSaved": "Visit prescription created successfully"
-      },
-      "errors": {
-        "saveFailed": "Error saving prescription. Please try again."
+        },
+        "toast": {
+          "medicineSaved": "Medicine prescription created successfully",
+          "serviceSaved": "Visit prescription created successfully"
+        },
+        "errors": {
+          "saveFailed": "Error saving prescription. Please try again."
+        }
+      }, 
+      "medicineDetails": {
+        "units": {
+          "day": "day",
+          "mg": "mg"
+        },
+        "periods": {
+          "day": "per day",
+          "week": "per week"
+        },
+        "durationUnits": {
+          "day": "days",
+          "week": "weeks"
+        },
+        "prescription": {
+          "validUntilExecution": "Until execution"
+        }
       }
     }
-    }
   },
-  "common": {
-    "loading": "Loading...",
-    "retry": "Retry",
-    "cancel": "Cancel",
-    "save": "Save",
-    "saving": "Saving...",
-    "back": "Back"
+    "common": {
+      "loading": "Loading...",
+      "retry": "Retry",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "back": "Back"
+    },
+    "prescriptionTags": {
+      "prescription": "prescription",
+      "medicines": "medicines",
+      "services": "services"
+    },
+    "prescriptionSummary": {
+      "medicine": "Prescription: {medicine}",
+      "service": "Prescription: {service}"
+    },
+    "facilities": {
+      "default": "Default facility"
+    }
   }
-}

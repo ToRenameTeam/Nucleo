@@ -21,6 +21,7 @@ const showSuccessToast = ref(false)
 const successToastMessage = ref('')
 const delegationSendError = ref('')
 const newDelegationModalKey = ref(0)
+const isSending = ref(false)
 
 const openDelegationsModal = () => {
   isDelegationsModalOpen.value = true
@@ -46,26 +47,6 @@ const handleBackFromNewDelegation = () => {
   isDelegationsModalOpen.value = true
 }
 
-const handleSendDelegationRequest = async (fiscalCode: string) => {
-  if (!currentUser.value?.userId) return
-
-  delegationSendError.value = ''
-
-  const result = await createDelegation(fiscalCode, currentUser.value.userId)
-  
-  if (result.success) {
-    isNewDelegationModalOpen.value = false
-    newDelegationModalKey.value++
-    
-    successToastMessage.value = t('delegations.toast.delegationSent', { name: result.userName })
-    showSuccessToast.value = true
-    
-    window.dispatchEvent(new CustomEvent('delegations-updated'))
-  } else {
-    delegationSendError.value = mapErrorToMessage(new Error(result.error || 'Unknown error'))
-  }
-}
-
 const handleReceivedDelegations = () => {
   closeDelegationsModal()
   delegationsListType.value = 'received'
@@ -85,6 +66,32 @@ const closeDelegationsListModal = () => {
 const handleBackFromDelegationsList = () => {
   isDelegationsListModalOpen.value = false
   isDelegationsModalOpen.value = true
+}
+
+const handleSendDelegationRequest = async (fiscalCode: string) => {
+  if (!currentUser.value?.userId) return
+
+  delegationSendError.value = ''
+  isSending.value = true
+
+  try {
+    const result = await createDelegation(fiscalCode, currentUser.value.userId)
+    
+    if (result.success) {
+      isNewDelegationModalOpen.value = false
+      newDelegationModalKey.value++
+      
+      successToastMessage.value = t('delegations.toast.delegationSent', { name: result.userName })
+      showSuccessToast.value = true
+      
+      // Emit event to update delegation counts
+      window.dispatchEvent(new CustomEvent('delegations-updated'))
+    } else {
+      delegationSendError.value = mapErrorToMessage(new Error(result.error || 'Unknown error'))
+    }
+  } finally {
+    isSending.value = false
+  }
 }
 
 const handleCloseToast = () => {
@@ -111,8 +118,8 @@ const mapErrorToMessage = (error: Error): string => {
 
 <template>
   <div class="delegations-manager">
-    <button class="delegations-button" @click="openDelegationsModal">
-      <UsersIcon class="delegations-icon" />
+    <button class="manage-delegations-btn" @click="openDelegationsModal">
+      <UsersIcon class="btn-icon" />
       {{ t('patientChoice.manageDelegations') }}
     </button>
 
@@ -128,6 +135,7 @@ const mapErrorToMessage = (error: Error): string => {
       :key="newDelegationModalKey"
       :is-open="isNewDelegationModalOpen"
       :send-error="delegationSendError"
+      :is-sending="isSending"
       @close="closeNewDelegationModal"
       @back="handleBackFromNewDelegation"
       @send="handleSendDelegationRequest"
@@ -144,6 +152,7 @@ const mapErrorToMessage = (error: Error): string => {
       :show="showSuccessToast"
       :message="successToastMessage"
       :duration="4000"
+      type="success"
       @close="handleCloseToast"
     />
   </div>
@@ -159,7 +168,7 @@ const mapErrorToMessage = (error: Error): string => {
   pointer-events: none;
 }
 
-.delegations-button {
+.manage-delegations-btn {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
@@ -168,34 +177,32 @@ const mapErrorToMessage = (error: Error): string => {
   gap: 0.75rem;
   padding: 1rem 1.5rem;
   background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   color: var(--white);
-  border: 1px solid var(--white-30);
+  border: 1px solid var(--white-20);
   border-radius: 9999px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 16px var(--accent-primary-30), 0 2px 8px var(--accent-primary-20), inset 0 1px 0 var(--white-20);
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px var(--accent-primary-30), 0 2px 8px var(--accent-primary-20), inset 0 1px 0 var(--white-20);
   z-index: 1000;
-  pointer-events: auto;
+  pointer-events: all;
   animation: fadeIn 0.6s cubic-bezier(0, 0, 0.2, 1);
   animation-delay: 0.6s;
   animation-fill-mode: both;
 }
 
-.delegations-button:hover {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+.manage-delegations-btn:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px var(--accent-primary-40), 0 4px 12px var(--accent-primary-30), inset 0 1px 0 var(--white-30);
 }
 
-.delegations-button:active {
+.manage-delegations-btn:active {
   transform: translateY(-2px);
 }
 
-.delegations-icon {
+.btn-icon {
   width: 1.5rem;
   height: 1.5rem;
   stroke-width: 2;
@@ -211,26 +218,28 @@ const mapErrorToMessage = (error: Error): string => {
 }
 
 @media (max-width: 768px) {
-  .delegations-button {
+  .manage-delegations-btn {
     bottom: 1.5rem;
     right: 1.5rem;
     padding: 0.875rem 1.25rem;
     font-size: 0.9375rem;
   }
-  .delegations-icon {
+
+  .btn-icon {
     width: 1.375rem;
     height: 1.375rem;
   }
 }
 
 @media (max-width: 480px) {
-  .delegations-button {
+  .manage-delegations-btn {
     bottom: 1rem;
     right: 1rem;
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
   }
-  .delegations-icon {
+
+  .btn-icon {
     width: 1.25rem;
     height: 1.25rem;
   }
