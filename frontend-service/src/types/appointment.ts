@@ -11,6 +11,8 @@ export interface Appointment {
   patientId?: string;
   doctorId?: string;
   status?: string;
+  category?: string;
+  serviceTypeDescription?: string;
 }
 
 export interface AppointmentCard {

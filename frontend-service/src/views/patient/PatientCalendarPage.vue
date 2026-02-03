@@ -14,6 +14,7 @@ import { useI18n } from 'vue-i18n'
 import type { BadgeColors } from '../../types/document'
 import { appointmentsApi } from '../../api/appointments'
 import ScheduleModal from '../../components/shared/ScheduleModal.vue'
+import { formatCategory } from '../../utils/formatters'
 
 const { t } = useI18n()
 
@@ -54,11 +55,24 @@ onMounted(() => {
 
 const tags = computed<Tag[]>(() => {
   const allAppointments = appointments.value
+  
+  // Get unique categories from appointments
+  const categoriesSet = new Set<string>()
+  allAppointments.forEach(apt => {
+    if (apt.category) {
+      categoriesSet.add(apt.category)
+    }
+  })
+  
+  const categoryTags: Tag[] = Array.from(categoriesSet).map(category => ({
+    id: category,
+    label: formatCategory(category),
+    count: allAppointments.filter(a => a.category === category).length
+  }))
+  
   return [
     { id: 'all', label: t('calendar.categories.all'), count: allAppointments.length },
-    { id: 'cardiologia', label: t('calendar.categories.cardiologia'), count: allAppointments.filter(a => a.tags?.includes('Cardiologia')).length },
-    { id: 'analisi', label: t('calendar.categories.analisi'), count: allAppointments.filter(a => a.tags?.includes('Analisi')).length },
-    { id: 'pediatria', label: t('calendar.categories.pediatria'), count: allAppointments.filter(a => a.tags?.includes('Pediatria')).length }
+    ...categoryTags
   ]
 })
 
@@ -70,9 +84,7 @@ const filteredAppointments = computed(() => {
   if (selectedTag.value === 'all') {
     return allAppointments
   }
-  return allAppointments.filter(apt => 
-    apt.tags?.some(tag => tag.toLowerCase() === selectedTag.value.toLowerCase())
-  )
+  return allAppointments.filter(apt => apt.category === selectedTag.value)
 })
 
 const currentAppointmentInfo = computed(() => {
@@ -296,27 +308,25 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
             :key="appointment.id"
             :card-id="appointment.id"
             :title="appointment.title"
-            :description="appointment.description"
+            :description="appointment.serviceTypeDescription || appointment.description"
             :icon="CalendarIcon"
             :metadata="getAppointmentMetadata(appointment)"
             :actions="getAppointmentActions()"
             :selected="selectedAppointmentId === appointment.id"
             @click="handleAppointmentClick(appointment.id)"
           >
-            <template v-if="appointment.tags && appointment.tags.length > 0" #badges>
+            <template v-if="appointment.category" #badges>
               <div class="badges-row">
                 <div 
-                  v-for="tag in appointment.tags.slice(0, 2)" 
-                  :key="tag" 
                   class="appointment-badge" 
                   :style="{
-                    color: getBadgeColors(tag).color,
-                    backgroundColor: getBadgeColors(tag).bgColor,
-                    borderColor: getBadgeColors(tag).borderColor
+                    color: getBadgeColors(appointment.category).color,
+                    backgroundColor: getBadgeColors(appointment.category).bgColor,
+                    borderColor: getBadgeColors(appointment.category).borderColor
                   }"
                 >
-                  <span class="badge-icon">{{ getBadgeIcon(tag) }}</span>
-                  <span class="badge-label">{{ tag }}</span>
+                  <span class="badge-icon">{{ getBadgeIcon(appointment.category) }}</span>
+                  <span class="badge-label">{{ formatCategory(appointment.category) }}</span>
                 </div>
               </div>
             </template>

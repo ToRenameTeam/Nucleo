@@ -321,7 +321,7 @@ const slots = defineSlots<{
 .metadata-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.25rem;
+  gap: 0.5rem;
   color: var(--text-metadata, var(--text-secondary));
   font-size: 0.97rem;
   margin-top: auto;

@@ -73,7 +73,7 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
     return {
       id: response.appointmentId,
       title: 'Appuntamento',
-      description: `Paziente: ${patientName}`,
+      description: `Dettagli non disponibili`,
       date: new Date().toLocaleDateString('it-IT'),
       time: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
       user: patientName,
@@ -88,13 +88,17 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
   const startTime = new Date(availability.timeSlot.startDateTime)
   const endTime = new Date(startTime.getTime() + availability.timeSlot.durationMinutes * 60000)
   
-  // Get service type name
+  // Get service type name, category, and description
   let serviceTypeName = 'Visita'
+  let serviceTypeCategory: string | undefined
+  let serviceTypeDescription: string | undefined
   if (availability.serviceTypeId) {
     console.log('[Appointments API] Fetching service type:', availability.serviceTypeId)
     const serviceType = await masterDataApi.getServiceTypeById(availability.serviceTypeId)
     if (serviceType) {
       serviceTypeName = serviceType.name
+      serviceTypeCategory = serviceType.category
+      serviceTypeDescription = serviceType.description
     }
   }
   
@@ -108,18 +112,31 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
     }
   }
   
+  // Get doctor name
+  let doctorName = availability.doctorId
+  if (availability.doctorId) {
+    console.log('[Appointments API] Fetching doctor user info:', availability.doctorId)
+    const doctorUser = await userApi.getUserById(availability.doctorId)
+    if (doctorUser) {
+      doctorName = `Dott. ${doctorUser.name} ${doctorUser.lastName}`
+      console.log('[Appointments API] Doctor name resolved:', doctorName)
+    }
+  }
+  
   return {
     id: response.appointmentId,
     title: serviceTypeName,
-    description: `Paziente: ${patientName}`,
+    description: serviceTypeDescription || `Appuntamento con ${doctorName} presso ${facilityName}`,
     date: startTime.toLocaleDateString('it-IT'),
     time: `${startTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })} - ${endTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`,
-    user: patientName,
+    user: doctorName,
     location: facilityName,
-    tags: [response.status],
+    tags: serviceTypeCategory ? [serviceTypeCategory] : [],
     patientId: response.patientId,
     doctorId: availability.doctorId,
-    status: response.status
+    status: response.status,
+    category: serviceTypeCategory,
+    serviceTypeDescription: serviceTypeDescription
   }
 }
 
