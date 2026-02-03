@@ -9,6 +9,7 @@ import it.nucleo.domain.FileStorageRepository
 import it.nucleo.domain.PatientId
 import it.nucleo.domain.Summary
 import it.nucleo.domain.Tag
+import it.nucleo.domain.Title
 import it.nucleo.domain.uploaded.UploadedDocumentType
 import it.nucleo.infrastructure.ai.AiAnalysisResult
 import it.nucleo.infrastructure.ai.AiServiceClient
@@ -120,6 +121,7 @@ class DocumentUploadService(
                 DocumentFactory.createUploadedDocument(
                     id = documentId,
                     patientId = command.patientId,
+                    title = Title(command.filename.removeSuffix(".pdf")),
                     filename = command.filename,
                     metadata = metadata,
                     documentType = inferDocumentType(metadata)

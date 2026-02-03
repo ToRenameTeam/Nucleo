@@ -36,6 +36,7 @@ class DocumentService(
 
     suspend fun createDocument(patientId: PatientId, request: CreateDocumentRequest): Document {
         val doctorId = DoctorId(request.doctorId)
+        val title = Title(request.title)
 
         // Generate document ID upfront - needed for PDF storage and AI analysis
         val documentId = DocumentId(UUID.randomUUID().toString())
@@ -50,6 +51,7 @@ class DocumentService(
                         id = documentId,
                         doctorId = doctorId,
                         patientId = patientId,
+                        title = title,
                         metadata = placeholderMetadata,
                         validity = request.validity.toDomain(),
                         dosage = request.dosage.toDomain()
@@ -60,6 +62,7 @@ class DocumentService(
                         id = documentId,
                         doctorId = doctorId,
                         patientId = patientId,
+                        title = title,
                         metadata = placeholderMetadata,
                         validity = request.validity.toDomain(),
                         serviceId = ServiceId(request.serviceId),
@@ -84,6 +87,7 @@ class DocumentService(
                         id = documentId,
                         doctorId = doctorId,
                         patientId = patientId,
+                        title = title,
                         metadata = placeholderMetadata,
                         servicePrescription = servicePrescriptionDoc,
                         executionDate = ExecutionDate(LocalDate.parse(request.executionDate)),

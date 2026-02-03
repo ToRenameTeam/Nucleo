@@ -1,5 +1,5 @@
 // MongoDB seed script for documents-service
-// Run with: mongosh mongodb://admin:password@localhost:27017/documents-db < scripts/seed.js
+// Run with: mongosh mongodb://admin:password@localhost:27037/nucleo_documents --authenticationDatabase admin < scripts/seed.js
 
 // Clear existing data
 db.medical_records.deleteMany({});
@@ -42,6 +42,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.FRANCESCO_VERDI,
                 patientId: PATIENT_IDS.MARIO_ROSSI,
                 issueDate: '2026-01-20',
+                title: 'Prescrizione Enalapril',
                 summary: 'Prescrizione farmaci antipertensivi per controllo pressione arteriosa',
                 tags: ['cardiologia', 'ipertensione', 'cronica'],
                 validity: {
@@ -63,6 +64,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.FRANCESCO_VERDI,
                 patientId: PATIENT_IDS.MARIO_ROSSI,
                 issueDate: '2026-01-15',
+                title: 'Referto Visita Cardiologica',
                 summary: 'Visita cardiologica di controllo - esito positivo',
                 tags: ['cardiologia', 'visita'],
                 reportType: 'Visita cardiologica',
@@ -75,6 +77,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.FRANCESCO_VERDI,
                 patientId: PATIENT_IDS.MARIO_ROSSI,
                 issueDate: '2026-01-15',
+                title: 'Prescrizione ECG Sotto Sforzo',
                 summary: 'Prescrizione ECG sotto sforzo',
                 tags: ['cardiologia', 'diagnostica'],
                 validity: {
@@ -98,6 +101,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.GIORGIO_COSTA,
                 patientId: PATIENT_IDS.ELENA_FERRARI,
                 issueDate: '2026-01-18',
+                title: 'Prescrizione Sumatriptan',
                 summary: 'Terapia per emicrania cronica',
                 tags: ['neurologia', 'emicrania', 'cronica'],
                 validity: {
@@ -119,6 +123,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.GIORGIO_COSTA,
                 patientId: PATIENT_IDS.ELENA_FERRARI,
                 issueDate: '2026-01-18',
+                title: 'Referto Visita Neurologica',
                 summary: 'Visita neurologica per cefalea',
                 tags: ['neurologia', 'cefalea'],
                 reportType: 'Visita neurologica',
@@ -138,6 +143,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.SARA_COLOMBO,
                 patientId: PATIENT_IDS.GIULIA_BIANCHI,
                 issueDate: '2026-01-22',
+                title: 'Prescrizione Amoxicillina',
                 summary: 'Antibiotico per infezione vie respiratorie',
                 tags: ['pediatria', 'antibiotico', 'respiratorio'],
                 validity: {
@@ -159,6 +165,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.SARA_COLOMBO,
                 patientId: PATIENT_IDS.GIULIA_BIANCHI,
                 issueDate: '2026-01-22',
+                title: 'Referto Visita Pediatrica',
                 summary: 'Visita pediatrica per febbre e tosse',
                 tags: ['pediatria', 'infezione'],
                 reportType: 'Visita pediatrica',
@@ -178,6 +185,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.PAOLO_GRECO,
                 patientId: PATIENT_IDS.LUCA_ROMANO,
                 issueDate: '2026-01-10',
+                title: 'Referto Visita Ortopedica Ginocchio',
                 summary: 'Visita ortopedica per dolore al ginocchio destro',
                 tags: ['ortopedia', 'ginocchio', 'trauma'],
                 reportType: 'Visita ortopedica',
@@ -190,6 +198,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.PAOLO_GRECO,
                 patientId: PATIENT_IDS.LUCA_ROMANO,
                 issueDate: '2026-01-10',
+                title: 'Prescrizione RMN Ginocchio',
                 summary: 'Prescrizione RMN ginocchio destro',
                 tags: ['ortopedia', 'diagnostica', 'rmn'],
                 validity: {
@@ -206,6 +215,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.PAOLO_GRECO,
                 patientId: PATIENT_IDS.LUCA_ROMANO,
                 issueDate: '2026-01-10',
+                title: 'Prescrizione Ibuprofene',
                 summary: 'Antinfiammatorio per distorsione ginocchio',
                 tags: ['ortopedia', 'antinfiammatorio'],
                 validity: {
@@ -234,6 +244,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.FRANCESCO_VERDI,
                 patientId: PATIENT_IDS.ALESSANDRO_RICCI,
                 issueDate: '2025-12-15',
+                title: 'Prescrizione Metformina',
                 summary: 'Terapia cronica per ipertensione e diabete',
                 tags: ['cardiologia', 'ipertensione', 'diabete', 'cronica'],
                 validity: {
@@ -255,6 +266,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.FRANCESCO_VERDI,
                 patientId: PATIENT_IDS.ALESSANDRO_RICCI,
                 issueDate: '2025-12-15',
+                title: 'Referto Controllo Cardiometabolico',
                 summary: 'Controllo cardiologico e metabolico',
                 tags: ['cardiologia', 'diabete', 'controllo'],
                 reportType: 'Visita cardiologica',
@@ -267,6 +279,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.STEFANO_LOMBARDI,
                 patientId: PATIENT_IDS.ALESSANDRO_RICCI,
                 issueDate: '2026-01-25',
+                title: 'Prescrizione Ketoconazolo Crema',
                 summary: 'Crema dermatologica per dermatite seborroica',
                 tags: ['dermatologia', 'dermatite'],
                 validity: {
@@ -295,6 +308,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.PAOLO_GRECO,
                 patientId: PATIENT_IDS.MARIA_CONTI,
                 issueDate: '2026-01-12',
+                title: 'Prescrizione Calcio e Vitamina D',
                 summary: 'Integratore calcio e vitamina D per osteoporosi',
                 tags: ['ortopedia', 'osteoporosi', 'prevenzione'],
                 validity: {
@@ -316,6 +330,7 @@ const medicalRecords = [
                 doctorId: DOCTOR_IDS.PAOLO_GRECO,
                 patientId: PATIENT_IDS.MARIA_CONTI,
                 issueDate: '2026-01-12',
+                title: 'Referto Densitometria Ossea',
                 summary: 'Controllo densitometria ossea',
                 tags: ['ortopedia', 'osteoporosi', 'densitometria'],
                 reportType: 'Visita ortopedica',

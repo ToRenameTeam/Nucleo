@@ -12,6 +12,7 @@ data class UploadedDocument(
     override val doctorId: DoctorId,
     override val patientId: PatientId,
     override val issueDate: IssueDate,
+    override val title: Title,
     override val metadata: FileMetadata,
     val filename: String,
     val documentType: UploadedDocumentType

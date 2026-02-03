@@ -6,12 +6,14 @@ object DocumentFixtures {
 
     fun medicinePrescriptionRequest(
         doctorId: String = "doctor-test-001",
+        title: String = "Test Medicine Prescription",
         metadata: FileMetadataDto = defaultMetadata("Medicine prescription for test"),
         validity: ValidityRequest = ValidityRequest.UntilDate("2026-12-31"),
         dosage: DosageRequest = defaultDosage()
     ): CreateMedicinePrescriptionRequest =
         CreateMedicinePrescriptionRequest(
             doctorId = doctorId,
+            title = title,
             metadata = metadata,
             validity = validity,
             dosage = dosage
@@ -19,6 +21,7 @@ object DocumentFixtures {
 
     fun servicePrescriptionRequest(
         doctorId: String = "doctor-test-001",
+        title: String = "Test Service Prescription",
         metadata: FileMetadataDto = defaultMetadata("Service prescription for test"),
         validity: ValidityRequest = ValidityRequest.UntilExecution,
         serviceId: String = "service-blood-test",
@@ -27,6 +30,7 @@ object DocumentFixtures {
     ): CreateServicePrescriptionRequest =
         CreateServicePrescriptionRequest(
             doctorId = doctorId,
+            title = title,
             metadata = metadata,
             validity = validity,
             serviceId = serviceId,
@@ -36,6 +40,7 @@ object DocumentFixtures {
 
     fun reportRequest(
         doctorId: String = "doctor-test-002",
+        title: String = "Test Report",
         metadata: FileMetadataDto = defaultMetadata("Test report"),
         servicePrescriptionId: String,
         executionDate: String = "2026-01-30",
@@ -46,6 +51,7 @@ object DocumentFixtures {
     ): CreateReportRequest =
         CreateReportRequest(
             doctorId = doctorId,
+            title = title,
             metadata = metadata,
             servicePrescriptionId = servicePrescriptionId,
             executionDate = executionDate,

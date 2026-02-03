@@ -11,6 +11,8 @@ interface Document {
 
     val issueDate: IssueDate
 
+    val title: Title
+
     val metadata: FileMetadata
 
     fun withMetadata(newMetadata: FileMetadata): Document
@@ -25,6 +27,8 @@ data class FileMetadata(val summary: Summary, val tags: Set<Tag>)
 @JvmInline value class DoctorId(val id: String)
 
 @JvmInline value class IssueDate(val date: LocalDate = LocalDate.now())
+
+@JvmInline value class Title(val value: String)
 
 @JvmInline value class Summary(val summary: String)
 

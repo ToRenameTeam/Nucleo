@@ -18,6 +18,7 @@ sealed class DocumentDto {
     abstract val doctorId: String
     abstract val patientId: String
     abstract val issueDate: String
+    abstract val title: String
     abstract val summary: String
     abstract val tags: Set<String>
 }
@@ -29,6 +30,7 @@ data class MedicinePrescriptionDto(
     override val doctorId: String,
     override val patientId: String,
     override val issueDate: String,
+    override val title: String,
     override val summary: String,
     override val tags: Set<String>,
     val validity: ValidityDto,
@@ -42,6 +44,7 @@ data class ServicePrescriptionDto(
     override val doctorId: String,
     override val patientId: String,
     override val issueDate: String,
+    override val title: String,
     override val summary: String,
     override val tags: Set<String>,
     val validity: ValidityDto,
@@ -57,6 +60,7 @@ data class ReportDto(
     override val doctorId: String,
     override val patientId: String,
     override val issueDate: String,
+    override val title: String,
     override val summary: String,
     override val tags: Set<String>,
     val servicePrescription: ServicePrescriptionDto,
@@ -74,6 +78,7 @@ data class UploadedDocumentDto(
     override val doctorId: String,
     override val patientId: String,
     override val issueDate: String,
+    override val title: String,
     override val summary: String,
     override val tags: Set<String>,
     val filename: String,

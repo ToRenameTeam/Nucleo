@@ -9,6 +9,7 @@ sealed class DocumentResponse {
     abstract val doctorId: String
     abstract val patientId: String
     abstract val issueDate: String
+    abstract val title: String
     abstract val metadata: FileMetadataDto
 }
 
@@ -19,6 +20,7 @@ data class MedicinePrescriptionResponse(
     override val doctorId: String,
     override val patientId: String,
     override val issueDate: String,
+    override val title: String,
     override val metadata: FileMetadataDto,
     val validity: ValidityResponse,
     val dosage: DosageResponse
@@ -31,6 +33,7 @@ data class ServicePrescriptionResponse(
     override val doctorId: String,
     override val patientId: String,
     override val issueDate: String,
+    override val title: String,
     override val metadata: FileMetadataDto,
     val validity: ValidityResponse,
     val serviceId: String,
@@ -45,6 +48,7 @@ data class ReportResponse(
     override val doctorId: String,
     override val patientId: String,
     override val issueDate: String,
+    override val title: String,
     override val metadata: FileMetadataDto,
     val servicePrescription: ServicePrescriptionResponse,
     val executionDate: String,
@@ -61,6 +65,7 @@ data class UploadedDocumentResponse(
     override val doctorId: String,
     override val patientId: String,
     override val issueDate: String,
+    override val title: String,
     override val metadata: FileMetadataDto,
     val filename: String,
     val documentType: String
@@ -94,6 +99,7 @@ data class DosageResponse(
 @Serializable
 sealed class CreateDocumentRequest {
     abstract val doctorId: String
+    abstract val title: String
     abstract val metadata: FileMetadataDto
 }
 
@@ -101,6 +107,7 @@ sealed class CreateDocumentRequest {
 @SerialName("medicine_prescription")
 data class CreateMedicinePrescriptionRequest(
     override val doctorId: String,
+    override val title: String,
     override val metadata: FileMetadataDto,
     val validity: ValidityRequest,
     val dosage: DosageRequest
@@ -110,6 +117,7 @@ data class CreateMedicinePrescriptionRequest(
 @SerialName("service_prescription")
 data class CreateServicePrescriptionRequest(
     override val doctorId: String,
+    override val title: String,
     override val metadata: FileMetadataDto,
     val validity: ValidityRequest,
     val serviceId: String,
@@ -121,6 +129,7 @@ data class CreateServicePrescriptionRequest(
 @SerialName("report")
 data class CreateReportRequest(
     override val doctorId: String,
+    override val title: String,
     override val metadata: FileMetadataDto,
     val servicePrescriptionId: String,
     val executionDate: String,

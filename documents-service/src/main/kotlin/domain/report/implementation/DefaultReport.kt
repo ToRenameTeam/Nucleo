@@ -6,6 +6,7 @@ import it.nucleo.domain.DocumentId
 import it.nucleo.domain.FileMetadata
 import it.nucleo.domain.IssueDate
 import it.nucleo.domain.PatientId
+import it.nucleo.domain.Title
 import it.nucleo.domain.prescription.implementation.ServicePrescription
 import it.nucleo.domain.report.*
 
@@ -14,6 +15,7 @@ class DefaultReport(
     override val doctorId: DoctorId,
     override val patientId: PatientId,
     override val issueDate: IssueDate,
+    override val title: Title,
     override var metadata: FileMetadata,
     override val servicePrescription: ServicePrescription,
     override val executionDate: ExecutionDate,
@@ -54,6 +56,7 @@ class DefaultReport(
             doctorId = doctorId,
             patientId = patientId,
             issueDate = issueDate,
+            title = title,
             metadata = newMetadata,
             servicePrescription = servicePrescription,
             executionDate = executionDate,

@@ -6,6 +6,7 @@ import it.nucleo.domain.DocumentId
 import it.nucleo.domain.FileMetadata
 import it.nucleo.domain.IssueDate
 import it.nucleo.domain.PatientId
+import it.nucleo.domain.Title
 import it.nucleo.domain.prescription.Prescription
 import it.nucleo.domain.prescription.Validity
 
@@ -14,6 +15,7 @@ data class ServicePrescription(
     override val doctorId: DoctorId,
     override val patientId: PatientId,
     override val issueDate: IssueDate,
+    override val title: Title,
     override val metadata: FileMetadata,
     override val validity: Validity,
     val serviceId: ServiceId,
