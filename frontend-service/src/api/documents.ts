@@ -249,37 +249,41 @@ export const documentsApiService = {
   /**
    * Get all documents for a patient
    */
-  async getDocumentsByPatient(patientId: string): Promise<DocumentResponse[]> {
-    const response = await fetch(`${BASE_URL}/patients/${patientId}/documents`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+  async getDocumentsByPatient(patientId: string): Promise<AnyDocument[]> {
+    try {
+      const response = await fetch(`${BASE_URL}/patients/${patientId}/documents`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      const documents = await handleResponse<DocumentApiResponse[]>(response)
+      return documents.map(doc => mapDocumentResponse(doc))
+    } catch (error) {
+      console.error('[Documents API] Error fetching documents by patient:', error)
+      throw error
     }
-
-    return await response.json()
   },
 
   /**
    * Get a specific document by ID
    */
-  async getDocumentById(patientId: string, documentId: string): Promise<DocumentResponse> {
-    const response = await fetch(`${BASE_URL}/patients/${patientId}/documents/${documentId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+  async getDocumentById(patientId: string, documentId: string): Promise<AnyDocument> {
+    try {
+      const response = await fetch(`${BASE_URL}/patients/${patientId}/documents/${documentId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      const document = await handleResponse<DocumentApiResponse>(response)
+      return mapDocumentResponse(document)
+    } catch (error) {
+      console.error('[Documents API] Error fetching document by ID:', error)
+      throw error
     }
-
-    return await response.json()
   },
 
   /**
