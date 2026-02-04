@@ -27,9 +27,6 @@ const handleItemClick = (item: string) => {
   } else if (item === 'myProfile') {
     showProfileModal.value = true
   } else if (item === 'logout') {
-    // Implement logout logic here
-    console.log('Logging out...')
-  } else if (item === 'logout') {
     logout()
   } else {
     console.log('Clicked:', item)
