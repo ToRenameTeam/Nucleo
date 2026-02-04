@@ -47,6 +47,12 @@ node_modules/
 ### TypeScript ###
 dist/
 
+### Python ###
+.venv/
+.ruff_cache/
+.env
+__pycache__/
+
 ### Logs ###
 logs
 *.log

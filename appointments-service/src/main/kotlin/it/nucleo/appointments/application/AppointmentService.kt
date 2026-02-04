@@ -2,6 +2,7 @@ package it.nucleo.appointments.application
 
 import it.nucleo.appointments.domain.Appointment
 import it.nucleo.appointments.domain.AppointmentRepository
+import it.nucleo.appointments.domain.Availability
 import it.nucleo.appointments.domain.AvailabilityRepository
 import it.nucleo.appointments.domain.valueobjects.*
 import org.slf4j.LoggerFactory
@@ -37,14 +38,7 @@ class AppointmentService(
         }
 
         val appointment =
-            Appointment.schedule(
-                patientId = patientId,
-                availabilityId = availabilityId,
-                doctorId = availability.doctorId,
-                facilityId = availability.facilityId,
-                serviceTypeId = availability.serviceTypeId,
-                timeSlot = availability.timeSlot
-            )
+            Appointment.schedule(patientId = patientId, availabilityId = availabilityId)
 
         val savedAppointment = appointmentRepository.save(appointment)
 
@@ -68,34 +62,44 @@ class AppointmentService(
         return appointment
     }
 
+    data class AppointmentDetails(val appointment: Appointment, val availability: Availability)
+
+    suspend fun getAppointmentDetails(id: String): AppointmentDetails? {
+        logger.info("Fetching appointment details by ID: $id")
+
+        val appointment = appointmentRepository.findById(AppointmentId.fromString(id))
+        if (appointment == null) {
+            logger.warn("Appointment not found with ID: $id")
+            return null
+        }
+
+        val availability = availabilityRepository.findById(appointment.availabilityId)
+        if (availability == null) {
+            logger.error(
+                "Availability not found for appointment ID: $id, availabilityId: ${appointment.availabilityId}"
+            )
+            throw AvailabilityNotFoundException("Availability not found for appointment")
+        }
+
+        logger.info("Appointment details found with ID: $id")
+        return AppointmentDetails(appointment, availability)
+    }
+
     suspend fun getAppointmentsByFilters(
         patientId: String?,
         doctorId: String?,
-        facilityId: String?,
-        status: String?,
-        startDate: String?,
-        endDate: String?
+        status: String?
     ): List<Appointment> {
         val patientIdValue = patientId?.let { PatientId.fromString(it) }
         val doctorIdValue = doctorId?.let { DoctorId.fromString(it) }
-        val facilityIdValue = facilityId?.let { FacilityId.fromString(it) }
         val statusValue = status?.let { AppointmentStatus.valueOf(it) }
-        val startDateValue = startDate?.let { kotlinx.datetime.LocalDateTime.parse(it) }
-        val endDateValue = endDate?.let { kotlinx.datetime.LocalDateTime.parse(it) }
 
         logger.info(
-            "Fetching appointments with filters - patientId: $patientIdValue, doctorId: $doctorIdValue, facilityId: $facilityIdValue, status: $statusValue, startDate: $startDateValue, endDate: $endDateValue"
+            "Fetching appointments with filters - patientId: $patientIdValue, doctorId: $doctorIdValue, status: $statusValue"
         )
 
         val appointments =
-            appointmentRepository.findByFilters(
-                patientIdValue,
-                doctorIdValue,
-                facilityIdValue,
-                statusValue,
-                startDateValue,
-                endDateValue
-            )
+            appointmentRepository.findByFilters(patientIdValue, doctorIdValue, statusValue)
 
         logger.info("Found ${appointments.size} appointments")
         return appointments
@@ -133,8 +137,13 @@ class AppointmentService(
                         throw AvailabilityNotAvailableException("New availability is not available")
                     }
 
-                    // Use the timeSlot from the availability
-                    appointment.reschedule(newAvailability.timeSlot, newAvailabilityId)
+                    // Free up the old availability and book the new one
+                    val oldAvailability =
+                        availabilityRepository.findById(appointment.availabilityId)
+                    oldAvailability?.let { availabilityRepository.update(it.makeAvailable()) }
+                    availabilityRepository.update(newAvailability.book())
+
+                    appointment.reschedule(newAvailabilityId)
                 }
                 else ->
                     throw IllegalArgumentException("Must provide either status or availabilityId")

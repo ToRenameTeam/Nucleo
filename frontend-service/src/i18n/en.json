@@ -136,8 +136,7 @@
     "newAppointment": "Book Visit",
     "upcomingAppointments": "Upcoming Appointments",
     "noAppointments": "No scheduled appointments",
-    "recentDocuments": "Recent Documents",
-    "searchHint": "Try: \"back pain\", \"chest pain\" or \"Marco's blood tests\""
+    "recentDocuments": "Recent Documents"
   },
   "appointmentBooking": {
     "title": "Book a Visit",
@@ -192,6 +191,14 @@
         "subtitle": "Personal data and service status"
       }
     },
+    "profileModal": {
+      "title": "Profile",
+      "fullName": "Full name",
+      "fiscalCode": "Fiscal code",
+      "dateOfBirth": "Date of birth",
+      "noData": "No data available",
+      "delegatedAccess": "You are viewing data for"
+    },
     "app": {
       "title": "App",
       "notifications": {
@@ -200,19 +207,11 @@
       },
       "appearance": {
         "title": "Appearance",
-        "subtitle": "Theme, colors and appearance, text size",
+        "subtitle": "Theme and application appearance",
         "theme": {
           "title": "Theme",
           "light": "Light",
           "dark": "Dark"
-        },
-        "colorBlind": {
-          "title": "Color Blind Mode",
-          "subtitle": "Adjust colors for better visibility",
-          "none": "None",
-          "deuteranopia": "Deuteranopia (red-green)",
-          "protanopia": "Protanopia (red-green)",
-          "tritanopia": "Tritanopia (blue-yellow)"
         }
       }
     },
@@ -228,7 +227,7 @@
       "version": "Nucleo v0.1 · Prototype"
     }
   },
-  "legalFooter": {
+  "footer": {
     "privacy": "Privacy",
     "privacyAria": "Open privacy and cookie policy",
     "legalNotes": "Legal Notes",
@@ -327,5 +326,221 @@
   "toast": {
     "closeNotification": "Close notification",
     "bookingConfirmed": "Booking confirmed successfully!"
+  },
+  "doctor": {
+    "home": {
+      "title": "Doctor Area",
+      "subtitle": "Welcome to your workspace"
+    },
+    "appointments": {
+      "title": "Appointments",
+      "subtitle": "Manage all your patients' appointments",
+      "appointmentsList": "Appointments List",
+      "noAppointments": "No appointments found",
+      "listView": "List",
+      "calendarView": "Calendar",
+      "errorLoading": "Error loading appointments",
+      "categories": {
+        "all": "All",
+        "scheduled": "Scheduled",
+        "completed": "Completed",
+        "noShow": "Patient No Show",
+        "cancelled": "Cancelled"
+      },
+      "status": {
+        "SCHEDULED": "Scheduled",
+        "COMPLETED": "Completed",
+        "NO_SHOW": "Patient No Show",
+        "CANCELLED": "Cancelled"
+      },
+      "errors": {
+        "notFound": "Appointment not found",
+        "loadFailed": "Error loading appointment details"
+      },
+      "actions": {
+        "visitCompleted": "Visit Completed",
+        "patientNoShow": "Patient No Show",
+        "addDocument": "Add Document",
+        "statusUpdateSuccess": "Status updated successfully",
+        "statusUpdateError": "Error updating status"
+      },
+      "reschedule": {
+        "title": "Reschedule Appointment",
+        "subtitle": "Select a new availability for the appointment",
+        "currentAppointment": "Current Appointment",
+        "selectNewSlot": "Select New Time",
+        "noAvailabilities": "No availabilities found",
+        "errorLoading": "Error loading availabilities",
+        "confirm": "Confirm Reschedule",
+        "success": "Appointment rescheduled successfully",
+        "error": "Error rescheduling appointment"
+      }
+    },
+    "availabilities": {
+      "title": "Availability Management",
+      "subtitle": "Create and manage your appointment availabilities",
+      "addAvailability": "Add Availability",
+      "errorLoading": "Error loading availabilities",
+      "cannotEditBooked": "Cannot edit an already booked availability",
+      "cannotDeleteBooked": "Cannot delete an already booked availability",
+      "stats": {
+        "total": "Total this week",
+        "available": "Available",
+        "booked": "Booked"
+      },
+      "calendar": {
+        "previousWeek": "Previous week",
+        "nextWeek": "Next week",
+        "today": "Today"
+      },
+      "legend": {
+        "available": "Available",
+        "booked": "Booked"
+      },
+      "actions": {
+        "edit": "Edit availability",
+        "delete": "Delete availability"
+      },
+      "modal": {
+        "titleCreate": "New Availability",
+        "titleEdit": "Edit Availability",
+        "subtitle": "Fill in the fields to define your availability",
+        "date": "Date",
+        "time": "Start time",
+        "duration": "Duration",
+        "facility": "Facility",
+        "selectFacility": "Select a facility",
+        "serviceType": "Visit type",
+        "selectServiceType": "Select a visit type",
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "deleteConfirm": {
+        "title": "Confirm deletion",
+        "message": "Are you sure you want to delete this availability? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "toast": {
+        "created": "Availability created successfully",
+        "updated": "Availability updated successfully",
+        "deleted": "Availability deleted successfully",
+        "error": "An error occurred. Please try again."
+      },
+      "errors": {
+        "OVERLAP_ERROR": "An availability already exists that overlaps with the selected time. Please choose a different time.",
+        "ALREADY_BOOKED": "This availability has already been booked and cannot be modified or deleted.",
+        "NOT_FOUND": "The requested availability was not found.",
+        "INVALID_TIME_SLOT": "The selected time is invalid. Please check the date, time, and duration.",
+        "GENERIC_ERROR": "An error occurred. Please try again later."
+      }
+    },
+    "documents": {
+      "title": "Documents",
+      "subtitle": "View and manage your patients' documents",
+      "searchPlaceholder": "Search documents, symptoms, patients...",
+      "errorLoading": "Error loading documents",
+      "noResults": "No documents found",
+      "medicine": "Medicine",
+      "dosage": "Dosage",
+      "categories": {
+        "all": "All",
+        "reports": "Reports",
+        "medicinePrescriptions": "Medicine Prescriptions",
+        "servicePrescriptions": "Visit Prescriptions"
+      },
+      "prescriptions": {
+      "addPrescription": "Add Prescription",
+      "noPatientResults": "No patients found",
+      "menu": {
+        "title": "New Prescription",
+        "subtitle": "Select the type of prescription you want to create",
+        "medicine": {
+          "title": "Medicine Prescription",
+          "subtitle": "Create a prescription for medications"
+        },
+        "service": {
+          "title": "Visit Prescription",
+          "subtitle": "Request visits or diagnostic exams"
+        }
+      },
+      "medicine": {
+        "title": "New Medicine Prescription",
+        "subtitle": "Fill in the details for the medicine prescription",
+        "patientName": "Patient Name and/or Surname",
+        "patientNamePlaceholder": "Enter patient's name and/or surname",
+        "medicineName": "Medicine Name",
+        "medicineNamePlaceholder": "e.g., Amoxicillin",
+        "dosage": "Dosage",
+        "dosagePlaceholder": "e.g., 500mg",
+        "frequency": "Frequency",
+        "frequencyPlaceholder": "e.g., 3 times a day",
+        "duration": "Duration",
+        "durationPlaceholder": "e.g., 7 days",
+        "notes": "Notes",
+        "notesPlaceholder": "Additional instructions or notes..."
+      },
+      "service": {
+        "title": "New Visit Prescription",
+        "subtitle": "Fill in the details for the visit prescription",
+        "patientName": "Patient Name and/or Surname",
+        "patientNamePlaceholder": "Enter patient's name and/or surname",
+        "serviceType": "Visit/Exam Type",
+        "serviceTypePlaceholder": "e.g., Cardiology visit, X-ray",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe the visit or exam needed...",
+        "urgency": "Urgency",
+        "urgencyLow": "Low",
+        "urgencyMedium": "Medium",
+        "urgencyHigh": "High",
+        "notes": "Notes",
+        "notesPlaceholder": "Additional instructions or notes..."
+        },
+        "toast": {
+          "medicineSaved": "Medicine prescription created successfully",
+          "serviceSaved": "Visit prescription created successfully"
+        },
+        "errors": {
+          "saveFailed": "Error saving prescription. Please try again."
+        }
+      }, 
+      "medicineDetails": {
+        "units": {
+          "day": "day",
+          "mg": "mg"
+        },
+        "periods": {
+          "day": "per day",
+          "week": "per week"
+        },
+        "durationUnits": {
+          "day": "days",
+          "week": "weeks"
+        },
+        "prescription": {
+          "validUntilExecution": "Until execution"
+        }
+      }
+    }
+  },
+    "common": {
+      "loading": "Loading...",
+      "retry": "Retry",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "back": "Back"
+    },
+    "prescriptionTags": {
+      "prescription": "prescription",
+      "medicines": "medicines",
+      "services": "services"
+    },
+    "prescriptionSummary": {
+      "medicine": "Prescription: {medicine}",
+      "service": "Prescription: {service}"
+    },
+    "facilities": {
+      "default": "Default facility"
+    }
   }
-}

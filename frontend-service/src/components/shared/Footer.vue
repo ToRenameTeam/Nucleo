@@ -51,17 +51,17 @@ const currentYear = new Date().getFullYear()
         <button 
           @click="openPrivacyModal" 
           class="footer-link"
-          :aria-label="t('legalFooter.privacyAria')"
+          :aria-label="t('footer.privacyAria')"
         >
-          {{ t('legalFooter.privacy') }}
+          {{ t('footer.privacy') }}
         </button>
         <span class="footer-separator">|</span>
         <button 
           @click="openLegalModal" 
           class="footer-link"
-          :aria-label="t('legalFooter.legalAria')"
+          :aria-label="t('footer.legalAria')"
         >
-          {{ t('legalFooter.legalNotes') }}
+          {{ t('footer.legalNotes') }}
         </button>
         <span class="footer-separator">|</span>
         <a 
@@ -69,12 +69,12 @@ const currentYear = new Date().getFullYear()
           target="_blank" 
           rel="noopener noreferrer"
           class="footer-link"
-          :aria-label="t('legalFooter.accessibilityAria')"
+          :aria-label="t('footer.accessibilityAria')"
         >
-          {{ t('legalFooter.accessibility') }}
+          {{ t('footer.accessibility') }}
         </a>
         <span class="footer-separator">|</span>
-        <span class="footer-license">{{ t('legalFooter.license') }}</span>
+        <span class="footer-license">{{ t('footer.license') }}</span>
       </div>
     </div>
   </footer>
@@ -83,29 +83,29 @@ const currentYear = new Date().getFullYear()
   <Transition name="slide-up">
     <div v-if="showCookieBanner" class="cookie-banner" role="dialog" aria-labelledby="cookie-banner-title">
       <div class="cookie-content">
-        <h3 id="cookie-banner-title">{{ t('legalFooter.cookieTitle') }}</h3>
-        <p>{{ t('legalFooter.cookieDescription') }}</p>
+        <h3 id="cookie-banner-title">{{ t('footer.cookieTitle') }}</h3>
+        <p>{{ t('footer.cookieDescription') }}</p>
         <div class="cookie-actions">
           <button 
             @click="acceptNecessaryCookies" 
             class="cookie-btn cookie-btn-secondary"
-            :aria-label="t('legalFooter.acceptNecessaryAria')"
+            :aria-label="t('footer.acceptNecessaryAria')"
           >
-            {{ t('legalFooter.acceptNecessary') }}
+            {{ t('footer.acceptNecessary') }}
           </button>
           <button 
             @click="openPrivacyModal" 
             class="cookie-btn cookie-btn-link"
-            :aria-label="t('legalFooter.moreInfoAria')"
+            :aria-label="t('footer.moreInfoAria')"
           >
-            {{ t('legalFooter.moreInfo') }}
+            {{ t('footer.moreInfo') }}
           </button>
           <button 
             @click="acceptAllCookies" 
             class="cookie-btn cookie-btn-primary"
-            :aria-label="t('legalFooter.acceptAllAria')"
+            :aria-label="t('footer.acceptAllAria')"
           >
-            {{ t('legalFooter.acceptAll') }}
+            {{ t('footer.acceptAll') }}
           </button>
         </div>
       </div>
@@ -117,7 +117,7 @@ const currentYear = new Date().getFullYear()
     <div v-if="showPrivacyModal" class="modal-overlay" @click.self="showPrivacyModal = false">
       <div class="modal-container" role="dialog" aria-labelledby="privacy-modal-title">
         <div class="modal-header">
-          <h2 id="privacy-modal-title">{{ t('legalFooter.privacyModalTitle') }}</h2>
+          <h2 id="privacy-modal-title">{{ t('footer.privacyModalTitle') }}</h2>
           <button 
             @click="showPrivacyModal = false" 
             class="modal-close"
@@ -227,7 +227,7 @@ const currentYear = new Date().getFullYear()
         
         <div class="modal-footer">
           <button @click="showPrivacyModal = false" class="btn-primary">
-            {{ t('legalFooter.privacyModalClose') }}
+            {{ t('footer.privacyModalClose') }}
           </button>
         </div>
       </div>
@@ -239,7 +239,7 @@ const currentYear = new Date().getFullYear()
     <div v-if="showLegalModal" class="modal-overlay" @click.self="showLegalModal = false">
       <div class="modal-container" role="dialog" aria-labelledby="legal-modal-title">
         <div class="modal-header">
-          <h2 id="legal-modal-title">{{ t('legalFooter.legalModalTitle') }}</h2>
+          <h2 id="legal-modal-title">{{ t('footer.legalModalTitle') }}</h2>
           <button 
             @click="showLegalModal = false" 
             class="modal-close"
@@ -329,7 +329,7 @@ const currentYear = new Date().getFullYear()
         
         <div class="modal-footer">
           <button @click="showLegalModal = false" class="btn-primary">
-            {{ t('legalFooter.legalModalClose') }}
+            {{ t('footer.legalModalClose') }}
           </button>
         </div>
       </div>

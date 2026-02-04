@@ -3,11 +3,12 @@ package it.nucleo.appointments.infrastructure.persistence
 import it.nucleo.appointments.domain.Appointment
 import it.nucleo.appointments.domain.AppointmentRepository
 import it.nucleo.appointments.domain.valueobjects.*
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toJavaLocalDateTime
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andWhere
+import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
@@ -21,11 +22,6 @@ class ExposedAppointmentRepository : AppointmentRepository {
             it[appointmentId] = appointment.id.value
             it[patientId] = appointment.patientId.value
             it[availabilityId] = appointment.availabilityId.value
-            it[doctorId] = appointment.doctorId.value
-            it[facilityId] = appointment.facilityId.value
-            it[serviceTypeId] = appointment.serviceTypeId.value
-            it[startDateTime] = appointment.timeSlot.startDateTime.toJavaLocalDateTime()
-            it[durationMinutes] = appointment.timeSlot.durationMinutes
             it[status] = appointment.status.name
             it[createdAt] = appointment.createdAt.toJavaLocalDateTime()
             it[updatedAt] = appointment.updatedAt.toJavaLocalDateTime()
@@ -43,25 +39,24 @@ class ExposedAppointmentRepository : AppointmentRepository {
     override suspend fun findByFilters(
         patientId: PatientId?,
         doctorId: DoctorId?,
-        facilityId: FacilityId?,
-        status: AppointmentStatus?,
-        startDate: LocalDateTime?,
-        endDate: LocalDateTime?
+        status: AppointmentStatus?
     ): List<Appointment> = dbQuery {
-        var query = AppointmentsTable.selectAll()
+        var query =
+            if (doctorId != null) {
+                // JOIN with availabilities when filtering by doctorId
+                AppointmentsTable.innerJoin(
+                        AvailabilitiesTable,
+                        { AppointmentsTable.availabilityId },
+                        { AvailabilitiesTable.availabilityId }
+                    )
+                    .select(AppointmentsTable.columns)
+                    .where { AvailabilitiesTable.doctorId eq doctorId.value }
+            } else {
+                AppointmentsTable.selectAll()
+            }
 
-        patientId?.let { query = query.where { AppointmentsTable.patientId eq it.value } }
-        doctorId?.let { query = query.andWhere { AppointmentsTable.doctorId eq it.value } }
-        facilityId?.let { query = query.andWhere { AppointmentsTable.facilityId eq it.value } }
+        patientId?.let { query = query.andWhere { AppointmentsTable.patientId eq it.value } }
         status?.let { query = query.andWhere { AppointmentsTable.status eq it.name } }
-
-        if (startDate != null && endDate != null) {
-            query =
-                query.andWhere {
-                    (AppointmentsTable.startDateTime greaterEq startDate.toJavaLocalDateTime()) and
-                        (AppointmentsTable.startDateTime lessEq endDate.toJavaLocalDateTime())
-                }
-        }
 
         query.map { it.toAppointment() }
     }
@@ -71,11 +66,6 @@ class ExposedAppointmentRepository : AppointmentRepository {
             AppointmentsTable.update({ AppointmentsTable.appointmentId eq appointment.id.value }) {
                 it[patientId] = appointment.patientId.value
                 it[availabilityId] = appointment.availabilityId.value
-                it[doctorId] = appointment.doctorId.value
-                it[facilityId] = appointment.facilityId.value
-                it[serviceTypeId] = appointment.serviceTypeId.value
-                it[startDateTime] = appointment.timeSlot.startDateTime.toJavaLocalDateTime()
-                it[durationMinutes] = appointment.timeSlot.durationMinutes
                 it[status] = appointment.status.name
                 it[updatedAt] = appointment.updatedAt.toJavaLocalDateTime()
             }

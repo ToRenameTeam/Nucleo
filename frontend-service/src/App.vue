@@ -1,13 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import TopBar from './components/shared/TopBar.vue'
-import Breadcrumbs from './components/shared/Breadcrumbs.vue'
-import BottomBar from './components/shared/BottomBar.vue'
-import LegalFooter from './components/shared/LegalFooter.vue'
 
 const route = useRoute()
-
 const hideNavigation = computed(() => route.meta.hideNavigation === true)
 </script>
 
@@ -16,17 +11,11 @@ const hideNavigation = computed(() => route.meta.hideNavigation === true)
     <!-- Skip link per accessibilità WCAG 2.4.1 -->
     <a href="#main-content" class="skip-link">Salta al contenuto principale</a>
     
-    <TopBar v-if="!hideNavigation" />
-    <Breadcrumbs v-if="!hideNavigation" />
-    <main 
-      id="main-content"
-      :class="hideNavigation ? 'full-screen' : 'main-content'"
-      tabindex="-1"
-    >  
+    <router-view v-if="hideNavigation" />
+    
+    <template v-else>
       <router-view />
-    </main>
-    <BottomBar v-if="!hideNavigation" />
-    <LegalFooter v-if="!hideNavigation" />
+    </template>
   </div>
 </template>
 
@@ -53,17 +42,6 @@ const hideNavigation = computed(() => route.meta.hideNavigation === true)
   z-index: 0;
 }
 
-.main-content {
-  flex: 1;
-  overflow-y: auto;
-  position: relative;
-  z-index: 1;
-}
-
-.full-screen {
-  height: 100vh;
-}
-
 /* Skip link per accessibilità - visibile solo al focus */
 .skip-link {
   position: absolute;
@@ -84,9 +62,5 @@ const hideNavigation = computed(() => route.meta.hideNavigation === true)
   top: 0;
   outline: 3px solid var(--accent-primary);
   outline-offset: 2px;
-}
-
-main:focus {
-  outline: none;
 }
 </style>

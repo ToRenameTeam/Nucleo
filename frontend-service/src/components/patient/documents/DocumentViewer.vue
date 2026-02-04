@@ -81,15 +81,15 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
         <!-- Default: Simple document info (for viewer) -->
         <div class="document-info">
           <!-- Description -->
-          <div v-if="document?.description" class="info-section">
+          <div class="info-section">
             <span class="info-label">{{ t('documents.viewer.description') }}</span>
-            <p class="description-text">{{ document.description }}</p>
+            <p class="description-text">{{ document?.description || '--' }}</p>
           </div>
 
           <!-- Tags -->
-          <div v-if="document?.tags?.length" class="info-section">
+          <div class="info-section">
             <span class="info-label">{{ t('documents.viewer.tags') }}</span>
-            <div class="info-tags">
+            <div v-if="document?.tags?.length" class="info-tags">
               <span
                 v-for="(tag, index) in document.tags"
                 :key="index"
@@ -98,24 +98,25 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
                 {{ tag }}
               </span>
             </div>
+            <span v-else class="info-value">--</span>
           </div>
 
           <!-- Date -->
           <div class="info-row">
             <span class="info-label">{{ t('documents.viewer.date') }}</span>
-            <span class="info-value">{{ document?.date }}</span>
+            <span class="info-value">{{ document?.date || '--' }}</span>
           </div>
 
           <!-- Doctor -->
           <div class="info-row">
             <span class="info-label">{{ t('documents.viewer.doctor') }}</span>
-            <span class="info-value">{{ document?.doctor }}</span>
+            <span class="info-value">{{ document?.doctor || '--' }}</span>
           </div>
 
           <!-- Hospital -->
           <div class="info-row">
             <span class="info-label">{{ t('documents.viewer.hospital') }}</span>
-            <span class="info-value">{{ document?.hospital }}</span>
+            <span class="info-value">{{ document?.hospital || '--' }}</span>
           </div>
         </div>
       </slot>

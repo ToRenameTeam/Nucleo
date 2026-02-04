@@ -3,10 +3,11 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '../../composables/useAuth'
+import { ArrowRightStartOnRectangleIcon, ArrowsRightLeftIcon } from '@heroicons/vue/24/outline'
 
 const { t, locale } = useI18n()
 const router = useRouter()
-const { currentPatientProfile, logout: authLogout } = useAuth()
+const { currentUser, currentPatientProfile, logout: authLogout } = useAuth()
 const showUserMenu = ref(false)
 const showLanguageMenu = ref(false)
 
@@ -21,6 +22,16 @@ const changeLanguage = (lang: string) => {
 
 const currentLanguage = computed(() => {
   return locale.value === 'it' ? 'ITA' : 'ENG'
+})
+
+const displayUserName = computed(() => {
+  if (!currentUser.value || !currentPatientProfile.value) {
+    return t('topbar.user')
+  }
+  if (currentUser.value.fiscalCode === currentPatientProfile.value.fiscalCode) {
+    return currentPatientProfile.value.name
+  }
+  return `${currentUser.value.name} @ ${currentPatientProfile.value.name}`
 })
 
 const toggleUserMenu = () => {
@@ -43,7 +54,7 @@ const changeUser = () => {
 <template>
   <div class="topbar-container">
     <div class="topbar-title-container">
-      <h1 class="topbar-title" @click="router.push('/patient-home')">{{ t('app.title') }}</h1>
+      <h1 class="topbar-title" @click="router.push('/patient/home')">{{ t('app.title') }}</h1>
     </div>
     <div class="topbar-actions">
       <button 
@@ -106,43 +117,29 @@ const changeUser = () => {
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
             </svg>
           </div>
-          <span class="user-name-text topbar-text">{{ currentPatientProfile?.name || t('topbar.user') }}</span>
-          <svg class="topbar-icon-secondary user-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <span class="user-name-text">{{ displayUserName }}</span>
+          <svg class="user-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <polyline points="6 9 12 15 18 9"/>
           </svg>
         </button>
-        <div 
-          v-if="showUserMenu" 
-          class="user-menu"
-        >
+        <div v-if="showUserMenu" class="user-menu">
           <button 
-            class="user-menu-profile"
-            :aria-label="t('topbar.userProfileAria', { user: currentPatientProfile?.name || t('topbar.user') })"
+            class="user-menu-item"
             @click="changeUser"
           >
-            <div class="user-profile-content">
-              <div class="user-profile-avatar">
-                <svg class="user-profile-avatar-icon" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                </svg>
-              </div>
-              <div class="user-profile-details">
-                <div class="user-profile-name">{{ currentPatientProfile?.name }}</div>
-              </div>
+            <div class="user-menu-icon-container">
+              <ArrowsRightLeftIcon class="user-menu-icon" />
             </div>
+            <span class="user-profile-name">{{ t('settings.account.changeProfile')}}</span>
           </button>
           <!-- Logout Button -->
           <button
-            class="user-menu-logout"
+            class="user-menu-item"
             :aria-label="t('userMenu.logout')"
             @click="logout"
           >
-            <div class="user-menu-logout-icon-container">
-              <svg class="user-menu-logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                <polyline points="16 17 21 12 16 7"/>
-                <line x1="21" y1="12" x2="9" y2="12"/>
-              </svg>
+            <div class="user-menu-icon-container">
+              <ArrowRightStartOnRectangleIcon class="user-menu-icon" />
             </div>
             <span class="user-menu-logout-text">{{ t('userMenu.logout') }}</span>
           </button>
@@ -341,17 +338,21 @@ const changeUser = () => {
   min-width: 12rem;
   z-index: 50;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
-.user-menu-profile {
+.user-menu-item {
   width: 100%;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--border-light);
   background: transparent;
   cursor: pointer;
   border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   transition: background 0.2s cubic-bezier(0, 0, 0.2, 1);
 }
-.user-menu-profile:hover {
+.user-menu-item:hover {
   background: var(--glass-menu-hover-bg);
 }
 .user-profile-content {
@@ -360,8 +361,8 @@ const changeUser = () => {
   gap: 0.75rem;
 }
 .user-profile-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: 50%;
   background: var(--white-80);
   display: flex;
@@ -369,9 +370,9 @@ const changeUser = () => {
   justify-content: center;
   color: var(--text-gray-600);
 }
-.user-profile-avatar-icon {
-  width: 1.5rem;
-  height: 1.5rem;
+.user-menu-icon {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 .user-profile-details {
   text-align: left;
@@ -381,21 +382,7 @@ const changeUser = () => {
   font-size: 1rem;
   font-weight: 600;
 }
-.user-menu-logout {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: transparent;
-  cursor: pointer;
-  border: none;
-  transition: background 0.2s cubic-bezier(0, 0, 0.2, 1);
-}
-.user-menu-logout:hover {
-  background: var(--glass-menu-hover-bg);
-}
-.user-menu-logout-icon-container {
+.user-menu-icon-container {
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
@@ -404,10 +391,7 @@ const changeUser = () => {
   justify-content: center;
   color: var(--text-gray-600);
 }
-.user-menu-logout-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
+
 .user-menu-logout-text {
   color: var(--accent-primary);
   font-size: 1rem;

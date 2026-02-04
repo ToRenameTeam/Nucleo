@@ -13,3 +13,5 @@ dependencyResolutionManagement {
 includeBuild("build-logic")
 
 include("appointments-service")
+
+include("documents-service")

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useAuth } from '../../composables/useAuth'
 import { CheckCircleIcon } from '@heroicons/vue/24/outline'
 import SearchBar from '../../components/shared/SearchBar.vue'
 import TagBar from '../../components/shared/TagBar.vue'
@@ -11,12 +12,16 @@ import type { DateRange } from '../../types/date-range'
 import BatchActionsBar from '../../components/patient/documents/BatchActionsBar.vue'
 import type { Tag } from '../../types/tag'
 import type { Document } from '../../types/document'
-import { MOCK_DOCUMENTS } from '../../constants/mockData'
+import { parseItalianDate } from '../../utils/dateUtils'
+import { documentsApiService } from '../../api/documents'
+
+const { currentUser } = useAuth()
 
 const searchQuery = ref('')
 const selectedTags = ref<string[]>([])
 const selectedDocument = ref<Document | null>(null)
 const isModalOpen = ref(false)
+const isLoading = ref(false)
 
 // Selection mode
 const selectionMode = ref(false)
@@ -28,18 +33,40 @@ const dateRange = ref<DateRange>({
   to: null
 })
 
+const documents = ref<Document[]>([])
+
 const tags = computed<Tag[]>(() => [
-  { id: 'tutti', label: 'Tutti', count: MOCK_DOCUMENTS.length },
-  { id: 'prescrizione', label: 'Prescrizione', count: MOCK_DOCUMENTS.filter(d => d.tags.includes('Prescrizione')).length },
-  { id: 'diabete', label: 'Diabete', count: MOCK_DOCUMENTS.filter(d => d.tags.includes('Diabete')).length },
-  { id: 'cardiologia', label: 'Cardiologia', count: MOCK_DOCUMENTS.filter(d => d.tags.includes('Cardiologia')).length },
-  { id: 'analisi', label: 'Analisi', count: MOCK_DOCUMENTS.filter(d => d.tags.includes('Analisi')).length },
-  { id: 'diagnostica', label: 'Diagnostica', count: MOCK_DOCUMENTS.filter(d => d.tags.includes('Diagnostica')).length },
-  { id: 'oculistica', label: 'Oculistica', count: MOCK_DOCUMENTS.filter(d => d.tags.includes('Oculistica')).length },
-  { id: 'ortopedia', label: 'Ortopedia', count: MOCK_DOCUMENTS.filter(d => d.tags.includes('Ortopedia')).length },
+  { id: 'tutti', label: 'Tutti', count: documents.value.length },
+  { id: 'prescrizione', label: 'Prescrizione', count: documents.value.filter(d => d.tags.includes('Prescrizione')).length },
+  { id: 'diabete', label: 'Diabete', count: documents.value.filter(d => d.tags.includes('Diabete')).length },
+  { id: 'cardiologia', label: 'Cardiologia', count: documents.value.filter(d => d.tags.includes('Cardiologia')).length },
+  { id: 'analisi', label: 'Analisi', count: documents.value.filter(d => d.tags.includes('Analisi')).length },
+  { id: 'diagnostica', label: 'Diagnostica', count: documents.value.filter(d => d.tags.includes('Diagnostica')).length },
+  { id: 'oculistica', label: 'Oculistica', count: documents.value.filter(d => d.tags.includes('Oculistica')).length },
+  { id: 'ortopedia', label: 'Ortopedia', count: documents.value.filter(d => d.tags.includes('Ortopedia')).length },
 ])
 
-const documents = ref<Document[]>(MOCK_DOCUMENTS)
+async function loadDocuments() {
+  if (!currentUser.value?.userId) {
+    console.log('[PatientDocumentsPage] No current user ID available')
+    return
+  }
+
+  isLoading.value = true
+  
+  try {
+    const fetchedDocuments = await documentsApiService.getDocumentsByPatient(currentUser.value.userId)
+    documents.value = fetchedDocuments
+  } catch (err) {
+    console.error('[PatientDocumentsPage] Error loading documents:', err)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadDocuments()
+})
 
 const filteredDocuments = computed(() => {
   let filtered = documents.value
@@ -107,26 +134,6 @@ const activeTags = computed(() => {
   }
   return selectedTags.value
 })
-
-// Parse Italian date format "GG Mese AAAA"
-function parseItalianDate(dateStr: string): Date | null {
-  const months: Record<string, number> = {
-    'Gen': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'Mag': 4, 'Giu': 5,
-    'Lug': 6, 'Ago': 7, 'Set': 8, 'Ott': 9, 'Nov': 10, 'Dic': 11
-  }
-  
-  const parts = dateStr.split(' ')
-  if (parts.length !== 3) return null
-  
-  const day = parseInt(parts[0] || '')
-  const monthKey = parts[1] || ''
-  const month = months[monthKey]
-  const year = parseInt(parts[2] || '')
-  
-  if (isNaN(day) || month === undefined || isNaN(year)) return null
-  
-  return new Date(year, month, day)
-}
 
 const handleSearch = (query: string) => {
   searchQuery.value = query
@@ -223,7 +230,7 @@ const handleCloseModal = () => {
     <!-- Search Bar & Date Range Filter -->
     <div class="section-spacing">
       <div class="filters-row">
-        <SearchBar @search="handleSearch" />
+        <SearchBar @search="handleSearch" :placeholder="$t('documents.searchPlaceholder')"/>
         <DateRangeFilter v-model="dateRange" />
       </div>
     </div>

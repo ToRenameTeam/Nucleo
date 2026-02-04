@@ -19,7 +19,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/doctor-patient-choice',
     name: 'doctor-patient-choice',
-    component: () => import('../views/doctor/DoctorPatientChoice.vue'),
+    component: () => import('../views/DoctorPatientChoice.vue'),
     meta: {
       hideNavigation: true
     }
@@ -30,24 +30,75 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/patient/PatientChoice.vue'),
   },
   {
-    path: '/patient-home',
-    name: 'patient-home',
-    component: () => import('../views/patient/PatientHomePage.vue'),
+    path: '/patient',
+    component: () => import('../views/layouts/PatientLayout.vue'),
+    meta: {
+      requiresAuth: true
+    },
+    children: [
+      {
+        path: '',
+        redirect: '/patient/home'
+      },
+      {
+        path: 'home',
+        name: 'patient-home',
+        component: () => import('../views/patient/PatientHomePage.vue')
+      },
+      {
+        path: 'documents',
+        name: 'patient-documents',
+        component: () => import('../views/patient/PatientDocumentsPage.vue')
+      },
+      {
+        path: 'calendar',
+        name: 'patient-calendar',
+        component: () => import('../views/patient/PatientCalendarPage.vue')
+      },
+      {
+        path: 'settings',
+        name: 'patient-settings',
+        component: () => import('../views/patient/SettingsPage.vue')
+      }
+    ]
   },
   {
-    path: '/patient-documents',
-    name: 'patient-documents',
-    component: () => import('../views/patient/PatientDocumentsPage.vue'),
-  },
-  {
-    path: '/patient-calendar',
-    name: 'patient-calendar',
-    component: () => import('../views/patient/CalendarPage.vue'),
-  },
-  {
-    path: '/patient-settings',
-    name: 'patient-settings',
-    component: () => import('../views/patient/SettingsPage.vue'),
+    path: '/doctor',
+    component: () => import('../views/layouts/DoctorLayout.vue'),
+    meta: {
+      requiresAuth: true
+    },
+    children: [
+      {
+        path: '',
+        redirect: '/doctor/appointments'
+      },
+      {
+        path: 'appointments',
+        name: 'doctor-appointments',
+        component: () => import('../views/doctor/DoctorAppointmentsPage.vue')
+      },
+      {
+        path: 'availabilities',
+        name: 'doctor-availabilities',
+        component: () => import('../views/doctor/DoctorAvailabilitiesPage.vue')
+      },
+      {
+        path: 'documents',
+        name: 'doctor-documents',
+        component: () => import('../views/doctor/DoctorDocumentsPage.vue')
+      },
+      {
+        path: 'patients',
+        name: 'doctor-patients',
+        component: () => import('../views/doctor/DoctorHomePage.vue') // Placeholder - sarà creato dopo
+      },
+      {
+        path: 'settings',
+        name: 'doctor-settings',
+        component: () => import('../views/doctor/DoctorHomePage.vue') // Placeholder - sarà creato dopo
+      }
+    ]
   }
 ]
 
@@ -67,7 +118,7 @@ router.beforeEach((to, _, next) => {
   if (requiresAuth && !isAuthenticated.value) {
     next('/login')
   } else if (to.path === '/login' && isAuthenticated.value) {
-    next('/patient-home')
+    next('/patient/home')
   } else {
     next()
   }

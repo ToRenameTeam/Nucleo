@@ -7,6 +7,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.path
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -35,6 +36,21 @@ fun Application.configureApp() {
     logger.info("Initializing database...")
     DatabaseFactory.init()
     logger.info("Database initialized successfully")
+
+    // Configure CORS
+    logger.info("Configuring CORS...")
+    install(CORS) {
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Patch)
+        allowHeader(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader("X-Requested-With")
+        anyHost() // Allow all hosts for development
+    }
 
     // Configure JSON serialization
     logger.info("Configuring content negotiation...")

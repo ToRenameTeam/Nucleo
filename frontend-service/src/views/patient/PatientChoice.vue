@@ -47,6 +47,8 @@ const loadDelegatedProfiles = async () => {
     const personalProfile: Profile = {
       id: currentUser.value.userId,
       name: `${currentUser.value.name}`,
+      lastName: currentUser.value.lastName,
+      dateOfBirth: currentUser.value.dateOfBirth,
       fiscalCode: currentUser.value.fiscalCode
     }
 
@@ -60,11 +62,14 @@ const loadDelegatedProfiles = async () => {
         const profilePromises = response.delegations.map(async (delegation) => {
           try {
             const userData = await authApi.getUserById(delegation.delegatorUserId) as UserData
-            return {
+            const profile: Profile = {
               id: delegation.delegatorUserId,
-              name: `${userData.name}`,
-              fiscalCode: userData.fiscalCode
+              name: userData.name,
+              lastName: userData.lastName,
+              fiscalCode: userData.fiscalCode,
+              dateOfBirth: userData.dateOfBirth
             }
+            return profile
           } catch (err) {
             console.error(`Errore nel caricamento dell'utente ${delegation.delegatorUserId}:`, err)
             return null
@@ -90,7 +95,7 @@ const loadDelegatedProfiles = async () => {
 
 const selectPatientProfile = (profile: Profile) => {
   setProfile(profile)
-  router.push('/patient-home')
+  router.push('/patient/home')
 }
 </script>
 

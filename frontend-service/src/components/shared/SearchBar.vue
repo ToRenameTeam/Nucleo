@@ -4,6 +4,10 @@ import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
 
 const searchQuery = ref('')
 
+const props = defineProps<{
+  placeholder?: string
+}>()
+
 const emit = defineEmits<{
   search: [query: string]
 }>()
@@ -17,13 +21,13 @@ const handleSearch = () => {
   <div class="search-bar-wrapper">
     <div class="search-bar-container">
       <label for="search-input" class="visually-hidden">
-        {{ $t('documents.searchPlaceholder') }}
+        {{ props.placeholder || '' }}
       </label>
       <input
         id="search-input"
         v-model="searchQuery"
         type="search"
-        :placeholder="$t('documents.searchPlaceholder')"
+        :placeholder="props.placeholder || ''"
         class="search-input"
         @input="handleSearch"
       />

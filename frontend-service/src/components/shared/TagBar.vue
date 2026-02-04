@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { TagBar } from '../../types/tag'
 
 const props = withDefaults(defineProps<TagBar>(), {
@@ -8,7 +9,23 @@ const props = withDefaults(defineProps<TagBar>(), {
   activeTags: () => []
 })
 
+const { t } = useI18n()
+
 const localSelectedTag = ref(props.selectedTag || props.tags[0]?.id || '')
+
+// Filter tags: hide those with count = 0, except for the "all" tag
+const visibleTags = computed(() => {
+  const allTagLabel = t('tags.all').toLowerCase()
+  
+  return props.tags.filter(tag => {
+    // The "all" tag is always shown (checks both id and translated label)
+    if (tag.id === 'all' || tag.label.toLowerCase() === allTagLabel) {
+      return true
+    }
+    // Show tags without count or with count > 0
+    return tag.count === undefined || tag.count > 0
+  })
+})
 
 watch(() => props.selectedTag, (newVal) => {
   if (newVal) {
@@ -36,7 +53,7 @@ const selectTag = (tagId: string) => {
 <template>
   <div class="tag-bar">
     <button
-      v-for="tag in tags"
+      v-for="tag in visibleTags"
       :key="tag.id"
       :class="['tag-button', { 'tag-active': isTagActive(tag.id) }]"
       @click="selectTag(tag.id)"

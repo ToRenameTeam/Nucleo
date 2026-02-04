@@ -1,28 +1,57 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useAuth } from '../../composables/useAuth'
 import { DocumentPlusIcon, PlusIcon } from '@heroicons/vue/24/outline'
-import SearchBar from '../../components/shared/SearchBar.vue'
 import Toast from '../../components/shared/Toast.vue'
 import AppointmentCard from '../../components/shared/AppointmentCard.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
 import AppointmentBooking from '../../components/patient/home/AppointmentBooking.vue'
 import CardList from '../../components/shared/CardList.vue'
-import { MOCK_DOCUMENTS, MOCK_APPOINTMENTS } from '../../constants/mockData'
 import type { Document } from '../../types/document'
+import type { Appointment } from '../../types/appointment'
+import { appointmentsApi } from '../../api/appointments'
+import { documentsApiService } from '../../api/documents'
 
-const searchQuery = ref('')
-const appointments = computed(() => MOCK_APPOINTMENTS.slice(0, 2))
-const recentDocuments = computed(() => MOCK_DOCUMENTS.slice(0, 2))
+const { currentUser } = useAuth()
+
+const appointmentsData = ref<Appointment[]>([])
+const documentsData = ref<Document[]>([])
+const isLoading = ref(false)
+const appointments = computed(() => appointmentsData.value.slice(0, 2))
+const recentDocuments = computed(() => documentsData.value.slice(0, 2))
 const isBookingOpen = ref(false)
 const selectedDocument = ref<Document | null>(null)
 const isDocumentModalOpen = ref(false)
 const preselectedVisitType = ref<string | null>(null)
 const showSuccessToast = ref(false)
 
-const handleSearch = (query: string) => {
-  searchQuery.value = query
+async function loadData() {
+  if (!currentUser.value?.userId) {
+    console.log('[PatientHomePage] No current user ID available')
+    return
+  }
+
+  isLoading.value = true
+  
+  try {
+    const [fetchedAppointments, fetchedDocuments] = await Promise.all([
+      appointmentsApi.getAppointmentsByPatient(currentUser.value.userId),
+      documentsApiService.getDocumentsByPatient(currentUser.value.userId)
+    ])
+    
+    appointmentsData.value = fetchedAppointments
+    documentsData.value = fetchedDocuments
+  } catch (err) {
+    console.error('[PatientHomePage] Error loading data:', err)
+  } finally {
+    isLoading.value = false
+  }
 }
+
+onMounted(() => {
+  loadData()
+})
 
 const handleUpload = () => {
   console.log('Upload document')
@@ -63,12 +92,6 @@ const handleCloseToast = () => {
   <div class="home-page">
     <div class="content-grid">
       <div class="main-column">
-        <div class="section-card">
-          <SearchBar @search="handleSearch" />
-          <p class="search-hint">
-            {{ $t('home.searchHint') }}
-          </p>
-        </div>
 
         <div class="quick-actions">
           <div class="quick-actions-flex">
@@ -181,17 +204,9 @@ const handleCloseToast = () => {
   z-index: 1;
 }
 
-.search-hint {
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
-  color: var(--hint-text-color);
-  text-align: center;
-}
-
 .main-column {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
 .section-card {
@@ -211,12 +226,12 @@ const handleCloseToast = () => {
 }
 
 .quick-action-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
 }
 
 .quick-actions {
-  margin: 1rem;
+  padding: 1.25rem;
   animation: fadeIn 0.5s cubic-bezier(0, 0, 0.2, 1);
   animation-delay: 0.1s;
   animation-fill-mode: both;
@@ -300,11 +315,11 @@ const handleCloseToast = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1.25rem;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
   border-radius: 0.75rem;
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
   background: var(--white-60);
   backdrop-filter: blur(12px);
