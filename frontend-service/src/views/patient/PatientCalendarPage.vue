@@ -4,6 +4,7 @@ import { useAuth } from '../../composables/useAuth'
 import TagBar from '../../components/shared/TagBar.vue'
 import type { Tag } from '../../types/tag'
 import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue'
+import LoadingSpinner from '../../components/shared/LoadingSpinner.vue'
 import BaseCard from '../../components/shared/BaseCard.vue'
 import CardList from '../../components/shared/CardList.vue'
 import type { Appointment } from '../../types/appointment'
@@ -257,10 +258,11 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
         <h2 class="appointments-list-title">{{ $t('calendar.appointments') }}</h2>
         
         <!-- Loading State -->
-        <div v-if="isLoading" class="loading-state">
-          <div class="spinner"></div>
-          <p class="loading-text">{{ $t('calendar.loading') }}</p>
-        </div>
+        <LoadingSpinner 
+          v-if="isLoading" 
+          :message="$t('calendar.loading')" 
+          size="medium"
+        />
         
         <!-- Error State -->
         <div v-else-if="error" class="error-state">
@@ -481,40 +483,6 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
 .empty-state-text {
   color: var(--gray-525252);
   margin: 0;
-}
-
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 3rem;
-  text-align: center;
-  background: var(--white-15);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--white-20);
-  border-radius: 1rem;
-  box-shadow: 0 4px 16px var(--black-8);
-  gap: 1rem;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid var(--white-30);
-  border-top-color: var(--sky-0ea5e9);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-text {
-  color: var(--gray-525252);
-  margin: 0;
-  font-size: 1rem;
 }
 
 .error-state {

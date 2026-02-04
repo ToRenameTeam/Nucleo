@@ -5,6 +5,7 @@ import { DocumentPlusIcon, PlusIcon, CalendarIcon, ClockIcon, UserIcon, MapPinIc
 import Toast from '../../components/shared/Toast.vue'
 import BaseCard from '../../components/shared/BaseCard.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
+import LoadingSpinner from '../../components/shared/LoadingSpinner.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
 import AppointmentBooking from '../../components/patient/home/AppointmentBooking.vue'
 import UploadDocumentModal from '../../components/patient/documents/UploadDocumentModal.vue'
@@ -255,9 +256,20 @@ const handleCloseToast = () => {
 
         <div class="section-card">
           <h3 class="section-title">{{ $t('home.upcomingAppointments') }}</h3>
-          <div v-if="upcomingAppointments.length === 0" class="empty-card-message">
+          
+          <!-- Loading State -->
+          <LoadingSpinner 
+            v-if="isLoading" 
+            :message="$t('home.loadingAppointments')" 
+            size="medium"
+          />
+          
+          <!-- Empty State -->
+          <div v-else-if="upcomingAppointments.length === 0" class="empty-card-message">
             {{ $t('home.noAppointments') }}
           </div>
+          
+          <!-- Appointments List -->
           <CardList v-else>
             <BaseCard
               v-for="appointment in upcomingAppointments"

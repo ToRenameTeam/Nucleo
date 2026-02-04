@@ -146,7 +146,8 @@
     "newAppointment": "Prenota visita",
     "upcomingAppointments": "Prossimi appuntamenti",
     "noAppointments": "Nessun appuntamento in programma",
-    "recentDocuments": "Documenti recenti"
+    "recentDocuments": "Documenti recenti",
+    "loadingAppointments": "Caricamento appuntamenti..."
   },
   "appointmentBooking": {
     "title": "Prenota una visita",
