@@ -10,13 +10,11 @@ export interface UserInfo {
   dateOfBirth: string
   patient?: {
     userId: string
-    activeDelegationIds: string[]
   }
   doctor?: {
     userId: string
     medicalLicenseNumber: string
     specializations: string[]
-    assignedPatientUserIds: string[]
   }
 }
 

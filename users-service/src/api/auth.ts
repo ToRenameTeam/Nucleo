@@ -42,7 +42,6 @@ router.post('/login', async (req: Request, res: Response) => {
                 activeProfile: 'PATIENT',
                 patient: {
                     userId: authenticatedUser.user.userId,
-                    activeDelegationIds: patientUser.patientProfile.activeDelegationIds,
                 },
             });
         }

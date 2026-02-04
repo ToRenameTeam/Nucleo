@@ -10,16 +10,12 @@ export class PatientRepositoryImpl implements IPatientRepository {
 
         return {
             userId: patient.userId,
-            activeDelegationIds: patient.activeDelegationIds,
         };
     }
 
     async save(patient: Patient): Promise<void> {
         await PatientModel.findOneAndUpdate(
             { userId: patient.userId },
-            {
-                activeDelegationIds: patient.activeDelegationIds,
-            },
             {
                 upsert: true,
                 new: true,

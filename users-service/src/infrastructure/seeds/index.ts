@@ -44,7 +44,6 @@ async function seedUsers(): Promise<void> {
 
         await PatientModel.create({
             userId: userSeed.userId,
-            activeDelegationIds: [],
         });
 
         if (userSeed.doctor) {
@@ -52,7 +51,6 @@ async function seedUsers(): Promise<void> {
                 userId: userSeed.userId,
                 medicalLicenseNumber: userSeed.doctor.medicalLicenseNumber,
                 specializations: userSeed.doctor.specializations,
-                assignedPatientUserIds: [],
             });
         }
     }
@@ -76,7 +74,6 @@ async function seedDelegations(): Promise<void> {
     for (const delegation of activeDelegations) {
         await PatientModel.findOneAndUpdate(
             { userId: delegation.delegatingUserId },
-            { $addToSet: { activeDelegationIds: delegation.delegationId } }
         );
     }
 

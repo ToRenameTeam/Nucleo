@@ -4,7 +4,6 @@ export interface DoctorData {
     userId: string;
     medicalLicenseNumber: string;
     specializations: string[];
-    assignedPatientUserIds: string[];
 }
 
 export interface IDoctorRepository {

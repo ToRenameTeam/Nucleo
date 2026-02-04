@@ -15,12 +15,11 @@ describe('AuthenticatedUserFactory', () => {
 
     beforeEach(() => {
         mockUser = { userId: randomUUID() } as unknown as User;
-        mockPatient = Patient.reconstitute(randomUUID(), []);
+        mockPatient = Patient.reconstitute(randomUUID());
         mockDoctor = Doctor.reconstitute(
             randomUUID(),
             'ML123456',
             ['Cardiologia'],
-            []
         );
     });
 
@@ -76,7 +75,7 @@ describe('PatientOnlyUser', () => {
 
     beforeEach(() => {
         mockUser = { userId: randomUUID() } as unknown as User;
-        mockPatient = Patient.reconstitute(randomUUID(), ['delegation1']);
+        mockPatient = Patient.reconstitute(randomUUID());
         instance = new PatientOnlyUser(mockUser, mockPatient);
     });
 
@@ -86,11 +85,6 @@ describe('PatientOnlyUser', () => {
 
     it('should indicate no doctor profile', () => {
         expect(instance.hasDoctorProfile).toBe(false);
-    });
-
-    it('should return patient profile with correct delegations', () => {
-        expect(instance.patientProfile).toBe(mockPatient);
-        expect(instance.patientProfile.activeDelegationIds).toEqual(['delegation1']);
     });
 
     it('should return user reference', () => {
@@ -105,12 +99,11 @@ describe('DoctorPatientUser', () => {
 
     beforeEach(() => {
         mockUser = { userId: randomUUID() } as unknown as User;
-        mockPatient = Patient.reconstitute(randomUUID(), []);
+        mockPatient = Patient.reconstitute(randomUUID());
         mockDoctor = Doctor.reconstitute(
             randomUUID(),
             'ML123456',
             ['Cardiologia', 'Medicina Interna'],
-            ['patient1', 'patient2']
         );
     });
 
@@ -141,7 +134,6 @@ describe('DoctorPatientUser', () => {
 
         expect(instance.doctorProfile.medicalLicenseNumber).toBe('ML123456');
         expect(instance.doctorProfile.specialization).toEqual(['Cardiologia', 'Medicina Interna']);
-        expect(instance.doctorProfile.assignedPatientUserIds).toEqual(['patient1', 'patient2']);
     });
 
     it('should return user reference', () => {

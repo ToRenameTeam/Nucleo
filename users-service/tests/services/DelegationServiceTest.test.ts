@@ -14,6 +14,7 @@ describe('DelegationService', () => {
             findDelegationByUsers: jest.fn(),
             findByDelegatingUserId: jest.fn(),
             findByDelegatorUserId: jest.fn(),
+            findAll: jest.fn(),
             create: jest.fn(),
             save: jest.fn(),
             delete: jest.fn()
@@ -30,7 +31,7 @@ describe('DelegationService', () => {
 
     describe('createDelegation', () => {
         it('should create delegation when patients exist', async () => {
-            mockPatientRepo.findByUserId.mockResolvedValue({ userId: randomUUID(), activeDelegationIds: [] });
+            mockPatientRepo.findByUserId.mockResolvedValue({ userId: randomUUID()});
             mockDelegationRepo.findDelegationByUsers.mockResolvedValue(null);
 
             const result = await service.createDelegation({
@@ -52,7 +53,7 @@ describe('DelegationService', () => {
         });
 
         it('should throw error if delegation already exists', async () => {
-            mockPatientRepo.findByUserId.mockResolvedValue({ userId: randomUUID(), activeDelegationIds: [] });
+            mockPatientRepo.findByUserId.mockResolvedValue({ userId: randomUUID()});
             mockDelegationRepo.findDelegationByUsers.mockResolvedValue({
                 delegationId: randomUUID(),
                 delegatingUserId: randomUUID(),
@@ -151,8 +152,7 @@ describe('DelegationService', () => {
             }]);
             
             mockPatientRepo.findByUserId.mockResolvedValue({
-                userId: 'owner-id',
-                activeDelegationIds: []
+                userId: 'owner-id'
             });
 
             const result = await service.getActiveDelegationsForDelegatingUser(randomUUID());

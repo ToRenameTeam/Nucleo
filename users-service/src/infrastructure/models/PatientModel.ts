@@ -2,7 +2,6 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IPatientDocument extends Document {
     userId: string;
-    activeDelegationIds: string[];
 }
 
 const PatientSchema = new Schema<IPatientDocument>(
@@ -12,11 +11,7 @@ const PatientSchema = new Schema<IPatientDocument>(
             required: true,
             unique: true,
             ref: 'User',
-        },
-        activeDelegationIds: {
-            type: [String],
-            default: [],
-        },
+        }
     },
     {
         timestamps: true,

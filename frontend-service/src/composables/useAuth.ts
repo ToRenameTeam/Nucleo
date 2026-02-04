@@ -21,13 +21,11 @@ const DEV_USER: AuthenticatedUser = {
   activeProfile: 'PATIENT',
   patient: {
     userId: 'dev-user-001',
-    activeDelegationIds: []
   },
   doctor: {
     userId: 'dev-user-001',
     medicalLicenseNumber: 'DEV123456',
     specializations: ['Medicina Generale'],
-    assignedPatientUserIds: []
   }
 }
 

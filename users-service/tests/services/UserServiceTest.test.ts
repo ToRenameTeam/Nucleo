@@ -114,15 +114,13 @@ describe('UserService', () => {
             });
 
             mockPatientRepository.findByUserId.mockResolvedValue({
-                userId,
-                activeDelegationIds: ['delegation1'],
+                userId
             });
 
             mockDoctorRepository.findByUserId.mockResolvedValue({
                 userId,
                 medicalLicenseNumber: 'ML123456',
                 specializations: ['Cardiologia'],
-                assignedPatientUserIds: [],
             });
 
             const result = await userService.getUserById(userId);
@@ -133,7 +131,6 @@ describe('UserService', () => {
                 name: 'Mario',
                 lastName: 'Rossi',
                 patientData: {
-                    activeDelegationIds: ['delegation1'],
                 },
                 doctor: {
                     medicalLicenseNumber: 'ML123456',
@@ -164,15 +161,13 @@ describe('UserService', () => {
             });
 
             mockPatientRepository.findByUserId.mockResolvedValue({
-                userId,
-                activeDelegationIds: ['delegation1'],
+                userId
             });
 
             mockDoctorRepository.findByUserId.mockResolvedValue({
                 userId,
                 medicalLicenseNumber: 'ML123456',
-                specializations: ['Cardiologia'],
-                assignedPatientUserIds: [],
+                specializations: ['Cardiologia']
             });
 
             const result = await userService.getUserByFiscalCode(fiscalCode);
@@ -183,7 +178,6 @@ describe('UserService', () => {
                 name: 'Mario',
                 lastName: 'Rossi',
                 patientData: {
-                    activeDelegationIds: ['delegation1'],
                 },
                 doctor: {
                     medicalLicenseNumber: 'ML123456',
@@ -204,8 +198,7 @@ describe('UserService', () => {
             });
 
             mockPatientRepository.findByUserId.mockResolvedValue({
-                userId,
-                activeDelegationIds: [],
+                userId
             });
 
             mockDoctorRepository.findByUserId.mockResolvedValue(null);
@@ -218,7 +211,6 @@ describe('UserService', () => {
                 name: 'Mario',
                 lastName: 'Rossi',
                 patientData: {
-                    activeDelegationIds: [],
                 },
                 doctor: undefined,
             });
@@ -246,8 +238,7 @@ describe('UserService', () => {
             });
 
             mockPatientRepository.findByUserId.mockResolvedValue({
-                userId,
-                activeDelegationIds: [],
+                userId
             });
 
             mockDoctorRepository.findByUserId.mockResolvedValue(null);
@@ -294,8 +285,7 @@ describe('UserService', () => {
             });
 
             mockPatientRepository.findByUserId.mockResolvedValue({
-                userId: user1Id,
-                activeDelegationIds: [],
+                userId: user1Id
             });
 
             mockDoctorRepository.findByUserId
@@ -303,17 +293,13 @@ describe('UserService', () => {
                 .mockResolvedValueOnce({
                     userId: user2Id,
                     medicalLicenseNumber: 'ML123456',
-                    specializations: ['Cardiologia'],
-                    assignedPatientUserIds: [],
+                    specializations: ['Cardiologia']
                 });
 
             const result = await userService.listUsers();
 
             expect(result.users).toHaveLength(2);
-            expect(result.users[0]?.fiscalCode).toBe('RSSMRA80A01H501U');
-            expect(result.users[0]?.patientData).toEqual({
-                activeDelegationIds: [],
-            });
+            expect(result.users[0]?.fiscalCode).toBe('RSSMRA80A01H501U');    
             expect(result.users[1]?.doctor).toEqual({
                 medicalLicenseNumber: 'ML123456',
                 specializations: ['Cardiologia'],
