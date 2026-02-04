@@ -197,8 +197,7 @@
       "fiscalCode": "Fiscal code",
       "dateOfBirth": "Date of birth",
       "noData": "No data available",
-      "delegatedAccess": "You are viewing data for",
-      "yourData": "Your data"
+      "delegatedAccess": "You are viewing data for"
     },
     "app": {
       "title": "App",

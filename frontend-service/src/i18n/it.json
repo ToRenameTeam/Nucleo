@@ -207,8 +207,7 @@
       "fiscalCode": "Codice fiscale",
       "dateOfBirth": "Data di nascita",
       "noData": "Nessun dato disponibile",
-      "delegatedAccess": "Stai visualizzando i dati di",
-      "yourData": "I tuoi dati"
+      "delegatedAccess": "Stai visualizzando i dati di"
     },
     "app": {
       "title": "App",

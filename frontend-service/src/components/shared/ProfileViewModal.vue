@@ -4,13 +4,13 @@ import { useI18n } from 'vue-i18n'
 import BaseModal from './BaseModal.vue'
 import { UserCircleIcon, IdentificationIcon, CalendarIcon } from '@heroicons/vue/24/outline'
 import type { Profile } from '../../types/auth'
+import { parseItalianDate } from '../../utils/dateUtils'
 
 interface Props {
   isOpen: boolean
   profileData: Profile | null
   title?: string
   isDelegated?: boolean
-  delegatedByName?: string
 }
 
 const { t } = useI18n()
@@ -18,7 +18,6 @@ const { t } = useI18n()
 const props = withDefaults(defineProps<Props>(), {
   title: undefined,
   isDelegated: false,
-  delegatedByName: undefined
 })
 
 const emit = defineEmits<{
@@ -26,24 +25,11 @@ const emit = defineEmits<{
 }>()
 
 const fullName = computed(() => {
+    console.log('props.profileData', props.profileData)
   if (!props.profileData) return ''
   return props.profileData.lastName 
     ? `${props.profileData.name} ${props.profileData.lastName}`
     : props.profileData.name
-})
-
-const formattedDateOfBirth = computed(() => {
-  if (!props.profileData?.dateOfBirth) return null
-  try {
-    const date = new Date(props.profileData.dateOfBirth)
-    return date.toLocaleDateString('it-IT', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    })
-  } catch {
-    return props.profileData.dateOfBirth
-  }
 })
 
 const avatarInitials = computed(() => {
@@ -72,7 +58,6 @@ const modalTitle = computed(() => props.title || t('settings.profileModal.title'
         <div class="delegation-badge-content">
           <div class="delegation-badge-label">{{ t('settings.profileModal.delegatedAccess') }}</div>
           <div class="delegation-badge-name">{{ fullName }}</div>
-          <div v-if="delegatedByName" class="delegation-badge-delegator">{{ delegatedByName }}</div>
         </div>
       </div>
 
@@ -106,13 +91,13 @@ const modalTitle = computed(() => props.title || t('settings.profileModal.title'
           </div>
         </div>
 
-        <div v-if="formattedDateOfBirth" class="detail-item">
+        <div class="detail-item">
           <div class="detail-icon">
             <CalendarIcon />
           </div>
           <div class="detail-content">
             <div class="detail-label">{{ t('settings.profileModal.dateOfBirth') }}</div>
-            <div class="detail-value">{{ formattedDateOfBirth }}</div>
+            <div class="detail-value">{{ parseItalianDate(profileData.dateOfBirth) }}</div>
           </div>
         </div>
       </div>

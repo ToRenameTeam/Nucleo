@@ -62,11 +62,14 @@ const loadDelegatedProfiles = async () => {
         const profilePromises = response.delegations.map(async (delegation) => {
           try {
             const userData = await authApi.getUserById(delegation.delegatorUserId) as UserData
-            return {
+            const profile: Profile = {
               id: delegation.delegatorUserId,
-              name: `${userData.name}`,
-              fiscalCode: userData.fiscalCode
+              name: userData.name,
+              lastName: userData.lastName,
+              fiscalCode: userData.fiscalCode,
+              dateOfBirth: userData.dateOfBirth
             }
+            return profile
           } catch (err) {
             console.error(`Errore nel caricamento dell'utente ${delegation.delegatorUserId}:`, err)
             return null
