@@ -39,7 +39,7 @@
   "userMenu": {
     "profile": "Profilo",
     "settings": "Impostazioni",
-    "logout": "Esci"
+    "logout": "Disconnettiti"
   },
   "tabs": {
     "home": "Home",
