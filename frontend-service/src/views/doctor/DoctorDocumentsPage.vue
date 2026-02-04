@@ -203,9 +203,33 @@ const deselectAll = () => {
     selectedDocumentIds.value.clear()
 }
 
-// TODO : implementare logica del download
-const handleDownloadAll = () => {
-    alert(`Scaricamento di ${selectedDocuments.value.length} documenti...`)
+const handleDownloadAll = async () => {
+    if (selectedDocuments.value.length === 0) {
+        return
+    }
+
+    try {
+        console.log('[DoctorDocumentsPage] Downloading', selectedDocuments.value.length, 'documents')
+
+        const documentsToDownload = selectedDocuments.value
+            .filter(doc => doc.patientId) // Only download documents with patientId
+            .map(doc => ({
+                patientId: doc.patientId!,
+                documentId: doc.id,
+                title: doc.title
+            }))
+
+        if (documentsToDownload.length === 0) {
+            console.warn('[DoctorDocumentsPage] No documents with patientId to download')
+            return
+        }
+
+        await documentsApiService.downloadMultipleDocuments(documentsToDownload)
+        console.log('[DoctorDocumentsPage] Download batch completed')
+    } catch (error) {
+        console.error('[DoctorDocumentsPage] Error downloading documents:', error)
+        // TODO: Mostrare un messaggio di errore all'utente
+    }
 }
 
 const handleCancelSelection = () => {

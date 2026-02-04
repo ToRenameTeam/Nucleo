@@ -184,6 +184,7 @@
   "documentModal": {
     "descriptionLabel": "Descrizione contenuto referto:",
     "download": "Scarica",
+    "downloading": "Scaricamento...",
     "share": "Condividi"
   },
   "settings": {
