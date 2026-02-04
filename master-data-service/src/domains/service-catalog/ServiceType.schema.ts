@@ -5,7 +5,7 @@ export interface IServiceType {
     code: string;
     name: string;
     description: string;
-    category: ServiceCategory;
+    category: ServiceCategory[];
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -23,6 +23,12 @@ export enum ServiceCategory {
     ODONTOIATRIA = 'odontoiatria',
     OCULISTICA = 'oculistica',
     CARDIOLOGIA = 'cardiologia',
+    DERMATOLOGIA = 'dermatologia',
+    ORTOPEDIA = 'ortopedia',
+    NEUROLOGIA = 'neurologia',
+    OTORINOLARINGOIATRIA = 'otorinolaringoiatria',
+    UROLOGIA = 'urologia',
+    ENDOCRINOLOGIA = 'endocrinologia',
     GINECOLOGIA = 'ginecologia',
     PEDIATRIA = 'pediatria',
     ALTRO = 'altro'
@@ -51,9 +57,14 @@ const ServiceTypeSchema = new Schema<IServiceType>(
             trim: true
         },
         category: {
-            type: String,
+            type: [String],
             required: true,
-            enum: Object.values(ServiceCategory)
+            validate: {
+                validator: function(v: string[]) {
+                    return v && v.length > 0 && v.every(cat => Object.values(ServiceCategory).includes(cat as ServiceCategory));
+                },
+                message: 'Category must be a non-empty array of valid ServiceCategory values'
+            }
         },
         isActive: {
             type: Boolean,

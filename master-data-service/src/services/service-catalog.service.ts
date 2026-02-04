@@ -10,14 +10,14 @@ export interface CreateServiceTypeInput {
     code: string;
     name: string;
     description?: string;
-    category: ServiceCategory;
+    category: ServiceCategory[];
     isActive?: boolean;
 }
 
 export interface UpdateServiceTypeInput {
     name?: string;
     description?: string;
-    category?: ServiceCategory;
+    category?: ServiceCategory[];
     isActive?: boolean;
 }
 
@@ -34,7 +34,8 @@ export class ServiceCatalogService {
         const query: Record<string, unknown> = {};
 
         if (filter.category) {
-            query.category = filter.category;
+            // Use $in to search for services that include the specified category
+            query.category = { $in: [filter.category] };
         }
 
         if (filter.active !== undefined) {
