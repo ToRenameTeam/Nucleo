@@ -191,6 +191,15 @@
         "subtitle": "Personal data and service status"
       }
     },
+    "profileModal": {
+      "title": "Profile",
+      "fullName": "Full name",
+      "fiscalCode": "Fiscal code",
+      "dateOfBirth": "Date of birth",
+      "noData": "No data available",
+      "delegatedAccess": "You are viewing data for",
+      "yourData": "Your data"
+    },
     "app": {
       "title": "App",
       "notifications": {

@@ -1,7 +1,9 @@
 export interface Profile {
   id: string
   name: string
+  lastName: string
   fiscalCode: string
+  dateOfBirth: string
 }
 
 export interface UserData {

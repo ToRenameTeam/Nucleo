@@ -47,6 +47,8 @@ const loadDelegatedProfiles = async () => {
     const personalProfile: Profile = {
       id: currentUser.value.userId,
       name: `${currentUser.value.name}`,
+      lastName: currentUser.value.lastName,
+      dateOfBirth: currentUser.value.dateOfBirth,
       fiscalCode: currentUser.value.fiscalCode
     }
 

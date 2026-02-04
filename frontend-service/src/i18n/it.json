@@ -201,6 +201,15 @@
         "subtitle": "Anagrafica e stato dei servizi"
       }
     },
+    "profileModal": {
+      "title": "Profilo",
+      "fullName": "Nome completo",
+      "fiscalCode": "Codice fiscale",
+      "dateOfBirth": "Data di nascita",
+      "noData": "Nessun dato disponibile",
+      "delegatedAccess": "Stai visualizzando i dati di",
+      "yourData": "I tuoi dati"
+    },
     "app": {
       "title": "App",
       "notifications": {
