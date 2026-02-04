@@ -60,29 +60,32 @@ If the document is NOT medical-related (e.g., invoice, contract, personal letter
 - Return EMPTY list for tags: []
 
 If the document IS medical-related, analyze it and:
-1. Generate a concise, professional summary (2-3 sentences) that captures:
+1. Generate a concise, professional summary IN ITALIAN (2-3 sentences) that captures:
    - The type of document (prescription, report)
    - Key medical information (diagnoses, medications, procedures, findings)
    - Patient-relevant outcomes or recommendations
+   - DO NOT include any IDs (document IDs, patient IDs, doctor IDs, reference numbers)
 
-2. Extract relevant tags (3-10 tags) including:
-   - Document type (e.g., "prescription", "report")
-   - Medical specialties involved (e.g., "cardiology", "radiology", "general_medicine")
+2. Extract relevant tags IN ITALIAN (3-10 tags) including:
+   - Document type (e.g., "ricetta", "referto")
+   - Medical specialties involved (e.g., "cardiologia", "radiologia", "medicina generale")
    - Diagnoses or conditions mentioned
    - Medications prescribed (generic names preferred)
    - Procedures or tests performed
    - Key clinical findings
    - Anatomical regions involved
-   - Urgency level if mentioned (e.g., "routine", "urgent")
+   - Urgency level if mentioned (e.g., "routine", "urgente")
+   - DO NOT include any IDs (document IDs, patient IDs, doctor IDs, reference numbers)
 
 Guidelines for tags:
-- Use lowercase with underscores for multi-word tags (e.g., "blood_pressure")
-- Use standardized medical terminology when possible
+- Use lowercase with underscores for multi-word tags (e.g., "pressione_sanguigna")
+- Use standardized medical terminology in Italian when possible
 - Avoid patient-identifying information in tags
+- Avoid any kind of IDs (document, patient, doctor, reference numbers)
 - Focus on clinically relevant terms
 
 Response format for MEDICAL documents:
-{"summary": "Your summary here.", "tags": ["tag1", "tag2", "tag3"]}
+{"summary": "Il tuo riassunto qui in italiano.", "tags": ["tag1", "tag2", "tag3"]}
 
 Response format for NON-MEDICAL documents:
 {"summary": "", "tags": []}"""
