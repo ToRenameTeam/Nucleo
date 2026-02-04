@@ -217,7 +217,7 @@
       },
       "appearance": {
         "title": "Aspetto",
-        "subtitle": "Tema, colori e aspetto, dimensione testo",
+        "subtitle": "Tema e aspetto dell'applicazione",
         "theme": {
           "title": "Tema",
           "light": "Chiaro",

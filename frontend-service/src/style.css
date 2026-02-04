@@ -838,36 +838,6 @@ img, video {
   --badge-gastroenterologia-border: rgba(251, 146, 60, 0.3);
 }
 
-/* Deuteranopia (rosso-verde) - colori più distinguibili */
-:root.deuteranopia {
-  --accent-primary: #0284c7;
-  --accent-secondary: #facc15;
-  --accent-tertiary: #0284c7;
-  --success: #0284c7;
-  --error: #eab308;
-  --warning: #06b6d4;
-}
-
-/* Protanopia (rosso-verde) - simile a deuteranopia */
-:root.protanopia {
-  --accent-primary: #0891b2;
-  --accent-secondary: #fbbf24;
-  --accent-tertiary: #0891b2;
-  --success: #06b6d4;
-  --error: #f59e0b;
-  --warning: #0ea5e9;
-}
-
-/* Tritanopia (blu-giallo) */
-:root.tritanopia {
-  --accent-primary: #dc2626;
-  --accent-secondary: #06b6d4;
-  --accent-tertiary: #f43f5e;
-  --success: #06b6d4;
-  --error: #dc2626;
-  --warning: #f43f5e;
-}
-
 body {
   margin: 0;
   min-width: 320px;

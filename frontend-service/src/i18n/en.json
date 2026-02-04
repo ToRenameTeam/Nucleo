@@ -207,7 +207,7 @@
       },
       "appearance": {
         "title": "Appearance",
-        "subtitle": "Theme, colors and appearance, text size",
+        "subtitle": "Theme and application appearance",
         "theme": {
           "title": "Theme",
           "light": "Light",

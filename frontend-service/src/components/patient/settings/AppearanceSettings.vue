@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { useTheme} from '../../../composables/useTheme'
+import { useTheme } from '../../../composables/useTheme'
 import { SunIcon, MoonIcon, CheckCircleIcon } from '@heroicons/vue/24/solid'
 
 const { t } = useI18n()
