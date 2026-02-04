@@ -14,7 +14,7 @@ import type { Tag } from '../../types/tag'
 import type { Appointment } from '../../types/appointment'
 import type { CardMetadata } from '../../types/shared'
 import { appointmentsApi } from '../../api/appointments'
-import { TAG_COLOR_MAP } from '../../constants/mockData'
+import { TAG_COLOR_MAP } from '../../constants/categoryBadgeConfig'
 import type { BadgeColors } from '../../types/document'
 
 const { t } = useI18n()

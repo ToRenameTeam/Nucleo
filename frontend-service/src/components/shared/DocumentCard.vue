@@ -4,7 +4,7 @@ import { DocumentIcon, MapPinIcon, UserIcon, CalendarIcon } from '@heroicons/vue
 import BaseCard from './BaseCard.vue'
 import type { CardMetadata } from '../../types/shared'
 import type { DocumentCard, BadgeColors } from '../../types/document'
-import { TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/mockData'
+import { TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/categoryBadgeConfig'
 
 const props = withDefaults(defineProps<DocumentCard>(), {
   selectable: false,

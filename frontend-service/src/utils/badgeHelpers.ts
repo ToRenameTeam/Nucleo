@@ -1,4 +1,4 @@
-import { TAG_COLOR_MAP, TAG_ICON_MAP } from '../constants/mockData'
+import { TAG_COLOR_MAP, TAG_ICON_MAP } from '../constants/categoryBadgeConfig'
 import type { BadgeColors } from '../types/document'
 
 /**
