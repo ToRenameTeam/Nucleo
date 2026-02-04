@@ -59,15 +59,16 @@ const tags = computed<Tag[]>(() => {
   // Get unique categories from appointments
   const categoriesSet = new Set<string>()
   allAppointments.forEach(apt => {
-    if (apt.category) {
-      categoriesSet.add(apt.category)
+    if (apt.category && apt.category.length > 0) {
+      // Category is now an array, add each category
+      apt.category.forEach(cat => categoriesSet.add(cat))
     }
   })
   
   const categoryTags: Tag[] = Array.from(categoriesSet).map(category => ({
     id: category,
     label: formatCategory(category),
-    count: allAppointments.filter(a => a.category === category).length
+    count: allAppointments.filter(a => a.category && a.category.includes(category)).length
   }))
   
   return [
@@ -84,7 +85,7 @@ const filteredAppointments = computed(() => {
   if (selectedTag.value === 'all') {
     return allAppointments
   }
-  return allAppointments.filter(apt => apt.category === selectedTag.value)
+  return allAppointments.filter(apt => apt.category && apt.category.includes(selectedTag.value))
 })
 
 const currentAppointmentInfo = computed(() => {
@@ -284,18 +285,20 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
             :selected="selectedAppointmentId === appointment.id"
             @click="handleAppointmentClick(appointment.id)"
           >
-            <template v-if="appointment.category" #badges>
+            <template v-if="appointment.category && appointment.category.length > 0" #badges>
               <div class="badges-row">
                 <div 
+                  v-for="cat in appointment.category"
+                  :key="cat"
                   class="appointment-badge" 
                   :style="{
-                    color: getBadgeColors(appointment.category).color,
-                    backgroundColor: getBadgeColors(appointment.category).bgColor,
-                    borderColor: getBadgeColors(appointment.category).borderColor
+                    color: getBadgeColors(cat).color,
+                    backgroundColor: getBadgeColors(cat).bgColor,
+                    borderColor: getBadgeColors(cat).borderColor
                   }"
                 >
-                  <span class="badge-icon">{{ getBadgeIcon(appointment.category) }}</span>
-                  <span class="badge-label">{{ formatCategory(appointment.category) }}</span>
+                  <span class="badge-icon">{{ getBadgeIcon(cat) }}</span>
+                  <span class="badge-label">{{ formatCategory(cat) }}</span>
                 </div>
               </div>
             </template>

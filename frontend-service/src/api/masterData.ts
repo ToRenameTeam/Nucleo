@@ -6,7 +6,7 @@ export interface ServiceType {
   code: string
   name: string
   description?: string
-  category?: string
+  category?: string[]
 }
 
 // Facility Types

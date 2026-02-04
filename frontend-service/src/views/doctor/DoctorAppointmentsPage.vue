@@ -43,10 +43,10 @@ const toastType = ref<'success' | 'error' | 'info'>('success')
 // Computed tags based on appointments
 const tags = computed<Tag[]>(() => [
   { id: 'all', label: t('calendar.categories.all'), count: appointments.value.length },
-  { id: 'scheduled', label: t('doctor.appointments.categories.scheduled'), count: appointments.value.filter(a => a.tags?.includes('SCHEDULED')).length },
-  { id: 'completed', label: t('doctor.appointments.categories.completed'), count: appointments.value.filter(a => a.tags?.includes('COMPLETED')).length },
-  { id: 'no-show', label: t('doctor.appointments.categories.noShow'), count: appointments.value.filter(a => a.tags?.includes('NO_SHOW')).length },
-  { id: 'cancelled', label: t('doctor.appointments.categories.cancelled'), count: appointments.value.filter(a => a.tags?.includes('CANCELLED')).length }
+  { id: 'scheduled', label: t('doctor.appointments.categories.scheduled'), count: appointments.value.filter(a => a.status === 'SCHEDULED').length },
+  { id: 'completed', label: t('doctor.appointments.categories.completed'), count: appointments.value.filter(a => a.status === 'COMPLETED').length },
+  { id: 'no-show', label: t('doctor.appointments.categories.noShow'), count: appointments.value.filter(a => a.status === 'NO_SHOW').length },
+  { id: 'cancelled', label: t('doctor.appointments.categories.cancelled'), count: appointments.value.filter(a => a.status === 'CANCELLED').length }
 ])
 
 // Get status label
@@ -80,7 +80,7 @@ const filteredAppointments = computed(() => {
     const tagToFilter = statusMap[selectedTag.value] || selectedTag.value.toUpperCase()
     
     filtered = filtered.filter(apt => 
-      apt.tags?.includes(tagToFilter)
+      apt.status === tagToFilter
     )
   }
   
@@ -401,27 +401,25 @@ onMounted(() => {
               :selected="selectedAppointmentId === appointment.id"
               @click="handleAppointmentClick(appointment.id)"
             >
-              <template v-if="appointment.tags && appointment.tags.length > 0" #badges>
+              <template v-if="appointment.status" #badges>
                 <div class="badges-row">
                   <div 
-                    v-for="tag in appointment.tags.slice(0, 2)" 
-                    :key="tag" 
                     class="appointment-badge" 
                     :style="{
-                      color: getBadgeColors(tag).color,
-                      backgroundColor: getBadgeColors(tag).bgColor,
-                      borderColor: getBadgeColors(tag).borderColor
+                      color: getBadgeColors(appointment.status).color,
+                      backgroundColor: getBadgeColors(appointment.status).bgColor,
+                      borderColor: getBadgeColors(appointment.status).borderColor
                     }"
                   >
-                    <span class="badge-icon">{{ getStatusIcon(tag) }}</span>
-                    <span class="badge-label">{{ getStatusLabel(tag) }}</span>
+                    <span class="badge-icon">{{ getStatusIcon(appointment.status) }}</span>
+                    <span class="badge-label">{{ getStatusLabel(appointment.status) }}</span>
                   </div>
                 </div>
               </template>
 
               <template #actions>
                 <button
-                  v-if="appointment.tags && appointment.tags.includes('SCHEDULED')"
+                  v-if="appointment.status === 'SCHEDULED'"
                   class="action-button edit-button"
                   @click.stop="handleEditAppointment(appointment.id)"
                   :title="$t('appointments.editAppointment')"
@@ -430,7 +428,7 @@ onMounted(() => {
                   <span>{{ $t('appointments.editAppointment') }}</span>
                 </button>
                 <button
-                  v-if="appointment.tags && appointment.tags.includes('SCHEDULED') && isAppointmentCurrentOrFuture(appointment)"
+                  v-if="appointment.status === 'SCHEDULED' && isAppointmentCurrentOrFuture(appointment)"
                   class="action-button completed-button"
                   @click.stop="handleMarkAsCompleted(appointment.id)"
                   :title="$t('doctor.appointments.actions.visitCompleted')"
@@ -439,7 +437,7 @@ onMounted(() => {
                   <span>{{ $t('doctor.appointments.actions.visitCompleted') }}</span>
                 </button>
                 <button
-                  v-if="appointment.tags && appointment.tags.includes('SCHEDULED') && isAppointmentCurrentOrFuture(appointment)"
+                  v-if="appointment.status === 'SCHEDULED' && isAppointmentCurrentOrFuture(appointment)"
                   class="action-button noshow-button"
                   @click.stop="handleMarkAsNoShow(appointment.id)"
                   :title="$t('doctor.appointments.actions.patientNoShow')"
@@ -448,7 +446,7 @@ onMounted(() => {
                   <span>{{ $t('doctor.appointments.actions.patientNoShow') }}</span>
                 </button>
                 <button
-                  v-if="appointment.tags && appointment.tags.includes('COMPLETED')"
+                  v-if="appointment.status === 'COMPLETED'"
                   class="action-button document-button"
                   @click.stop="handleAddDocument(appointment)"
                   :title="$t('doctor.appointments.actions.addDocument')"
@@ -490,27 +488,25 @@ onMounted(() => {
                 :selected="selectedAppointmentId === appointment.id"
                 @click="handleAppointmentClick(appointment.id)"
               >
-                <template v-if="appointment.tags && appointment.tags.length > 0" #badges>
+                <template v-if="appointment.status" #badges>
                   <div class="badges-row">
                     <div 
-                      v-for="tag in appointment.tags.slice(0, 2)" 
-                      :key="tag" 
                       class="appointment-badge" 
                       :style="{
-                        color: getBadgeColors(tag).color,
-                        backgroundColor: getBadgeColors(tag).bgColor,
-                        borderColor: getBadgeColors(tag).borderColor
+                        color: getBadgeColors(appointment.status).color,
+                        backgroundColor: getBadgeColors(appointment.status).bgColor,
+                        borderColor: getBadgeColors(appointment.status).borderColor
                       }"
                     >
-                      <span class="badge-icon">{{ getStatusIcon(tag) }}</span>
-                      <span class="badge-label">{{ getStatusLabel(tag) }}</span>
+                      <span class="badge-icon">{{ getStatusIcon(appointment.status) }}</span>
+                      <span class="badge-label">{{ getStatusLabel(appointment.status) }}</span>
                     </div>
                   </div>
                 </template>
 
                 <template #actions>
                   <button
-                    v-if="appointment.tags && appointment.tags.includes('SCHEDULED')"
+                    v-if="appointment.status === 'SCHEDULED'"
                     class="action-button edit-button"
                     @click.stop="handleEditAppointment(appointment.id)"
                     :title="$t('appointments.editAppointment')"
@@ -519,7 +515,7 @@ onMounted(() => {
                     <span>{{ $t('appointments.editAppointment') }}</span>
                   </button>
                   <button
-                    v-if="appointment.tags && appointment.tags.includes('SCHEDULED') && isAppointmentCurrentOrFuture(appointment)"
+                    v-if="appointment.status === 'SCHEDULED' && isAppointmentCurrentOrFuture(appointment)"
                     class="action-button completed-button"
                     @click.stop="handleMarkAsCompleted(appointment.id)"
                     :title="$t('doctor.appointments.actions.visitCompleted')"
@@ -528,7 +524,7 @@ onMounted(() => {
                     <span>{{ $t('doctor.appointments.actions.visitCompleted') }}</span>
                   </button>
                   <button
-                    v-if="appointment.tags && appointment.tags.includes('SCHEDULED') && isAppointmentCurrentOrFuture(appointment)"
+                    v-if="appointment.status === 'SCHEDULED' && isAppointmentCurrentOrFuture(appointment)"
                     class="action-button noshow-button"
                     @click.stop="handleMarkAsNoShow(appointment.id)"
                     :title="$t('doctor.appointments.actions.patientNoShow')"
@@ -537,7 +533,7 @@ onMounted(() => {
                     <span>{{ $t('doctor.appointments.actions.patientNoShow') }}</span>
                   </button>
                   <button
-                    v-if="appointment.tags && appointment.tags.includes('COMPLETED')"
+                    v-if="appointment.status === 'COMPLETED'"
                     class="action-button document-button"
                     @click.stop="handleAddDocument(appointment)"
                     :title="$t('doctor.appointments.actions.addDocument')"

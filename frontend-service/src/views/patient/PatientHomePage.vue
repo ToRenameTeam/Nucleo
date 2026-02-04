@@ -302,18 +302,20 @@ const handleCloseToast = () => {
               :metadata="getAppointmentMetadata(appointment)"
               @click="handleAppointmentClick(appointment.id)"
             >
-              <template v-if="appointment.category" #badges>
+              <template v-if="appointment.category && appointment.category.length > 0" #badges>
                 <div class="badges-row">
                   <div 
+                    v-for="cat in appointment.category"
+                    :key="cat"
                     class="appointment-badge" 
                     :style="{
-                      color: getBadgeColors(appointment.category).color,
-                      backgroundColor: getBadgeColors(appointment.category).bgColor,
-                      borderColor: getBadgeColors(appointment.category).borderColor
+                      color: getBadgeColors(cat).color,
+                      backgroundColor: getBadgeColors(cat).bgColor,
+                      borderColor: getBadgeColors(cat).borderColor
                     }"
                   >
-                    <span class="badge-icon">{{ getBadgeIcon(appointment.category) }}</span>
-                    <span class="badge-label">{{ formatCategory(appointment.category) }}</span>
+                    <span class="badge-icon">{{ getBadgeIcon(cat) }}</span>
+                    <span class="badge-label">{{ formatCategory(cat) }}</span>
                   </div>
                 </div>
               </template>

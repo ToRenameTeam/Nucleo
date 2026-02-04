@@ -2,7 +2,6 @@ export interface Appointment {
   id: string;
   title: string;
   description: string;
-  tags?: string[];
   date: string;
   time?: string;
   user?: string;
@@ -11,7 +10,7 @@ export interface Appointment {
   patientId?: string;
   doctorId?: string;
   status?: string;
-  category?: string;
+  category?: string[]; // Service type categories
   serviceTypeDescription?: string;
 }
 
