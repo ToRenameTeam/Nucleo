@@ -45,7 +45,7 @@ const loadDelegatedProfiles = async () => {
 
     // Add always the personal profile
     const personalProfile: Profile = {
-      id: currentUser.value.userId,
+      userId: currentUser.value.userId,
       name: `${currentUser.value.name}`,
       lastName: currentUser.value.lastName,
       dateOfBirth: currentUser.value.dateOfBirth,
@@ -63,7 +63,7 @@ const loadDelegatedProfiles = async () => {
           try {
             const userData = await authApi.getUserById(delegation.delegatorUserId) as UserData
             const profile: Profile = {
-              id: delegation.delegatorUserId,
+              userId: delegation.delegatorUserId,
               name: userData.name,
               lastName: userData.lastName,
               fiscalCode: userData.fiscalCode,
@@ -121,7 +121,7 @@ const selectPatientProfile = (profile: Profile) => {
     <div v-else class="profiles-container">
       <ProfileCard
         v-for="profile in profiles"
-        :key="profile.id"
+        :key="profile.userId"
         :name="profile.name"
         :fiscalCode="profile.fiscalCode"
         @click="selectPatientProfile(profile)"

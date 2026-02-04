@@ -196,6 +196,8 @@
       "fullName": "Full name",
       "fiscalCode": "Fiscal code",
       "dateOfBirth": "Date of birth",
+      "medicalLicense": "Medical license number",
+      "specializations": "Specializations",
       "noData": "No data available",
       "delegatedAccess": "You are viewing data for"
     },
@@ -521,6 +523,9 @@
           "validUntilExecution": "Until execution"
         }
       }
+    },
+    "settings": {
+
     }
   },
     "common": {

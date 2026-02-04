@@ -3,10 +3,10 @@ import { ref, computed } from 'vue'
 import { useAuth } from '../../composables/useAuth'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import SettingsItem from '../../components/patient/settings/SettingsItem.vue'
+import SettingsItem from '../../components/shared/SettingsItem.vue'
 import BaseModal from '../../components/shared/BaseModal.vue'
 import ProfileViewModal from '../../components/shared/ProfileViewModal.vue'
-import AppearanceSettings from '../../components/patient/settings/AppearanceSettings.vue'
+import AppearanceSettings from '../../components/shared/AppearanceSettings.vue'
 import {
   UserCircleIcon,
   BellIcon,
@@ -19,17 +19,28 @@ const { t } = useI18n()
 const router = useRouter()
 const showAppearanceModal = ref(false)
 const showProfileModal = ref(false)
-const { currentPatientProfile, currentUser } = useAuth()
+const { currentPatientProfile, currentUser, logout: authLogout } = useAuth()
 
 const handleItemClick = (item: string) => {
   if (item === 'appearance') {
     showAppearanceModal.value = true
   } else if (item === 'myProfile') {
     showProfileModal.value = true
+  } else if (item === 'logout') {
+    // Implement logout logic here
+    console.log('Logging out...')
+  } else if (item === 'logout') {
+    logout()
   } else {
     console.log('Clicked:', item)
   }
 }
+
+const logout = () => {
+  authLogout()
+  router.push('/login')
+}
+
 
 function handleChangeProfile() {
   router.push('/patient-choice')

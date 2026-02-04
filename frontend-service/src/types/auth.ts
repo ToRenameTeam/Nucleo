@@ -1,9 +1,11 @@
 export interface Profile {
-  id: string
+  userId: string
   name: string
   lastName: string
   fiscalCode: string
   dateOfBirth: string
+  medicalLicenseNumber?: string
+  specializations?: string[]
 }
 
 export interface UserData {
