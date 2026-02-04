@@ -464,6 +464,56 @@ img, video {
   --badge-altro-bg: rgba(107, 114, 128, 0.12);
   --badge-altro-border: rgba(107, 114, 128, 0.3);
   
+  /* Additional medical specialty badge colors */
+  --badge-diabete: #f97316;
+  --badge-diabete-bg: rgba(249, 115, 22, 0.12);
+  --badge-diabete-border: rgba(249, 115, 22, 0.3);
+  --badge-endocrinologia: #84cc16;
+  --badge-endocrinologia-bg: rgba(132, 204, 22, 0.12);
+  --badge-endocrinologia-border: rgba(132, 204, 22, 0.3);
+  --badge-farmaci: #a855f7;
+  --badge-farmaci-bg: rgba(168, 85, 247, 0.12);
+  --badge-farmaci-border: rgba(168, 85, 247, 0.3);
+  --badge-esami: #06b6d4;
+  --badge-esami-bg: rgba(6, 182, 212, 0.12);
+  --badge-esami-border: rgba(6, 182, 212, 0.3);
+  --badge-analisi: #0ea5e9;
+  --badge-analisi-bg: rgba(14, 165, 233, 0.12);
+  --badge-analisi-border: rgba(14, 165, 233, 0.3);
+  --badge-ortopedia: #a3e635;
+  --badge-ortopedia-bg: rgba(163, 230, 53, 0.12);
+  --badge-ortopedia-border: rgba(163, 230, 53, 0.3);
+  --badge-dermatologia: #fda4af;
+  --badge-dermatologia-bg: rgba(253, 164, 175, 0.12);
+  --badge-dermatologia-border: rgba(253, 164, 175, 0.3);
+  --badge-radiologia: #64748b;
+  --badge-radiologia-bg: rgba(100, 116, 139, 0.12);
+  --badge-radiologia-border: rgba(100, 116, 139, 0.3);
+  --badge-ecografia: #22d3ee;
+  --badge-ecografia-bg: rgba(34, 211, 238, 0.12);
+  --badge-ecografia-border: rgba(34, 211, 238, 0.3);
+  --badge-nefrologia: #818cf8;
+  --badge-nefrologia-bg: rgba(129, 140, 248, 0.12);
+  --badge-nefrologia-border: rgba(129, 140, 248, 0.3);
+  --badge-vascolare: #f87171;
+  --badge-vascolare-bg: rgba(248, 113, 113, 0.12);
+  --badge-vascolare-border: rgba(248, 113, 113, 0.3);
+  --badge-riabilitazione: #10b981;
+  --badge-riabilitazione-bg: rgba(16, 185, 129, 0.12);
+  --badge-riabilitazione-border: rgba(16, 185, 129, 0.3);
+  --badge-controllo: #22c55e;
+  --badge-controllo-bg: rgba(34, 197, 94, 0.12);
+  --badge-controllo-border: rgba(34, 197, 94, 0.3);
+  --badge-neurologia: #c084fc;
+  --badge-neurologia-bg: rgba(192, 132, 252, 0.12);
+  --badge-neurologia-border: rgba(192, 132, 252, 0.3);
+  --badge-pneumologia: #06b6d4;
+  --badge-pneumologia-bg: rgba(6, 182, 212, 0.12);
+  --badge-pneumologia-border: rgba(6, 182, 212, 0.3);
+  --badge-gastroenterologia: #f97316;
+  --badge-gastroenterologia-bg: rgba(249, 115, 22, 0.12);
+  --badge-gastroenterologia-border: rgba(249, 115, 22, 0.3);
+  
   /* Status text colors */
   --success-text-dark: #065f46;
   --warning-text-dark: #92400e;
