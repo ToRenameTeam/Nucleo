@@ -10,10 +10,12 @@ import {
   MapPinIcon
 } from '@heroicons/vue/24/outline'
 import BaseModal from '../shared/BaseModal.vue'
+import AvailabilitySlotsList from '../shared/AvailabilitySlotsList.vue'
 import type { ScheduleModalProps, AvailabilityDisplay } from '../../types/availability'
 import type { Facility, ServiceType } from '../../api/masterData'
 import { masterDataApi } from '../../api/masterData'
 import { availabilitiesApi } from '../../api/availabilities'
+import { formatDateToISO, formatTimeForInput } from '../../utils/dateUtils'
 
 const props = withDefaults(defineProps<ScheduleModalProps>(), {
   mode: 'create',
@@ -77,34 +79,6 @@ const isFormValid = computed(() => {
          selectedDuration.value > 0
 })
 
-// Group availabilities by date for select mode
-const availableDates = computed(() => {
-  if (props.mode !== 'select') return []
-  
-  const dateMap = new Map<string, AvailabilityDisplay[]>()
-  
-  availabilitiesList.value
-    .filter(a => a.status === 'AVAILABLE' && !a.isBooked)
-    .forEach(availability => {
-      const dateKey = formatDate(availability.startDateTime)
-      if (!dateMap.has(dateKey)) {
-        dateMap.set(dateKey, [])
-      }
-      dateMap.get(dateKey)!.push(availability)
-    })
-  
-  return Array.from(dateMap.entries())
-    .map(([date, slots]) => ({
-      date,
-      slots: slots.sort((a, b) => a.startDateTime.getTime() - b.startDateTime.getTime())
-    }))
-    .sort((a, b) => {
-      const dateA = parseDateString(a.date)
-      const dateB = parseDateString(b.date)
-      return dateA.getTime() - dateB.getTime()
-    })
-})
-
 async function loadMasterData() {
   isLoading.value = true
   try {
@@ -139,14 +113,14 @@ function initializeForm() {
   if (props.mode === 'edit' && props.availability) {
     // Edit mode - populate from availability
     const avail = props.availability
-    selectedDate.value = formatDateForInput(avail.startDateTime)
+    selectedDate.value = formatDateToISO(avail.startDateTime)
     selectedTime.value = formatTimeForInput(avail.startDateTime)
     selectedFacilityId.value = avail.facilityId
     selectedServiceTypeId.value = avail.serviceTypeId
     selectedDuration.value = avail.durationMinutes
   } else if (props.preselectedDate) {
     // Create mode with preselected date/hour
-    selectedDate.value = formatDateForInput(props.preselectedDate)
+    selectedDate.value = formatDateToISO(props.preselectedDate)
     if (props.preselectedHour !== null) {
       selectedTime.value = `${props.preselectedHour.toString().padStart(2, '0')}:00`
     }
@@ -164,43 +138,6 @@ function initializeForm() {
   
   // Reset selection state
   selectedAvailabilityId.value = null
-}
-
-function formatDateForInput(date: Date): string {
-  const year = date.getFullYear()
-  const month = (date.getMonth() + 1).toString().padStart(2, '0')
-  const day = date.getDate().toString().padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
-function formatTimeForInput(date: Date): string {
-  const hours = date.getHours().toString().padStart(2, '0')
-  const minutes = date.getMinutes().toString().padStart(2, '0')
-  return `${hours}:${minutes}`
-}
-
-function formatDate(date: Date): string {
-  const day = String(date.getDate()).padStart(2, '0')
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const year = date.getFullYear()
-  return `${day}/${month}/${year}`
-}
-
-function parseDateString(dateStr: string): Date {
-  const [day, month, year] = dateStr.split('/').map(Number)
-  return new Date(year || 0, (month || 1) - 1, day || 1)
-}
-
-function formatTime(date: Date): string {
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${hours}:${minutes}`
-}
-
-function formatDayName(dateStr: string): string {
-  const date = parseDateString(dateStr)
-  const days = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
-  return days[date.getDay()] || ''
 }
 
 function selectAvailability(availabilityId: string) {
@@ -308,45 +245,13 @@ onMounted(() => {
         </div>
 
         <!-- Available Slots -->
-        <div class="availabilities-section">
+        <div class="availabilities-wrapper">
           <h3 class="section-title">{{ t('doctor.appointments.reschedule.selectNewSlot') }}</h3>
-          
-          <div v-if="availableDates.length === 0" class="empty-state">
-            <p>{{ t('doctor.appointments.reschedule.noAvailabilities') }}</p>
-          </div>
-
-          <div v-else class="dates-list">
-            <div
-              v-for="dateGroup in availableDates"
-              :key="dateGroup.date"
-              class="date-group"
-            >
-              <div class="date-header">
-                <CalendarIcon class="date-icon" />
-                <div>
-                  <p class="date-day">{{ formatDayName(dateGroup.date) }}</p>
-                  <p class="date-text">{{ dateGroup.date }}</p>
-                </div>
-              </div>
-
-              <div class="time-slots">
-                <button
-                  v-for="slot in dateGroup.slots"
-                  :key="slot.id"
-                  class="time-slot"
-                  :class="{ selected: selectedAvailabilityId === slot.id }"
-                  @click="selectAvailability(slot.id)"
-                >
-                  <ClockIcon class="slot-icon" />
-                  <div class="slot-content">
-                    <span class="slot-time">{{ formatTime(slot.startDateTime) }}</span>
-                    <span class="slot-facility">{{ slot.facilityName }}</span>
-                    <span class="slot-service">{{ slot.serviceTypeName }}</span>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
+          <AvailabilitySlotsList
+            :availabilities="availabilitiesList"
+            :selected-availability-id="selectedAvailabilityId"
+            @select-availability="selectAvailability"
+          />
         </div>
       </template>
 
@@ -528,7 +433,7 @@ onMounted(() => {
   color: var(--sky-0ea5e9);
 }
 
-.availabilities-section {
+.availabilities-wrapper {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -539,117 +444,6 @@ onMounted(() => {
   font-weight: 600;
   color: var(--gray-171717);
   margin: 0;
-}
-
-.empty-state {
-  padding: 3rem;
-  text-align: center;
-  background: var(--white-15);
-  border: 1px solid var(--white-20);
-  border-radius: 1rem;
-  color: var(--gray-525252);
-}
-
-.dates-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.date-group {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.date-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--white-30);
-}
-
-.date-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--sky-0ea5e9);
-}
-
-.date-day {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--gray-171717);
-  margin: 0;
-}
-
-.date-text {
-  font-size: 0.8125rem;
-  color: var(--gray-525252);
-  margin: 0;
-}
-
-.time-slots {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 0.75rem;
-}
-
-.time-slot {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: var(--white-20);
-  backdrop-filter: blur(12px);
-  border: 1.5px solid var(--white-30);
-  border-radius: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
-  text-align: left;
-}
-
-.time-slot:hover {
-  background: var(--white-30);
-  border-color: var(--sky-0ea5e9);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px var(--black-8);
-}
-
-.time-slot.selected {
-  background: var(--sky-0ea5e9-20);
-  border-color: var(--sky-0ea5e9);
-  box-shadow: 0 4px 16px var(--sky-0ea5e9-30);
-}
-
-.slot-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--sky-0ea5e9);
-  flex-shrink: 0;
-}
-
-.slot-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  flex: 1;
-}
-
-.slot-time {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--gray-171717);
-}
-
-.slot-facility {
-  font-size: 0.8125rem;
-  color: var(--gray-525252);
-}
-
-.slot-service {
-  font-size: 0.75rem;
-  color: var(--gray-737373);
 }
 
 .form-group {

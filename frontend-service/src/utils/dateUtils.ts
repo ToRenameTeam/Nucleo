@@ -94,3 +94,52 @@ export function setTimeOnDate(date: Date, timeStr: string | undefined): Date {
   date.setHours(hours, minutes)
   return date
 }
+/**
+ * Format Date object to Italian date format with slashes (dd/mm/yyyy)
+ * Example: "15/03/2026"
+ * @param date - Date object to format
+ * @returns Formatted date string
+ */
+export function formatDateSlash(date: Date): string {
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}/${month}/${year}`
+}
+
+/**
+ * Format Date object to time string (HH:mm)
+ * Example: "14:30"
+ * @param date - Date object to format
+ * @returns Time string
+ */
+export function formatTime(date: Date): string {
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${hours}:${minutes}`
+}
+
+/**
+ * Format Date object to time string for input field (HH:mm)
+ * Example: "14:30"
+ * @param date - Date object to format
+ * @returns Time string for input
+ */
+export function formatTimeForInput(date: Date): string {
+  const hours = date.getHours().toString().padStart(2, '0')
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+  return `${hours}:${minutes}`
+}
+
+/**
+ * Get Italian day name from date string in format dd/mm/yyyy
+ * Example: "15/03/2026" -> "Mercoledì"
+ * @param dateStr - Date string in format dd/mm/yyyy
+ * @returns Italian day name
+ */
+export function formatDayName(dateStr: string): string {
+  const date = parseItalianDateSlash(dateStr)
+  if (!date) return ''
+  const days = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
+  return days[date.getDay()] || ''
+}
