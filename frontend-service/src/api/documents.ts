@@ -257,7 +257,12 @@ export const documentsApiService = {
     })
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      // Try to get error details from response
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
+      const error = new Error(errorData.message || `HTTP error! status: ${response.status}`)
+      // Attach the error code if available
+      ;(error as any).code = errorData.code
+      throw error
     }
 
     return await response.json()

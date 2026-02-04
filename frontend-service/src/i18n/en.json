@@ -542,5 +542,18 @@
     },
     "facilities": {
       "default": "Default facility"
+    },
+    "upload": {
+      "confirmTitle": "Confirm Upload",
+      "confirmSubtitle": "Review file details before uploading",
+      "confirmMessage": "The document will be uploaded to your personal archive and will be visible in the Documents section.",
+      "cancel": "Cancel",
+      "confirmUpload": "Upload Document",
+      "uploading": "Uploading...",
+      "success": "Document uploaded successfully",
+      "error": "Error uploading document",
+      "invalidFileType": "Invalid file type. Only PDF files are accepted.",
+      "fileTooLarge": "File is too large. Maximum size: 10 MB",
+      "nonMedicalDocument": "The document was not accepted. Only medical documents (reports, prescriptions, clinical notes) are allowed."
     }
   }
