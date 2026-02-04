@@ -19,6 +19,25 @@ export interface Facility {
   email?: string
 }
 
+// Medicine Types
+export interface Medicine {
+  _id: string
+  code: string
+  name: string
+  description: string
+  category: string
+  activeIngredient: string
+  dosageForm: string
+  strength: string
+  manufacturer: string
+  isActive: boolean
+}
+
+export interface MedicineCategory {
+  value: string
+  label: string
+}
+
 /**
  * Master Data API Client
  */
@@ -112,6 +131,89 @@ export const masterDataApi = {
       return data
     } catch (error) {
       return null
+    }
+  },
+
+  /**
+   * Get all medicines with optional filtering
+   */
+  async getMedicines(filter?: { category?: string; search?: string; active?: boolean }): Promise<Medicine[]> {
+    const params = new URLSearchParams()
+    
+    if (filter?.category) {
+      params.append('category', filter.category)
+    }
+    if (filter?.search) {
+      params.append('search', filter.search)
+    }
+    if (filter?.active !== undefined) {
+      params.append('active', String(filter.active))
+    }
+    
+    const queryString = params.toString()
+    const url = `${MASTER_DATA_API_URL}/api/medicines${queryString ? `?${queryString}` : ''}`
+    
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      const data = await handleApiResponse<Medicine[]>(response)
+      return data
+    } catch (error) {
+      console.error('[Master Data API] Error fetching medicines:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Get medicine by ID
+   */
+  async getMedicineById(id: string): Promise<Medicine | null> {
+    const url = `${MASTER_DATA_API_URL}/api/medicines/${id}`
+    
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      if (response.status === 404) {
+        return null
+      }
+      
+      const data = await handleApiResponse<Medicine>(response)
+      return data
+    } catch (error) {
+      console.error('[Master Data API] Error fetching medicine:', error)
+      return null
+    }
+  },
+
+  /**
+   * Get all medicine categories
+   */
+  async getMedicineCategories(): Promise<MedicineCategory[]> {
+    const url = `${MASTER_DATA_API_URL}/api/medicines/categories`
+    
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      const data = await handleApiResponse<MedicineCategory[]>(response)
+      return data
+    } catch (error) {
+      console.error('[Master Data API] Error fetching medicine categories:', error)
+      throw error
     }
   },
 }

@@ -1,29 +1,43 @@
 import type { Document, MedicinePrescription, ServicePrescription, Report, AnyDocument, Validity, Dosage } from '../types/document'
-import { APPOINTMENTS_API_URL, DOCUMENTS_API_URL } from './config'
+import { DOCUMENTS_API_URL } from './config'
 
-const BASE_URL = `${APPOINTMENTS_API_URL}/patients`
-const DOCUMENTS_BASE_URL = `${DOCUMENTS_API_URL}/documents`
+const BASE_URL = DOCUMENTS_API_URL
+const DOCUMENTS_BASE_URL = `${DOCUMENTS_API_URL}/api/documents`
 
-// API Request types
+// Validity types for API requests (using _t as discriminator)
+interface ValidityUntilDate {
+  _t: 'until_date'
+  date: string
+}
+
+interface ValidityUntilExecution {
+  _t: 'until_execution'
+}
+
+type ValidityRequest = ValidityUntilDate | ValidityUntilExecution
+
+// API Request types (using _t as class discriminator for Kotlin backend)
 interface CreateMedicinePrescriptionRequest {
-  type: 'medicine_prescription'
+  _t: 'medicine_prescription'
   doctorId: string
+  title?: string
   metadata: {
     summary: string
     tags: string[]
   }
-  validity: Validity
+  validity: ValidityRequest
   dosage: Dosage
 }
 
 interface CreateServicePrescriptionRequest {
-  type: 'service_prescription'
+  _t: 'service_prescription'
   doctorId: string
+  title?: string
   metadata: {
     summary: string
     tags: string[]
   }
-  validity: Validity
+  validity: ValidityRequest
   serviceId: string
   facilityId: string
   priority: string
@@ -213,7 +227,7 @@ export const doctorDocumentsApi = {
   async createMedicinePrescription(patientId: string, request: CreateMedicinePrescriptionRequest): Promise<MedicinePrescription> {
     console.log('[Doctor Documents API] Create medicine prescription for patient:', patientId)
     
-    const url = `${BASE_URL}/patients/${patientId}/documents`
+    const url = `${BASE_URL}/api/patients/${patientId}/documents`
     console.log('[Doctor Documents API] POST call to:', url)
     
     try {
@@ -248,7 +262,7 @@ export const doctorDocumentsApi = {
   async createServicePrescription(patientId: string, request: CreateServicePrescriptionRequest): Promise<ServicePrescription> {
     console.log('[Doctor Documents API] Create service prescription for patient:', patientId)
     
-    const url = `${BASE_URL}/patients/${patientId}/documents`
+    const url = `${BASE_URL}/api/patients/${patientId}/documents`
     console.log('[Doctor Documents API] POST call to:', url)
     
     try {
