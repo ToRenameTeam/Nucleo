@@ -563,6 +563,8 @@ onMounted(() => {
       mode="select"
       :doctor-id="currentUser?.userId || ''"
       :current-appointment="currentAppointmentInfo"
+      title="doctor.appointments.reschedule.title"
+      subtitle="doctor.appointments.reschedule.subtitle"
       @close="isRescheduleModalOpen = false"
       @select-availability="handleSelectAvailability"
     />

@@ -62,21 +62,9 @@ const durationOptions = [
   { value: 120, label: '2 ore' }
 ]
 
-const modalTitle = computed(() => {
-  if (props.mode === 'select') {
-    return t('doctor.appointments.reschedule.title')
-  }
-  return props.mode === 'create' 
-    ? t('doctor.availabilities.modal.titleCreate')
-    : t('doctor.availabilities.modal.titleEdit')
-})
+const modalTitle = computed(() => t(props.title))
 
-const modalSubtitle = computed(() => {
-  if (props.mode === 'select') {
-    return t('doctor.appointments.reschedule.subtitle')
-  }
-  return t('doctor.availabilities.modal.subtitle')
-})
+const modalSubtitle = computed(() => t(props.subtitle))
 
 const isFormValid = computed(() => {
   if (props.mode === 'select') {
@@ -296,7 +284,7 @@ onMounted(() => {
 
       <!-- SELECT MODE: Show current appointment and available slots -->
       <template v-else-if="mode === 'select'">
-        <!-- Current Appointment Info -->
+        <!-- Current Appointment Info (only when rescheduling) -->
         <div v-if="currentAppointment" class="appointment-info">
           <h3 class="info-title">{{ t('doctor.appointments.reschedule.currentAppointment') }}</h3>
           <div class="info-grid">

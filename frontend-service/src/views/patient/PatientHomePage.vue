@@ -7,8 +7,8 @@ import BaseCard from '../../components/shared/BaseCard.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
 import LoadingSpinner from '../../components/shared/LoadingSpinner.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
-import AppointmentBooking from '../../components/patient/home/AppointmentBooking.vue'
 import UploadDocumentModal from '../../components/patient/documents/UploadDocumentModal.vue'
+import ScheduleModal from '../../components/shared/ScheduleModal.vue'
 import CardList from '../../components/shared/CardList.vue'
 import type { Document } from '../../types/document'
 import type { Appointment } from '../../types/appointment'
@@ -53,13 +53,15 @@ const upcomingAppointments = computed(() => {
 })
 
 const recentDocuments = computed(() => documentsData.value.slice(0, 2))
-const isBookingOpen = ref(false)
 const selectedDocument = ref<Document | null>(null)
 const isDocumentModalOpen = ref(false)
-const preselectedVisitType = ref<string | null>(null)
 const showSuccessToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref<'success' | 'error'>('success')
+
+// Booking modal states
+const isBookingModalOpen = ref(false)
+const selectedDoctorId = ref<string>('doc-123') // TODO: Implementare selezione medico
 
 // Upload refs
 const isUploadModalOpen = ref(false)
@@ -176,9 +178,34 @@ const handleUploadCancel = () => {
   selectedFile.value = null
 }
 
-const handleNewAppointment = () => {
-  preselectedVisitType.value = null
-  isBookingOpen.value = true
+function handleOpenBooking() {
+  isBookingModalOpen.value = true
+}
+
+function handleCloseBooking() {
+  isBookingModalOpen.value = false
+}
+
+async function handleBookingConfirmed(availabilityId: string) {
+  if (!currentUser.value?.userId) return
+  
+  try {
+    await appointmentsApi.createAppointment(currentUser.value.userId, availabilityId)
+    
+    toastMessage.value = 'toast.bookingConfirmed'
+    toastType.value = 'success'
+    showSuccessToast.value = true
+    
+    isBookingModalOpen.value = false
+    
+    // Ricarica appuntamenti
+    await loadData()
+  } catch (error) {
+    console.error('[PatientHomePage] Error booking appointment:', error)
+    toastMessage.value = 'Errore durante la prenotazione'
+    toastType.value = 'error'
+    showSuccessToast.value = true
+  }
 }
 
 const handleAppointmentClick = (id: string) => {
@@ -204,11 +231,6 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   }
   
   return meta
-}
-
-const handleBookingConfirm = (appointment: any) => {
-  console.log('Appointment booked:', appointment)
-  showSuccessToast.value = true
 }
 
 const handleDocumentClick = (document: Document) => {
@@ -245,7 +267,7 @@ const handleCloseToast = () => {
               <span>{{ $t('home.uploadDocument') }}</span>
             </button>
             <button 
-              @click="handleNewAppointment"
+              @click="handleOpenBooking"
               class="quick-action-btn quick-action-btn-flex"
             >
               <PlusIcon class="quick-action-icon" />
@@ -330,12 +352,15 @@ const handleCloseToast = () => {
       @confirm="handleUploadConfirm"
     />
 
-    <!-- Appointment Booking Modal -->
-    <AppointmentBooking
-      :is-open="isBookingOpen"
-      :preselected-visit="preselectedVisitType"
-      @close="isBookingOpen = false"
-      @confirm="handleBookingConfirm"
+    <!-- Booking Modal -->
+    <ScheduleModal
+      :is-open="isBookingModalOpen"
+      mode="select"
+      :doctor-id="selectedDoctorId"
+      title="patient.booking.title"
+      subtitle="patient.booking.subtitle"
+      @close="handleCloseBooking"
+      @select-availability="handleBookingConfirmed"
     />
 
     <!-- Document Modal (Teleported to body) -->

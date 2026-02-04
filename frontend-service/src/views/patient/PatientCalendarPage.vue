@@ -315,6 +315,8 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
       mode="select"
       :doctor-id="appointmentToReschedule.doctorId || ''"
       :current-appointment="currentAppointmentInfo"
+      title="patient.reschedule.title"
+      subtitle="patient.reschedule.subtitle"
       @close="isRescheduleModalOpen = false"
       @select-availability="handleSelectAvailability"
     />
