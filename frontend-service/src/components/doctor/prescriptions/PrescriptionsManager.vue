@@ -10,6 +10,7 @@ import Toast from '../../shared/Toast.vue'
 import { userApi, type UserInfo } from '../../../api/users'
 import { doctorDocumentsApi } from '../../../api/doctorDocuments'
 import type { MedicinePrescriptionFormData } from './MedicinePrescriptionForm.vue'
+import type { ServicePrescriptionFormData } from './ServicePrescriptionForm.vue'
 
 const { t } = useI18n()
 
@@ -126,7 +127,7 @@ const handleSaveMedicinePrescription = async (prescription: MedicinePrescription
   }
 }
 
-const handleSaveServicePrescription = async (prescription: any) => {
+const handleSaveServicePrescription = async (prescription: ServicePrescriptionFormData) => {
   prescriptionSaveError.value = ''
   isSaving.value = true
   
@@ -137,24 +138,27 @@ const handleSaveServicePrescription = async (prescription: any) => {
       throw new Error('Doctor ID not found')
     }
     
-    // Note: Backend uses "_t" as class discriminator instead of "type"
+    // Build the request with the proper format for the API
     const request = {
       _t: 'service_prescription' as const,
       doctorId,
-      title: `Prescrizione: ${prescription.serviceType}`,
+      title: `Prescrizione: ${prescription.serviceName}`,
       metadata: {
-        summary: t('prescriptionSummary.service', { service: prescription.serviceType }),
+        summary: t('prescriptionSummary.service', { service: prescription.serviceName }),
         tags: [t('prescriptionTags.prescription'), t('prescriptionTags.services')]
       },
-      validity: {
-        _t: 'until_execution' as const
-      },
-      serviceId: prescription.serviceType,
-      facilityId: prescription.facilityId || 'facility-default',
-      priority: prescription.urgency || 'ROUTINE'
+      validity: prescription.validityType === 'until_execution' 
+        ? { _t: 'until_execution' as const }
+        : { 
+            _t: 'until_date' as const, 
+            date: prescription.validityDate // Already in yyyy-MM-dd format from date input
+          },
+      serviceId: prescription.serviceId,
+      facilityId: prescription.facilityId,
+      priority: prescription.priority
     }
     
-    await doctorDocumentsApi.createServicePrescription(prescription.userId, request)
+    await doctorDocumentsApi.createServicePrescription(prescription.patientId, request)
     
     isServicePrescriptionModalOpen.value = false
     successToastMessage.value = t('doctor.documents.prescriptions.toast.serviceSaved')
