@@ -548,7 +548,8 @@
       "cancel": "Cancel",
       "save": "Save",
       "saving": "Saving...",
-      "back": "Back"
+      "back": "Back",
+      "close": "Close"
     },
     "prescriptionTags": {
       "prescription": "prescription",
@@ -573,6 +574,18 @@
       "error": "Error uploading document",
       "invalidFileType": "Invalid file type. Only PDF files are accepted.",
       "fileTooLarge": "File is too large. Maximum size: 10 MB",
-      "nonMedicalDocument": "The document was not accepted. Only medical documents (reports, prescriptions, clinical notes) are allowed."
+      "nonMedicalDocument": "The document was not accepted. Only medical documents (reports, prescriptions, clinical notes) are allowed.",
+      "progress": {
+        "title": "Uploading",
+        "successTitle": "Upload Complete",
+        "received": "Document Received",
+        "receivedDesc": "File was successfully received by the server",
+        "stored": "Document Stored",
+        "storedDesc": "File has been securely saved",
+        "analyzed": "Analysis Complete",
+        "analyzedDesc": "Document has been analyzed by AI",
+        "completed": "Upload Complete",
+        "completedDesc": "Document is ready and available"
+      }
     }
   }

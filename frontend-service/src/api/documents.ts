@@ -126,6 +126,27 @@ export interface UploadResponse {
   documentId?: string
 }
 
+export type UploadProgressEventType =
+  | 'document-received'
+  | 'storage-started'
+  | 'storage-completed'
+  | 'analysis-started'
+  | 'analysis-completed'
+  | 'upload-completed'
+  | 'upload-error'
+
+export interface UploadProgressEvent {
+  type: UploadProgressEventType
+  data: {
+    documentId?: string
+    filename?: string
+    message?: string
+    summary?: string
+    tags?: string
+    errorCode?: string
+  }
+}
+
 // Helper functions
 function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {  
   const baseDocument: Document = {
@@ -268,6 +289,117 @@ export const documentsApiService = {
     }
 
     return await response.json()
+  },
+
+  /**
+   * Upload a document file (PDF) with SSE progress tracking
+   * @param patientId - Patient ID
+   * @param file - File to upload
+   * @param onProgress - Callback for progress events
+   */
+  async uploadDocumentWithProgress(
+    patientId: string,
+    file: File,
+    onProgress: (event: UploadProgressEvent) => void
+  ): Promise<UploadResponse> {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      // Start the upload
+      fetch(`${BASE_URL}/api/patients/${patientId}/documents/upload-stream`, {
+        method: 'POST',
+        body: formData
+      })
+        .then(async response => {
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
+            const error = new Error(errorData.message || `HTTP error! status: ${response.status}`)
+            ;(error as any).code = errorData.code
+            throw error
+          }
+
+          // Response body should be text/event-stream
+          const reader = response.body?.getReader()
+          const decoder = new TextDecoder()
+
+          if (!reader) {
+            reject(new Error('No response body'))
+            return
+          }
+
+          let buffer = ''
+          let uploadResult: UploadResponse | null = null
+
+          while (true) {
+            const { done, value } = await reader.read()
+
+            if (done) {
+              // If we received an upload-completed event, resolve with the document ID
+              if (uploadResult) {
+                resolve(uploadResult)
+              } else {
+                reject(new Error('Upload completed without result'))
+              }
+              break
+            }
+
+            // Decode chunk and add to buffer
+            buffer += decoder.decode(value, { stream: true })
+
+            // Process complete SSE messages
+            const messages = buffer.split('\n\n')
+            buffer = messages.pop() || '' // Keep incomplete message in buffer
+
+            for (const message of messages) {
+              if (!message.trim()) continue
+
+              const lines = message.split('\n')
+              let eventType = 'message'
+              let eventData = ''
+
+              for (const line of lines) {
+                if (line.startsWith('event:')) {
+                  eventType = line.substring(6).trim()
+                } else if (line.startsWith('data:')) {
+                  eventData = line.substring(5).trim()
+                }
+              }
+
+              if (!eventData) continue
+
+              try {
+                const data = JSON.parse(eventData)
+
+                const progressEvent: UploadProgressEvent = {
+                  type: eventType as any,
+                  data
+                }
+
+                onProgress(progressEvent)
+
+                // Handle completion
+                if (eventType === 'upload-completed') {
+                  uploadResult = {
+                    success: true,
+                    message: data.message,
+                    documentId: data.documentId
+                  }
+                } else if (eventType === 'upload-error') {
+                  reader.cancel()
+                  reject(new Error(data.message))
+                  return
+                }
+              } catch (e) {
+                console.error('Error parsing SSE data:', e, eventData)
+              }
+            }
+          }
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
   },
 
   /**

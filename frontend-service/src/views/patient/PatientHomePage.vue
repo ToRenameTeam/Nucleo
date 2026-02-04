@@ -8,11 +8,13 @@ import DocumentCard from '../../components/shared/DocumentCard.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
 import AppointmentBooking from '../../components/patient/home/AppointmentBooking.vue'
 import UploadDocumentModal from '../../components/patient/documents/UploadDocumentModal.vue'
+import UploadProgressModal from '../../components/patient/documents/UploadProgressModal.vue'
 import CardList from '../../components/shared/CardList.vue'
 import type { Document } from '../../types/document'
 import type { Appointment } from '../../types/appointment'
 import { appointmentsApi } from '../../api/appointments'
 import { documentsApiService } from '../../api/documents'
+import type { UploadProgressEvent, UploadProgressEventType } from '../../api/documents'
 
 const { currentUser } = useAuth()
 
@@ -31,9 +33,12 @@ const toastType = ref<'success' | 'error'>('success')
 
 // Upload refs
 const isUploadModalOpen = ref(false)
+const isUploadProgressModalOpen = ref(false)
 const selectedFile = ref<File | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
-const isUploading = ref(false)
+const uploadProgress = ref<UploadProgressEventType | null>(null)
+const uploadError = ref<string | null>(null)
+const uploadingFilename = ref<string>('')
 
 async function loadData() {
   if (!currentUser.value?.userId) {
@@ -102,41 +107,65 @@ const handleFileSelected = (event: Event) => {
 const handleUploadConfirm = async () => {
   if (!selectedFile.value || !currentUser.value?.userId) return
 
-  isUploading.value = true
+  // Save filename before clearing selectedFile
+  uploadingFilename.value = selectedFile.value.name
+
+  // Close the confirmation modal
+  isUploadModalOpen.value = false
+
+  // Open the progress modal
+  isUploadProgressModalOpen.value = true
+  uploadProgress.value = null
+  uploadError.value = null
+
+  const fileToUpload = selectedFile.value
+  selectedFile.value = null
 
   try {
-    await documentsApiService.uploadDocument(currentUser.value.userId, selectedFile.value)
+    await documentsApiService.uploadDocumentWithProgress(
+      currentUser.value.userId,
+      fileToUpload,
+      (event: UploadProgressEvent) => {
+        console.log('[PatientHomePage] Upload progress:', event.type, event.data)
+        uploadProgress.value = event.type
+      }
+    )
 
-    // Close modal
-    isUploadModalOpen.value = false
-    selectedFile.value = null
+    // Success - reload documents
+    await loadData()
 
     // Show success toast
     toastMessage.value = 'upload.success'
     toastType.value = 'success'
     showSuccessToast.value = true
-
-    // Reload documents to show the newly uploaded one
-    await loadData()
   } catch (error: any) {
     console.error('[PatientHomePage] Error uploading document:', error)
 
-    // Close modal on error
-    isUploadModalOpen.value = false
-    selectedFile.value = null
-
-    // Check if it's a non-medical document error
+    // Set error in progress modal
     if (error.message && error.message.includes('does not appear to be a medical document')) {
-      toastMessage.value = 'upload.nonMedicalDocument'
+      uploadError.value = 'upload.nonMedicalDocument'
     } else {
-      toastMessage.value = 'upload.error'
+      uploadError.value = error.message || 'upload.error'
     }
 
+    // Also show error toast after closing progress modal
+    toastMessage.value = uploadError.value || 'upload.error'
     toastType.value = 'error'
-    showSuccessToast.value = true
-  } finally {
-    isUploading.value = false
   }
+}
+
+const handleUploadProgressClose = () => {
+  isUploadProgressModalOpen.value = false
+  
+  // If there was an error, show toast
+  if (uploadError.value) {
+    showSuccessToast.value = true
+  }
+  
+  // Reset state
+  uploadProgress.value = null
+  uploadError.value = null
+  uploadingFilename.value = ''
 }
 
 const handleUploadCancel = () => {
@@ -245,6 +274,15 @@ const handleCloseToast = () => {
       :file="selectedFile"
       @close="handleUploadCancel"
       @confirm="handleUploadConfirm"
+    />
+
+    <!-- Upload Progress Modal -->
+    <UploadProgressModal
+      :is-open="isUploadProgressModalOpen"
+      :current-step="uploadProgress"
+      :error="uploadError"
+      :filename="uploadingFilename"
+      @close="handleUploadProgressClose"
     />
 
     <!-- Appointment Booking Modal -->

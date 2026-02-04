@@ -563,7 +563,8 @@
     "cancel": "Annulla",
     "save": "Salva",
     "saving": "Salvataggio...",
-    "back": "Indietro"
+    "back": "Indietro",
+    "close": "Chiudi"
   },
   "prescriptionTags": {
     "prescription": "prescrizione",
@@ -588,6 +589,19 @@
     "error": "Errore durante il caricamento del documento",
     "invalidFileType": "Tipo di file non valido. Sono accettati solo file PDF.",
     "fileTooLarge": "Il file è troppo grande. Dimensione massima: 10 MB",
+    "nonMedicalDocument": "Il documento non è stato accettato. Sono consentiti solo documenti medici (referti, prescrizioni, note cliniche).",
+    "progress": {
+      "title": "Caricamento in corso",
+      "successTitle": "Caricamento completato",
+      "received": "Documento ricevuto",
+      "receivedDesc": "Il file è stato ricevuto correttamente dal server",
+      "stored": "Documento archiviato",
+      "storedDesc": "Il file è stato salvato in modo sicuro",
+      "analyzed": "Analisi completata",
+      "analyzedDesc": "Il documento è stato analizzato dall'intelligenza artificiale",
+      "completed": "Caricamento completato",
+      "completedDesc": "Il documento è pronto e disponibile"
+    },
     "nonMedicalDocument": "Il documento non è stato accettato. Solo documenti medici (referti, prescrizioni, note cliniche) sono permessi."
   }
 }
