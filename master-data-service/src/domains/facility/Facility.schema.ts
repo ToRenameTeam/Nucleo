@@ -1,6 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, type HydratedDocument } from 'mongoose';
 
-export interface IFacility extends Document {
+export interface IFacility {
     _id: string;
     code: string;
     name: string;
@@ -10,6 +10,8 @@ export interface IFacility extends Document {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export type FacilityDocument = HydratedDocument<IFacility>;
 
 const FacilitySchema = new Schema<IFacility>(
     {

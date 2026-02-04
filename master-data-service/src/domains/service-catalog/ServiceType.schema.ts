@@ -1,6 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, type HydratedDocument } from 'mongoose';
 
-export interface IServiceType extends Document {
+export interface IServiceType {
     _id: string;
     code: string;
     name: string;
@@ -10,6 +10,8 @@ export interface IServiceType extends Document {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export type ServiceTypeDocument = HydratedDocument<IServiceType>;
 
 export enum ServiceCategory {
     VISITA_SPECIALISTICA = 'visita_specialistica',
