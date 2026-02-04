@@ -8,7 +8,7 @@ import DocumentCard from '../../components/shared/DocumentCard.vue'
 import LoadingSpinner from '../../components/shared/LoadingSpinner.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
 import UploadDocumentModal from '../../components/patient/documents/UploadDocumentModal.vue'
-import ScheduleModal from '../../components/shared/ScheduleModal.vue'
+import BookingModal from '../../components/patient/BookingModal.vue'
 import CardList from '../../components/shared/CardList.vue'
 import type { Document } from '../../types/document'
 import type { Appointment } from '../../types/appointment'
@@ -61,7 +61,6 @@ const toastType = ref<'success' | 'error'>('success')
 
 // Booking modal states
 const isBookingModalOpen = ref(false)
-const selectedDoctorId = ref<string>('doc-123') // TODO: Implementare selezione medico
 
 // Upload refs
 const isUploadModalOpen = ref(false)
@@ -355,14 +354,10 @@ const handleCloseToast = () => {
     />
 
     <!-- Booking Modal -->
-    <ScheduleModal
+    <BookingModal
       :is-open="isBookingModalOpen"
-      mode="select"
-      :doctor-id="selectedDoctorId"
-      title="patient.booking.title"
-      subtitle="patient.booking.subtitle"
       @close="handleCloseBooking"
-      @select-availability="handleBookingConfirmed"
+      @confirm="handleBookingConfirmed"
     />
 
     <!-- Document Modal (Teleported to body) -->

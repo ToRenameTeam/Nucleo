@@ -546,12 +546,28 @@
     "cancel": "Annulla",
     "save": "Salva",
     "saving": "Salvataggio...",
-    "back": "Indietro"
+    "back": "Indietro",
+    "next": "Avanti"
   },
   "patient": {
     "booking": {
       "title": "Prenota Visita",
-      "subtitle": "Seleziona data e orario per la tua visita"
+      "subtitle": "Seleziona data e orario per la tua visita",
+      "modal": {
+        "title": "Prenota Visita",
+        "subtitle": "Segui i passaggi per prenotare la tua visita",
+        "step1": "Tipo Visita",
+        "step2": "Medico",
+        "step3": "Orario",
+        "selectServiceType": "Seleziona il tipo di visita",
+        "selectDoctor": "Seleziona il medico",
+        "selectSlot": "Seleziona data e orario",
+        "selectedService": "Tipo visita selezionato",
+        "selectedDoctor": "Medico selezionato",
+        "noDoctorsAvailable": "Nessun medico disponibile per questa tipologia di visita",
+        "noSlotsAvailable": "Nessuna disponibilità trovata per questo medico",
+        "confirmBooking": "Conferma Prenotazione"
+      }
     },
     "reschedule": {
       "title": "Ripianifica Appuntamento",
