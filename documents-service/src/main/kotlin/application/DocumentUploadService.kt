@@ -1,5 +1,7 @@
 package it.nucleo.application
 
+import it.nucleo.application.upload.UploadEvent
+import it.nucleo.application.upload.UploadEventChannel
 import it.nucleo.domain.DocumentFactory
 import it.nucleo.domain.DocumentId
 import it.nucleo.domain.DocumentRepository
@@ -140,6 +142,141 @@ class DocumentUploadService(
         } catch (e: Exception) {
             logger.error("Failed to create document entity for patient: ${command.patientId.id}", e)
             UploadResult.StorageError("Failed to create document: ${e.message}")
+        }
+    }
+
+    /**
+     * Upload a document with Server-Sent Events progress tracking.
+     * This method emits events through the provided channel during the upload process.
+     */
+    suspend fun uploadWithEvents(
+        command: UploadDocumentCommand,
+        eventChannel: UploadEventChannel
+    ): UploadResult {
+        logger.debug(
+            "Processing upload with events for patient: ${command.patientId.id}, filename: ${command.filename}"
+        )
+
+        try {
+            // Validation
+            val validationError = validate(command)
+            if (validationError != null) {
+                eventChannel.send(
+                    UploadEvent.UploadError(
+                        message = validationError.message,
+                        errorCode = "validation_error"
+                    )
+                )
+                return validationError
+            }
+
+            val documentId = DocumentId(UUID.randomUUID().toString())
+
+            // Event: Document received
+            eventChannel.send(
+                UploadEvent.DocumentReceived(documentId = documentId, filename = command.filename)
+            )
+
+            // Step 1: Store PDF file in MinIO
+            eventChannel.send(UploadEvent.StorageStarted(documentId = documentId))
+
+            fileStorageRepository.store(
+                patientId = command.patientId,
+                documentId = documentId,
+                filename = command.filename,
+                inputStream = command.content.inputStream(),
+                contentLength = command.content.size.toLong(),
+                contentType = PDF_CONTENT_TYPE
+            )
+
+            logger.info(
+                "PDF uploaded successfully with ID: ${documentId.id}, filename: ${command.filename}"
+            )
+            eventChannel.send(UploadEvent.StorageCompleted(documentId = documentId))
+
+            // Step 2: Analyze document with AI to extract metadata
+            eventChannel.send(UploadEvent.AnalysisStarted(documentId = documentId))
+
+            val metadata = analyzeDocumentWithAi(command.patientId, documentId)
+
+            eventChannel.send(
+                UploadEvent.AnalysisCompleted(
+                    documentId = documentId,
+                    summary =
+                        metadata.summary.summary.take(200), // Limit summary length for SSE
+                    tags = metadata.tags.map { it.tag }.toSet()
+                )
+            )
+
+            // Step 2.5: Validate that document is medical-related
+            if (metadata.summary.summary.isBlank() && metadata.tags.isEmpty()) {
+                logger.warn(
+                    "Document ${documentId.id} identified as non-medical by AI. Rejecting upload."
+                )
+                // Delete the PDF from MinIO since we're rejecting it
+                try {
+                    fileStorageRepository.delete(command.patientId, documentId)
+                    logger.debug("Deleted non-medical PDF from MinIO: ${documentId.id}")
+                } catch (e: Exception) {
+                    logger.error("Failed to delete non-medical PDF from MinIO: ${documentId.id}", e)
+                }
+
+                eventChannel.send(
+                    UploadEvent.UploadError(
+                        message =
+                            "The uploaded document does not appear to be a medical document.",
+                        errorCode = "non_medical_document"
+                    )
+                )
+
+                return UploadResult.ValidationError(
+                    "The uploaded document does not appear to be a medical document. " +
+                        "Only medical documents (reports, prescriptions, clinical notes) are accepted."
+                )
+            }
+
+            // Step 3: Create document entity with AI-generated metadata and default values
+            val document =
+                DocumentFactory.createUploadedDocument(
+                    id = documentId,
+                    patientId = command.patientId,
+                    title = Title(command.filename.removeSuffix(".pdf")),
+                    filename = command.filename,
+                    metadata = metadata,
+                    documentType = inferDocumentType(metadata)
+                )
+
+            // Step 4: Save document entity to MongoDB
+            documentRepository.addDocument(command.patientId, document)
+            logger.info(
+                "Document entity created and saved successfully: ${documentId.id}, type: ${document.documentType}"
+            )
+
+            // Final event: Upload completed
+            eventChannel.send(UploadEvent.UploadCompleted(documentId = documentId))
+
+            return UploadResult.Success(documentId)
+        } catch (e: FileStorageException) {
+            logger.error("Failed to upload document for patient: ${command.patientId.id}", e)
+            eventChannel.send(
+                UploadEvent.UploadError(
+                    message = e.message ?: "Storage error",
+                    errorCode = "storage_error"
+                )
+            )
+            return UploadResult.StorageError(e.message ?: "Unknown storage error")
+        } catch (e: Exception) {
+            logger.error("Failed to create document entity for patient: ${command.patientId.id}", e)
+            eventChannel.send(
+                UploadEvent.UploadError(
+                    message = e.message ?: "Unknown error",
+                    errorCode = "internal_error"
+                )
+            )
+            return UploadResult.StorageError("Failed to create document: ${e.message}")
+        } finally {
+            // Always close the channel when done
+            eventChannel.close()
         }
     }
 
