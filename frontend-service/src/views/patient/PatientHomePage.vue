@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '../../composables/useAuth'
-import { DocumentPlusIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { DocumentPlusIcon, PlusIcon, CalendarIcon, ClockIcon, UserIcon, MapPinIcon } from '@heroicons/vue/24/outline'
 import Toast from '../../components/shared/Toast.vue'
-import AppointmentCard from '../../components/shared/AppointmentCard.vue'
+import BaseCard from '../../components/shared/BaseCard.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
 import AppointmentBooking from '../../components/patient/home/AppointmentBooking.vue'
@@ -11,15 +11,46 @@ import UploadDocumentModal from '../../components/patient/documents/UploadDocume
 import CardList from '../../components/shared/CardList.vue'
 import type { Document } from '../../types/document'
 import type { Appointment } from '../../types/appointment'
+import type { CardMetadata } from '../../types/shared'
 import { appointmentsApi } from '../../api/appointments'
 import { documentsApiService } from '../../api/documents'
+import { parseItalianDateSlash, setTimeOnDate } from '../../utils/dateUtils'
+import { formatCategory } from '../../utils/formatters'
+import { getBadgeColors, getBadgeIcon } from '../../utils/badgeHelpers'
+import { useI18n } from 'vue-i18n'
 
+useI18n()
 const { currentUser } = useAuth()
 
 const appointmentsData = ref<Appointment[]>([])
 const documentsData = ref<Document[]>([])
 const isLoading = ref(false)
-const appointments = computed(() => appointmentsData.value.slice(0, 2))
+
+function parseAppointmentDateTime(appointment: Appointment): Date | null {
+  const date = parseItalianDateSlash(appointment.date)
+  if (!date) return null
+  return setTimeOnDate(new Date(date), appointment.time)
+}
+
+const upcomingAppointments = computed(() => {
+  const now = new Date()
+  
+  return appointmentsData.value
+    .filter(appointment => {
+      const appointmentDate = parseAppointmentDateTime(appointment)
+      return appointmentDate && appointmentDate > now
+    })
+    .sort((a, b) => {
+      const dateA = parseAppointmentDateTime(a)
+      const dateB = parseAppointmentDateTime(b)
+      
+      if (!dateA || !dateB) return 0
+      
+      return dateA.getTime() - dateB.getTime()
+    })
+    .slice(0, 3)
+})
+
 const recentDocuments = computed(() => documentsData.value.slice(0, 2))
 const isBookingOpen = ref(false)
 const selectedDocument = ref<Document | null>(null)
@@ -153,6 +184,27 @@ const handleAppointmentClick = (id: string) => {
   console.log('Appointment clicked:', id)
 }
 
+// Get metadata for appointment card
+function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
+  const meta: CardMetadata[] = [
+    { icon: CalendarIcon, label: appointment.date }
+  ]
+  
+  if (appointment.time) {
+    meta.push({ icon: ClockIcon, label: appointment.time })
+  }
+  
+  if (appointment.user) {
+    meta.push({ icon: UserIcon, label: appointment.user })
+  }
+  
+  if (appointment.location) {
+    meta.push({ icon: MapPinIcon, label: appointment.location })
+  }
+  
+  return meta
+}
+
 const handleBookingConfirm = (appointment: any) => {
   console.log('Appointment booked:', appointment)
   showSuccessToast.value = true
@@ -203,16 +255,35 @@ const handleCloseToast = () => {
 
         <div class="section-card">
           <h3 class="section-title">{{ $t('home.upcomingAppointments') }}</h3>
-          <div v-if="appointments.length === 0" class="empty-card-message">
+          <div v-if="upcomingAppointments.length === 0" class="empty-card-message">
             {{ $t('home.noAppointments') }}
           </div>
           <CardList v-else>
-            <AppointmentCard
-              v-for="appointment in appointments"
+            <BaseCard
+              v-for="appointment in upcomingAppointments"
               :key="appointment.id"
-              :appointment="appointment"
-              @click="handleAppointmentClick"
-            />
+              :title="appointment.title"
+              :description="appointment.description"
+              :icon="CalendarIcon"
+              :metadata="getAppointmentMetadata(appointment)"
+              @click="handleAppointmentClick(appointment.id)"
+            >
+              <template v-if="appointment.category" #badges>
+                <div class="badges-row">
+                  <div 
+                    class="appointment-badge" 
+                    :style="{
+                      color: getBadgeColors(appointment.category).color,
+                      backgroundColor: getBadgeColors(appointment.category).bgColor,
+                      borderColor: getBadgeColors(appointment.category).borderColor
+                    }"
+                  >
+                    <span class="badge-icon">{{ getBadgeIcon(appointment.category) }}</span>
+                    <span class="badge-label">{{ formatCategory(appointment.category) }}</span>
+                  </div>
+                </div>
+              </template>
+            </BaseCard>
           </CardList>
         </div>
 
@@ -352,6 +423,46 @@ const handleCloseToast = () => {
   background: var(--bg-secondary-40);
   border-radius: 12px;
   border: 1px dashed var(--border-color);
+}
+
+.badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.appointment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border: 1.5px solid;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  box-shadow: 0 2px 8px var(--badge-shadow), inset 0 1px 0 var(--white-40);
+  width: fit-content;
+  animation: fadeInScale 0.4s cubic-bezier(0, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.badge-label {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-size: 0.8125rem;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 1023px) {

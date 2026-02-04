@@ -9,12 +9,11 @@ import CardList from '../../components/shared/CardList.vue'
 import type { Appointment } from '../../types/appointment'
 import type { CardMetadata, CardAction } from '../../types/shared'
 import { CalendarIcon, ClockIcon, UserIcon, MapPinIcon, PencilIcon, XCircleIcon } from '@heroicons/vue/24/outline'
-import { TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/mockData'
 import { useI18n } from 'vue-i18n'
-import type { BadgeColors } from '../../types/document'
 import { appointmentsApi } from '../../api/appointments'
 import ScheduleModal from '../../components/shared/ScheduleModal.vue'
 import { formatCategory } from '../../utils/formatters'
+import { getBadgeColors, getBadgeIcon } from '../../utils/badgeHelpers'
 
 const { t } = useI18n()
 
@@ -200,38 +199,6 @@ function getAppointmentActions(): CardAction[] {
       onClick: handleCancelAppointment
     }
   ]
-}
-
-// Get badge colors for tags
-function getBadgeColors(tag: string): BadgeColors {
-  const normalizedTag = tag.toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-
-  const colorKey = TAG_COLOR_MAP[normalizedTag]
-
-  if (colorKey) {
-    return {
-      color: `var(--badge-${colorKey})`,
-      bgColor: `var(--badge-${colorKey}-bg)`,
-      borderColor: `var(--badge-${colorKey}-border)`
-    }
-  }
-
-  return {
-    color: 'var(--text-primary)',
-    bgColor: 'var(--bg-secondary-30)',
-    borderColor: 'var(--border-color)'
-  }
-}
-
-// Get badge icon for tags
-function getBadgeIcon(tag: string): string {
-  const normalizedTag = tag.toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-
-  return TAG_ICON_MAP[normalizedTag] || ''
 }
 
 // Get metadata for appointment card
