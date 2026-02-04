@@ -91,6 +91,7 @@ MONGO_INITDB_ROOT_PASSWORD=password
 "
 setup_env_file "frontend-service" "frontend-service" "
 VITE_APPOINTMENTS_API_URL=http://localhost:8080
+VITE_DOCUMENTS_API_URL=http://localhost:8090
 VITE_MASTER_DATA_API_URL=http://localhost:3040
 VITE_USERS_API_URL=http://localhost:3030
 VITE_DELEGATIONS_API_URL=http://localhost:3030

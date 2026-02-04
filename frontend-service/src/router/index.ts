@@ -91,7 +91,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'patients',
         name: 'doctor-patients',
-        component: () => import('../views/doctor/DoctorHomePage.vue') // Placeholder - sarà creato dopo
+        component: () => import('../views/doctor/DoctorPatientsPage.vue')
       },
       {
         path: 'settings',

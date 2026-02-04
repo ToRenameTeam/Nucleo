@@ -333,6 +333,24 @@
       "title": "Doctor Area",
       "subtitle": "Welcome to your workspace"
     },
+    "patients": {
+      "title": "Patients",
+      "subtitle": "Manage your patients' medical records",
+      "searchPlaceholder": "Search by name, surname or fiscal code...",
+      "noPatients": "No patients found",
+      "noResults": "No patients match the search",
+      "noDocuments": "No documents in medical records",
+      "errorLoading": "Error loading patients",
+      "patient": "patient",
+      "patientsCount": "patients",
+      "document": "document",
+      "documents": "documents",
+      "medicalRecords": "Medical Records",
+      "fiscalCode": "Fiscal Code",
+      "dateOfBirth": "Date of Birth",
+      "years": "years",
+      "viewMedicalRecords": "View medical records"
+    },
     "appointments": {
       "title": "Appointments",
       "subtitle": "Manage all your patients' appointments",

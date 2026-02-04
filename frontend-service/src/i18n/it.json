@@ -348,6 +348,24 @@
       "title": "Area Medico",
       "subtitle": "Benvenuto nella tua area di lavoro"
     },
+    "patients": {
+      "title": "Pazienti",
+      "subtitle": "Gestisci la cartella clinica dei tuoi pazienti",
+      "searchPlaceholder": "Cerca per nome, cognome o codice fiscale...",
+      "noPatients": "Nessun paziente trovato",
+      "noResults": "Nessun paziente corrisponde alla ricerca",
+      "noDocuments": "Nessun documento nella cartella clinica",
+      "errorLoading": "Errore nel caricamento dei pazienti",
+      "patient": "paziente",
+      "patientsCount": "pazienti",
+      "document": "documento",
+      "documents": "documenti",
+      "medicalRecords": "Cartella clinica",
+      "fiscalCode": "Codice Fiscale",
+      "dateOfBirth": "Data di nascita",
+      "years": "anni",
+      "viewMedicalRecords": "Visualizza cartella clinica"
+    },
     "appointments": {
       "title": "Appuntamenti",
       "subtitle": "Gestisci tutti gli appuntamenti dei tuoi pazienti",

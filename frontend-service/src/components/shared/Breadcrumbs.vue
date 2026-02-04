@@ -27,9 +27,25 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => {
   // Add current page
   if (route.name && route.name !== 'login') {
     const currentPageKey = `breadcrumbs.${String(route.name)}`
-    items.push({
-      name: t(currentPageKey)
-    })
+    
+    // Check if there's a patient query param (for doctor-patients page)
+    const patientFiscalCode = route.query.patient as string | undefined
+    
+    if (patientFiscalCode) {
+      // Add the current page as a link
+      items.push({
+        name: t(currentPageKey),
+        path: route.path
+      })
+      // Add the patient fiscal code as the current item
+      items.push({
+        name: patientFiscalCode
+      })
+    } else {
+      items.push({
+        name: t(currentPageKey)
+      })
+    }
   }
 
   return items
