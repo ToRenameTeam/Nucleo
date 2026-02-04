@@ -214,14 +214,6 @@
           "title": "Tema",
           "light": "Chiaro",
           "dark": "Scuro"
-        },
-        "colorBlind": {
-          "title": "Modalità daltonici",
-          "subtitle": "Adatta i colori per una migliore visibilità",
-          "none": "Nessuna",
-          "deuteranopia": "Deuteranopia (rosso-verde)",
-          "protanopia": "Protanopia (rosso-verde)",
-          "tritanopia": "Tritanopia (blu-giallo)"
         }
       }
     },

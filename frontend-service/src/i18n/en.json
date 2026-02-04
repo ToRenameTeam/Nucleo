@@ -204,14 +204,6 @@
           "title": "Theme",
           "light": "Light",
           "dark": "Dark"
-        },
-        "colorBlind": {
-          "title": "Color Blind Mode",
-          "subtitle": "Adjust colors for better visibility",
-          "none": "None",
-          "deuteranopia": "Deuteranopia (red-green)",
-          "protanopia": "Protanopia (red-green)",
-          "tritanopia": "Tritanopia (blue-yellow)"
         }
       }
     },
