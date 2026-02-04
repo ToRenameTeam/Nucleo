@@ -30,6 +30,10 @@ class DocumentService(
         return repository.findAllDocumentsByPatient(patientId)
     }
 
+    suspend fun getAllDocumentsByDoctor(doctorId: DoctorId): Iterable<Document> {
+        return repository.findAllDocumentsByDoctor(doctorId)
+    }
+
     suspend fun getDocumentById(patientId: PatientId, documentId: DocumentId): Document {
         return repository.findDocumentById(patientId, documentId)
     }

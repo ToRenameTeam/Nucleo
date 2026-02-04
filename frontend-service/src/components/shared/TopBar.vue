@@ -7,7 +7,7 @@ import { ArrowRightStartOnRectangleIcon, ArrowsRightLeftIcon } from '@heroicons/
 
 const { t, locale } = useI18n()
 const router = useRouter()
-const { currentPatientProfile, logout: authLogout } = useAuth()
+const { currentUser, currentPatientProfile, logout: authLogout } = useAuth()
 const showUserMenu = ref(false)
 const showLanguageMenu = ref(false)
 
@@ -22,6 +22,16 @@ const changeLanguage = (lang: string) => {
 
 const currentLanguage = computed(() => {
   return locale.value === 'it' ? 'ITA' : 'ENG'
+})
+
+const displayUserName = computed(() => {
+  if (!currentUser.value || !currentPatientProfile.value) {
+    return t('topbar.user')
+  }
+  if (currentUser.value.fiscalCode === currentPatientProfile.value.fiscalCode) {
+    return currentPatientProfile.value.name
+  }
+  return `${currentUser.value.name} @ ${currentPatientProfile.value.name}`
 })
 
 const toggleUserMenu = () => {
@@ -107,15 +117,14 @@ const changeUser = () => {
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
             </svg>
           </div>
-          <span class="user-name-text topbar-text">{{ currentPatientProfile?.name || t('topbar.user') }}</span>
-          <svg class="topbar-icon-secondary user-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <span class="user-name-text">{{ displayUserName }}</span>
+          <svg class="user-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <polyline points="6 9 12 15 18 9"/>
           </svg>
         </button>
         <div v-if="showUserMenu" class="user-menu">
           <button 
             class="user-menu-item"
-            :aria-label="t('topbar.userProfileAria', { user: currentPatientProfile?.name || t('topbar.user') })"
             @click="changeUser"
           >
             <div class="user-menu-icon-container">

@@ -12,6 +12,8 @@ interface DocumentRepository {
 
     suspend fun findDocumentById(patientId: PatientId, documentId: DocumentId): Document
 
+    suspend fun findAllDocumentsByDoctor(doctorId: DoctorId): Iterable<Document>
+
     suspend fun updateReport(patientId: PatientId, report: Report)
 }
 

@@ -19,6 +19,8 @@ fun Route.documentRoutes(documentService: DocumentService) {
         deleteDocument(documentService)
         updateReport(documentService)
     }
+
+    route("/documents") { getDocumentsByDoctor(documentService) }
 }
 
 /** GET /patients/{patientId}/documents Retrieves all documents for a specific patient. */
@@ -39,6 +41,32 @@ private fun Route.getAllDocuments(documentService: DocumentService) {
             call.respond(HttpStatusCode.OK, response)
         } catch (e: RepositoryException) {
             logger.error("GET /patients/$patientId/documents - Failed to retrieve documents", e)
+            call.respond(
+                HttpStatusCode.InternalServerError,
+                ErrorResponse("internal_error", "Failed to retrieve documents", e.message)
+            )
+        }
+    }
+}
+
+/** GET /documents?doctorId={doctorId} Retrieves all documents issued by a specific doctor. */
+private fun Route.getDocumentsByDoctor(documentService: DocumentService) {
+    get {
+        val doctorId =
+            call.request.queryParameters["doctorId"]
+                ?: return@get call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse("bad_request", "Doctor ID is required")
+                )
+
+        logger.debug("GET /documents?doctorId=$doctorId - Retrieving all documents for doctor")
+        try {
+            val documents = documentService.getAllDocumentsByDoctor(DoctorId(doctorId))
+            val response = documents.map { it.toResponse() }
+            logger.info("GET /documents?doctorId=$doctorId - Retrieved ${response.size} documents")
+            call.respond(HttpStatusCode.OK, response)
+        } catch (e: RepositoryException) {
+            logger.error("GET /documents?doctorId=$doctorId - Failed to retrieve documents", e)
             call.respond(
                 HttpStatusCode.InternalServerError,
                 ErrorResponse("internal_error", "Failed to retrieve documents", e.message)

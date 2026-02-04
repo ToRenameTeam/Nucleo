@@ -4,6 +4,7 @@ import com.mongodb.client.model.Filters
 import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import it.nucleo.domain.DoctorId
 import it.nucleo.domain.Document
 import it.nucleo.domain.DocumentId
 import it.nucleo.domain.DocumentNotFoundException
@@ -101,6 +102,27 @@ class MongoDocumentRepository(database: MongoDatabase) : DocumentRepository {
         } catch (e: Exception) {
             logger.error("Failed to find documents for patient: ${patientId.id}", e)
             throw RepositoryException("Failed to find documents for patient '${patientId.id}'", e)
+        }
+    }
+
+    override suspend fun findAllDocumentsByDoctor(doctorId: DoctorId): Iterable<Document> {
+        logger.debug("Finding all documents for doctor: ${doctorId.id}")
+        try {
+            val allDocuments = mutableListOf<Document>()
+
+            collection.find().collect { record ->
+                record.documents.forEach { documentDto ->
+                    if (documentDto.doctorId == doctorId.id) {
+                        allDocuments.add(documentDto.toDomain())
+                    }
+                }
+            }
+
+            logger.debug("Found ${allDocuments.size} documents for doctor: ${doctorId.id}")
+            return allDocuments
+        } catch (e: Exception) {
+            logger.error("Failed to find documents for doctor: ${doctorId.id}", e)
+            throw RepositoryException("Failed to find documents for doctor '${doctorId.id}'", e)
         }
     }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuth } from '../../composables/useAuth'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -17,7 +17,7 @@ import {
 const { t } = useI18n()
 const router = useRouter()
 const showAppearanceModal = ref(false)
-const { currentUser } = useAuth()
+const { currentPatientProfile, currentUser } = useAuth()
 
 const handleItemClick = (item: string) => {
   if (item === 'appearance') {
@@ -30,6 +30,16 @@ const handleItemClick = (item: string) => {
 function handleChangeProfile() {
   router.push('/patient-choice')
 }
+
+const displayUserName = computed(() => {
+  if (!currentUser.value || !currentPatientProfile.value) {
+    return t('topbar.user')
+  }
+  if (currentUser.value.fiscalCode === currentPatientProfile.value.fiscalCode) {
+    return currentPatientProfile.value.name
+  }
+  return `${currentUser.value.name} @ ${currentPatientProfile.value.name}`
+})
 </script>
 
 <template>
@@ -46,10 +56,10 @@ function handleChangeProfile() {
       </div>
       <div class="settings-account">
         <div class="settings-account-avatar">
-          <span>{{ currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : '?' }}</span>
+          <span>{{ displayUserName.charAt(0).toUpperCase() }}</span>
         </div>
         <div class="settings-account-info">
-          <div class="settings-account-name">{{ currentUser?.name || t('settings.account.owner') }}</div>
+          <div class="settings-account-name">{{ displayUserName }}</div>
         </div>
         <button class="settings-account-button" @click="handleChangeProfile">
           {{ t('settings.account.changeProfile') }}

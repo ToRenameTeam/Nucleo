@@ -37,7 +37,7 @@ fun Application.configureRouting(
 
     routing {
         healthCheck()
-        route("/api/v1") {
+        route("/api") {
             documentRoutes(documentService)
             uploadRoutes(uploadService)
             downloadRoutes(downloadService)

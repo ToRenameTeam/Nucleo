@@ -76,17 +76,20 @@ export interface DocumentResponse {
   doctorId: string
   patientId: string
   issueDate: string
+  title: string
   metadata: FileMetadata
 }
 
 export interface MedicinePrescriptionResponse extends DocumentResponse {
   type: 'medicine_prescription'
+  title: string
   validity: Validity
   dosage: Dosage
 }
 
 export interface ServicePrescriptionResponse extends DocumentResponse {
   type: 'service_prescription'
+  title: string
   validity: Validity
   serviceId: string
   facilityId: string
@@ -95,6 +98,7 @@ export interface ServicePrescriptionResponse extends DocumentResponse {
 
 export interface ReportResponse extends DocumentResponse {
   type: 'report'
+  title: string
   servicePrescription: ServicePrescriptionResponse
   executionDate: string
   clinicalQuestion?: string
@@ -103,7 +107,14 @@ export interface ReportResponse extends DocumentResponse {
   recommendations?: string
 }
 
-export type DocumentApiResponse = MedicinePrescriptionResponse | ServicePrescriptionResponse | ReportResponse
+export interface UploadedDocumentResponse extends DocumentResponse {
+  type: 'uploaded_document'
+  title: string
+  filename: string
+  documentType: string
+}
+
+export type DocumentApiResponse = MedicinePrescriptionResponse | ServicePrescriptionResponse | ReportResponse | UploadedDocumentResponse
 
 export interface UploadDocumentRequest {
   file: File
@@ -119,8 +130,8 @@ export interface UploadResponse {
 function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {  
   const baseDocument: Document = {
     id: response.id,
-    title: response.metadata.summary || getDocumentTypeLabel(response.type),
-    description: response.metadata.summary || '',
+    title: response.title || getDocumentTypeLabel(response.type),
+    description: response.metadata.summary || '--',
     date: response.issueDate,
     tags: response.metadata.tags || []
   }
@@ -163,6 +174,12 @@ function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {
       return report
     }
     
+    case 'uploaded_document': {
+      // For uploaded documents, we just return the base document
+      // as they don't have additional structured fields
+      return baseDocument
+    }
+
     default:
       return baseDocument
   }
@@ -212,7 +229,7 @@ export const documentsApiService = {
       ...('recommendations' in request && { recommendations: request.recommendations })
     }
 
-    const response = await fetch(`${BASE_URL}/patients/${patientId}/documents`, {
+    const response = await fetch(`${BASE_URL}/api/patients/${patientId}/documents`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -234,7 +251,7 @@ export const documentsApiService = {
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await fetch(`${BASE_URL}/patients/${patientId}/documents/upload`, {
+    const response = await fetch(`${BASE_URL}/api/patients/${patientId}/documents/upload`, {
       method: 'POST',
       body: formData
     })
@@ -251,7 +268,7 @@ export const documentsApiService = {
    */
   async getDocumentsByPatient(patientId: string): Promise<AnyDocument[]> {
     try {
-      const response = await fetch(`${BASE_URL}/patients/${patientId}/documents`, {
+      const response = await fetch(`${BASE_URL}/api/patients/${patientId}/documents`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -271,7 +288,7 @@ export const documentsApiService = {
    */
   async getDocumentById(patientId: string, documentId: string): Promise<AnyDocument> {
     try {
-      const response = await fetch(`${BASE_URL}/patients/${patientId}/documents/${documentId}`, {
+      const response = await fetch(`${BASE_URL}/api/patients/${patientId}/documents/${documentId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -292,8 +309,8 @@ export const documentsApiService = {
   async getDocumentsByDoctor(doctorId: string): Promise<AnyDocument[]> {
     const queryParams = new URLSearchParams()
     queryParams.append('doctorId', doctorId)
-    const url = `${BASE_URL}/documents?${queryParams.toString()}`
-    
+    const url = `${BASE_URL}/api/documents?${queryParams.toString()}`
+
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -335,8 +352,8 @@ export const documentsApiService = {
    * Create a medicine prescription
    */
   async createMedicinePrescription(patientId: string, request: CreateMedicinePrescriptionRequest): Promise<MedicinePrescription> {
-    const url = `${BASE_URL}/patients/${patientId}/documents`
-    
+    const url = `${BASE_URL}/api/patients/${patientId}/documents`
+
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -363,8 +380,8 @@ export const documentsApiService = {
    * Create a service prescription
    */
   async createServicePrescription(patientId: string, request: CreateServicePrescriptionRequest): Promise<ServicePrescription> {
-    const url = `${BASE_URL}/patients/${patientId}/documents`
-    
+    const url = `${BASE_URL}/api/patients/${patientId}/documents`
+
     try {
       const response = await fetch(url, {
         method: 'POST',
