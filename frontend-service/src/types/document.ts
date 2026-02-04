@@ -4,6 +4,8 @@ export interface Document {
   description: string
   tags: string[]
   date: string
+  patientId?: string
+  doctorId?: string
   doctor?: string
   hospital?: string
 }

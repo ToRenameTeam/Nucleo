@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { CheckCircleIcon, XMarkIcon, XCircleIcon } from '@heroicons/vue/24/outline'
 import { useI18n } from 'vue-i18n'
 import type { Toast } from '../../types/shared'
 
@@ -37,7 +37,9 @@ const ariaLive = props.type === 'error' ? 'assertive' : 'polite'
       >
         <div class="toast-content">
           <div class="toast-icon" :class="`toast-icon-${type}`">
-            <CheckCircleIcon class="toast-check-icon" aria-hidden="true" />
+            <CheckCircleIcon v-if="type === 'success'" class="toast-check-icon" aria-hidden="true" />
+            <XCircleIcon v-else-if="type === 'error'" class="toast-check-icon" aria-hidden="true" />
+            <CheckCircleIcon v-else class="toast-check-icon" aria-hidden="true" />
           </div>
           <p class="toast-message">{{ message }}</p>
           <button 

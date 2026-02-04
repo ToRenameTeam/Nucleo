@@ -184,6 +184,7 @@
   "documentModal": {
     "descriptionLabel": "Descrizione contenuto referto:",
     "download": "Scarica",
+    "downloading": "Scaricamento...",
     "share": "Condividi"
   },
   "settings": {
@@ -557,5 +558,18 @@
   },
   "facilities": {
     "default": "Struttura predefinita"
+  },
+  "upload": {
+    "confirmTitle": "Conferma caricamento",
+    "confirmSubtitle": "Verifica i dettagli del file prima di caricare",
+    "confirmMessage": "Il documento sarà caricato nel tuo archivio personale e sarà visibile nella sezione Documenti.",
+    "cancel": "Annulla",
+    "confirmUpload": "Carica documento",
+    "uploading": "Caricamento in corso...",
+    "success": "Documento caricato con successo",
+    "error": "Errore durante il caricamento del documento",
+    "invalidFileType": "Tipo di file non valido. Sono accettati solo file PDF.",
+    "fileTooLarge": "Il file è troppo grande. Dimensione massima: 10 MB",
+    "nonMedicalDocument": "Il documento non è stato accettato. Solo documenti medici (referti, prescrizioni, note cliniche) sono permessi."
   }
 }

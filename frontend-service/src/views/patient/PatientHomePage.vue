@@ -7,6 +7,7 @@ import AppointmentCard from '../../components/shared/AppointmentCard.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
 import AppointmentBooking from '../../components/patient/home/AppointmentBooking.vue'
+import UploadDocumentModal from '../../components/patient/documents/UploadDocumentModal.vue'
 import CardList from '../../components/shared/CardList.vue'
 import type { Document } from '../../types/document'
 import type { Appointment } from '../../types/appointment'
@@ -25,6 +26,14 @@ const selectedDocument = ref<Document | null>(null)
 const isDocumentModalOpen = ref(false)
 const preselectedVisitType = ref<string | null>(null)
 const showSuccessToast = ref(false)
+const toastMessage = ref('')
+const toastType = ref<'success' | 'error'>('success')
+
+// Upload refs
+const isUploadModalOpen = ref(false)
+const selectedFile = ref<File | null>(null)
+const fileInputRef = ref<HTMLInputElement | null>(null)
+const isUploading = ref(false)
 
 async function loadData() {
   if (!currentUser.value?.userId) {
@@ -54,7 +63,85 @@ onMounted(() => {
 })
 
 const handleUpload = () => {
-  console.log('Upload document')
+  // Trigger file input click
+  fileInputRef.value?.click()
+}
+
+const handleFileSelected = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+
+  if (!file) return
+
+  // Validate file type
+  if (file.type !== 'application/pdf') {
+    toastMessage.value = 'upload.invalidFileType'
+    toastType.value = 'error'
+    showSuccessToast.value = true
+    return
+  }
+
+  // Validate file size (max 10MB)
+  const maxSize = 10 * 1024 * 1024 // 10MB in bytes
+  if (file.size > maxSize) {
+    toastMessage.value = 'upload.fileTooLarge'
+    toastType.value = 'error'
+    showSuccessToast.value = true
+    return
+  }
+
+  selectedFile.value = file
+  isUploadModalOpen.value = true
+
+  // Reset input value to allow re-selecting the same file
+  if (target) {
+    target.value = ''
+  }
+}
+
+const handleUploadConfirm = async () => {
+  if (!selectedFile.value || !currentUser.value?.userId) return
+
+  isUploading.value = true
+
+  try {
+    await documentsApiService.uploadDocument(currentUser.value.userId, selectedFile.value)
+
+    // Close modal
+    isUploadModalOpen.value = false
+    selectedFile.value = null
+
+    // Show success toast
+    toastMessage.value = 'upload.success'
+    toastType.value = 'success'
+    showSuccessToast.value = true
+
+    // Reload documents to show the newly uploaded one
+    await loadData()
+  } catch (error: any) {
+    console.error('[PatientHomePage] Error uploading document:', error)
+
+    // Close modal on error
+    isUploadModalOpen.value = false
+    selectedFile.value = null
+
+    // Check if it's a non-medical document error
+    if (error.message && error.message.includes('does not appear to be a medical document')) {
+      toastMessage.value = 'upload.nonMedicalDocument'
+    } else {
+      toastMessage.value = 'upload.error'
+    }
+
+    toastType.value = 'error'
+    showSuccessToast.value = true
+  } finally {
+    isUploading.value = false
+  }
+}
+
+const handleUploadCancel = () => {
+  isUploadModalOpen.value = false
+  selectedFile.value = null
 }
 
 const handleNewAppointment = () => {
@@ -85,6 +172,8 @@ const handleCloseDocumentModal = () => {
 
 const handleCloseToast = () => {
   showSuccessToast.value = false
+  toastMessage.value = ''
+  toastType.value = 'success'
 }
 </script>
 
@@ -141,6 +230,23 @@ const handleCloseToast = () => {
       </div>
     </div>
 
+    <!-- Hidden file input -->
+    <input
+      ref="fileInputRef"
+      type="file"
+      accept="application/pdf"
+      style="display: none"
+      @change="handleFileSelected"
+    />
+
+    <!-- Upload Document Modal -->
+    <UploadDocumentModal
+      :is-open="isUploadModalOpen"
+      :file="selectedFile"
+      @close="handleUploadCancel"
+      @confirm="handleUploadConfirm"
+    />
+
     <!-- Appointment Booking Modal -->
     <AppointmentBooking
       :is-open="isBookingOpen"
@@ -161,7 +267,8 @@ const handleCloseToast = () => {
     <!-- Success Toast -->
     <Toast
       :show="showSuccessToast"
-      :message="$t('toast.bookingConfirmed')"
+      :type="toastType"
+      :message="$t(toastMessage || 'toast.bookingConfirmed')"
       :duration="4000"
       @close="handleCloseToast"
     />

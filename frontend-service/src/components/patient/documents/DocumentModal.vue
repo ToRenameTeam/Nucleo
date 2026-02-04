@@ -4,6 +4,8 @@ import { ArrowDownTrayIcon } from '@heroicons/vue/24/outline'
 import type { DocumentModal } from '../../../types/document'
 import BaseModal from '../../shared/BaseModal.vue'
 import DocumentViewer from './DocumentViewer.vue'
+import { useAuth } from '../../../composables/useAuth'
+import { documentsApiService } from '../../../api/documents'
 
 const props = defineProps<DocumentModal>()
 
@@ -11,7 +13,9 @@ const emit = defineEmits<{
   close: []
 }>()
 
+const { currentUser } = useAuth()
 const currentPageIndex = ref(0)
+const isDownloading = ref(false)
 
 const handlePrevPage = () => {
   if (currentPageIndex.value > 0) {
@@ -23,9 +27,30 @@ const handleNextPage = () => {
   currentPageIndex.value++
 }
 
-const handleDownload = () => {
-  console.log('Download documento:', props.document?.id)
-  // Implementare logica di download
+const handleDownload = async () => {
+  if (!props.document || isDownloading.value) {
+    return
+  }
+
+  // Use patientId from document if available (for doctor view), otherwise use current user's ID (for patient view)
+  const patientId = props.document.patientId || currentUser.value?.userId
+
+  if (!patientId) {
+    console.error('[DocumentModal] No patient ID available for download')
+    return
+  }
+
+  isDownloading.value = true
+
+  try {
+    await documentsApiService.downloadDocument(patientId, props.document.id)
+    console.log('[DocumentModal] Download successful for document:', props.document.id)
+  } catch (error) {
+    console.error('[DocumentModal] Error downloading document:', error)
+    // TODO: Mostrare un messaggio di errore all'utente
+  } finally {
+    isDownloading.value = false
+  }
 }
 </script>
 
@@ -42,9 +67,16 @@ const handleDownload = () => {
       preview-height="35vh" @prev-page="handlePrevPage" @next-page="handleNextPage" />
 
     <template #footer>
-      <button class="action-button download-button" @click="handleDownload" :aria-label="$t('documentModal.download')">
-        <ArrowDownTrayIcon class="icon-action" />
-        <span class="button-label">{{ $t('documentModal.download') }}</span>
+      <button
+        class="action-button download-button"
+        @click="handleDownload"
+        :disabled="isDownloading"
+        :aria-label="$t('documentModal.download')"
+      >
+        <ArrowDownTrayIcon class="icon-action" :class="{ 'icon-loading': isDownloading }" />
+        <span class="button-label">
+          {{ isDownloading ? $t('documentModal.downloading') : $t('documentModal.download') }}
+        </span>
       </button>
     </template>
   </BaseModal>
@@ -74,6 +106,7 @@ const handleDownload = () => {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
   border: 1px solid transparent;
+  width: 100%;
 }
 
 .download-button {
@@ -82,18 +115,35 @@ const handleDownload = () => {
   border-color: var(--white-30);
   color: var(--white);
   box-shadow: 0 4px 16px var(--accent-primary-30), inset 0 1px 0 var(--white-20);
-  margin-left: auto;
 }
 
-.download-button:hover {
+.download-button:hover:not(:disabled) {
   background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--accent-primary-40), inset 0 1px 0 var(--white-30);
+  box-shadow: 0 6px 20px var(--accent-primary-30), inset 0 1px 0 var(--white-30);
+}
+
+.download-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .icon-action {
   width: 1.25rem;
   height: 1.25rem;
+}
+
+.icon-loading {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 .button-label {
@@ -102,7 +152,7 @@ const handleDownload = () => {
 
 @media (max-width: 768px) {
   .action-button {
-    width: 100%;
+    padding: 0.75rem 1rem;
   }
 }
 </style>

@@ -133,7 +133,9 @@ function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {
     title: response.title || getDocumentTypeLabel(response.type),
     description: response.metadata.summary || '--',
     date: response.issueDate,
-    tags: response.metadata.tags || []
+    tags: response.metadata.tags || [],
+    patientId: response.patientId,
+    doctorId: response.doctorId
   }
   
   // Map to specific document types
@@ -257,7 +259,12 @@ export const documentsApiService = {
     })
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      // Try to get error details from response
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
+      const error = new Error(errorData.message || `HTTP error! status: ${response.status}`)
+      // Attach the error code if available
+      ;(error as any).code = errorData.code
+      throw error
     }
 
     return await response.json()
@@ -279,6 +286,64 @@ export const documentsApiService = {
       return documents.map(doc => mapDocumentResponse(doc))
     } catch (error) {
       console.error('[Documents API] Error fetching documents by patient:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Download a document PDF
+   */
+  async downloadDocument(patientId: string, documentId: string): Promise<void> {
+    try {
+      const response = await fetch(`${BASE_URL}/api/patients/${patientId}/documents/${documentId}/pdf`, {
+        method: 'GET'
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      // Get filename from Content-Disposition header or use a default
+      const contentDisposition = response.headers.get('Content-Disposition')
+      let filename = 'document.pdf'
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1].replace(/['"]/g, '')
+        }
+      }
+
+      // Get the blob and create download link
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+
+      // Cleanup
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (error) {
+      console.error('[Documents API] Error downloading document:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Download multiple documents as PDFs
+   */
+  async downloadMultipleDocuments(documents: { patientId: string; documentId: string; title?: string }[]): Promise<void> {
+    try {
+      for (const doc of documents) {
+        await this.downloadDocument(doc.patientId, doc.documentId)
+        // Small delay between downloads to avoid overwhelming the browser
+        await new Promise(resolve => setTimeout(resolve, 300))
+      }
+    } catch (error) {
+      console.error('[Documents API] Error downloading multiple documents:', error)
       throw error
     }
   },

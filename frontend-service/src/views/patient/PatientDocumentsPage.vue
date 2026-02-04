@@ -177,10 +177,26 @@ const deselectAll = () => {
   selectedDocumentIds.value.clear()
 }
 
-const handleDownloadAll = () => {
-  console.log('Scaricamento di', selectedDocuments.value.length, 'documenti')
-  // TODO: Implementare download batch
-  alert(`Scaricamento di ${selectedDocuments.value.length} documenti...`)
+const handleDownloadAll = async () => {
+  if (selectedDocuments.value.length === 0 || !currentUser.value?.userId) {
+    return
+  }
+
+  try {
+    console.log('[PatientDocumentsPage] Downloading', selectedDocuments.value.length, 'documents')
+
+    const documentsToDownload = selectedDocuments.value.map(doc => ({
+      patientId: currentUser.value!.userId,
+      documentId: doc.id,
+      title: doc.title
+    }))
+
+    await documentsApiService.downloadMultipleDocuments(documentsToDownload)
+    console.log('[PatientDocumentsPage] Download batch completed')
+  } catch (error) {
+    console.error('[PatientDocumentsPage] Error downloading documents:', error)
+    // TODO: Mostrare un messaggio di errore all'utente
+  }
 }
 
 const handleCancelSelection = () => {
