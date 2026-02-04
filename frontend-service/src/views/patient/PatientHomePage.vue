@@ -2,7 +2,6 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '../../composables/useAuth'
 import { DocumentPlusIcon, PlusIcon } from '@heroicons/vue/24/outline'
-import SearchBar from '../../components/shared/SearchBar.vue'
 import Toast from '../../components/shared/Toast.vue'
 import AppointmentCard from '../../components/shared/AppointmentCard.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
@@ -16,7 +15,6 @@ import { documentsApiService } from '../../api/documents'
 
 const { currentUser } = useAuth()
 
-const searchQuery = ref('')
 const appointmentsData = ref<Appointment[]>([])
 const documentsData = ref<Document[]>([])
 const isLoading = ref(false)
@@ -54,10 +52,6 @@ async function loadData() {
 onMounted(() => {
   loadData()
 })
-
-const handleSearch = (query: string) => {
-  searchQuery.value = query
-}
 
 const handleUpload = () => {
   console.log('Upload document')
@@ -98,9 +92,6 @@ const handleCloseToast = () => {
   <div class="home-page">
     <div class="content-grid">
       <div class="main-column">
-        <div class="section-card">
-          <SearchBar @search="handleSearch" :placeholder="$t('documents.searchPlaceholder')"/>
-        </div>
 
         <div class="quick-actions">
           <div class="quick-actions-flex">
@@ -213,13 +204,6 @@ const handleCloseToast = () => {
   z-index: 1;
 }
 
-.search-hint {
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
-  color: var(--hint-text-color);
-  text-align: center;
-}
-
 .main-column {
   display: flex;
   flex-direction: column;
@@ -242,8 +226,8 @@ const handleCloseToast = () => {
 }
 
 .quick-action-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
 }
 
 .quick-actions {
@@ -331,11 +315,11 @@ const handleCloseToast = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1.25rem;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
   border-radius: 0.75rem;
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
   background: var(--white-60);
   backdrop-filter: blur(12px);
