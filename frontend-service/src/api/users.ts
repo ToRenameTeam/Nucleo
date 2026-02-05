@@ -8,14 +8,14 @@ export interface UserInfo {
   name: string
   lastName: string
   dateOfBirth: string
-  patientData?: {
+  patient?: {
+    userId: string
     activeDelegationIds: string[]
   }
   doctor?: {
     userId: string
     medicalLicenseNumber: string
     specializations: string[]
-    assignedPatientUserIds: string[]
   }
 }
 

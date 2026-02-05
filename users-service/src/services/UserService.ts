@@ -44,7 +44,7 @@ export class UserService {
         const user = User.create(userId, fiscalCode, credentials, profileInfo);
         await this.userRepository.create(user);
 
-        const patient = Patient.reconstitute(userId, []);
+        const patient = Patient.reconstitute(userId);
         await this.patientRepository.save(patient);
 
         let doctorInfo = undefined;
@@ -54,8 +54,7 @@ export class UserService {
             const doctor = Doctor.reconstitute(
                 userId,
                 data.doctor.medicalLicenseNumber,
-                data.doctor.specializations,
-                []
+                data.doctor.specializations
             );
             await this.doctorRepository.save(doctor);
             doctorInfo = {
@@ -112,9 +111,7 @@ export class UserService {
                     name: userData.name,
                     lastName: userData.lastName,
                     dateOfBirth: userData.dateOfBirth.toISOString(),
-                    patientData: patientData ? {
-                        activeDelegationIds: patientData.activeDelegationIds,
-                    } : undefined,
+                    patientData: patientData,
                     doctor: doctorData ? {
                         medicalLicenseNumber: doctorData.medicalLicenseNumber,
                         specializations: doctorData.specializations,

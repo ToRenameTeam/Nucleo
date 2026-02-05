@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import SettingsItem from '../../components/patient/settings/SettingsItem.vue'
 import BaseModal from '../../components/shared/BaseModal.vue'
+import ProfileViewModal from '../../components/shared/ProfileViewModal.vue'
 import AppearanceSettings from '../../components/patient/settings/AppearanceSettings.vue'
 import {
   UserCircleIcon,
@@ -17,11 +18,14 @@ import {
 const { t } = useI18n()
 const router = useRouter()
 const showAppearanceModal = ref(false)
+const showProfileModal = ref(false)
 const { currentPatientProfile, currentUser } = useAuth()
 
 const handleItemClick = (item: string) => {
   if (item === 'appearance') {
     showAppearanceModal.value = true
+  } else if (item === 'myProfile') {
+    showProfileModal.value = true
   } else {
     console.log('Clicked:', item)
   }
@@ -39,6 +43,18 @@ const displayUserName = computed(() => {
     return currentPatientProfile.value.name
   }
   return `${currentUser.value.name} @ ${currentPatientProfile.value.name}`
+})
+
+const isDelegatedProfile = computed(() => {
+  if (!currentUser.value || !currentPatientProfile.value) return false
+  return currentUser.value.fiscalCode !== currentPatientProfile.value.fiscalCode
+})
+
+const delegatorName = computed(() => {
+  if (!isDelegatedProfile.value || !currentUser.value) return undefined
+  return currentUser.value.lastName 
+    ? `${currentUser.value.name} ${currentUser.value.lastName}`
+    : currentUser.value.name
 })
 </script>
 
@@ -120,6 +136,16 @@ const displayUserName = computed(() => {
       @close="showAppearanceModal = false">
       <AppearanceSettings />
     </BaseModal>
+
+    <!-- Modal Profilo -->
+    <ProfileViewModal 
+      :is-open="showProfileModal" 
+      :profile-data="currentPatientProfile"
+      :title="t('settings.profileFamily.myProfile.title')"
+      :is-delegated="isDelegatedProfile"
+      :delegated-by-name="delegatorName"
+      @close="showProfileModal = false"
+    />
   </div>
 </template>
 

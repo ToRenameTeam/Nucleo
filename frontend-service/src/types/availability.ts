@@ -63,4 +63,6 @@ export interface ScheduleModalProps {
     time?: string
     location?: string
   } | null
+  title: string       
+  subtitle: string   
 }

@@ -31,6 +31,8 @@ const modalMode = ref<'create' | 'edit'>('create')
 const editingAvailability = ref<AvailabilityDisplay | null>(null)
 const preselectedDate = ref<Date | null>(null)
 const preselectedHour = ref<number | null>(null)
+const modalTitle = ref('')
+const modalSubtitle = ref('')
 
 // Toast state
 const showToast = ref(false)
@@ -119,6 +121,8 @@ function openCreateModal(date?: Date, hour?: number) {
   editingAvailability.value = null
   preselectedDate.value = date || null
   preselectedHour.value = hour ?? null
+  modalTitle.value = 'doctor.availabilities.modal.titleCreate'
+  modalSubtitle.value = 'doctor.availabilities.modal.subtitle'
   isModalOpen.value = true
 }
 
@@ -132,6 +136,8 @@ function openEditModal(availability: AvailabilityDisplay) {
   editingAvailability.value = availability
   preselectedDate.value = null
   preselectedHour.value = null
+  modalTitle.value = 'doctor.availabilities.modal.titleEdit'
+  modalSubtitle.value = 'doctor.availabilities.modal.subtitle'
   isModalOpen.value = true
 }
 
@@ -323,6 +329,8 @@ onMounted(() => {
       :availability="editingAvailability"
       :preselected-date="preselectedDate"
       :preselected-hour="preselectedHour"
+      :title="modalTitle"
+      :subtitle="modalSubtitle"
       @close="closeModal"
       @save="handleSave"
     />

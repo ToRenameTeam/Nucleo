@@ -21,20 +21,20 @@ const DEV_USER: AuthenticatedUser = {
   activeProfile: 'PATIENT',
   patient: {
     userId: 'dev-user-001',
-    activeDelegationIds: []
   },
   doctor: {
     userId: 'dev-user-001',
     medicalLicenseNumber: 'DEV123456',
     specializations: ['Medicina Generale'],
-    assignedPatientUserIds: []
   }
 }
 
 const DEV_PROFILE: Profile = {
   id: 'dev-profile-001',
-  name: 'Dev User',
-  fiscalCode: 'DVLUSR00A01H501X'
+  name: 'Dev',
+  lastName: 'User',
+  fiscalCode: 'DVLUSR00A01H501X',
+  dateOfBirth: '2000-01-01'
 }
 
 // In development mode, automatically use dev user

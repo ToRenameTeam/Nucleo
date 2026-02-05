@@ -1,7 +1,9 @@
 export interface Profile {
   id: string
   name: string
+  lastName: string
   fiscalCode: string
+  dateOfBirth: string
 }
 
 export interface UserData {
@@ -12,13 +14,11 @@ export interface UserData {
   dateOfBirth: string
   patient?: {
     userId: string
-    activeDelegationIds: string[]
   }
   doctor?: {
     userId: string
     medicalLicenseNumber: string
     specializations: string[]
-    assignedPatientUserIds: string[]
   }
 }
 

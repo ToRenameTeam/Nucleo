@@ -2,7 +2,6 @@ export interface Appointment {
   id: string;
   title: string;
   description: string;
-  tags?: string[];
   date: string;
   time?: string;
   user?: string;
@@ -11,7 +10,7 @@ export interface Appointment {
   patientId?: string;
   doctorId?: string;
   status?: string;
-  category?: string;
+  category?: string[]; // Service type categories
   serviceTypeDescription?: string;
 }
 
@@ -27,22 +26,4 @@ export interface UpcomingAppointments {
 export type AppointmentBooking = {
   isOpen: boolean;
   preselectedVisit?: string | null;
-}
-
-export type VisitTypeSelector = {
-  modelValue: string | null;
-  loading?: boolean;
-}
-
-export interface DateSelector {
-  modelValue: string | null;
-  disabled?: boolean;
-  loading?: boolean;
-}
-
-export interface TimeSlotSelector {
-  modelValue: string | null;
-  selectedDate: string | null;
-  disabled?: boolean;
-  loading?: boolean;
 }

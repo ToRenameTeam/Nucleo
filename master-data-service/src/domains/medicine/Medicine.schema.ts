@@ -1,6 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, type HydratedDocument } from 'mongoose';
 
-export interface IMedicine extends Document {
+export interface IMedicine {
     _id: string;
     code: string;
     name: string;
@@ -14,6 +14,8 @@ export interface IMedicine extends Document {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export type MedicineDocument = HydratedDocument<IMedicine>;
 
 export enum MedicineCategory {
     ANALGESICO = 'analgesico',

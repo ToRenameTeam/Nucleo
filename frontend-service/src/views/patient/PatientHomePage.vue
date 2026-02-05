@@ -1,35 +1,68 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '../../composables/useAuth'
-import { DocumentPlusIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { DocumentPlusIcon, PlusIcon, CalendarIcon, ClockIcon, UserIcon, MapPinIcon } from '@heroicons/vue/24/outline'
 import Toast from '../../components/shared/Toast.vue'
-import AppointmentCard from '../../components/shared/AppointmentCard.vue'
+import BaseCard from '../../components/shared/BaseCard.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
+import LoadingSpinner from '../../components/shared/LoadingSpinner.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
-import AppointmentBooking from '../../components/patient/home/AppointmentBooking.vue'
 import UploadDocumentModal from '../../components/patient/documents/UploadDocumentModal.vue'
 import UploadProgressModal from '../../components/patient/documents/UploadProgressModal.vue'
+import BookingModal from '../../components/patient/BookingModal.vue'
 import CardList from '../../components/shared/CardList.vue'
 import type { Document } from '../../types/document'
 import type { Appointment } from '../../types/appointment'
+import type { CardMetadata } from '../../types/shared'
 import { appointmentsApi } from '../../api/appointments'
 import { documentsApiService } from '../../api/documents'
+import { parseItalianDateSlash, setTimeOnDate } from '../../utils/dateUtils'
+import { formatCategory } from '../../utils/formatters'
+import { getBadgeColors, getBadgeIcon } from '../../utils/badgeHelpers'
+import { useI18n } from 'vue-i18n'
 import type { UploadProgressEvent, UploadProgressEventType } from '../../api/documents'
 
+useI18n()
 const { currentUser } = useAuth()
 
 const appointmentsData = ref<Appointment[]>([])
 const documentsData = ref<Document[]>([])
 const isLoading = ref(false)
-const appointments = computed(() => appointmentsData.value.slice(0, 2))
+
+function parseAppointmentDateTime(appointment: Appointment): Date | null {
+  const date = parseItalianDateSlash(appointment.date)
+  if (!date) return null
+  return setTimeOnDate(new Date(date), appointment.time)
+}
+
+const upcomingAppointments = computed(() => {
+  const now = new Date()
+  
+  return appointmentsData.value
+    .filter(appointment => {
+      const appointmentDate = parseAppointmentDateTime(appointment)
+      return appointmentDate && appointmentDate > now
+    })
+    .sort((a, b) => {
+      const dateA = parseAppointmentDateTime(a)
+      const dateB = parseAppointmentDateTime(b)
+      
+      if (!dateA || !dateB) return 0
+      
+      return dateA.getTime() - dateB.getTime()
+    })
+    .slice(0, 3)
+})
+
 const recentDocuments = computed(() => documentsData.value.slice(0, 2))
-const isBookingOpen = ref(false)
 const selectedDocument = ref<Document | null>(null)
 const isDocumentModalOpen = ref(false)
-const preselectedVisitType = ref<string | null>(null)
 const showSuccessToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref<'success' | 'error'>('success')
+
+// Booking modal states
+const isBookingModalOpen = ref(false)
 
 // Upload refs
 const isUploadModalOpen = ref(false)
@@ -173,18 +206,59 @@ const handleUploadCancel = () => {
   selectedFile.value = null
 }
 
-const handleNewAppointment = () => {
-  preselectedVisitType.value = null
-  isBookingOpen.value = true
+function handleOpenBooking() {
+  isBookingModalOpen.value = true
+}
+
+function handleCloseBooking() {
+  isBookingModalOpen.value = false
+}
+
+async function handleBookingConfirmed(availabilityId: string) {
+  if (!currentUser.value?.userId) return
+  
+  try {
+    await appointmentsApi.createAppointment(currentUser.value.userId, availabilityId)
+    
+    toastMessage.value = 'toast.bookingConfirmed'
+    toastType.value = 'success'
+    showSuccessToast.value = true
+    
+    isBookingModalOpen.value = false
+    
+    // Ricarica appuntamenti
+    await loadData()
+  } catch (error) {
+    console.error('[PatientHomePage] Error booking appointment:', error)
+    toastMessage.value = 'Errore durante la prenotazione'
+    toastType.value = 'error'
+    showSuccessToast.value = true
+  }
 }
 
 const handleAppointmentClick = (id: string) => {
   console.log('Appointment clicked:', id)
 }
 
-const handleBookingConfirm = (appointment: any) => {
-  console.log('Appointment booked:', appointment)
-  showSuccessToast.value = true
+// Get metadata for appointment card
+function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
+  const meta: CardMetadata[] = [
+    { icon: CalendarIcon, label: appointment.date }
+  ]
+  
+  if (appointment.time) {
+    meta.push({ icon: ClockIcon, label: appointment.time })
+  }
+  
+  if (appointment.user) {
+    meta.push({ icon: UserIcon, label: appointment.user })
+  }
+  
+  if (appointment.location) {
+    meta.push({ icon: MapPinIcon, label: appointment.location })
+  }
+  
+  return meta
 }
 
 const handleDocumentClick = (document: Document) => {
@@ -221,7 +295,7 @@ const handleCloseToast = () => {
               <span>{{ $t('home.uploadDocument') }}</span>
             </button>
             <button 
-              @click="handleNewAppointment"
+              @click="handleOpenBooking"
               class="quick-action-btn quick-action-btn-flex"
             >
               <PlusIcon class="quick-action-icon" />
@@ -232,16 +306,48 @@ const handleCloseToast = () => {
 
         <div class="section-card">
           <h3 class="section-title">{{ $t('home.upcomingAppointments') }}</h3>
-          <div v-if="appointments.length === 0" class="empty-card-message">
+          
+          <!-- Loading State -->
+          <LoadingSpinner 
+            v-if="isLoading" 
+            :message="$t('home.loadingAppointments')" 
+            size="medium"
+          />
+          
+          <!-- Empty State -->
+          <div v-else-if="upcomingAppointments.length === 0" class="empty-card-message">
             {{ $t('home.noAppointments') }}
           </div>
+          
+          <!-- Appointments List -->
           <CardList v-else>
-            <AppointmentCard
-              v-for="appointment in appointments"
+            <BaseCard
+              v-for="appointment in upcomingAppointments"
               :key="appointment.id"
-              :appointment="appointment"
-              @click="handleAppointmentClick"
-            />
+              :title="appointment.title"
+              :description="appointment.description"
+              :icon="CalendarIcon"
+              :metadata="getAppointmentMetadata(appointment)"
+              @click="handleAppointmentClick(appointment.id)"
+            >
+              <template v-if="appointment.category && appointment.category.length > 0" #badges>
+                <div class="badges-row">
+                  <div 
+                    v-for="cat in appointment.category"
+                    :key="cat"
+                    class="appointment-badge" 
+                    :style="{
+                      color: getBadgeColors(cat).color,
+                      backgroundColor: getBadgeColors(cat).bgColor,
+                      borderColor: getBadgeColors(cat).borderColor
+                    }"
+                  >
+                    <span class="badge-icon">{{ getBadgeIcon(cat) }}</span>
+                    <span class="badge-label">{{ formatCategory(cat) }}</span>
+                  </div>
+                </div>
+              </template>
+            </BaseCard>
           </CardList>
         </div>
 
@@ -285,12 +391,12 @@ const handleCloseToast = () => {
       @close="handleUploadProgressClose"
     />
 
-    <!-- Appointment Booking Modal -->
-    <AppointmentBooking
-      :is-open="isBookingOpen"
+    <!-- Booking Modal -->
+    <BookingModal
+      :is-open="isBookingModalOpen"
       :preselected-visit="preselectedVisitType"
-      @close="isBookingOpen = false"
-      @confirm="handleBookingConfirm"
+      @close="handleCloseBooking"
+      @confirm="handleBookingConfirmed"
     />
 
     <!-- Document Modal (Teleported to body) -->
@@ -390,6 +496,46 @@ const handleCloseToast = () => {
   background: var(--bg-secondary-40);
   border-radius: 12px;
   border: 1px dashed var(--border-color);
+}
+
+.badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.appointment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border: 1.5px solid;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  box-shadow: 0 2px 8px var(--badge-shadow), inset 0 1px 0 var(--white-40);
+  width: fit-content;
+  animation: fadeInScale 0.4s cubic-bezier(0, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.badge-label {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-size: 0.8125rem;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 1023px) {

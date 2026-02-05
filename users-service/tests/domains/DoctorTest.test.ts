@@ -3,14 +3,12 @@ import { randomUUID } from 'crypto';
 
 describe('Doctor', () => {
     function createTestDoctor(
-        specialization: string[] = ['Cardiologia'],
-        assignedPatientUserIds: string[] = []
+        specialization: string[] = ['Cardiologia']
     ) {
         return Doctor.reconstitute(
             randomUUID(),
             'ML123456',
-            specialization,
-            assignedPatientUserIds
+            specialization
         );
     }
 
@@ -18,14 +16,12 @@ describe('Doctor', () => {
         it('should reconstitute doctor with all properties', () => {
             const userId = randomUUID();
             const specialization = ['Cardiologia', 'Medicina Interna'];
-            const patientIds = ['patient1', 'patient2'];
 
-            const doctor = Doctor.reconstitute(userId, 'ML123456', specialization, patientIds);
+            const doctor = Doctor.reconstitute(userId, 'ML123456', specialization);
 
             expect(doctor.userId).toBe(userId);
             expect(doctor.medicalLicenseNumber).toBe('ML123456');
             expect(doctor.specialization).toEqual(specialization);
-            expect(doctor.assignedPatientUserIds).toEqual(patientIds);
         });
 
         it('should reconstitute doctor with empty arrays as defaults', () => {
@@ -33,89 +29,13 @@ describe('Doctor', () => {
             const doctor = Doctor.reconstitute(userId, 'ML654321');
 
             expect(doctor.specialization).toEqual([]);
-            expect(doctor.assignedPatientUserIds).toEqual([]);
         });
 
-        it('should preserve specialization and patient order', () => {
+        it('should preserve specialization', () => {
             const specializations = ['Neurologia', 'Cardiologia', 'Dermatologia'];
-            const patients = ['patient3', 'patient1', 'patient2'];
-            const doctor = Doctor.reconstitute(randomUUID(), 'ML123', specializations, patients);
+            const doctor = Doctor.reconstitute(randomUUID(), 'ML123', specializations);
 
             expect(doctor.specialization).toEqual(['Neurologia', 'Cardiologia', 'Dermatologia']);
-            expect(doctor.assignedPatientUserIds).toEqual(['patient3', 'patient1', 'patient2']);
-        });
-    });
-
-    describe('assignPatient', () => {
-        it('should assign a new patient', () => {
-            const doctor = createTestDoctor();
-            doctor.assignPatient('patient1');
-
-            expect(doctor.assignedPatientUserIds).toContain('patient1');
-            expect(doctor.assignedPatientUserIds).toHaveLength(1);
-        });
-
-        it('should not duplicate patient assignment', () => {
-            const doctor = createTestDoctor();
-            doctor.assignPatient('patient1');
-            doctor.assignPatient('patient1');
-
-            expect(doctor.assignedPatientUserIds).toEqual(['patient1']);
-            expect(doctor.assignedPatientUserIds).toHaveLength(1);
-        });
-
-        it('should assign multiple different patients', () => {
-            const doctor = createTestDoctor();
-            doctor.assignPatient('patient1');
-            doctor.assignPatient('patient2');
-            doctor.assignPatient('patient3');
-
-            expect(doctor.assignedPatientUserIds).toEqual(['patient1', 'patient2', 'patient3']);
-            expect(doctor.assignedPatientUserIds).toHaveLength(3);
-        });
-    });
-
-    describe('unassignPatient', () => {
-        it('should remove an assigned patient', () => {
-            const doctor = createTestDoctor([], ['patient1', 'patient2']);
-            doctor.unassignPatient('patient1');
-
-            expect(doctor.assignedPatientUserIds).toEqual(['patient2']);
-            expect(doctor.assignedPatientUserIds).not.toContain('patient1');
-        });
-
-        it('should handle unassigning non-existent patient', () => {
-            const doctor = createTestDoctor([], ['patient1']);
-            doctor.unassignPatient('patient2');
-
-            expect(doctor.assignedPatientUserIds).toEqual(['patient1']);
-        });
-
-        it('should handle unassigning from empty list', () => {
-            const doctor = createTestDoctor([], []);
-            doctor.unassignPatient('patient1');
-
-            expect(doctor.assignedPatientUserIds).toEqual([]);
-        });
-    });
-
-    describe('hasPatient', () => {
-        it('should return true for assigned patient', () => {
-            const doctor = createTestDoctor([], ['patient1', 'patient2']);
-
-            expect(doctor.hasPatient('patient1')).toBe(true);
-        });
-
-        it('should return false for non-assigned patient', () => {
-            const doctor = createTestDoctor([], ['patient1']);
-
-            expect(doctor.hasPatient('patient2')).toBe(false);
-        });
-
-        it('should return false for empty patient list', () => {
-            const doctor = createTestDoctor([], []);
-
-            expect(doctor.hasPatient('patient1')).toBe(false);
         });
     });
 
@@ -123,13 +43,11 @@ describe('Doctor', () => {
         it('should expose doctor properties', () => {
             const userId = randomUUID();
             const specialization = ['Cardiologia', 'Medicina Interna'];
-            const patientIds = ['patient1', 'patient2'];
-            const doctor = Doctor.reconstitute(userId, 'ML123456', specialization, patientIds);
+            const doctor = Doctor.reconstitute(userId, 'ML123456', specialization);
 
             expect(doctor.userId).toBe(userId);
             expect(doctor.medicalLicenseNumber).toBe('ML123456');
             expect(doctor.specialization).toEqual(specialization);
-            expect(doctor.assignedPatientUserIds).toEqual(patientIds);
         });
 
         it('should return a copy of specialization array', () => {
@@ -142,13 +60,5 @@ describe('Doctor', () => {
             expect(doctor.specialization).toEqual(['Cardiologia']);
         });
 
-        it('should return a copy of assigned patient ids array', () => {
-            const doctor = createTestDoctor([], ['patient1']);
-            const returnedPatientIds = doctor.assignedPatientUserIds;
-
-            returnedPatientIds.push('patient2');
-
-            expect(doctor.assignedPatientUserIds).toEqual(['patient1']);
-        });
     });
 });

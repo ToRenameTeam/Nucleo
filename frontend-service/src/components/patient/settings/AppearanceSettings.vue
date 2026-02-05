@@ -1,17 +1,10 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { useTheme, type ColorBlindMode } from '../../../composables/useTheme'
+import { useTheme } from '../../../composables/useTheme'
 import { SunIcon, MoonIcon, CheckCircleIcon } from '@heroicons/vue/24/solid'
 
 const { t } = useI18n()
-const { themeMode, colorBlindMode, setThemeMode, setColorBlindMode } = useTheme()
-
-const colorBlindOptions: { value: ColorBlindMode; label: string }[] = [
-  { value: 'none', label: t('settings.app.appearance.colorBlind.none') },
-  { value: 'deuteranopia', label: t('settings.app.appearance.colorBlind.deuteranopia') },
-  { value: 'protanopia', label: t('settings.app.appearance.colorBlind.protanopia') },
-  { value: 'tritanopia', label: t('settings.app.appearance.colorBlind.tritanopia') }
-]
+const { themeMode, setThemeMode } = useTheme()
 </script>
 
 <template>
@@ -41,24 +34,6 @@ const colorBlindOptions: { value: ColorBlindMode; label: string }[] = [
             <span>{{ t('settings.app.appearance.theme.dark') }}</span>
           </div>
           <CheckCircleIcon v-if="themeMode === 'dark'" class="check-icon" />
-        </button>
-      </div>
-    </div>
-
-    <!-- Color Blind Mode -->
-    <div class="setting-group">
-      <h3 class="setting-label">{{ t('settings.app.appearance.colorBlind.title') }}</h3>
-      <p class="setting-description">{{ t('settings.app.appearance.colorBlind.subtitle') }}</p>
-      <div class="color-blind-selector">
-        <button
-          v-for="option in colorBlindOptions"
-          :key="option.value"
-          class="radio-option"
-          :class="{ active: colorBlindMode === option.value }"
-          @click="setColorBlindMode(option.value)"
-        >
-          <span class="radio-label">{{ option.label }}</span>
-          <CheckCircleIcon v-if="colorBlindMode === option.value" class="check-icon-small" />
         </button>
       </div>
     </div>
@@ -153,12 +128,6 @@ const colorBlindOptions: { value: ColorBlindMode; label: string }[] = [
 
 .theme-button.active span {
   font-weight: 700;
-}
-
-.color-blind-selector {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
 }
 
 .radio-option {

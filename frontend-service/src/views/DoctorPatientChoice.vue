@@ -18,7 +18,9 @@ const selectDoctor = () => {
   setProfile({
     id: currentUser.value.userId,
     name: currentUser.value.name,
-    fiscalCode: currentUser.value.fiscalCode
+    lastName: currentUser.value.lastName,
+    fiscalCode: currentUser.value.fiscalCode,
+    dateOfBirth: currentUser.value.dateOfBirth
   })
 
     router.push('/doctor/appointments')

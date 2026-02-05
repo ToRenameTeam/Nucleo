@@ -146,7 +146,8 @@
     "newAppointment": "Prenota visita",
     "upcomingAppointments": "Prossimi appuntamenti",
     "noAppointments": "Nessun appuntamento in programma",
-    "recentDocuments": "Documenti recenti"
+    "recentDocuments": "Documenti recenti",
+    "loadingAppointments": "Caricamento appuntamenti..."
   },
   "appointmentBooking": {
     "title": "Prenota una visita",
@@ -202,6 +203,14 @@
         "subtitle": "Anagrafica e stato dei servizi"
       }
     },
+    "profileModal": {
+      "title": "Profilo",
+      "fullName": "Nome completo",
+      "fiscalCode": "Codice fiscale",
+      "dateOfBirth": "Data di nascita",
+      "noData": "Nessun dato disponibile",
+      "delegatedAccess": "Stai visualizzando i dati di"
+    },
     "app": {
       "title": "App",
       "notifications": {
@@ -210,19 +219,11 @@
       },
       "appearance": {
         "title": "Aspetto",
-        "subtitle": "Tema, colori e aspetto, dimensione testo",
+        "subtitle": "Tema e aspetto dell'applicazione",
         "theme": {
           "title": "Tema",
           "light": "Chiaro",
           "dark": "Scuro"
-        },
-        "colorBlind": {
-          "title": "Modalità daltonici",
-          "subtitle": "Adatta i colori per una migliore visibilità",
-          "none": "Nessuna",
-          "deuteranopia": "Deuteranopia (rosso-verde)",
-          "protanopia": "Protanopia (rosso-verde)",
-          "tritanopia": "Tritanopia (blu-giallo)"
         }
       }
     },
@@ -564,7 +565,33 @@
     "save": "Salva",
     "saving": "Salvataggio...",
     "back": "Indietro",
-    "close": "Chiudi"
+    "close": "Chiudi",
+    "next": "Avanti"
+  },
+  "patient": {
+    "booking": {
+      "title": "Prenota Visita",
+      "subtitle": "Seleziona data e orario per la tua visita",
+      "modal": {
+        "title": "Prenota Visita",
+        "subtitle": "Segui i passaggi per prenotare la tua visita",
+        "step1": "Tipo Visita",
+        "step2": "Medico",
+        "step3": "Orario",
+        "selectServiceType": "Seleziona il tipo di visita",
+        "selectDoctor": "Seleziona il medico",
+        "selectSlot": "Seleziona data e orario",
+        "selectedService": "Tipo visita selezionato",
+        "selectedDoctor": "Medico selezionato",
+        "noDoctorsAvailable": "Nessun medico disponibile per questa tipologia di visita",
+        "noSlotsAvailable": "Nessuna disponibilità trovata per questo medico",
+        "confirmBooking": "Conferma Prenotazione"
+      }
+    },
+    "reschedule": {
+      "title": "Ripianifica Appuntamento",
+      "subtitle": "Seleziona una nuova data e orario per il tuo appuntamento"
+    }
   },
   "prescriptionTags": {
     "prescription": "prescrizione",

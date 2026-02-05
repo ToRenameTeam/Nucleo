@@ -78,10 +78,10 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
       time: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
       user: patientName,
       location: 'Non specificata',
-      tags: [response.status],
       patientId: response.patientId,
       doctorId: response.doctorId,
-      status: response.status
+      status: response.status,
+      category: []
     }
   }
   
@@ -90,14 +90,14 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
   
   // Get service type name, category, and description
   let serviceTypeName = 'Visita'
-  let serviceTypeCategory: string | undefined
+  let serviceTypeCategories: string[] = []
   let serviceTypeDescription: string | undefined
   if (availability.serviceTypeId) {
     console.log('[Appointments API] Fetching service type:', availability.serviceTypeId)
     const serviceType = await masterDataApi.getServiceTypeById(availability.serviceTypeId)
     if (serviceType) {
       serviceTypeName = serviceType.name
-      serviceTypeCategory = serviceType.category
+      serviceTypeCategories = serviceType.category || []
       serviceTypeDescription = serviceType.description
     }
   }
@@ -131,11 +131,10 @@ async function mapAppointmentResponse(response: AppointmentResponse): Promise<Ap
     time: `${startTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })} - ${endTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`,
     user: doctorName,
     location: facilityName,
-    tags: serviceTypeCategory ? [serviceTypeCategory] : [],
     patientId: response.patientId,
     doctorId: availability.doctorId,
     status: response.status,
-    category: serviceTypeCategory,
+    category: serviceTypeCategories,
     serviceTypeDescription: serviceTypeDescription
   }
 }

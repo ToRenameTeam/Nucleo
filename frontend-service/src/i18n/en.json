@@ -192,6 +192,14 @@
         "subtitle": "Personal data and service status"
       }
     },
+    "profileModal": {
+      "title": "Profile",
+      "fullName": "Full name",
+      "fiscalCode": "Fiscal code",
+      "dateOfBirth": "Date of birth",
+      "noData": "No data available",
+      "delegatedAccess": "You are viewing data for"
+    },
     "app": {
       "title": "App",
       "notifications": {
@@ -200,19 +208,11 @@
       },
       "appearance": {
         "title": "Appearance",
-        "subtitle": "Theme, colors and appearance, text size",
+        "subtitle": "Theme and application appearance",
         "theme": {
           "title": "Theme",
           "light": "Light",
           "dark": "Dark"
-        },
-        "colorBlind": {
-          "title": "Color Blind Mode",
-          "subtitle": "Adjust colors for better visibility",
-          "none": "None",
-          "deuteranopia": "Deuteranopia (red-green)",
-          "protanopia": "Protanopia (red-green)",
-          "tritanopia": "Tritanopia (blue-yellow)"
         }
       }
     },

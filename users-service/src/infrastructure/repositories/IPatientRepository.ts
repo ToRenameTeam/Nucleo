@@ -2,7 +2,6 @@ import type { Patient } from '../../domains/Patient.js';
 
 export interface PatientData {
     userId: string;
-    activeDelegationIds: string[];
 }
 
 export interface IPatientRepository {

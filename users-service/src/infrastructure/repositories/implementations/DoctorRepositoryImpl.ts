@@ -14,7 +14,6 @@ export class DoctorRepositoryImpl implements IDoctorRepository {
             userId: doctor.userId,
             medicalLicenseNumber: doctor.medicalLicenseNumber,
             specializations: doctor.specializations,
-            assignedPatientUserIds: doctor.assignedPatientUserIds
         };
     }
 
@@ -29,7 +28,6 @@ export class DoctorRepositoryImpl implements IDoctorRepository {
             userId: doctor.userId,
             medicalLicenseNumber: doctor.medicalLicenseNumber,
             specializations: doctor.specializations,
-            assignedPatientUserIds: doctor.assignedPatientUserIds
         };
     }
 
@@ -38,7 +36,6 @@ export class DoctorRepositoryImpl implements IDoctorRepository {
             { userId: doctor.userId },
             {
                 medicalLicenseNumber: doctor.medicalLicenseNumber,
-                assignedPatientUserIds: doctor.assignedPatientUserIds,
                 specializations: doctor.specialization,
             },
             {

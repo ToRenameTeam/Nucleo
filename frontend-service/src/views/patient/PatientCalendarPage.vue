@@ -4,17 +4,17 @@ import { useAuth } from '../../composables/useAuth'
 import TagBar from '../../components/shared/TagBar.vue'
 import type { Tag } from '../../types/tag'
 import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue'
+import LoadingSpinner from '../../components/shared/LoadingSpinner.vue'
 import BaseCard from '../../components/shared/BaseCard.vue'
 import CardList from '../../components/shared/CardList.vue'
 import type { Appointment } from '../../types/appointment'
 import type { CardMetadata, CardAction } from '../../types/shared'
 import { CalendarIcon, ClockIcon, UserIcon, MapPinIcon, PencilIcon, XCircleIcon } from '@heroicons/vue/24/outline'
-import { TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/mockData'
 import { useI18n } from 'vue-i18n'
-import type { BadgeColors } from '../../types/document'
 import { appointmentsApi } from '../../api/appointments'
 import ScheduleModal from '../../components/shared/ScheduleModal.vue'
 import { formatCategory } from '../../utils/formatters'
+import { getBadgeColors, getBadgeIcon } from '../../utils/badgeHelpers'
 
 const { t } = useI18n()
 
@@ -59,15 +59,16 @@ const tags = computed<Tag[]>(() => {
   // Get unique categories from appointments
   const categoriesSet = new Set<string>()
   allAppointments.forEach(apt => {
-    if (apt.category) {
-      categoriesSet.add(apt.category)
+    if (apt.category && apt.category.length > 0) {
+      // Category is now an array, add each category
+      apt.category.forEach(cat => categoriesSet.add(cat))
     }
   })
   
   const categoryTags: Tag[] = Array.from(categoriesSet).map(category => ({
     id: category,
     label: formatCategory(category),
-    count: allAppointments.filter(a => a.category === category).length
+    count: allAppointments.filter(a => a.category && a.category.includes(category)).length
   }))
   
   return [
@@ -84,7 +85,7 @@ const filteredAppointments = computed(() => {
   if (selectedTag.value === 'all') {
     return allAppointments
   }
-  return allAppointments.filter(apt => apt.category === selectedTag.value)
+  return allAppointments.filter(apt => apt.category && apt.category.includes(selectedTag.value))
 })
 
 const currentAppointmentInfo = computed(() => {
@@ -202,38 +203,6 @@ function getAppointmentActions(): CardAction[] {
   ]
 }
 
-// Get badge colors for tags
-function getBadgeColors(tag: string): BadgeColors {
-  const normalizedTag = tag.toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-
-  const colorKey = TAG_COLOR_MAP[normalizedTag]
-
-  if (colorKey) {
-    return {
-      color: `var(--badge-${colorKey})`,
-      bgColor: `var(--badge-${colorKey}-bg)`,
-      borderColor: `var(--badge-${colorKey}-border)`
-    }
-  }
-
-  return {
-    color: 'var(--text-primary)',
-    bgColor: 'var(--bg-secondary-30)',
-    borderColor: 'var(--border-color)'
-  }
-}
-
-// Get badge icon for tags
-function getBadgeIcon(tag: string): string {
-  const normalizedTag = tag.toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-
-  return TAG_ICON_MAP[normalizedTag] || ''
-}
-
 // Get metadata for appointment card
 function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   const meta: CardMetadata[] = [
@@ -290,10 +259,11 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
         <h2 class="appointments-list-title">{{ $t('calendar.appointments') }}</h2>
         
         <!-- Loading State -->
-        <div v-if="isLoading" class="loading-state">
-          <div class="spinner"></div>
-          <p class="loading-text">{{ $t('calendar.loading') }}</p>
-        </div>
+        <LoadingSpinner 
+          v-if="isLoading" 
+          :message="$t('calendar.loading')" 
+          size="medium"
+        />
         
         <!-- Error State -->
         <div v-else-if="error" class="error-state">
@@ -315,18 +285,20 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
             :selected="selectedAppointmentId === appointment.id"
             @click="handleAppointmentClick(appointment.id)"
           >
-            <template v-if="appointment.category" #badges>
+            <template v-if="appointment.category && appointment.category.length > 0" #badges>
               <div class="badges-row">
                 <div 
+                  v-for="cat in appointment.category"
+                  :key="cat"
                   class="appointment-badge" 
                   :style="{
-                    color: getBadgeColors(appointment.category).color,
-                    backgroundColor: getBadgeColors(appointment.category).bgColor,
-                    borderColor: getBadgeColors(appointment.category).borderColor
+                    color: getBadgeColors(cat).color,
+                    backgroundColor: getBadgeColors(cat).bgColor,
+                    borderColor: getBadgeColors(cat).borderColor
                   }"
                 >
-                  <span class="badge-icon">{{ getBadgeIcon(appointment.category) }}</span>
-                  <span class="badge-label">{{ formatCategory(appointment.category) }}</span>
+                  <span class="badge-icon">{{ getBadgeIcon(cat) }}</span>
+                  <span class="badge-label">{{ formatCategory(cat) }}</span>
                 </div>
               </div>
             </template>
@@ -346,6 +318,8 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
       mode="select"
       :doctor-id="appointmentToReschedule.doctorId || ''"
       :current-appointment="currentAppointmentInfo"
+      title="patient.reschedule.title"
+      subtitle="patient.reschedule.subtitle"
       @close="isRescheduleModalOpen = false"
       @select-availability="handleSelectAvailability"
     />
@@ -514,40 +488,6 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
 .empty-state-text {
   color: var(--gray-525252);
   margin: 0;
-}
-
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 3rem;
-  text-align: center;
-  background: var(--white-15);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--white-20);
-  border-radius: 1rem;
-  box-shadow: 0 4px 16px var(--black-8);
-  gap: 1rem;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid var(--white-30);
-  border-top-color: var(--sky-0ea5e9);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-text {
-  color: var(--gray-525252);
-  margin: 0;
-  font-size: 1rem;
 }
 
 .error-state {

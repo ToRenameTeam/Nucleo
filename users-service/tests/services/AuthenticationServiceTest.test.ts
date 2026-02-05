@@ -60,8 +60,7 @@ describe('AuthenticationService', () => {
         };
 
         const mockPatientData: PatientData = {
-            userId,
-            activeDelegationIds: [],
+            userId
         };
 
         it('should authenticate patient-only user with correct credentials', async () => {
@@ -82,8 +81,7 @@ describe('AuthenticationService', () => {
             const mockDoctorData: DoctorData = {
                 userId,
                 medicalLicenseNumber: 'ML123456',
-                specializations: ['Cardiologia'],
-                assignedPatientUserIds: [],
+                specializations: ['Cardiologia']
             };
 
             mockUserRepository.findByFiscalCode.mockResolvedValue(mockUserData);
@@ -142,8 +140,7 @@ describe('AuthenticationService', () => {
         };
 
         const mockPatientData: PatientData = {
-            userId,
-            activeDelegationIds: ['delegation1', 'delegation2'],
+            userId
         };
 
         it('should return patient profile data when PATIENT is selected', async () => {
@@ -161,8 +158,7 @@ describe('AuthenticationService', () => {
                 dateOfBirth: new Date('1980-01-01'),
                 activeProfile: 'PATIENT',
                 patient: {
-                    userId,
-                    activeDelegationIds: ['delegation1', 'delegation2'],
+                    userId
                 },
             });
         });
@@ -171,8 +167,7 @@ describe('AuthenticationService', () => {
             const mockDoctorData: DoctorData = {
                 userId,
                 medicalLicenseNumber: 'ML123456',
-                specializations: ['Cardiologia', 'Medicina Interna'],
-                assignedPatientUserIds: ['patient1', 'patient2'],
+                specializations: ['Cardiologia', 'Medicina Interna']
             };
 
             mockUserRepository.findUserById.mockResolvedValue(mockUserData);
@@ -191,8 +186,7 @@ describe('AuthenticationService', () => {
                 doctor: {
                     userId,
                     medicalLicenseNumber: 'ML123456',
-                    specializations: ['Cardiologia', 'Medicina Interna'],
-                    assignedPatientUserIds: ['patient1', 'patient2'],
+                    specializations: ['Cardiologia', 'Medicina Interna']
                 },
             });
         });

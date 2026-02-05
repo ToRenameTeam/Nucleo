@@ -62,7 +62,6 @@ export class AuthenticationService {
                 ...baseData,
                 patient: {
                     userId: patientData.userId,
-                    activeDelegationIds: patientData.activeDelegationIds,
                 },
             };
         }
@@ -77,7 +76,6 @@ export class AuthenticationService {
                 userId: doctorData.userId,
                 medicalLicenseNumber: doctorData.medicalLicenseNumber,
                 specializations: doctorData.specializations,
-                assignedPatientUserIds: doctorData.assignedPatientUserIds,
             },
         };
     }
@@ -90,13 +88,12 @@ export class AuthenticationService {
             throw new Error('Patient profile not found. Data integrity issue.');
         }
 
-        const patient = Patient.reconstitute(toUUID(patientData.userId), patientData.activeDelegationIds);
+        const patient = Patient.reconstitute(toUUID(patientData.userId));
         const doctor = doctorData
             ? Doctor.reconstitute(
                 toUUID(doctorData.userId),
                 doctorData.medicalLicenseNumber,
-                doctorData.specializations,
-                doctorData.assignedPatientUserIds
+                doctorData.specializations
             )
             : null;
 
