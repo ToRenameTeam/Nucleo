@@ -105,6 +105,11 @@ const metadata = computed<CardMetadata[]>(() => {
       <!-- Slot for custom document details (e.g., prescription info) -->
       <slot name="details"></slot>
     </template>
+
+    <!-- Slot for actions -->
+    <template #actions>
+      <slot name="actions"></slot>
+    </template>
   </BaseCard>
 </template>
 

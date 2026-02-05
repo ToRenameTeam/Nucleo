@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuth } from '../../composables/useAuth'
-import { CheckCircleIcon } from '@heroicons/vue/24/outline'
+import { CheckCircleIcon, CalendarIcon } from '@heroicons/vue/24/outline'
 import SearchBar from '../../components/shared/SearchBar.vue'
 import TagBar from '../../components/shared/TagBar.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
@@ -11,11 +12,13 @@ import DateRangeFilter from '../../components/patient/documents/DateRangeFilter.
 import type { DateRange } from '../../types/date-range'
 import BatchActionsBar from '../../components/patient/documents/BatchActionsBar.vue'
 import type { Tag } from '../../types/tag'
-import type { Document } from '../../types/document'
+import type { Document, ServicePrescription, AnyDocument } from '../../types/document'
 import { parseItalianDate } from '../../utils/dateUtils'
 import { documentsApiService } from '../../api/documents'
+import { masterDataApi, type ServiceType } from '../../api/masterData'
 
 const { currentUser } = useAuth()
+const router = useRouter()
 
 const searchQuery = ref('')
 const selectedTags = ref<string[]>([])
@@ -33,7 +36,8 @@ const dateRange = ref<DateRange>({
   to: null
 })
 
-const documents = ref<Document[]>([])
+const documents = ref<AnyDocument[]>([])
+const serviceTypes = ref<ServiceType[]>([])
 
 const tags = computed<Tag[]>(() => [
   { id: 'tutti', label: 'Tutti', count: documents.value.length },
@@ -46,6 +50,11 @@ const tags = computed<Tag[]>(() => [
   { id: 'ortopedia', label: 'Ortopedia', count: documents.value.filter(d => d.tags.includes('Ortopedia')).length },
 ])
 
+// Type guard for ServicePrescription
+function isServicePrescription(doc: AnyDocument): doc is ServicePrescription {
+  return 'type' in doc && doc.type === 'service_prescription'
+}
+
 async function loadDocuments() {
   if (!currentUser.value?.userId) {
     console.log('[PatientDocumentsPage] No current user ID available')
@@ -55,12 +64,48 @@ async function loadDocuments() {
   isLoading.value = true
   
   try {
-    const fetchedDocuments = await documentsApiService.getDocumentsByPatient(currentUser.value.userId)
+    const [fetchedDocuments, fetchedServiceTypes] = await Promise.all([
+      documentsApiService.getDocumentsByPatient(currentUser.value.userId),
+      masterDataApi.getServiceTypes()
+    ])
     documents.value = fetchedDocuments
+    serviceTypes.value = fetchedServiceTypes
+    
+    // Debug: log documents to check structure
+    console.log('[PatientDocumentsPage] Total documents:', fetchedDocuments.length)
+    fetchedDocuments.forEach((doc, idx) => {
+      console.log(`[PatientDocumentsPage] Document ${idx}:`, {
+        id: doc.id,
+        title: doc.title,
+        type: 'type' in doc ? doc.type : 'NO TYPE FIELD',
+        hasType: 'type' in doc,
+        isServicePrescription: isServicePrescription(doc)
+      })
+    })
   } catch (err) {
     console.error('[PatientDocumentsPage] Error loading documents:', err)
   } finally {
     isLoading.value = false
+  }
+}
+
+// Get service type name from serviceId
+function getServiceTypeName(serviceId: string): string | null {
+  const service = serviceTypes.value.find(st => st._id === serviceId)
+  return service?.name || null
+}
+
+// Handle booking button click for service prescription
+function handleBookVisit(doc: ServicePrescription) {
+  const serviceName = getServiceTypeName(doc.serviceId)
+  if (serviceName) {
+    // Navigate to home with booking modal state
+    router.push({
+      name: 'patient-home',
+      query: {
+        bookVisit: serviceName
+      }
+    })
   }
 }
 
@@ -281,7 +326,14 @@ const handleCloseModal = () => {
         :selected="selectedDocumentIds.has(doc.id)"
         @click="handleDocumentClick(doc)"
         @toggle-select="() => toggleDocumentSelection(doc.id)"
-      />
+      >
+        <template #actions v-if="isServicePrescription(doc) && !selectionMode">
+          <button class="book-visit-btn" @click.stop="handleBookVisit(doc)">
+            <CalendarIcon class="book-icon" />
+            <span>{{ $t('documents.bookVisit') }}</span>
+          </button>
+        </template>
+      </DocumentCard>
     </CardList>
 
     <!-- Empty State -->
@@ -612,4 +664,50 @@ const handleCloseModal = () => {
     font-size: 1.375rem;
   }
 }
-</style>
+/* Book Visit Button */
+.book-visit-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+  box-shadow: 0 4px 12px var(--accent-primary-40);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+.book-visit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-primary-40);
+  filter: brightness(1.1);
+}
+
+.book-visit-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 10px var(--accent-primary-30);
+}
+
+.book-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .book-visit-btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+  }
+  
+  .book-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}</style>

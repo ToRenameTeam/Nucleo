@@ -81,14 +81,14 @@ export interface DocumentResponse {
 }
 
 export interface MedicinePrescriptionResponse extends DocumentResponse {
-  type: 'medicine_prescription'
+  _t: 'medicine_prescription'
   title: string
   validity: Validity
   dosage: Dosage
 }
 
 export interface ServicePrescriptionResponse extends DocumentResponse {
-  type: 'service_prescription'
+  _t: 'service_prescription'
   title: string
   validity: Validity
   serviceId: string
@@ -97,7 +97,7 @@ export interface ServicePrescriptionResponse extends DocumentResponse {
 }
 
 export interface ReportResponse extends DocumentResponse {
-  type: 'report'
+  _t: 'report'
   title: string
   servicePrescription: ServicePrescriptionResponse
   executionDate: string
@@ -108,7 +108,7 @@ export interface ReportResponse extends DocumentResponse {
 }
 
 export interface UploadedDocumentResponse extends DocumentResponse {
-  type: 'uploaded_document'
+  _t: 'uploaded_document'
   title: string
   filename: string
   documentType: string
@@ -149,9 +149,15 @@ export interface UploadProgressEvent {
 
 // Helper functions
 function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {  
+  console.log('[Documents API] Mapping document response:', {
+    id: response.id,
+    _t: response._t,
+    title: response.title
+  })
+  
   const baseDocument: Document = {
     id: response.id,
-    title: response.title || getDocumentTypeLabel(response.type),
+    title: response.title || getDocumentTypeLabel(response._t),
     description: response.metadata.summary || '--',
     date: response.issueDate,
     tags: response.metadata.tags || [],
@@ -160,7 +166,7 @@ function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {
   }
   
   // Map to specific document types
-  switch (response.type) {
+  switch (response._t) {
     case 'medicine_prescription': {
       const medicinePrescription: MedicinePrescription = {
         ...baseDocument,
@@ -168,6 +174,7 @@ function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {
         validity: response.validity,
         dosage: response.dosage
       }
+      console.log('[Documents API] Mapped as MedicinePrescription')
       return medicinePrescription
     }
     
@@ -180,6 +187,7 @@ function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {
         facilityId: response.facilityId,
         priority: response.priority
       }
+      console.log('[Documents API] Mapped as ServicePrescription with serviceId:', response.serviceId)
       return servicePrescription
     }
     

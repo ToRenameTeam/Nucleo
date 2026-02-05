@@ -67,6 +67,7 @@
     "searchPlaceholder": "Search documents, symptoms, doctors...",
     "noResults": "No documents found",
     "close": "Close",
+    "bookVisit": "Book visit",
     "selectDocument": "Select Document",
     "selection": {
       "selectMode": "Select documents",

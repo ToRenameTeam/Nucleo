@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '../../composables/useAuth'
 import { DocumentPlusIcon, PlusIcon, CalendarIcon, ClockIcon, UserIcon, MapPinIcon } from '@heroicons/vue/24/outline'
 import Toast from '../../components/shared/Toast.vue'
@@ -24,6 +25,8 @@ import type { UploadProgressEvent, UploadProgressEventType } from '../../api/doc
 
 useI18n()
 const { currentUser } = useAuth()
+const router = useRouter()
+const route = useRoute()
 
 const appointmentsData = ref<Appointment[]>([])
 const documentsData = ref<Document[]>([])
@@ -99,6 +102,27 @@ async function loadData() {
 
 onMounted(() => {
   loadData()
+  
+  // Check if we should open booking modal with preselected visit
+  if (route.query.bookVisit) {
+    const visitName = route.query.bookVisit as string
+    preselectedVisitType.value = visitName
+    isBookingModalOpen.value = true
+    
+    // Clear query param from URL
+    router.replace({ query: {} })
+  }
+})
+
+// Watch for route changes (when navigating to home from other pages)
+watch(() => route.query.bookVisit, (visitName) => {
+  if (visitName && typeof visitName === 'string') {
+    preselectedVisitType.value = visitName
+    isBookingModalOpen.value = true
+    
+    // Clear query param from URL
+    router.replace({ query: {} })
+  }
 })
 
 const handleUpload = () => {
