@@ -25,8 +25,10 @@ const presets = computed(() => [
     label: t('documents.dateRange.lastMonth'),
     getDates: () => {
       const to = new Date()
+      to.setHours(23, 59, 59, 999)
       const from = new Date()
       from.setMonth(from.getMonth() - 1)
+      from.setHours(0, 0, 0, 0)
       return { from, to }
     }
   },
@@ -35,8 +37,10 @@ const presets = computed(() => [
     label: t('documents.dateRange.last3Months'),
     getDates: () => {
       const to = new Date()
+      to.setHours(23, 59, 59, 999)
       const from = new Date()
       from.setMonth(from.getMonth() - 3)
+      from.setHours(0, 0, 0, 0)
       return { from, to }
     }
   },
@@ -45,8 +49,10 @@ const presets = computed(() => [
     label: t('documents.dateRange.last6Months'),
     getDates: () => {
       const to = new Date()
+      to.setHours(23, 59, 59, 999)
       const from = new Date()
       from.setMonth(from.getMonth() - 6)
+      from.setHours(0, 0, 0, 0)
       return { from, to }
     }
   },
@@ -55,8 +61,10 @@ const presets = computed(() => [
     label: t('documents.dateRange.lastYear'),
     getDates: () => {
       const to = new Date()
+      to.setHours(23, 59, 59, 999)
       const from = new Date()
       from.setFullYear(from.getFullYear() - 1)
+      from.setHours(0, 0, 0, 0)
       return { from, to }
     }
   }
@@ -117,8 +125,16 @@ const applyPreset = (preset: typeof presets.value[0]) => {
 
 const applyCustomRange = () => {
   const range: DateRange = {
-    from: fromDate.value ? new Date(fromDate.value) : null,
-    to: toDate.value ? new Date(toDate.value) : null
+    from: fromDate.value ? (() => {
+      const date = new Date(fromDate.value)
+      date.setHours(0, 0, 0, 0)
+      return date
+    })() : null,
+    to: toDate.value ? (() => {
+      const date = new Date(toDate.value)
+      date.setHours(23, 59, 59, 999)
+      return date
+    })() : null
   }
   emit('update:modelValue', range)
   showPicker.value = false

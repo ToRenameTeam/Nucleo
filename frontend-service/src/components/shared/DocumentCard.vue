@@ -89,7 +89,7 @@ const metadata = computed<CardMetadata[]>(() => {
     <template #badges>
       <div class="badges-row">
         <div 
-          v-for="tag in document.tags.slice(0, 2)" 
+          v-for="tag in document.tags.slice(0, 5)" 
           :key="tag" 
           class="document-badge" 
           :style="{

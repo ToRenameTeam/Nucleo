@@ -41,13 +41,13 @@ const serviceTypes = ref<ServiceType[]>([])
 
 const tags = computed<Tag[]>(() => [
   { id: 'tutti', label: 'Tutti', count: documents.value.length },
-  { id: 'prescrizione', label: 'Prescrizione', count: documents.value.filter(d => d.tags.includes('Prescrizione')).length },
-  { id: 'diabete', label: 'Diabete', count: documents.value.filter(d => d.tags.includes('Diabete')).length },
-  { id: 'cardiologia', label: 'Cardiologia', count: documents.value.filter(d => d.tags.includes('Cardiologia')).length },
-  { id: 'analisi', label: 'Analisi', count: documents.value.filter(d => d.tags.includes('Analisi')).length },
-  { id: 'diagnostica', label: 'Diagnostica', count: documents.value.filter(d => d.tags.includes('Diagnostica')).length },
-  { id: 'oculistica', label: 'Oculistica', count: documents.value.filter(d => d.tags.includes('Oculistica')).length },
-  { id: 'ortopedia', label: 'Ortopedia', count: documents.value.filter(d => d.tags.includes('Ortopedia')).length },
+  { id: 'prescrizione', label: 'Prescrizione', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'prescrizione')).length },
+  { id: 'diabete', label: 'Diabete', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'diabete')).length },
+  { id: 'cardiologia', label: 'Cardiologia', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'cardiologia')).length },
+  { id: 'analisi', label: 'Analisi', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'analisi')).length },
+  { id: 'diagnostica', label: 'Diagnostica', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'diagnostica')).length },
+  { id: 'oculistica', label: 'Oculistica', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'oculistica')).length },
+  { id: 'ortopedia', label: 'Ortopedia', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'ortopedia')).length },
 ])
 
 // Type guard for ServicePrescription
@@ -141,15 +141,26 @@ const filteredDocuments = computed(() => {
       const docDate = parseItalianDate(doc.date)
       if (!docDate) return false
 
+      // Set docDate to start of day for accurate comparison
+      docDate.setHours(0, 0, 0, 0)
+
       const from = dateRange.value.from
       const to = dateRange.value.to
 
       if (from && to) {
-        return docDate >= from && docDate <= to
+        const fromCompare = new Date(from)
+        fromCompare.setHours(0, 0, 0, 0)
+        const toCompare = new Date(to)
+        toCompare.setHours(23, 59, 59, 999)
+        return docDate >= fromCompare && docDate <= toCompare
       } else if (from) {
-        return docDate >= from
+        const fromCompare = new Date(from)
+        fromCompare.setHours(0, 0, 0, 0)
+        return docDate >= fromCompare
       } else if (to) {
-        return docDate <= to
+        const toCompare = new Date(to)
+        toCompare.setHours(23, 59, 59, 999)
+        return docDate <= toCompare
       }
       return true
     })
