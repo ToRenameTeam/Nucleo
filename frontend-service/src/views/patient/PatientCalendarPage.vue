@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useAuth } from '../../composables/useAuth'
 import TagBar from '../../components/shared/TagBar.vue'
 import type { Tag } from '../../types/tag'
@@ -18,7 +18,7 @@ import { getBadgeColors, getBadgeIcon } from '../../utils/badgeHelpers'
 
 const { t } = useI18n()
 
-const { currentUser } = useAuth()
+const { currentUser, currentPatientProfile } = useAuth()
 
 const appointments = ref<Appointment[]>([])
 const isLoading = ref(false)
@@ -27,8 +27,10 @@ const isRescheduleModalOpen = ref(false)
 const appointmentToReschedule = ref<Appointment | null>(null)
 
 async function loadAppointments() {
-  if (!currentUser.value?.userId) {
-    console.log('[PatientCalendarPage] No current user ID available')
+  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId
+
+  if (!patientId) {
+    console.log('[PatientCalendarPage] No patient ID available')
     return
   }
 
@@ -36,8 +38,8 @@ async function loadAppointments() {
   error.value = null
   
   try {
-    console.log('[PatientCalendarPage] Fetching appointments for patient:', currentUser.value.userId)
-    const data = await appointmentsApi.getAppointmentsByPatient(currentUser.value.userId)
+    console.log('[PatientCalendarPage] Fetching appointments for patient:', patientId)
+    const data = await appointmentsApi.getAppointmentsByPatient(patientId)
     // Filter only appointments with SCHEDULED status
     appointments.value = data.filter(apt => apt.status === 'SCHEDULED')
     console.log('[PatientCalendarPage] Loaded appointments:', data.length, 'Scheduled:', appointments.value.length)
@@ -50,6 +52,11 @@ async function loadAppointments() {
 }
 
 onMounted(() => {
+  loadAppointments()
+})
+
+// Watch for changes in patient profile
+watch(() => currentPatientProfile.value?.userId, () => {
   loadAppointments()
 })
 

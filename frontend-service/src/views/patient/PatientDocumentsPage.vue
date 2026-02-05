@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../../composables/useAuth'
 import { CheckCircleIcon, CalendarIcon } from '@heroicons/vue/24/outline'
@@ -17,7 +17,7 @@ import { parseItalianDate } from '../../utils/dateUtils'
 import { documentsApiService } from '../../api/documents'
 import { masterDataApi, type ServiceType } from '../../api/masterData'
 
-const { currentUser } = useAuth()
+const { currentUser, currentPatientProfile } = useAuth()
 const router = useRouter()
 
 const searchQuery = ref('')
@@ -56,8 +56,10 @@ function isServicePrescription(doc: AnyDocument): doc is ServicePrescription {
 }
 
 async function loadDocuments() {
-  if (!currentUser.value?.userId) {
-    console.log('[PatientDocumentsPage] No current user ID available')
+  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId
+
+  if (!patientId) {
+    console.log('[PatientDocumentsPage] No patient ID available')
     return
   }
 
@@ -65,7 +67,7 @@ async function loadDocuments() {
   
   try {
     const [fetchedDocuments, fetchedServiceTypes] = await Promise.all([
-      documentsApiService.getDocumentsByPatient(currentUser.value.userId),
+      documentsApiService.getDocumentsByPatient(patientId),
       masterDataApi.getServiceTypes()
     ])
     documents.value = fetchedDocuments
@@ -111,6 +113,14 @@ function handleBookVisit(doc: ServicePrescription) {
 
 onMounted(() => {
   loadDocuments()
+})
+
+// Watch for changes in patient profile
+watch(() => currentPatientProfile.value?.userId, () => {
+  loadDocuments()
+  // Reset selection when changing profile
+  selectionMode.value = false
+  selectedDocumentIds.value.clear()
 })
 
 const filteredDocuments = computed(() => {
@@ -234,7 +244,9 @@ const deselectAll = () => {
 }
 
 const handleDownloadAll = async () => {
-  if (selectedDocuments.value.length === 0 || !currentUser.value?.userId) {
+  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId
+
+  if (selectedDocuments.value.length === 0 || !patientId) {
     return
   }
 
@@ -242,7 +254,7 @@ const handleDownloadAll = async () => {
     console.log('[PatientDocumentsPage] Downloading', selectedDocuments.value.length, 'documents')
 
     const documentsToDownload = selectedDocuments.value.map(doc => ({
-      patientId: currentUser.value!.userId,
+      patientId: patientId,
       documentId: doc.id,
       title: doc.title
     }))
@@ -504,7 +516,7 @@ const handleCloseModal = () => {
   .filters-row {
     flex-direction: column;
   }
-  
+
   .filters-row > * {
     width: 100%;
   }
@@ -566,7 +578,7 @@ const handleCloseModal = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, var(--sky-0ea5e9-20) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, var(--purple-a855f7-20) 0%, transparent 50%);
   pointer-events: none;
@@ -716,7 +728,7 @@ const handleCloseModal = () => {
     padding: 0.625rem 1rem;
     font-size: 0.8125rem;
   }
-  
+
   .book-icon {
     width: 1rem;
     height: 1rem;

@@ -24,7 +24,7 @@ import { useI18n } from 'vue-i18n'
 import type { UploadProgressEvent, UploadProgressEventType } from '../../api/documents'
 
 useI18n()
-const { currentUser } = useAuth()
+const { currentUser, currentPatientProfile } = useAuth()
 const router = useRouter()
 const route = useRoute()
 
@@ -91,8 +91,10 @@ const uploadError = ref<string | null>(null)
 const uploadingFilename = ref<string>('')
 
 async function loadData() {
-  if (!currentUser.value?.userId) {
-    console.log('[PatientHomePage] No current user ID available')
+  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId
+
+  if (!patientId) {
+    console.log('[PatientHomePage] No patient ID available')
     return
   }
 
@@ -100,8 +102,8 @@ async function loadData() {
   
   try {
     const [fetchedAppointments, fetchedDocuments] = await Promise.all([
-      appointmentsApi.getAppointmentsByPatient(currentUser.value.userId),
-      documentsApiService.getDocumentsByPatient(currentUser.value.userId)
+      appointmentsApi.getAppointmentsByPatient(patientId ),
+      documentsApiService.getDocumentsByPatient(patientId)
     ])
     
     appointmentsData.value = fetchedAppointments
@@ -125,6 +127,11 @@ onMounted(() => {
     // Clear query param from URL
     router.replace({ query: {} })
   }
+})
+
+// Watch for changes in patient profile
+watch(() => currentPatientProfile.value?.userId, () => {
+  loadData()
 })
 
 // Watch for route changes (when navigating to home from other pages)
@@ -176,7 +183,9 @@ const handleFileSelected = (event: Event) => {
 }
 
 const handleUploadConfirm = async () => {
-  if (!selectedFile.value || !currentUser.value?.userId) return
+  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId
+
+  if (!selectedFile.value || !patientId) return
 
   // Save filename before clearing selectedFile
   uploadingFilename.value = selectedFile.value.name
@@ -194,12 +203,12 @@ const handleUploadConfirm = async () => {
 
   try {
     await documentsApiService.uploadDocumentWithProgress(
-      currentUser.value.userId,
-      fileToUpload,
-      (event: UploadProgressEvent) => {
-        console.log('[PatientHomePage] Upload progress:', event.type, event.data)
-        uploadProgress.value = event.type
-      }
+        patientId,
+        fileToUpload,
+        (event: UploadProgressEvent) => {
+          console.log('[PatientHomePage] Upload progress:', event.type, event.data)
+          uploadProgress.value = event.type
+        }
     )
 
     // Success - reload documents
@@ -249,11 +258,13 @@ function handleCloseBooking() {
 }
 
 async function handleBookingConfirmed(availabilityId: string) {
-  if (!currentUser.value?.userId) return
-  
+  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId
+
+  if (!patientId) return
+
   try {
-    await appointmentsApi.createAppointment(currentUser.value.userId, availabilityId)
-    
+    await appointmentsApi.createAppointment(patientId, availabilityId)
+
     toastMessage.value = 'toast.bookingConfirmed'
     toastType.value = 'success'
     showSuccessToast.value = true
