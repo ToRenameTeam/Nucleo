@@ -53,7 +53,7 @@ const menuOptions = computed<MenuOption[]>(() => [
   {
     id: 'received',
     title: t('delegations.menu.receivedDelegations.title'),
-    subtitle: t('delegations.menu.receivedDelegations.subtitle'),
+    subtitle: t('delegations.menu.receivedDelegations.subtitle', { count: receivedCount.value }),
     icon: InboxArrowDownIcon,
     action: () => emit('received-delegations'),
     badge: receivedCount.value > 0 ? receivedCount.value : undefined
@@ -61,7 +61,7 @@ const menuOptions = computed<MenuOption[]>(() => [
   {
     id: 'sent',
     title: t('delegations.menu.sentDelegations.title'),
-    subtitle: t('delegations.menu.sentDelegations.subtitle'),
+    subtitle: t('delegations.menu.sentDelegations.subtitle', { count: sentCount.value }),
     icon: PaperAirplaneIcon,
     action: () => emit('sent-delegations'),
     badge: sentCount.value > 0 ? sentCount.value : undefined
