@@ -8,12 +8,15 @@ import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.v
 import BaseCard from '../../components/shared/BaseCard.vue'
 import CardList from '../../components/shared/CardList.vue'
 import ScheduleModal from '../../components/shared/ScheduleModal.vue'
-import CreateDocumentModal from '../../components/doctor/CreateDocumentModal.vue'
+import UploadDocumentModal from '../../components/patient/documents/UploadDocumentModal.vue'
+import UploadProgressModal from '../../components/patient/documents/UploadProgressModal.vue'
 import Toast from '../../components/shared/Toast.vue'
 import type { Tag } from '../../types/tag'
 import type { Appointment } from '../../types/appointment'
 import type { CardMetadata } from '../../types/shared'
 import { appointmentsApi } from '../../api/appointments'
+import { documentsApiService } from '../../api/documents'
+import type { UploadProgressEvent, UploadProgressEventType } from '../../api/documents'
 import { TAG_COLOR_MAP } from '../../constants/categoryBadgeConfig'
 import type { BadgeColors } from '../../types/document'
 
@@ -31,9 +34,15 @@ const selectedTag = ref('scheduled')
 const isRescheduleModalOpen = ref(false)
 const appointmentToReschedule = ref<Appointment | null>(null)
 
-// Document modal state
-const isCreateDocumentModalOpen = ref(false)
+// Document upload state
 const appointmentForDocument = ref<Appointment | null>(null)
+const isUploadModalOpen = ref(false)
+const isUploadProgressModalOpen = ref(false)
+const selectedFile = ref<File | null>(null)
+const fileInputRef = ref<HTMLInputElement | null>(null)
+const uploadProgress = ref<UploadProgressEventType | null>(null)
+const uploadError = ref<string | null>(null)
+const uploadingFilename = ref<string>('')
 
 // Toast state
 const showToast = ref(false)
@@ -298,19 +307,108 @@ async function handleSelectAvailability(availabilityId: string) {
 
 // Document management
 function handleAddDocument(appointment: Appointment) {
+  if (!appointment.patientId) {
+    showToastMessage(t('doctor.appointments.errors.noPatientId'), 'error')
+    return
+  }
   appointmentForDocument.value = appointment
-  isCreateDocumentModalOpen.value = true
+  // Trigger file input click
+  fileInputRef.value?.click()
 }
 
-function handleDocumentCreated(documentId: string) {
-  isCreateDocumentModalOpen.value = false
-  appointmentForDocument.value = null
-  showToastMessage(`Document created successfully (ID: ${documentId})`, 'success')
+function handleFileSelected(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0] || null
+  
+  if (!file) return
+  
+  // Validate file type (PDF only)
+  if (file.type !== 'application/pdf') {
+    toastMessage.value = 'upload.invalidFileType'
+    toastType.value = 'error'
+    showToast.value = true
+    return
+  }
+  
+  // Validate file size (max 10MB)
+  const maxSize = 10 * 1024 * 1024 // 10MB in bytes
+  if (file.size > maxSize) {
+    toastMessage.value = 'upload.fileTooLarge'
+    toastType.value = 'error'
+    showToast.value = true
+    return
+  }
+  
+  selectedFile.value = file
+  isUploadModalOpen.value = true
+  
+  // Reset input value to allow re-selecting the same file
+  if (target) {
+    target.value = ''
+  }
 }
 
-function closeDocumentModal() {
-  isCreateDocumentModalOpen.value = false
+const handleUploadConfirm = async () => {
+  const patientId = appointmentForDocument.value?.patientId
+  if (!selectedFile.value || !patientId) return
+  
+  // Save filename before clearing selectedFile
+  uploadingFilename.value = selectedFile.value.name
+  
+  // Close the confirmation modal
+  isUploadModalOpen.value = false
+  
+  // Open the progress modal
+  isUploadProgressModalOpen.value = true
+  uploadProgress.value = null
+  uploadError.value = null
+  
+  const fileToUpload = selectedFile.value
+  selectedFile.value = null
+  
+  try {
+    await documentsApiService.uploadDocumentWithProgress(
+      patientId,
+      fileToUpload,
+      (event: UploadProgressEvent) => {
+        console.log('[DoctorAppointmentsPage] Upload progress:', event.type, event.data)
+        uploadProgress.value = event.type
+      }
+    )
+    
+    // Success - show success toast
+    toastMessage.value = 'upload.success'
+    toastType.value = 'success'
+    showToast.value = true
+  } catch (error: any) {
+    console.error('[DoctorAppointmentsPage] Error uploading document:', error)
+    // Set error in progress modal
+    if (error.message && error.message.includes('does not appear to be a medical document')) {
+      uploadError.value = 'upload.nonMedicalDocument'
+    } else {
+      uploadError.value = error.message || 'upload.error'
+    }
+    
+    // Also show error toast after closing progress modal
+    toastMessage.value = uploadError.value || 'upload.error'
+    toastType.value = 'error'
+  }
+}
+
+const handleUploadCancel = () => {
+  isUploadModalOpen.value = false
+  selectedFile.value = null
   appointmentForDocument.value = null
+}
+
+const handleUploadProgressClose = () => {
+  isUploadProgressModalOpen.value = false
+  appointmentForDocument.value = null
+  
+  // If there was an error, show toast
+  if (uploadError.value) {
+    showToast.value = true
+  }
 }
 
 // Toast helper
@@ -565,14 +663,30 @@ onMounted(() => {
       @select-availability="handleSelectAvailability"
     />
 
-    <!-- Create Document Modal -->
-    <CreateDocumentModal
-      v-if="appointmentForDocument"
-      :is-open="isCreateDocumentModalOpen"
-      :patient-id="appointmentForDocument.patientId || 'unknown'"
-      :appointment-id="appointmentForDocument.id"
-      @close="closeDocumentModal"
-      @document-created="handleDocumentCreated"
+    <!-- Hidden file input -->
+    <input
+      ref="fileInputRef"
+      type="file"
+      accept="application/pdf"
+      style="display: none"
+      @change="handleFileSelected"
+    />
+
+    <!-- Upload Document Modal -->
+    <UploadDocumentModal
+      :is-open="isUploadModalOpen"
+      :file="selectedFile"
+      @close="handleUploadCancel"
+      @confirm="handleUploadConfirm"
+    />
+
+    <!-- Upload Progress Modal -->
+    <UploadProgressModal
+      :is-open="isUploadProgressModalOpen"
+      :current-step="uploadProgress"
+      :error="uploadError"
+      :filename="uploadingFilename"
+      @close="handleUploadProgressClose"
     />
 
     <!-- Toast Notification -->
