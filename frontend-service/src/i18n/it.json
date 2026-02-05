@@ -208,6 +208,8 @@
       "fullName": "Nome completo",
       "fiscalCode": "Codice fiscale",
       "dateOfBirth": "Data di nascita",
+      "medicalLicense": "Numero iscrizione all'albo",
+      "specializations": "Specializzazioni",
       "noData": "Nessun dato disponibile",
       "delegatedAccess": "Stai visualizzando i dati di"
     },
@@ -556,8 +558,11 @@
           "validUntilExecution": "Fino ad esecuzione"
         }
       }
-  }
-},
+    },
+    "settings":{
+
+    }
+  },
   "common": {
     "loading": "Caricamento...",
     "retry": "Riprova",

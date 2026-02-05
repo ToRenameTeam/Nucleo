@@ -16,7 +16,7 @@ const selectDoctor = () => {
     })
 
   setProfile({
-    id: currentUser.value.userId,
+    userId: currentUser.value.userId,
     name: currentUser.value.name,
     lastName: currentUser.value.lastName,
     fiscalCode: currentUser.value.fiscalCode,

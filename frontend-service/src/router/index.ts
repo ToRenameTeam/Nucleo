@@ -33,7 +33,8 @@ const routes: RouteRecordRaw[] = [
     path: '/patient',
     component: () => import('../views/layouts/PatientLayout.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiredProfile: 'PATIENT'
     },
     children: [
       {
@@ -58,7 +59,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'settings',
         name: 'patient-settings',
-        component: () => import('../views/patient/SettingsPage.vue')
+        component: () => import('../views/patient/PatientSettingsPage.vue')
       }
     ]
   },
@@ -66,7 +67,8 @@ const routes: RouteRecordRaw[] = [
     path: '/doctor',
     component: () => import('../views/layouts/DoctorLayout.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiredProfile: 'DOCTOR'
     },
     children: [
       {
@@ -96,7 +98,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'settings',
         name: 'doctor-settings',
-        component: () => import('../views/doctor/DoctorHomePage.vue') // Placeholder - sarà creato dopo
+        component: () => import('../views/doctor/DoctorSettingsPage.vue') 
       }
     ]
   }
@@ -107,21 +109,38 @@ const router = createRouter({
   routes
 })
 
-// Navigation guard to protect routes that require authentication
+const getHomePageForProfile = (profile: 'PATIENT' | 'DOCTOR' | undefined): string => {
+  if (profile === 'DOCTOR') return '/doctor/appointments'
+  if (profile === 'PATIENT') return '/patient/home'
+  return '/login'
+}
+
+// Navigation guard to protect routes that require authentication and correct profile
 router.beforeEach((to, _, next) => {
-  const { isAuthenticated } = useAuth()
-  
-  // Determine if the route requires authentication
+  const { isAuthenticated, currentUser } = useAuth()
+  const activeProfile = currentUser.value?.activeProfile
   const requiresAuth = to.meta.requiresAuth !== false
+  const requiredProfile = to.meta.requiredProfile as 'PATIENT' | 'DOCTOR' | undefined
   
-  // If the route requires auth and the user is not authenticated, redirect to login
+  // Redirect to login if authentication is required but user is not authenticated
   if (requiresAuth && !isAuthenticated.value) {
     next('/login')
-  } else if (to.path === '/login' && isAuthenticated.value) {
-    next('/patient/home')
-  } else {
-    next()
+    return
   }
+  
+  // Redirect authenticated users away from login page
+  if (to.path === '/login' && isAuthenticated.value) {
+    next(getHomePageForProfile(activeProfile))
+    return
+  }
+  
+  // Verify profile matches the required section
+  if (requiredProfile && activeProfile !== requiredProfile) {
+    next(getHomePageForProfile(activeProfile))
+    return
+  }
+  
+  next()
 })
 
 export default router

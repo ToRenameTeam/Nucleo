@@ -3,10 +3,11 @@ import { ref, computed } from 'vue'
 import { useAuth } from '../../composables/useAuth'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import SettingsItem from '../../components/patient/settings/SettingsItem.vue'
+import type { Profile } from '../../types/auth'
+import SettingsItem from '../../components/shared/SettingsItem.vue'
 import BaseModal from '../../components/shared/BaseModal.vue'
 import ProfileViewModal from '../../components/shared/ProfileViewModal.vue'
-import AppearanceSettings from '../../components/patient/settings/AppearanceSettings.vue'
+import AppearanceSettings from '../../components/shared/AppearanceSettings.vue'
 import {
   UserCircleIcon,
   BellIcon,
@@ -19,43 +20,46 @@ const { t } = useI18n()
 const router = useRouter()
 const showAppearanceModal = ref(false)
 const showProfileModal = ref(false)
-const { currentPatientProfile, currentUser } = useAuth()
+const { currentUser, logout: authLogout } = useAuth()
+
+// Mappa currentUser a Profile per il modal
+const doctorProfile = computed<Profile | null>(() => {
+  if (!currentUser.value) return null
+  return {
+    userId: currentUser.value.userId,
+    name: currentUser.value.name,
+    lastName: currentUser.value.lastName,
+    fiscalCode: currentUser.value.fiscalCode,
+    dateOfBirth: currentUser.value.dateOfBirth,
+    medicalLicenseNumber: currentUser.value.doctor?.medicalLicenseNumber,
+    specializations: currentUser.value.doctor?.specializations
+  }
+})
 
 const handleItemClick = (item: string) => {
   if (item === 'appearance') {
     showAppearanceModal.value = true
   } else if (item === 'myProfile') {
     showProfileModal.value = true
+  } else if (item === 'logout') {
+    logout()
   } else {
     console.log('Clicked:', item)
   }
 }
 
-function handleChangeProfile() {
-  router.push('/patient-choice')
+const logout = () => {
+  authLogout()
+  router.push('/login')
 }
 
 const displayUserName = computed(() => {
-  if (!currentUser.value || !currentPatientProfile.value) {
+  if (!currentUser.value) {
     return t('topbar.user')
   }
-  if (currentUser.value.fiscalCode === currentPatientProfile.value.fiscalCode) {
-    return currentPatientProfile.value.name
-  }
-  return `${currentUser.value.name} @ ${currentPatientProfile.value.name}`
+  return `${currentUser.value.name} ${currentUser.value.lastName}`
 })
 
-const isDelegatedProfile = computed(() => {
-  if (!currentUser.value || !currentPatientProfile.value) return false
-  return currentUser.value.fiscalCode !== currentPatientProfile.value.fiscalCode
-})
-
-const delegatorName = computed(() => {
-  if (!isDelegatedProfile.value || !currentUser.value) return undefined
-  return currentUser.value.lastName 
-    ? `${currentUser.value.name} ${currentUser.value.lastName}`
-    : currentUser.value.name
-})
 </script>
 
 <template>
@@ -77,9 +81,6 @@ const delegatorName = computed(() => {
         <div class="settings-account-info">
           <div class="settings-account-name">{{ displayUserName }}</div>
         </div>
-        <button class="settings-account-button" @click="handleChangeProfile">
-          {{ t('settings.account.changeProfile') }}
-        </button>
       </div>
     </div>
 
@@ -140,10 +141,8 @@ const delegatorName = computed(() => {
     <!-- Modal Profilo -->
     <ProfileViewModal 
       :is-open="showProfileModal" 
-      :profile-data="currentPatientProfile"
+      :profile-data="doctorProfile"
       :title="t('settings.profileFamily.myProfile.title')"
-      :is-delegated="isDelegatedProfile"
-      :delegated-by-name="delegatorName"
       @close="showProfileModal = false"
     />
   </div>

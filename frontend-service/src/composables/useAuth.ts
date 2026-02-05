@@ -25,12 +25,12 @@ const DEV_USER: AuthenticatedUser = {
   doctor: {
     userId: 'dev-user-001',
     medicalLicenseNumber: 'DEV123456',
-    specializations: ['Medicina Generale'],
+    specializations: ['Medicina Generale', 'Pediatria', 'Cardiologia'],
   }
 }
 
 const DEV_PROFILE: Profile = {
-  id: 'dev-profile-001',
+  userId: 'dev-profile-001',
   name: 'Dev',
   lastName: 'User',
   fiscalCode: 'DVLUSR00A01H501X',
