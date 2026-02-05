@@ -1,0 +1,655 @@
+{
+  "app": {
+    "title": "Nucleo"
+  },
+  "auth": {
+    "loginSubtitle": "Log in to your account",
+    "fiscalCode": "Fiscal Code",
+    "fiscalCodePlaceholder": "Enter your fiscal code",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "loginButton": "Log In",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "invalidCredentials": "Invalid fiscal code or password",
+    "loginError": "Error during login. Please try again.",
+    "networkError": "Connection error. Please check your connection."
+  },
+  "patientChoice": {
+    "subtitle": "Who is using the app?",
+    "loadingProfiles": "Loading profiles...",
+    "retry": "Retry",
+    "manageDelegations": "Manage Delegations"
+  },
+  "doctorPatientChoice": {
+    "subtitle": "How do you want to access today?",
+    "doctorArea": {
+      "title": "Doctor Area",
+      "description": "Manage visits, patients and prescriptions"
+    },
+    "patientArea": {
+      "title": "Patient Area",
+      "description": "Access your documents and appointments"
+    }
+  },
+  "topbar": {
+    "notifications": "Notifications",
+    "user": "Main User",
+    "languageSelectorAria": "Change language to {lang}",
+    "italianSelectedAria": "Italian language selected",
+    "selectItalianAria": "Select Italian language",
+    "englishSelectedAria": "English language selected",
+    "selectEnglishAria": "Select English language",
+    "userMenuAria": "User menu for {user}",
+    "userProfileAria": "Profile of {user}",
+    "unread": "unread",
+    "notification": "notification"
+  },
+  "userMenu": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "tabs": {
+    "home": "Home",
+    "documents": "Documents",
+    "calendar": "Calendar",
+    "appointments": "Appointments",
+    "settings": "Settings",
+    "patients": "Patients",
+    "availability": "Availability"
+  },
+  "tags": {
+    "all": "All",
+    "toRead": "To Read",
+    "folder": "Folder"
+  },
+  "documents": {
+    "title": "Document Archive",
+    "subtitle": "15 documents",
+    "searchPlaceholder": "Search documents, symptoms, doctors...",
+    "noResults": "No documents found",
+    "close": "Close",
+    "bookVisit": "Book visit",
+    "selectDocument": "Select Document",
+    "selection": {
+      "selectMode": "Select documents",
+      "cancel": "Cancel selection"
+    },
+    "batch": {
+      "documentSelected": "document selected",
+      "documentsSelected": "documents selected",
+      "all": "All",
+      "downloadAll": "Download all",
+      "deselectAll": "Deselect all"
+    },
+    "dateRange": {
+      "selectRange": "Filter by date",
+      "from": "From",
+      "to": "To",
+      "quickSelect": "Quick select",
+      "customRange": "Custom range",
+      "apply": "Apply",
+      "lastMonth": "Last month",
+      "last3Months": "Last 3 months",
+      "last6Months": "Last 6 months",
+      "lastYear": "Last year",
+      "clearRange": "Clear filter"
+    },
+    "viewer": {
+      "title": "Compare Documents",
+      "subtitle": "Select two different documents to compare",
+      "selectDocument": "Select document",
+      "availableDocuments": "Available documents",
+      "selectPlaceholder": "Select a document",
+      "page": "Page {current} of {total}",
+      "date": "Date:",
+      "doctor": "Doctor:",
+      "hospital": "Hospital:",
+      "description": "Description:",
+      "tags": "Tags:",
+      "close": "Close"
+    },
+    "tags": {
+      "all": "All",
+      "toRead": "To Read",
+      "cardiology": "Cardiology"
+    }
+  },
+  "calendar": {
+    "title": "Calendar",
+    "subtitle": "Your family's shared calendar",
+    "appointments": "Appointments",
+    "noAppointments": "No appointments found",
+    "loading": "Loading appointments...",
+    "retry": "Retry",
+    "today": "Today",
+    "month": "Month",
+    "week": "Week",
+    "errors": {
+      "loadingAppointments": "Error loading appointments",
+      "appointmentNotFound": "Appointment not found",
+      "loadingDetails": "Error loading appointment details",
+      "cancellingAppointment": "Error cancelling appointment",
+      "reschedulingAppointment": "Error rescheduling appointment"
+    },
+    "categories": {
+      "all": "All",
+      "cardiologia": "Cardiology",
+      "analisi": "Analysis",
+      "pediatria": "Pediatrics"
+    },
+    "tags": {
+      "all": "All",
+      "health": "Health",
+      "work": "Work",
+      "family": "Family"
+    }
+  },
+  "appointments": {
+    "editAppointment": "Edit",
+    "cancelAppointment": "Cancel",
+    "confirmCancel": "Are you sure you want to cancel this appointment?"
+  },
+  "home": {
+    "uploadDocument": "Upload Document",
+    "newAppointment": "Book Visit",
+    "upcomingAppointments": "Upcoming Appointments",
+    "noAppointments": "No scheduled appointments",
+    "recentDocuments": "Recent Documents",
+    "loadingAppointments": "Loading appointments..."
+  },
+  "appointmentBooking": {
+    "title": "Book a Visit",
+    "searchPlaceholder": "Search visit type...",
+    "selectVisit": "Select visit type first",
+    "loadingAvailability": "Searching availability...",
+    "selectDateTime": "Select date and time",
+    "selectDate": "Select a date first",
+    "selectTime": "Select a time",
+    "customDateLabel": "Search availability from a specific date:",
+    "confirm": "Confirm Booking",
+    "cancel": "Cancel",
+    "loadMoreDates": "View later dates",
+    "loadPreviousDates": "View earlier dates",
+    "detailsTitle": "Appointment Details",
+    "doctor": "Doctor",
+    "location": "Location",
+    "visitTypes": {
+      "cardiology": "Cardiology Visit",
+      "dermatology": "Dermatology Visit",
+      "general": "General Medical Visit",
+      "ophthalmology": "Ophthalmology Visit",
+      "orthopedics": "Orthopedic Visit",
+      "pediatrics": "Pediatric Visit",
+      "gynecology": "Gynecology Visit",
+      "neurology": "Neurology Visit",
+      "psychiatry": "Psychiatry Visit",
+      "physiotherapy": "Physiotherapy Session",
+      "bloodTest": "Blood Test",
+      "ecg": "Electrocardiogram",
+      "ultrasound": "Ultrasound",
+      "xray": "X-Ray"
+    }
+  },
+  "documentModal": {
+    "descriptionLabel": "Report content description:",
+    "download": "Download",
+    "downloading": "Downloading...",
+    "share": "Share"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and preferences",
+    "account": {
+      "title": "Account",
+      "owner": "Account Owner",
+      "changeProfile": "Change Profile"
+    },
+    "profileFamily": {
+      "title": "Profile and Family",
+      "myProfile": {
+        "title": "My Profile",
+        "subtitle": "Personal data and service status"
+      }
+    },
+    "profileModal": {
+      "title": "Profile",
+      "fullName": "Full name",
+      "fiscalCode": "Fiscal code",
+      "dateOfBirth": "Date of birth",
+      "medicalLicense": "Medical license number",
+      "specializations": "Specializations",
+      "noData": "No data available",
+      "delegatedAccess": "You are viewing data for"
+    },
+    "app": {
+      "title": "App",
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Appointment and deadline reminders"
+      },
+      "appearance": {
+        "title": "Appearance",
+        "subtitle": "Theme and application appearance",
+        "theme": {
+          "title": "Theme",
+          "light": "Light",
+          "dark": "Dark"
+        }
+      }
+    },
+    "dataPrivacy": {
+      "title": "Data and Privacy",
+      "terms": {
+        "title": "Terms and Conditions",
+        "subtitle": "Read the terms of service"
+      }
+    },
+    "logout": "Logout",
+    "footer": {
+      "version": "Nucleo v0.1 · Prototype"
+    }
+  },
+  "footer": {
+    "privacy": "Privacy",
+    "privacyAria": "Open privacy and cookie policy",
+    "legalNotes": "Legal Notes",
+    "legalAria": "Open legal notes",
+    "accessibility": "Accessibility",
+    "accessibilityAria": "Go to accessibility statement (opens in new window)",
+    "cookieTitle": "Cookie Usage",
+    "cookieDescription": "This site uses technical cookies necessary for operation and analytics cookies to improve user experience. By continuing navigation you accept the use of cookies.",
+    "acceptNecessary": "Necessary only",
+    "acceptNecessaryAria": "Accept necessary cookies only",
+    "moreInfo": "More information",
+    "moreInfoAria": "Read full policy",
+    "acceptAll": "Accept all",
+    "acceptAllAria": "Accept all cookies",
+    "privacyModalTitle": "Privacy Policy and Cookie Policy",
+    "privacyModalClose": "I understand",
+    "legalModalTitle": "Legal Notes",
+    "legalModalClose": "Close",
+    "license": "EUPL-1.2"
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "patient-home": "Home",
+    "patient-documents": "Documents",
+    "patient-calendar": "Calendar",
+    "patient-settings": "Settings",
+    "doctor-appointments": "Appointments",
+    "doctor-availabilities": "Availability",
+    "doctor-documents": "Documents",
+    "doctor-patients": "Patients",
+    "doctor-settings": "Settings",
+    "goTo": "Go to"
+  },
+  "delegations": {
+    "loading": "Loading delegations...",
+    "noResults": "No delegations found",
+    "menu": {
+      "title": "Manage Delegations",
+      "subtitle": "Choose what you want to do",
+      "newDelegation": {
+        "title": "New Delegation",
+        "subtitle": "Search for a user and send a request"
+      },
+      "receivedDelegations": {
+        "title": "Received Delegations",
+        "subtitle": "{count} total delegations"
+      },
+      "sentDelegations": {
+        "title": "Sent Delegations",
+        "subtitle": "{count} total delegations"
+      }
+    },
+    "newDelegation": {
+      "title": "New Delegation",
+      "subtitle": "Enter the fiscal code",
+      "back": "Back",
+      "fiscalCodeLabel": "Fiscal Code",
+      "fiscalCodePlaceholder": "RSSMRA88A41H501Z",
+      "search": "Search",
+      "characters": "characters",
+      "userFound": "USER FOUND",
+      "sendRequest": "Send Request"
+    },
+    "receivedList": {
+      "title": "Received Delegations",
+      "subtitle": "{count} delegations"
+    },
+    "sentList": {
+      "title": "Sent Delegations",
+      "subtitle": "{count} delegations"
+    },
+    "status": {
+      "pending": "Pending",
+      "active": "Active",
+      "declined": "Declined",
+      "deleted": "Deleted"
+    },
+    "actions": {
+      "accept": "Accept",
+      "decline": "Decline",
+      "revoke": "Revoke",
+      "cancel": "Cancel",
+      "remove": "Remove access"
+    },
+    "back": "Back",
+    "errors": {
+      "searchNotImplemented": "Search by fiscal code is not yet implemented. Please contact support.",
+      "loadingFailed": "Failed to load delegations",
+      "actionFailed": "Action failed. Please try again.",
+      "delegationAlreadyExists": "A delegation already exists between these users",
+      "userNotFound": "User not found",
+      "cannotDelegateToYourself": "You cannot delegate to yourself"
+    },
+    "toast": {
+      "delegationSent": "Delegation request sent to {name}",
+      "delegationAccepted": "Delegation accepted successfully",
+      "delegationDeclined": "Delegation declined",
+      "delegationRemoved": "Delegation removed successfully"
+    }
+  },
+  "toast": {
+    "closeNotification": "Close notification",
+    "bookingConfirmed": "Booking confirmed successfully!"
+  },
+  "doctor": {
+    "home": {
+      "title": "Doctor Area",
+      "subtitle": "Welcome to your workspace"
+    },
+    "patients": {
+      "title": "Patients",
+      "subtitle": "Manage your patients' medical records",
+      "searchPlaceholder": "Search by name, surname or fiscal code...",
+      "noPatients": "No patients found",
+      "noResults": "No patients match the search",
+      "noDocuments": "No documents in medical records",
+      "errorLoading": "Error loading patients",
+      "patient": "patient",
+      "patientsCount": "patients",
+      "document": "document",
+      "documents": "documents",
+      "medicalRecords": "Medical Records",
+      "fiscalCode": "Fiscal Code",
+      "dateOfBirth": "Date of Birth",
+      "years": "years",
+      "viewMedicalRecords": "View medical records"
+    },
+    "appointments": {
+      "title": "Appointments",
+      "subtitle": "Manage all your patients' appointments",
+      "appointmentsList": "Appointments List",
+      "noAppointments": "No appointments found",
+      "listView": "List",
+      "calendarView": "Calendar",
+      "errorLoading": "Error loading appointments",
+      "categories": {
+        "all": "All",
+        "scheduled": "Scheduled",
+        "completed": "Completed",
+        "noShow": "Patient No Show",
+        "cancelled": "Cancelled"
+      },
+      "status": {
+        "SCHEDULED": "Scheduled",
+        "COMPLETED": "Completed",
+        "NO_SHOW": "Patient No Show",
+        "CANCELLED": "Cancelled"
+      },
+      "errors": {
+        "notFound": "Appointment not found",
+        "loadFailed": "Error loading appointment details"
+      },
+      "actions": {
+        "visitCompleted": "Visit Completed",
+        "patientNoShow": "Patient No Show",
+        "addDocument": "Add Document",
+        "statusUpdateSuccess": "Status updated successfully",
+        "statusUpdateError": "Error updating status"
+      },
+      "reschedule": {
+        "title": "Reschedule Appointment",
+        "subtitle": "Select a new availability for the appointment",
+        "currentAppointment": "Current Appointment",
+        "selectNewSlot": "Select New Time",
+        "noAvailabilities": "No availabilities found",
+        "errorLoading": "Error loading availabilities",
+        "confirm": "Confirm Reschedule",
+        "success": "Appointment rescheduled successfully",
+        "error": "Error rescheduling appointment"
+      }
+    },
+    "availabilities": {
+      "title": "Availability Management",
+      "subtitle": "Create and manage your appointment availabilities",
+      "addAvailability": "Add Availability",
+      "errorLoading": "Error loading availabilities",
+      "cannotEditBooked": "Cannot edit an already booked availability",
+      "cannotDeleteBooked": "Cannot delete an already booked availability",
+      "stats": {
+        "total": "Total this week",
+        "available": "Available",
+        "booked": "Booked",
+        "past": "Past"
+      },
+      "calendar": {
+        "previousWeek": "Previous week",
+        "nextWeek": "Next week",
+        "today": "Today"
+      },
+      "legend": {
+        "available": "Available",
+        "booked": "Booked",
+        "past": "Past"
+      },
+      "actions": {
+        "edit": "Edit availability",
+        "delete": "Delete availability"
+      },
+      "modal": {
+        "titleCreate": "New Availability",
+        "titleEdit": "Edit Availability",
+        "subtitle": "Fill in the fields to define your availability",
+        "date": "Date",
+        "time": "Start time",
+        "duration": "Duration",
+        "facility": "Facility",
+        "selectFacility": "Select a facility",
+        "serviceType": "Visit type",
+        "selectServiceType": "Select a visit type",
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "deleteConfirm": {
+        "title": "Confirm deletion",
+        "message": "Are you sure you want to delete this availability? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "toast": {
+        "created": "Availability created successfully",
+        "updated": "Availability updated successfully",
+        "deleted": "Availability deleted successfully",
+        "error": "An error occurred. Please try again."
+      },
+      "errors": {
+        "OVERLAP_ERROR": "An availability already exists that overlaps with the selected time. Please choose a different time.",
+        "ALREADY_BOOKED": "This availability has already been booked and cannot be modified or deleted.",
+        "NOT_FOUND": "The requested availability was not found.",
+        "INVALID_TIME_SLOT": "The selected time is invalid. Please check the date, time, and duration.",
+        "GENERIC_ERROR": "An error occurred. Please try again later."
+      }
+    },
+    "documents": {
+      "title": "Documents",
+      "subtitle": "View and manage your patients' documents",
+      "searchPlaceholder": "Search documents, symptoms, patients...",
+      "errorLoading": "Error loading documents",
+      "noResults": "No documents found",
+      "medicine": "Medicine",
+      "dosage": "Dosage",
+      "categories": {
+        "all": "All",
+        "reports": "Reports",
+        "medicinePrescriptions": "Medicine Prescriptions",
+        "servicePrescriptions": "Visit Prescriptions"
+      },
+      "prescriptions": {
+      "addPrescription": "Add Prescription",
+      "noPatientResults": "No patients found",
+      "menu": {
+        "title": "New Prescription",
+        "subtitle": "Select the type of prescription you want to create",
+        "medicine": {
+          "title": "Medicine Prescription",
+          "subtitle": "Create a prescription for medications"
+        },
+        "service": {
+          "title": "Visit Prescription",
+          "subtitle": "Request visits or diagnostic exams"
+        }
+      },
+      "medicine": {
+        "title": "New Medicine Prescription",
+        "subtitle": "Fill in the details for the medicine prescription",
+        "patientName": "Patient Name and/or Surname",
+        "patientNamePlaceholder": "Enter patient's name and/or surname",
+        "medicineName": "Medicine Name",
+        "medicineNamePlaceholder": "e.g., Amoxicillin",
+        "dosage": "Dosage",
+        "dosagePlaceholder": "e.g., 500mg",
+        "frequency": "Frequency",
+        "frequencyPlaceholder": "e.g., 3 times a day",
+        "duration": "Duration",
+        "durationPlaceholder": "e.g., 7 days",
+        "notes": "Notes",
+        "notesPlaceholder": "Additional instructions or notes..."
+      },
+      "service": {
+        "title": "New Visit Prescription",
+        "subtitle": "Fill in the details for the visit prescription",
+        "patientName": "Patient Name and/or Surname",
+        "patientNamePlaceholder": "Enter patient's name and/or surname",
+        "serviceType": "Visit/Exam Type",
+        "serviceTypePlaceholder": "e.g., Cardiology visit, X-ray",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe the visit or exam needed...",
+        "urgency": "Urgency",
+        "urgencyLow": "Low",
+        "urgencyMedium": "Medium",
+        "urgencyHigh": "High",
+        "notes": "Notes",
+        "notesPlaceholder": "Additional instructions or notes..."
+        },
+        "toast": {
+          "medicineSaved": "Medicine prescription created successfully",
+          "serviceSaved": "Visit prescription created successfully"
+        },
+        "errors": {
+          "saveFailed": "Error saving prescription. Please try again."
+        }
+      }, 
+      "medicineDetails": {
+        "units": {
+          "day": "day",
+          "mg": "mg"
+        },
+        "periods": {
+          "day": "per day",
+          "week": "per week"
+        },
+        "durationUnits": {
+          "day": "days",
+          "week": "weeks"
+        },
+        "prescription": {
+          "validUntilExecution": "Until execution"
+        }
+      }
+    },
+    "settings": {
+
+    }
+  },
+    "common": {
+      "loading": "Loading...",
+      "retry": "Retry",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "back": "Back",
+      "close": "Close",
+      "next": "Next"
+    },
+    "prescriptionTags": {
+      "prescription": "prescription",
+      "medicines": "medicines",
+      "services": "services"
+    },
+    "patient": {
+      "booking": {
+        "title": "Book Visit",
+        "subtitle": "Select date and time for your visit",
+        "modal": {
+          "title": "Book Visit",
+          "subtitle": "Follow the steps to book your visit",
+          "step1": "Visit Type",
+          "step2": "Doctor",
+          "step3": "Time",
+          "selectServiceType": "Select visit type",
+          "selectDoctor": "Select doctor",
+          "selectSlot": "Select date and time",
+          "selectedService": "Selected visit type",
+          "selectedDoctor": "Selected doctor",
+          "noDoctorsAvailable": "No doctors available for this visit type",
+          "noSlotsAvailable": "No availability found for this doctor",
+          "confirmBooking": "Confirm Booking"
+        }
+      },
+      "reschedule": {
+        "title": "Reschedule Appointment",
+        "subtitle": "Select a new date and time for your appointment"
+      }
+    },
+    "prescriptionTags": {
+      "prescription": "prescription",
+      "medicines": "medicines",
+      "services": "services"
+    },
+    "prescriptionSummary": {
+      "medicine": "Prescription: {medicine}",
+      "service": "Prescription: {service}"
+    },
+    "facilities": {
+      "default": "Default facility"
+    },
+    "upload": {
+      "confirmTitle": "Confirm Upload",
+      "confirmSubtitle": "Review file details before uploading",
+      "confirmMessage": "The document will be uploaded to your personal archive and will be visible in the Documents section.",
+      "cancel": "Cancel",
+      "confirmUpload": "Upload Document",
+      "uploading": "Uploading...",
+      "success": "Document uploaded successfully",
+      "error": "Error uploading document",
+      "invalidFileType": "Invalid file type. Only PDF files are accepted.",
+      "fileTooLarge": "File is too large. Maximum size: 10 MB",
+      "nonMedicalDocument": "The document was not accepted. Only medical documents (reports, prescriptions, clinical notes) are allowed.",
+      "progress": {
+        "title": "Uploading",
+        "successTitle": "Upload Complete",
+        "received": "Document Received",
+        "receivedDesc": "File was successfully received by the server",
+        "stored": "Document Stored",
+        "storedDesc": "File has been securely saved",
+        "analyzed": "Analysis Complete",
+        "analyzedDesc": "Document has been analyzed by AI",
+        "completed": "Upload Complete",
+        "completedDesc": "Document is ready and available"
+      }
+    }
+  }

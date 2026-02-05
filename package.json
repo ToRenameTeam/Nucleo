@@ -9,7 +9,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "dev:users": "pnpm --filter @nucleo/users-service dev",
-    "start:users": "pnpm --filter @nucleo/users-service start"
+    "start:users": "pnpm --filter @nucleo/users-service start",
+    "dev:master-data": "pnpm --filter @nucleo/master-data-service dev",
+    "start:master-data": "pnpm --filter @nucleo/master-data-service start"
   },
   "author": "",
   "license": "ISC",

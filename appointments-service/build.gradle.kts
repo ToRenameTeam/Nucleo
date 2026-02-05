@@ -1,21 +1,37 @@
 plugins {
-    kotlin("jvm")
-}
-
-group = "it.nucleo"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
+    id("kotlin-base")
+    alias(libs.plugins.ktor)
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
+    // Ktor Server
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.server.status.pages)
+    implementation(libs.ktor.server.call.logging)
+    implementation(libs.ktor.server.cors)
+
+    // Database
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.dao)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.java.time)
+    implementation(libs.hikari)
+    implementation(libs.postgresql)
+
+    // DateTime
+    implementation(libs.kotlinx.datetime)
+    
+    // Logging
+    implementation(libs.logback)
+
+    // Testing
+    testImplementation(libs.kotest)
+    testImplementation(libs.ktor.server.test.host)
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
-kotlin {
-    jvmToolchain(22)
+application {
+    mainClass.set("it.nucleo.ApplicationKt")
 }

@@ -1,5 +1,8 @@
 packages:
   - users-service
+  - master-data-service
+  - frontend-service
 
 onlyBuiltDependencies:
   - esbuild
+  - mongodb-memory-server

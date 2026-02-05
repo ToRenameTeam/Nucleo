@@ -1,0 +1,652 @@
+{
+  "app": {
+    "title": "Nucleo"
+  },
+  "auth": {
+    "loginSubtitle": "Accedi al tuo account",
+    "fiscalCode": "Codice Fiscale",
+    "fiscalCodePlaceholder": "Inserisci il tuo codice fiscale",
+    "password": "Password",
+    "passwordPlaceholder": "Inserisci la tua password",
+    "loginButton": "Accedi",
+    "showPassword": "Mostra password",
+    "hidePassword": "Nascondi password",
+    "invalidCredentials": "Codice fiscale o password non validi",
+    "loginError": "Errore durante l'accesso. Riprova.",
+    "networkError": "Errore di connessione. Verifica la tua connessione."
+  },
+  "patientChoice": {
+    "subtitle": "Chi sta usando l'app?",
+    "loadingProfiles": "Caricamento profili...",
+    "retry": "Riprova",
+    "manageDelegations": "Gestione Deleghe"
+  },
+  "doctorPatientChoice": {
+    "subtitle": "Come vuoi accedere oggi?",
+    "doctorArea": {
+      "title": "Area Medico",
+      "description": "Gestisci visite, pazienti e prescrizioni"
+    },
+    "patientArea": {
+      "title": "Area Paziente",
+      "description": "Accedi ai tuoi documenti e appuntamenti"
+    }
+  },
+  "topbar": {
+    "notifications": "Notifiche",
+    "user": "Main User",
+    "languageSelectorAria": "Cambia lingua in {lang}",
+    "italianSelectedAria": "Lingua italiana selezionata",
+    "selectItalianAria": "Seleziona lingua italiana",
+    "englishSelectedAria": "Lingua inglese selezionata",
+    "selectEnglishAria": "Seleziona lingua inglese",
+    "userMenuAria": "Menu utente per {user}",
+    "userProfileAria": "Profilo di {user}",
+    "unread": "non letto",
+    "notification": "notifica"
+  },
+  "userMenu": {
+    "profile": "Profilo",
+    "settings": "Impostazioni",
+    "logout": "Disconnettiti"
+  },
+  "tabs": {
+    "home": "Home",
+    "documents": "Documenti",
+    "calendar": "Calendario",
+    "appointments": "Appuntamenti",
+    "settings": "Impostazioni",
+    "patients": "Pazienti",
+    "availability": "Disponibilità"
+  },
+  "tags": {
+    "all": "Tutti",
+    "toRead": "Da leggere",
+    "folder": "Cartella"
+  },
+  "documents": {
+    "title": "Archivio documenti",
+    "subtitle": "15 documenti",
+    "searchPlaceholder": "Cerca documenti, sintomi, medici...",
+    "noResults": "Nessun documento trovato",
+    "close": "Chiudi",
+    "bookVisit": "Prenota visita",
+    "selection": {
+      "selectMode": "Seleziona documenti",
+      "cancel": "Annulla selezione",
+      "selectAll": "Seleziona tutti",
+      "deselectAll": "Deseleziona tutti"
+    },
+    "batch": {
+      "documentSelected": "documento selezionato",
+      "documentsSelected": "documenti selezionati",
+      "all": "Tutti",
+      "downloadAll": "Scarica tutti",
+      "deselectAll": "Deseleziona tutti"
+    },
+    "dateRange": {
+      "selectRange": "Filtra per data",
+      "from": "Da",
+      "to": "A",
+      "quickSelect": "Selezione rapida",
+      "customRange": "Intervallo personalizzato",
+      "apply": "Applica",
+      "lastMonth": "Ultimo mese",
+      "last3Months": "Ultimi 3 mesi",
+      "last6Months": "Ultimi 6 mesi",
+      "lastYear": "Ultimo anno",
+      "clearRange": "Cancella filtro"
+    },
+    "viewer": {
+      "title": "Confronto Documenti",
+      "subtitle": "Seleziona due documenti diversi per confrontarli",
+      "selectDocument": "Seleziona documento",
+      "availableDocuments": "Documenti disponibili",
+      "selectPlaceholder": "Seleziona un documento",
+      "page": "Pagina {current} di {total}",
+      "date": "Data:",
+      "doctor": "Medico:",
+      "hospital": "Ospedale:",
+      "description": "Descrizione:",
+      "tags": "Tag:",
+      "close": "Chiudi"
+    },
+    "tags": {
+      "all": "Tutti",
+      "toRead": "Da leggere",
+      "cardiology": "Cardiologia"
+    }
+  },
+  "calendar": {
+    "title": "Calendario",
+    "subtitle": "Calendario condiviso della tua famiglia",
+    "appointments": "Appuntamenti",
+    "noAppointments": "Nessun appuntamento trovato",
+    "loading": "Caricamento appuntamenti...",
+    "retry": "Riprova",
+    "today": "Oggi",
+    "month": "Mese",
+    "week": "Settimana",
+    "errors": {
+      "loadingAppointments": "Errore nel caricamento degli appuntamenti",
+      "appointmentNotFound": "Appuntamento non trovato",
+      "loadingDetails": "Errore nel caricamento dei dettagli dell'appuntamento",
+      "cancellingAppointment": "Errore nella cancellazione dell'appuntamento",
+      "reschedulingAppointment": "Errore nella ripianificazione dell'appuntamento"
+    },
+    "categories": {
+      "all": "Tutti",
+      "cardiologia": "Cardiologia",
+      "analisi": "Analisi",
+      "pediatria": "Pediatria"
+    },
+    "tags": {
+      "all": "Tutti",
+      "health": "Salute",
+      "work": "Lavoro",
+      "family": "Famiglia"
+    }
+  },
+  "appointments": {
+    "editAppointment": "Modifica",
+    "cancelAppointment": "Disdici",
+    "confirmCancel": "Sei sicuro di voler disdire questo appuntamento?"
+  },
+  "home": {
+    "uploadDocument": "Carica documento",
+    "newAppointment": "Prenota visita",
+    "upcomingAppointments": "Prossimi appuntamenti",
+    "noAppointments": "Nessun appuntamento in programma",
+    "recentDocuments": "Documenti recenti",
+    "loadingAppointments": "Caricamento appuntamenti..."
+  },
+  "appointmentBooking": {
+    "title": "Prenota una visita",
+    "searchPlaceholder": "Cerca tipo di visita...",
+    "selectVisit": "Selezionare prima il tipo di visita",
+    "loadingAvailability": "Ricerca disponibilità...",
+    "selectDateTime": "Seleziona data e orario",
+    "selectDate": "Selezionare prima una data",
+    "selectTime": "Seleziona un orario",
+    "customDateLabel": "Cerca disponibilità da una data specifica:",
+    "confirm": "Conferma prenotazione",
+    "cancel": "Annulla",
+    "loadMoreDates": "Visualizza date successive",
+    "loadPreviousDates": "Visualizza date precedenti",
+    "detailsTitle": "Dettagli appuntamento",
+    "doctor": "Medico",
+    "location": "Luogo",
+    "visitTypes": {
+      "cardiology": "Visita cardiologica",
+      "dermatology": "Visita dermatologica",
+      "general": "Visita medica generale",
+      "ophthalmology": "Visita oculistica",
+      "orthopedics": "Visita ortopedica",
+      "pediatrics": "Visita pediatrica",
+      "gynecology": "Visita ginecologica",
+      "neurology": "Visita neurologica",
+      "psychiatry": "Visita psichiatrica",
+      "physiotherapy": "Seduta fisioterapia",
+      "bloodTest": "Prelievo esami del sangue",
+      "ecg": "Elettrocardiogramma",
+      "ultrasound": "Ecografia",
+      "xray": "Radiografia"
+    }
+  },
+  "documentModal": {
+    "descriptionLabel": "Descrizione contenuto referto:",
+    "download": "Scarica",
+    "downloading": "Scaricamento...",
+    "share": "Condividi"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "subtitle": "Gestisci il tuo account e le preferenze",
+    "account": {
+      "title": "Account",
+      "owner": "Titolare dell'account",
+      "changeProfile": "Cambia profilo"
+    },
+    "profileFamily": {
+      "title": "Profilo e famiglia",
+      "myProfile": {
+        "title": "Il mio profilo",
+        "subtitle": "Anagrafica e stato dei servizi"
+      }
+    },
+    "profileModal": {
+      "title": "Profilo",
+      "fullName": "Nome completo",
+      "fiscalCode": "Codice fiscale",
+      "dateOfBirth": "Data di nascita",
+      "medicalLicense": "Numero iscrizione all'albo",
+      "specializations": "Specializzazioni",
+      "noData": "Nessun dato disponibile",
+      "delegatedAccess": "Stai visualizzando i dati di"
+    },
+    "app": {
+      "title": "App",
+      "notifications": {
+        "title": "Notifiche",
+        "subtitle": "Promemoria appuntamenti e scadenze"
+      },
+      "appearance": {
+        "title": "Aspetto",
+        "subtitle": "Tema e aspetto dell'applicazione",
+        "theme": {
+          "title": "Tema",
+          "light": "Chiaro",
+          "dark": "Scuro"
+        }
+      }
+    },
+    "dataPrivacy": {
+      "title": "Dati e privacy",
+      "terms": {
+        "title": "Termini e condizioni",
+        "subtitle": "Leggi i termini di servizio"
+      }
+    },
+    "logout": "Esci dall'account",
+    "footer": {
+      "version": "Nucleo v0.1 · Prototipo"
+    }
+  }, 
+  "footer": {
+    "privacy": "Privacy",
+    "privacyAria": "Apri informativa privacy e cookie policy",
+    "legalNotes": "Note Legali",
+    "legalAria": "Apri note legali",
+    "accessibility": "Accessibilità",
+    "accessibilityAria": "Vai alla dichiarazione di accessibilità (si apre in una nuova finestra)",
+    "cookieTitle": "Utilizzo dei Cookie",
+    "cookieDescription": "Questo sito utilizza cookie tecnici necessari per il funzionamento e cookie di analisi per migliorare l'esperienza utente. Proseguendo la navigazione accetti l'uso dei cookie.",
+    "acceptNecessary": "Solo necessari",
+    "acceptNecessaryAria": "Accetta solo cookie necessari",
+    "moreInfo": "Maggiori informazioni",
+    "moreInfoAria": "Leggi informativa completa",
+    "acceptAll": "Accetta tutti",
+    "acceptAllAria": "Accetta tutti i cookie",
+    "privacyModalTitle": "Informativa Privacy e Cookie Policy",
+    "privacyModalClose": "Ho compreso",
+    "legalModalTitle": "Note Legali",
+    "legalModalClose": "Chiudi",
+    "license": "EUPL-1.2"
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "patient-home": "Home",
+    "patient-documents": "Documenti",
+    "patient-calendar": "Calendario",
+    "patient-settings": "Impostazioni",
+    "doctor-appointments": "Appuntamenti",
+    "doctor-availabilities": "Disponibilità",
+    "doctor-documents": "Documenti",
+    "doctor-patients": "Pazienti",
+    "doctor-settings": "Impostazioni",
+    "goTo": "Vai a"
+  },
+  "delegations": {
+    "loading": "Caricamento deleghe...",
+    "noResults": "Nessuna delega trovata",
+    "menu": {
+      "title": "Gestione Deleghe",
+      "subtitle": "Scegli cosa vuoi fare",
+      "newDelegation": {
+        "title": "Nuova Delega",
+        "subtitle": "Cerca un utente e invia una richiesta"
+      },
+      "receivedDelegations": {
+        "title": "Deleghe Ricevute",
+        "subtitle": "{count} deleghe totali"
+      },
+      "sentDelegations": {
+        "title": "Deleghe Inviate",
+        "subtitle": "{count} deleghe totali"
+      }
+    },
+    "newDelegation": {
+      "title": "Nuova Delega",
+      "subtitle": "Inserisci il codice fiscale",
+      "back": "Indietro",
+      "fiscalCodeLabel": "Codice Fiscale",
+      "fiscalCodePlaceholder": "RSSMRA88A41H501Z",
+      "search": "Cerca",
+      "characters": "caratteri",
+      "userFound": "UTENTE TROVATO",
+      "sendRequest": "Invia Richiesta"
+    },
+    "receivedList": {
+      "title": "Deleghe Ricevute",
+      "subtitle": "{count} deleghe"
+    },
+    "sentList": {
+      "title": "Deleghe Inviate",
+      "subtitle": "{count} deleghe"
+    },
+    "status": {
+      "pending": "In attesa",
+      "active": "Attiva",
+      "declined": "Rifiutata",
+      "deleted": "Eliminata"
+    },
+    "actions": {
+      "accept": "Accetta",
+      "decline": "Rifiuta",
+      "revoke": "Revoca",
+      "cancel": "Annulla",
+      "remove": "Rimuovi accesso"
+    },
+    "back": "Indietro",
+    "errors": {
+      "searchNotImplemented": "La ricerca per codice fiscale non è ancora implementata. Contatta il supporto.",
+      "loadingFailed": "Errore nel caricamento delle deleghe",
+      "actionFailed": "Azione fallita. Riprova.",
+      "delegationAlreadyExists": "Esiste già una delega tra questi utenti",
+      "userNotFound": "Utente non trovato",
+      "cannotDelegateToYourself": "Non puoi delegare a te stesso"
+    },
+    "toast": {
+      "delegationSent": "Richiesta di delega inviata a {name}",
+      "delegationAccepted": "Delega accettata con successo",
+      "delegationDeclined": "Delega rifiutata",
+      "delegationRemoved": "Delega rimossa con successo"
+    }
+  },
+  "toast": {
+    "closeNotification": "Chiudi notifica",
+    "bookingConfirmed": "Prenotazione confermata con successo!"
+  },
+  "doctor": {
+    "home": {
+      "title": "Area Medico",
+      "subtitle": "Benvenuto nella tua area di lavoro"
+    },
+    "patients": {
+      "title": "Pazienti",
+      "subtitle": "Gestisci la cartella clinica dei tuoi pazienti",
+      "searchPlaceholder": "Cerca per nome, cognome o codice fiscale...",
+      "noPatients": "Nessun paziente trovato",
+      "noResults": "Nessun paziente corrisponde alla ricerca",
+      "noDocuments": "Nessun documento nella cartella clinica",
+      "errorLoading": "Errore nel caricamento dei pazienti",
+      "patient": "paziente",
+      "patientsCount": "pazienti",
+      "document": "documento",
+      "documents": "documenti",
+      "medicalRecords": "Cartella clinica",
+      "fiscalCode": "Codice Fiscale",
+      "dateOfBirth": "Data di nascita",
+      "years": "anni",
+      "viewMedicalRecords": "Visualizza cartella clinica"
+    },
+    "appointments": {
+      "title": "Appuntamenti",
+      "subtitle": "Gestisci tutti gli appuntamenti dei tuoi pazienti",
+      "appointmentsList": "Lista Appuntamenti",
+      "noAppointments": "Nessun appuntamento trovato",
+      "listView": "Lista",
+      "calendarView": "Calendario",
+      "errorLoading": "Errore nel caricamento degli appuntamenti",
+      "categories": {
+        "all": "Tutti",
+        "scheduled": "Programmati",
+        "completed": "Completati",
+        "noShow": "Paziente Non Presentato",
+        "cancelled": "Annullati"
+      },
+      "status": {
+        "SCHEDULED": "Programmato",
+        "COMPLETED": "Completato",
+        "NO_SHOW": "Paziente Non Presentato",
+        "CANCELLED": "Annullato"
+      },
+      "errors": {
+        "notFound": "Appuntamento non trovato",
+        "loadFailed": "Errore nel caricamento dei dettagli dell'appuntamento"
+      },
+      "actions": {
+        "visitCompleted": "Visita completata",
+        "patientNoShow": "Paziente non presentato",
+        "addDocument": "Aggiungi documento",
+        "statusUpdateSuccess": "Stato aggiornato con successo",
+        "statusUpdateError": "Errore nell'aggiornamento dello stato"
+      },
+      "reschedule": {
+        "title": "Ripianifica Appuntamento",
+        "subtitle": "Seleziona una nuova disponibilità per l'appuntamento",
+        "currentAppointment": "Appuntamento Corrente",
+        "selectNewSlot": "Seleziona Nuovo Orario",
+        "noAvailabilities": "Nessuna disponibilità trovata",
+        "errorLoading": "Errore nel caricamento delle disponibilità",
+        "confirm": "Conferma Ripianificazione",
+        "success": "Appuntamento ripianificato con successo",
+        "error": "Errore durante la ripianificazione dell'appuntamento"
+      }
+    },
+    "availabilities": {
+      "title": "Gestione Disponibilità",
+      "subtitle": "Crea e gestisci le tue disponibilità per le visite",
+      "addAvailability": "Inserisci disponibilità",
+      "errorLoading": "Errore nel caricamento delle disponibilità",
+      "cannotEditBooked": "Non puoi modificare una disponibilità già prenotata",
+      "cannotDeleteBooked": "Non puoi eliminare una disponibilità già prenotata",
+      "stats": {
+        "total": "Totale",
+        "available": "Disponibili",
+        "booked": "Prenotate",
+        "past": "Passate"
+      },
+      "calendar": {
+        "previousWeek": "Settimana precedente",
+        "nextWeek": "Settimana successiva",
+        "today": "Oggi"
+      },
+      "legend": {
+        "available": "Disponibile",
+        "booked": "Prenotato",
+        "past": "Passato"
+      },
+      "actions": {
+        "edit": "Modifica disponibilità",
+        "delete": "Elimina disponibilità"
+      },
+      "modal": {
+        "titleCreate": "Nuova Disponibilità",
+        "titleEdit": "Modifica Disponibilità",
+        "subtitle": "Compila i campi per definire la tua disponibilità",
+        "date": "Data",
+        "time": "Ora di inizio",
+        "duration": "Durata",
+        "facility": "Struttura",
+        "selectFacility": "Seleziona una struttura",
+        "serviceType": "Tipo di visita",
+        "selectServiceType": "Seleziona un tipo di visita",
+        "cancel": "Annulla",
+        "save": "Salva"
+      },
+      "deleteConfirm": {
+        "title": "Conferma eliminazione",
+        "message": "Sei sicuro di voler eliminare questa disponibilità? L'azione non può essere annullata.",
+        "cancel": "Annulla",
+        "confirm": "Elimina"
+      },
+      "toast": {
+        "created": "Disponibilità creata con successo",
+        "updated": "Disponibilità aggiornata con successo",
+        "deleted": "Disponibilità eliminata con successo",
+        "error": "Si è verificato un errore. Riprova."
+      },
+      "errors": {
+        "OVERLAP_ERROR": "Esiste già una disponibilità che si sovrappone all'orario selezionato. Scegli un altro orario.",
+        "ALREADY_BOOKED": "Questa disponibilità è già stata prenotata e non può essere modificata o eliminata.",
+        "NOT_FOUND": "La disponibilità richiesta non è stata trovata.",
+        "INVALID_TIME_SLOT": "L'orario selezionato non è valido. Verifica data, ora e durata.",
+        "GENERIC_ERROR": "Si è verificato un errore. Riprova più tardi."
+      }
+    },
+    "documents": {
+      "title": "Documenti",
+      "subtitle": "Visualizza e gestisci i documenti dei tuoi pazienti",
+      "searchPlaceholder": "Cerca documenti, sintomi, pazienti...",
+      "errorLoading": "Errore nel caricamento dei documenti",
+      "noResults": "Nessun documento trovato",
+      "medicine": "Farmaco",
+      "dosage": "Dosaggio",
+      "categories": {
+        "all": "Tutti",
+        "reports": "Referti",
+        "medicinePrescriptions": "Prescrizioni Farmaci",
+        "servicePrescriptions": "Prescrizioni Visite"
+      },
+      "prescriptions": {
+        "addPrescription": "Aggiungi Prescrizione",
+        "noPatientResults": "Nessun paziente trovato",
+        "menu": {
+          "title": "Nuova Prescrizione",
+          "subtitle": "Seleziona il tipo di prescrizione che vuoi creare",
+          "medicine": {
+            "title": "Prescrizione Farmaceutica",
+            "subtitle": "Crea una prescrizione per farmaci"
+          },
+          "service": {
+            "title": "Prescrizione Visita",
+            "subtitle": "Richiedi visite o esami diagnostici"
+          }
+        },
+        "medicine": {
+          "title": "Nuova Prescrizione Farmaceutica",
+          "subtitle": "Compila i dettagli per la prescrizione farmaceutica",
+          "patientName": "Nome Paziente",
+          "patientNamePlaceholder": "Inserisci il nome e/o cognome del paziente",
+          "medicineName": "Nome Farmaco",
+          "medicineNamePlaceholder": "es., Amoxicillina",
+          "dosage": "Dosaggio",
+          "dosagePlaceholder": "es., 500mg",
+          "frequency": "Frequenza",
+          "frequencyPlaceholder": "es., 3 volte al giorno",
+          "duration": "Durata",
+          "durationPlaceholder": "es., 7 giorni",
+          "notes": "Note",
+          "notesPlaceholder": "Istruzioni aggiuntive o note..."
+        },
+        "service": {
+          "title": "Nuova Prescrizione Visita",
+          "subtitle": "Compila i dettagli per la prescrizione della visita",
+          "patientName": "Nome Paziente",
+          "patientNamePlaceholder": "Inserisci il nome e/o cognome del paziente",
+          "serviceType": "Tipo di Visita/Esame",
+          "serviceTypePlaceholder": "es., Visita cardiologica, Radiografia",
+          "description": "Descrizione",
+          "descriptionPlaceholder": "Descrivi la visita o l'esame necessario...",
+          "urgency": "Urgenza",
+          "urgencyLow": "Bassa",
+          "urgencyMedium": "Media",
+          "urgencyHigh": "Alta",
+          "notes": "Note",
+          "notesPlaceholder": "Istruzioni aggiuntive o note..."
+        },
+        "toast": {
+          "medicineSaved": "Prescrizione farmaceutica creata con successo",
+          "serviceSaved": "Prescrizione visita creata con successo"
+        },
+        "errors": {
+          "saveFailed": "Errore nel salvataggio della prescrizione. Riprova."
+        }
+      },
+      "medicineDetails": {
+        "units": {
+          "day": "giorno",
+          "mg": "mg"
+        },
+        "periods": {
+          "day": "al giorno",
+          "week": "a settimana"
+        },
+        "durationUnits": {
+          "day": "giorni",
+          "week": "settimane"
+        },
+        "prescription": {
+          "validUntilExecution": "Fino ad esecuzione"
+        }
+      }
+    },
+    "settings":{
+
+    }
+  },
+  "common": {
+    "loading": "Caricamento...",
+    "retry": "Riprova",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "saving": "Salvataggio...",
+    "back": "Indietro",
+    "close": "Chiudi",
+    "next": "Avanti"
+  },
+  "patient": {
+    "booking": {
+      "title": "Prenota Visita",
+      "subtitle": "Seleziona data e orario per la tua visita",
+      "modal": {
+        "title": "Prenota Visita",
+        "subtitle": "Segui i passaggi per prenotare la tua visita",
+        "step1": "Tipo Visita",
+        "step2": "Medico",
+        "step3": "Orario",
+        "selectServiceType": "Seleziona il tipo di visita",
+        "selectDoctor": "Seleziona il medico",
+        "selectSlot": "Seleziona data e orario",
+        "selectedService": "Tipo visita selezionato",
+        "selectedDoctor": "Medico selezionato",
+        "noDoctorsAvailable": "Nessun medico disponibile per questa tipologia di visita",
+        "noSlotsAvailable": "Nessuna disponibilità trovata per questo medico",
+        "confirmBooking": "Conferma Prenotazione"
+      }
+    },
+    "reschedule": {
+      "title": "Ripianifica Appuntamento",
+      "subtitle": "Seleziona una nuova data e orario per il tuo appuntamento"
+    }
+  },
+  "prescriptionTags": {
+    "prescription": "prescrizione",
+    "medicines": "farmaci",
+    "services": "visite"
+  },
+  "prescriptionSummary": {
+    "medicine": "Prescrizione: {medicine}",
+    "service": "Prescrizione: {service}"
+  },
+  "facilities": {
+    "default": "Struttura predefinita"
+  },
+  "upload": {
+    "confirmTitle": "Conferma caricamento",
+    "confirmSubtitle": "Verifica i dettagli del file prima di caricare",
+    "confirmMessage": "Il documento sarà caricato nel tuo archivio personale e sarà visibile nella sezione Documenti.",
+    "cancel": "Annulla",
+    "confirmUpload": "Carica documento",
+    "uploading": "Caricamento in corso...",
+    "success": "Documento caricato con successo",
+    "error": "Errore durante il caricamento del documento",
+    "invalidFileType": "Tipo di file non valido. Sono accettati solo file PDF.",
+    "fileTooLarge": "Il file è troppo grande. Dimensione massima: 10 MB",
+    "nonMedicalDocument": "Il documento non è stato accettato. Sono consentiti solo documenti medici (referti, prescrizioni, note cliniche).",
+    "progress": {
+      "title": "Caricamento in corso",
+      "successTitle": "Caricamento completato",
+      "received": "Documento ricevuto",
+      "receivedDesc": "Il file è stato ricevuto correttamente dal server",
+      "stored": "Documento archiviato",
+      "storedDesc": "Il file è stato salvato in modo sicuro",
+      "analyzed": "Analisi completata",
+      "analyzedDesc": "Il documento è stato analizzato dall'intelligenza artificiale",
+      "completed": "Caricamento completato",
+      "completedDesc": "Il documento è pronto e disponibile"
+    },
+    "nonMedicalDocument": "Il documento non è stato accettato. Solo documenti medici (referti, prescrizioni, note cliniche) sono permessi."
+  }
+}
