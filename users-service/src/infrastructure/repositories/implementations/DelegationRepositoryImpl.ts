@@ -12,7 +12,7 @@ export class DelegationRepositoryImpl implements IDelegationRepository {
         return this.toDelegationData(delegation);
     }
 
-    async findAll(status?: string): Promise<DelegationData[]> {
+    async findAll(status?: string): Promise<{ delegations: DelegationData[] | null }> {
         const filter: any = {};
 
         if (status) {
@@ -20,10 +20,18 @@ export class DelegationRepositoryImpl implements IDelegationRepository {
         }
 
         const delegations = await DelegationModel.find(filter);
-        return delegations.map(d => this.toDelegationData(d));
+
+        if (delegations.length === 0) {
+            return { delegations: null };
+        }
+
+        return {
+            delegations: delegations.map(d => this.toDelegationData(d))
+        };
     }
 
-    async findByDelegatingUserId(userId: string, status?: string): Promise<DelegationData[]> {
+    async findByDelegatingUserId(userId: string, status?: string): Promise<{ delegations: DelegationData[] | null }> {
+
         const filter: any = { delegatingUserId: userId };
 
         if (status) {
@@ -31,10 +39,18 @@ export class DelegationRepositoryImpl implements IDelegationRepository {
         }
 
         const delegations = await DelegationModel.find(filter);
-        return delegations.map(d => this.toDelegationData(d));
+
+        if (delegations.length === 0) {
+            return { delegations: null };
+        }
+
+        return {
+            delegations: delegations.map(d => this.toDelegationData(d))
+        };
     }
 
-    async findByDelegatorUserId(userId: string, status?: string): Promise<DelegationData[]> {
+    async findByDelegatorUserId(userId: string, status?: string): Promise<{ delegations: DelegationData[] | null }> {
+
         const filter: any = { delegatorUserId: userId };
 
         if (status) {
@@ -42,7 +58,14 @@ export class DelegationRepositoryImpl implements IDelegationRepository {
         }
 
         const delegations = await DelegationModel.find(filter);
-        return delegations.map(d => this.toDelegationData(d));
+
+        if (delegations.length === 0) {
+            return { delegations: null };
+        }
+
+        return {
+            delegations: delegations.map(d => this.toDelegationData(d))
+        };
     }
 
     async findDelegationByUsers(delegatingUserId: string, delegatorUserId: string): Promise<DelegationData | null> {

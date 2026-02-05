@@ -4,7 +4,7 @@ import cors from 'cors';
 import authRoutes from './api/auth.js';
 import userRoutes from './api/user.js';
 import delegationRoutes from './api/delegation.js';
-import {runSeeds} from "./infrastructure/seeds/index.js";
+import { runSeeds } from "./infrastructure/seeds/index.js";
 
 const app = express();
 const PORT = process.env.PORT || 3030;

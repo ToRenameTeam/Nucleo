@@ -12,8 +12,7 @@ export class UserRepositoryImpl implements IUserRepository {
     }
 
     async findByFiscalCode(fiscalCode: string): Promise<UserData | null> {
-        const user = await UserModel
-            .findOne({ fiscalCode: fiscalCode.toUpperCase() });
+        const user = await UserModel.findOne({ fiscalCode: fiscalCode.toUpperCase() });
 
         if (!user) return null;
 

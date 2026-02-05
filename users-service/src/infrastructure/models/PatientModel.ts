@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IPatientDocument extends Document {
     userId: string;
-    activeDelegationIds: string[];
+    bloodType: string;
 }
 
 const PatientSchema = new Schema<IPatientDocument>(
@@ -13,10 +13,10 @@ const PatientSchema = new Schema<IPatientDocument>(
             unique: true,
             ref: 'User',
         },
-        activeDelegationIds: {
-            type: [String],
-            default: [],
-        },
+        bloodType: {
+            type: String,
+            required: true,
+        }
     },
     {
         timestamps: true,

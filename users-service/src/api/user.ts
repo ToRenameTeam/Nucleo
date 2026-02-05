@@ -1,97 +1,81 @@
 import { Router, Request, Response } from 'express';
-import { UserService } from '../services/UserService.js';
-import { UserRepositoryImpl } from '../infrastructure/repositories/implementations/UserRepositoryImpl.js';
-import { PatientRepositoryImpl } from '../infrastructure/repositories/implementations/PatientRepositoryImpl.js';
-import { DoctorRepositoryImpl } from '../infrastructure/repositories/implementations/DoctorRepositoryImpl.js';
+import { userService } from '../services/index.js';
 import { success, error } from './utils/response.js';
+import { AppError } from '../utils/errors.js';
+import { CreateUserInput } from "./dtos/UserDTOs.js";
 
 const router = Router();
 
-const userService = new UserService(
-    new UserRepositoryImpl(),
-    new PatientRepositoryImpl(),
-    new DoctorRepositoryImpl()
-);
 
-// Create a new user
+/**
+ * POST /api/users
+ * Create a new user
+ */
 router.post('/', async (req: Request, res: Response) => {
     try {
 
-        const { fiscalCode, password, name, lastName, dateOfBirth, doctor } = req.body;
+        const input: CreateUserInput = req.body;
 
-        if (!fiscalCode || !password || !name || !lastName || !dateOfBirth) {
+        if (!input.fiscalCode || !input.password || !input.name || !input.lastName || !input.dateOfBirth) {
             return error(res, 'Missing required fields: fiscalCode, password, name, lastName, dateOfBirth', 400);
         }
 
-        const user = await userService.createUser({
-            fiscalCode,
-            password,
-            name,
-            lastName,
-            dateOfBirth,
-            doctor,
-        });
+        const user = await userService.createUser(input);
 
         return success(res, user, 201);
-
     } catch (err) {
         console.error('Create user error:', err);
-
-        if (err instanceof Error) {
-            if (err.message.includes('already exists')) {
-                return error(res, err.message, 409);
-            }
-            if (err.message.includes('Invalid')) {
-                return error(res, err.message, 400);
-            }
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
         }
-
         return error(res, 'Internal server error', 500);
     }
 });
 
-// Search user by fiscal code - DEVE STARE PRIMA DI /:userId
+/**
+ * GET /api/users/search
+ * Search user by fiscal code
+ */
 router.get('/search', async (req: Request, res: Response) => {
     try {
         const { fiscalCode } = req.query;
 
         if (!fiscalCode || typeof fiscalCode !== 'string') {
-            return error(res, 'Missing or invalid fiscal code', 400);
+            return error(res, 'Invalid or missing fiscalCode query parameter', 400);
         }
 
         const user = await userService.getUserByFiscalCode(fiscalCode);
         return success(res, user);
-
     } catch (err) {
         console.error('Search user error:', err);
-
-        if (err instanceof Error) {
-            if (err.message === 'User not found') {
-                return error(res, err.message, 404);
-            }
-            if (err.message.includes('Invalid')) {
-                return error(res, err.message, 400);
-            }
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
         }
-
         return error(res, 'Internal server error', 500);
     }
 });
 
-// List all users
+/**
+ * GET /api/users
+ * List all users
+ */
 router.get('/', async (req: Request, res: Response) => {
     try {
-
         const result = await userService.listUsers();
         return success(res, result);
-
     } catch (err) {
         console.error('List users error:', err);
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
+        }
         return error(res, 'Internal server error', 500);
     }
 });
 
-// Get user by ID - DEVE STARE DOPO /search
+/**
+ * GET /api/users/:userId
+ * Get user by ID
+ */
 router.get('/:userId', async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
@@ -102,16 +86,11 @@ router.get('/:userId', async (req: Request, res: Response) => {
 
         const user = await userService.getUserById(userId);
         return success(res, user);
-
     } catch (err) {
         console.error('Get user error:', err);
-
-        if (err instanceof Error) {
-            if (err.message === 'User not found') {
-                return error(res, err.message, 404);
-            }
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
         }
-
         return error(res, 'Internal server error', 500);
     }
 });

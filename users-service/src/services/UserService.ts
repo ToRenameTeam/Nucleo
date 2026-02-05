@@ -1,13 +1,12 @@
 import crypto from 'crypto';
-import { User } from '../domains/User.js';
-import { Patient } from '../domains/Patient.js';
-import { Doctor } from '../domains/Doctor.js';
-import { FiscalCode } from '../domains/value-objects/FiscalCode.js';
-import { Credentials } from '../domains/value-objects/Credentials.js';
-import { ProfileInfo } from '../domains/value-objects/ProfileInfo.js';
-import type { IUserRepository } from '../infrastructure/repositories/IUserRepository.js';
+import { UserFactory } from './UserFactory.js';
+import type { IUserRepository, UserData } from '../infrastructure/repositories/IUserRepository.js';
 import type { IPatientRepository } from '../infrastructure/repositories/IPatientRepository.js';
 import type { IDoctorRepository } from '../infrastructure/repositories/IDoctorRepository.js';
+import { ConflictError, NotFoundError, ValidationError } from '../utils/errors.js';
+import type { CreateUserInput, UserResponse } from '../api/dtos/UserDTOs.js';
+import mongoose from "mongoose";
+import {BloodType} from "../domains/value-objects/BloodType.js";
 
 export class UserService {
     constructor(
@@ -16,111 +15,81 @@ export class UserService {
         private readonly doctorRepository: IDoctorRepository
     ) {}
 
-    async createUser(data: {
-        fiscalCode: string;
-        password: string;
-        name: string;
-        lastName: string;
-        dateOfBirth: string;
-        doctor?: {
-            medicalLicenseNumber: string;
-            specializations: string[];
-        };
-    }) {
-        const existing = await this.userRepository.findByFiscalCode(data.fiscalCode);
-        if (existing) {
-            throw new Error('User with this fiscal code already exists');
-        }
+    async createUser(data: CreateUserInput): Promise<UserResponse> {
+        const session = await mongoose.startSession();
+        session.startTransaction();
 
-        const userId = crypto.randomUUID();
-        const fiscalCode = FiscalCode.create(data.fiscalCode);
-        const credentials = Credentials.create(fiscalCode, data.password);
-        const profileInfo = ProfileInfo.create(
-            data.name,
-            data.lastName,
-            new Date(data.dateOfBirth)
-        );
+        try {
 
-        const user = User.create(userId, fiscalCode, credentials, profileInfo);
-        await this.userRepository.create(user);
+            const existingUser = await this.userRepository.findByFiscalCode(data.fiscalCode);
+            if (existingUser) {
+                throw new ConflictError('User with this fiscal code already exists');
+            }
 
-        const patient = Patient.reconstitute(userId, []);
-        await this.patientRepository.save(patient);
+            if (!BloodType.isValid(data.patient.bloodType)) {
+                throw new ValidationError('Invalid blood type');
+            }
 
-        let doctorInfo = undefined;
+            const userId = crypto.randomUUID();
 
-        // Optionally create doctor profile
-        if (data.doctor) {
-            const doctor = Doctor.reconstitute(
+            const {user, patient, doctor} = UserFactory.create({
                 userId,
-                data.doctor.medicalLicenseNumber,
-                data.doctor.specializations,
-                []
-            );
-            await this.doctorRepository.save(doctor);
-            doctorInfo = {
-                medicalLicenseNumber: data.doctor.medicalLicenseNumber,
-                specializations: data.doctor.specializations,
-            };
-        }
+                fiscalCode: data.fiscalCode,
+                password: data.password,
+                name: data.name,
+                lastName: data.lastName,
+                dateOfBirth: new Date(data.dateOfBirth),
+                patientData: data.patient,
+                doctorData: data.doctor,
+            });
 
-        return {
-            userId,
-            fiscalCode: data.fiscalCode,
-            name: data.name,
-            lastName: data.lastName,
-            dateOfBirth: data.dateOfBirth,
-            doctor: doctorInfo,
-        };
+            await this.userRepository.create(user);
+            await this.patientRepository.save(patient);
+
+            if (doctor) {
+                await this.doctorRepository.save(doctor);
+            }
+
+            return {
+                userId,
+                fiscalCode: data.fiscalCode,
+                name: data.name,
+                lastName: data.lastName,
+                dateOfBirth: data.dateOfBirth,
+                patient: {
+                    patientId: userId,
+                    bloodType: data.patient.bloodType,
+                },
+                doctor: doctor ? {
+                    doctorId: userId,
+                    medicalLicenseNumber: doctor.medicalLicenseNumber,
+                    specializations: doctor.specialization,
+                } : undefined,
+            };
+
+        } catch (error) {
+            await session.abortTransaction();
+            throw error;
+        } finally {
+            session.endSession();
+        }
     }
 
-    async getUserById(userId: string) {
+    async getUserById(userId: string): Promise<UserResponse> {
         const userData = await this.userRepository.findUserById(userId);
 
         if (!userData) {
-            throw new Error('User not found');
+            throw new NotFoundError('User not found');
         }
 
-        const patientData = await this.patientRepository.findByUserId(userId);
-        const doctorData = await this.doctorRepository.findByUserId(userId);
-
-        return {
-            userId: userData.userId,
-            fiscalCode: userData.fiscalCode,
-            name: userData.name,
-            lastName: userData.lastName,
-            dateOfBirth: userData.dateOfBirth.toISOString(),
-            patientData: patientData,
-            doctor: doctorData ? {
-                medicalLicenseNumber: doctorData.medicalLicenseNumber,
-                specializations: doctorData.specializations,
-            } : undefined,
-        };
+        return this.enrichUserWithProfiles(userData);
     }
 
     async listUsers() {
         const { users } = await this.userRepository.findAll();
 
         const usersWithProfiles = await Promise.all(
-            users.map(async (userData) => {
-                const patientData = await this.patientRepository.findByUserId(userData.userId);
-                const doctorData = await this.doctorRepository.findByUserId(userData.userId);
-
-                return {
-                    userId: userData.userId,
-                    fiscalCode: userData.fiscalCode,
-                    name: userData.name,
-                    lastName: userData.lastName,
-                    dateOfBirth: userData.dateOfBirth.toISOString(),
-                    patientData: patientData ? {
-                        activeDelegationIds: patientData.activeDelegationIds,
-                    } : undefined,
-                    doctor: doctorData ? {
-                        medicalLicenseNumber: doctorData.medicalLicenseNumber,
-                        specializations: doctorData.specializations,
-                    } : undefined,
-                };
-            })
+            users.map(user => this.enrichUserWithProfiles(user))
         );
 
         return {
@@ -128,13 +97,17 @@ export class UserService {
         };
     }
 
-    async getUserByFiscalCode(fiscalCode: string) {
+    async getUserByFiscalCode(fiscalCode: string): Promise<UserResponse> {
         const userData = await this.userRepository.findByFiscalCode(fiscalCode);
 
         if (!userData) {
-            throw new Error('User not found');
+            throw new NotFoundError('User not found');
         }
 
+        return this.enrichUserWithProfiles(userData);
+    }
+
+    private async enrichUserWithProfiles(userData: UserData): Promise<UserResponse> {
         const patientData = await this.patientRepository.findByUserId(userData.userId);
         const doctorData = await this.doctorRepository.findByUserId(userData.userId);
 
@@ -144,8 +117,12 @@ export class UserService {
             name: userData.name,
             lastName: userData.lastName,
             dateOfBirth: userData.dateOfBirth.toISOString(),
-            patientData: patientData,
+            patient: patientData ? {
+                patientId: patientData.userId,
+                bloodType: patientData.bloodType,
+            } : undefined,
             doctor: doctorData ? {
+                doctorId: doctorData.userId,
                 medicalLicenseNumber: doctorData.medicalLicenseNumber,
                 specializations: doctorData.specializations,
             } : undefined,

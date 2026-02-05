@@ -7,6 +7,9 @@ interface UserSeed {
     name: string;
     lastName: string;
     dateOfBirth: string;
+    patient: {
+        bloodType: string;
+    }
     doctor?: {
         medicalLicenseNumber: string;
         specializations: string[];
@@ -41,6 +44,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Mario',
         lastName: 'Rossi',
         dateOfBirth: '1985-08-01',
+        patient: {
+            bloodType: 'O+',
+        }
     },
     {
         userId: USER_IDS.ELENA_FERRARI,
@@ -49,6 +55,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Elena',
         lastName: 'Ferrari',
         dateOfBirth: '1988-10-22',
+        patient: {
+            bloodType: 'A+',
+        }
     },
     {
         userId: USER_IDS.GIULIA_BIANCHI,
@@ -57,6 +66,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Giulia',
         lastName: 'Bianchi',
         dateOfBirth: '1990-04-05',
+        patient: {
+            bloodType: 'B+',
+        }
     },
     {
         userId: USER_IDS.LUCA_ROMANO,
@@ -65,6 +77,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Luca',
         lastName: 'Romano',
         dateOfBirth: '1992-07-18',
+        patient: {
+            bloodType: 'AB+',
+        }
     },
     {
         userId: USER_IDS.ALESSANDRO_RICCI,
@@ -73,6 +88,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Alessandro',
         lastName: 'Ricci',
         dateOfBirth: '1955-06-21',
+        patient: {
+            bloodType: 'O-',
+        }
     },
     {
         userId: USER_IDS.MARIA_CONTI,
@@ -81,6 +99,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Maria',
         lastName: 'Conti',
         dateOfBirth: '1960-12-30',
+        patient: {
+            bloodType: 'A-',
+        }
     },
     {
         userId: USER_IDS.ANNA_MARINO,
@@ -89,6 +110,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Anna',
         lastName: 'Marino',
         dateOfBirth: '1995-05-07',
+        patient: {
+            bloodType: 'B-',
+        }
     },
     {
         userId: USER_IDS.CHIARA_BRUNO,
@@ -97,6 +121,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Chiara',
         lastName: 'Bruno',
         dateOfBirth: '1991-08-08',
+        patient: {
+            bloodType: 'AB-',
+        }
     },
     {
         userId: USER_IDS.ROBERTO_GALLO,
@@ -105,6 +132,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Roberto',
         lastName: 'Gallo',
         dateOfBirth: '1987-04-23',
+        patient: {
+            bloodType: 'A+',
+        }
     },
     {
         userId: USER_IDS.VALENTINA_MANCINI,
@@ -113,8 +143,11 @@ export const userSeeds: UserSeed[] = [
         name: 'Valentina',
         lastName: 'Mancini',
         dateOfBirth: '1993-11-12',
+        patient: {
+            bloodType: 'O+',
+        }
     },
-    
+
     // DOTTORI
     {
         userId: USER_IDS.FRANCESCO_VERDI,
@@ -123,6 +156,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Francesco',
         lastName: 'Verdi',
         dateOfBirth: '1978-03-15',
+        patient: {
+            bloodType: 'B+',
+        },
         doctor: {
             medicalLicenseNumber: 'MED-2003-001234',
             specializations: ['Cardiologia', 'Medicina Interna'],
@@ -135,6 +171,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Paolo',
         lastName: 'Greco',
         dateOfBirth: '1975-02-12',
+        patient: {
+            bloodType: 'AB+',
+        },
         doctor: {
             medicalLicenseNumber: 'MED-2001-009012',
             specializations: ['Ortopedia', 'Traumatologia'],
@@ -147,6 +186,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Giorgio',
         lastName: 'Costa',
         dateOfBirth: '1980-01-15',
+        patient: {
+            bloodType: 'O-',
+        },
         doctor: {
             medicalLicenseNumber: 'MED-2006-003456',
             specializations: ['Neurologia'],
@@ -159,6 +201,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Stefano',
         lastName: 'Lombardi',
         dateOfBirth: '1982-09-09',
+        patient: {
+            bloodType: 'A-',
+        },
         doctor: {
             medicalLicenseNumber: 'MED-2009-007890',
             specializations: ['Dermatologia', 'Venereologia'],
@@ -171,6 +216,9 @@ export const userSeeds: UserSeed[] = [
         name: 'Sara',
         lastName: 'Colombo',
         dateOfBirth: '1983-12-09',
+        patient: {
+            bloodType: 'B-',
+        },
         doctor: {
             medicalLicenseNumber: 'MED-2008-005678',
             specializations: ['Pediatria'],

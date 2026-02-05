@@ -10,15 +10,28 @@ export class PatientRepositoryImpl implements IPatientRepository {
 
         return {
             userId: patient.userId,
-            activeDelegationIds: patient.activeDelegationIds,
+            bloodType: patient.bloodType,
         };
+    }
+
+    async findByBloodType(bloodType: string): Promise<{patients: PatientData[] | null}> {
+        const patients = await PatientModel.find({ bloodType });
+
+        if (patients.length == 0) return { patients: null };
+
+        return {
+            patients: patients.map((patient) => ({
+                userId: patient.userId,
+                bloodType: patient.bloodType,
+            })),
+        }
     }
 
     async save(patient: Patient): Promise<void> {
         await PatientModel.findOneAndUpdate(
             { userId: patient.userId },
             {
-                activeDelegationIds: patient.activeDelegationIds,
+                bloodType: patient.bloodType,
             },
             {
                 upsert: true,

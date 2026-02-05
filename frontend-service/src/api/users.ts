@@ -15,7 +15,6 @@ export interface UserInfo {
     userId: string
     medicalLicenseNumber: string
     specializations: string[]
-    assignedPatientUserIds: string[]
   }
 }
 

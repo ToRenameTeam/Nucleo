@@ -1,99 +1,76 @@
-import { Router, Request, Response } from 'express';
-import { AuthenticationService } from '../services/AuthenticationService.js';
-import { UserRepositoryImpl } from '../infrastructure/repositories/implementations/UserRepositoryImpl.js';
-import { PatientRepositoryImpl } from '../infrastructure/repositories/implementations/PatientRepositoryImpl.js';
-import { DoctorRepositoryImpl } from '../infrastructure/repositories/implementations/DoctorRepositoryImpl.js';
-import { success, error } from './utils/response.js';
-import { PatientOnlyUser } from '../services/AuthenticatedUserFactory.js';
+import { Router } from 'express';
+import { authService, UnauthorizedError, UserNotFoundError, UserValidationError } from '../services/AuthenticationService.js';
+import { success, error } from './utils/response.js'; // ← aggiungi import
+import { LoginInput } from "./dtos/UserDTOs.js";
 
 const router = Router();
 
-const authService = new AuthenticationService(
-    new UserRepositoryImpl(),
-    new PatientRepositoryImpl(),
-    new DoctorRepositoryImpl()
-);
-
-router.post('/login', async (req: Request, res: Response) => {
+/**
+ * POST /api/auth/login
+ * Authenticate user and return profile information
+ */
+router.post('/login', async (req, res) => {
     try {
-        const { fiscalCode, password } = req.body;
+        const credentials: LoginInput = req.body;
+        const authResult = await authService.login(credentials);
 
-        if (!fiscalCode || !password) {
-            return error(res, 'Fiscal code and password are required', 400);
-        }
-
-        const authenticatedUser = await authService.login(fiscalCode, password);
-
-        const baseData = {
-            userId: authenticatedUser.user.userId,
-            fiscalCode: authenticatedUser.user.fiscalCode.value,
-            name: authenticatedUser.user.profileInfo.name,
-            lastName: authenticatedUser.user.profileInfo.lastName,
-            dateOfBirth: authenticatedUser.user.profileInfo.dateOfBirth,
+        const userData = {
+            userId: authResult.user.userId,
+            fiscalCode: authResult.user.fiscalCode.value,
+            name: authResult.user.profileInfo.name,
+            lastName: authResult.user.profileInfo.lastName,
+            dateOfBirth: authResult.user.profileInfo.dateOfBirth,
         };
 
-        // Case 1: PatientOnly - return complete data immediately
-        if (!authenticatedUser.hasDoctorProfile) {
-
-            const patientUser = authenticatedUser as PatientOnlyUser;
-
+        if (!authResult.hasDoctorProfile) {
             return success(res, {
-                ...baseData,
+                ...userData,
                 activeProfile: 'PATIENT',
                 patient: {
-                    userId: authenticatedUser.user.userId,
-                    activeDelegationIds: patientUser.patientProfile.activeDelegationIds,
+                    userId: authResult.patient.userId,
+                    bloodType: authResult.patient.bloodType,
                 },
             });
         }
 
-        // Case 2: DoctorPatient - require profile selection
         return success(res, {
-            ...baseData,
+            ...userData,
             requiresProfileSelection: true,
         });
-
     } catch (err) {
-        console.error('Login error:', err);
-
-        if (err instanceof Error) {
-            if (err.message.includes('Invalid credentials')) {
-                return error(res, err.message, 401);
-            }
+        if (err instanceof UserValidationError) {
+            return error(res, err.message, 400);
         }
-        
-        return error(res, 'Internal server error', 500);
+        if (err instanceof UnauthorizedError) {
+            return error(res, err.message, 401); 
+        }
+        if (err instanceof UserNotFoundError) {
+            return error(res, err.message, 404); 
+        }
+        console.error('Login error:', err);
+        return error(res, 'Failed to login', 500); 
     }
 });
 
-router.post('/select-profile', async (req: Request, res: Response) => {
+/**
+ * POST /api/auth/select-profile
+ * Select active profile for users with multiple profiles
+ */
+router.post('/select-profile', async (req, res) => {
     try {
         const { userId, selectedProfile } = req.body;
+        const profileData = await authService.selectProfile(userId, selectedProfile);
 
-        if (!userId) {
-            return error(res, 'User ID is required', 400);
-        }
-
-        if (selectedProfile !== 'PATIENT' && selectedProfile !== 'DOCTOR') {
-            return error(res, 'Invalid profile type. Must be PATIENT or DOCTOR', 400);
-        }
-
-        const profileData = await authService.getProfileData(userId, selectedProfile);
-        return success(res, profileData);
-
+        return success(res, profileData); 
     } catch (err) {
-        console.error('Profile selection error:', err);
-        
-        if (err instanceof Error) {
-            if (err.message.includes('not found')) {
-                return error(res, err.message, 404);
-            }
-            if (err.message.includes('does not have')) {
-                return error(res, err.message, 400);
-            }
+        if (err instanceof UserValidationError) {
+            return error(res, err.message, 400); 
         }
-        
-        return error(res, 'Internal server error', 500);
+        if (err instanceof UserNotFoundError) {
+            return error(res, err.message, 404); 
+        }
+        console.error('Select profile error:', err);
+        return error(res, 'Failed to select profile', 500); 
     }
 });
 

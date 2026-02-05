@@ -1,17 +1,14 @@
 import { Router, Request, Response } from 'express';
-import { DelegationService } from '../services/DelegationService.js';
-import { DelegationRepositoryImpl } from '../infrastructure/repositories/implementations/DelegationRepositoryImpl.js';
-import { PatientRepositoryImpl } from '../infrastructure/repositories/implementations/PatientRepositoryImpl.js';
+import { delegationService } from '../services/index.js';
 import { success, error } from './utils/response.js';
+import { AppError } from '../utils/errors.js';
 
 const router = Router();
 
-const delegationService = new DelegationService(
-    new DelegationRepositoryImpl(),
-    new PatientRepositoryImpl()
-);
-
-// Create a new delegation
+/**
+ * POST /api/delegations
+ * Create a new delegation
+ */
 router.post('/', async (req: Request, res: Response) => {
     try {
         const { delegatingUserId, delegatorUserId } = req.body;
@@ -19,8 +16,9 @@ router.post('/', async (req: Request, res: Response) => {
         if (!delegatingUserId || !delegatorUserId) {
             return error(res, 'delegatingUserId and delegatorUserId are required', 400);
         }
+
         if (delegatingUserId === delegatorUserId) {
-            return error(res, 'cannot delegate to yourself', 400);
+            return error(res, 'Cannot delegate to yourself', 400);
         }
 
         const delegation = await delegationService.createDelegation({
@@ -29,98 +27,108 @@ router.post('/', async (req: Request, res: Response) => {
         });
 
         return success(res, delegation, 201);
-
     } catch (err) {
         console.error('Create delegation error:', err);
-
-        if (err instanceof Error) {
-            if (err.message.includes('not found')) {
-                return error(res, err.message, 404);
-            }
-            if (err.message.includes('already exists')) {
-                return error(res, err.message, 409);
-            }
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
         }
-
         return error(res, 'Internal server error', 500);
     }
 });
 
-// Get all delegations
+/**
+ * GET /api/delegations
+ * Get all delegations, optionally filtered by status
+ */
 router.get('/', async (req: Request, res: Response) => {
     try {
         const status = req.query.status as string;
-
         const result = await delegationService.getAllDelegations(status);
         return success(res, result);
-
     } catch (err) {
         console.error('Get all delegations error:', err);
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
+        }
         return error(res, 'Internal server error', 500);
     }
 });
 
-
-
-// Get delegations received by user (where user must accept/decline)
+/**
+ * GET /api/delegations/received
+ * Get delegations received by user
+ */
 router.get('/received', async (req: Request, res: Response) => {
     try {
         const userId = req.query.userId as string;
-        
+
         if (!userId) {
             return error(res, 'userId is required as query parameter', 400);
         }
 
         const status = req.query.status as string | undefined;
-
         const result = await delegationService.getDelegationsForUser(userId, 'delegating', status);
         return success(res, result);
-
     } catch (err) {
-        console.error('List received delegations error:', err);
+        console.error('Get received delegations error:', err);
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
+        }
         return error(res, 'Internal server error', 500);
     }
 });
 
-// Get delegations sent by user (where user is the data owner)
+/**
+ * GET /api/delegations/sent
+ * Get delegations sent by user
+ */
 router.get('/sent', async (req: Request, res: Response) => {
     try {
         const userId = req.query.userId as string;
-        
+
         if (!userId) {
             return error(res, 'userId is required as query parameter', 400);
         }
 
         const status = req.query.status as string | undefined;
-
         const result = await delegationService.getDelegationsForUser(userId, 'delegator', status);
         return success(res, result);
-
     } catch (err) {
-        console.error('List sent delegations error:', err);
+        console.error('Get sent delegations error:', err);
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
+        }
         return error(res, 'Internal server error', 500);
     }
 });
 
-// Get active delegations where user can operate for others
+/**
+ * GET /api/delegations/active-for-user
+ * Get active delegations for a delegating user
+ */
 router.get('/active-for-user', async (req: Request, res: Response) => {
     try {
         const userId = req.query.userId as string;
-        
+
         if (!userId) {
             return error(res, 'userId is required as query parameter', 400);
         }
 
         const result = await delegationService.getActiveDelegationsForDelegatingUser(userId);
         return success(res, result);
-
     } catch (err) {
         console.error('Get active delegations error:', err);
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
+        }
         return error(res, 'Internal server error', 500);
     }
 });
 
-// Get delegation by ID
+/**
+ * GET /api/delegations/:delegationId
+ * Get delegation by ID
+ */
 router.get('/:delegationId', async (req: Request, res: Response) => {
     try {
         const { delegationId } = req.params;
@@ -131,21 +139,19 @@ router.get('/:delegationId', async (req: Request, res: Response) => {
 
         const delegation = await delegationService.getDelegationById(delegationId);
         return success(res, delegation);
-
     } catch (err) {
         console.error('Get delegation error:', err);
-
-        if (err instanceof Error) {
-            if (err.message === 'Delegation not found') {
-                return error(res, 'Delegation not found', 404);
-            }
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
         }
-
         return error(res, 'Internal server error', 500);
     }
 });
 
-// Accept a delegation
+/**
+ * PUT /api/delegations/:delegationId/accept
+ * Accept a delegation
+ */
 router.put('/:delegationId/accept', async (req: Request, res: Response) => {
     try {
         const { delegationId } = req.params;
@@ -161,27 +167,19 @@ router.put('/:delegationId/accept', async (req: Request, res: Response) => {
 
         const result = await delegationService.acceptDelegation(delegationId, userId);
         return success(res, result);
-
     } catch (err) {
         console.error('Accept delegation error:', err);
-
-        if (err instanceof Error) {
-            if (err.message === 'Delegation not found') {
-                return error(res, err.message, 404);
-            }
-            if (err.message.includes('not authorized')) {
-                return error(res, err.message, 403);
-            }
-            if (err.message.includes('Cannot accept')) {
-                return error(res, err.message, 400);
-            }
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
         }
-
         return error(res, 'Internal server error', 500);
     }
 });
 
-// Decline a delegation
+/**
+ * PUT /api/delegations/:delegationId/decline
+ * Decline a delegation
+ */
 router.put('/:delegationId/decline', async (req: Request, res: Response) => {
     try {
         const { delegationId } = req.params;
@@ -197,27 +195,19 @@ router.put('/:delegationId/decline', async (req: Request, res: Response) => {
 
         const result = await delegationService.declineDelegation(delegationId, userId);
         return success(res, result);
-
     } catch (err) {
         console.error('Decline delegation error:', err);
-
-        if (err instanceof Error) {
-            if (err.message === 'Delegation not found') {
-                return error(res, err.message, 404);
-            }
-            if (err.message.includes('not authorized')) {
-                return error(res, err.message, 403);
-            }
-            if (err.message.includes('Cannot decline')) {
-                return error(res, err.message, 400);
-            }
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
         }
-
         return error(res, 'Internal server error', 500);
     }
 });
 
-// Delete a delegation
+/**
+ * DELETE /api/delegations/:delegationId
+ * Delete a delegation
+ */
 router.delete('/:delegationId', async (req: Request, res: Response) => {
     try {
         const { delegationId } = req.params;
@@ -227,28 +217,17 @@ router.delete('/:delegationId', async (req: Request, res: Response) => {
             return error(res, 'Invalid delegation ID', 400);
         }
 
-        if (!userId || typeof userId !== 'string') {
+        if (!userId) {
             return error(res, 'userId is required as query parameter', 400);
         }
 
         const result = await delegationService.deleteDelegation(delegationId, userId);
         return success(res, result);
-
     } catch (err) {
         console.error('Delete delegation error:', err);
-
-        if (err instanceof Error) {
-            if (err.message === 'Delegation not found') {
-                return error(res, err.message, 404);
-            }
-            if (err.message.includes('not authorized')) {
-                return error(res, err.message, 403);
-            }
-            if (err.message.includes('Cannot delete')) {
-                return error(res, err.message, 400);
-            }
+        if (err instanceof AppError) {
+            return error(res, err.message, err.statusCode);
         }
-
         return error(res, 'Internal server error', 500);
     }
 });

@@ -9,9 +9,9 @@ export interface DelegationData {
 
 export interface IDelegationRepository {
     findDelegationById(delegationId: string): Promise<DelegationData | null>;
-    findAll(status?: string): Promise<DelegationData[]>;
-    findByDelegatingUserId(userId: string, status?: string): Promise<DelegationData[]>;
-    findByDelegatorUserId(userId: string, status?: string): Promise<DelegationData[]>;
+    findAll(status?: string): Promise<{delegations: DelegationData[] | null}>;
+    findByDelegatingUserId(userId: string, status?: string): Promise<{delegations: DelegationData[] | null}>;
+    findByDelegatorUserId(userId: string, status?: string): Promise<{delegations: DelegationData[] | null}>;
     findDelegationByUsers(delegatingUserId: string, delegatorUserId: string): Promise<DelegationData | null>;
     create(delegation: Delegation): Promise<void>;
     save(delegation: Delegation): Promise<void>;
