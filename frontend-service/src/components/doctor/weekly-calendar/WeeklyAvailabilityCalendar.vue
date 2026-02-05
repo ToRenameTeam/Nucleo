@@ -214,6 +214,10 @@ function isPastAvailability(availability: AvailabilityDisplay): boolean {
         <span class="legend-color booked"></span>
         <span class="legend-label">{{ t('doctor.availabilities.legend.booked') }}</span>
       </div>
+      <div class="legend-item">
+        <span class="legend-color past"></span>
+        <span class="legend-label">{{ t('doctor.availabilities.legend.past') }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -564,6 +568,11 @@ function isPastAvailability(availability: AvailabilityDisplay): boolean {
 .legend-color.booked {
   background: var(--accent-primary-30);
   border: 1px solid var(--accent-primary-40);
+}
+
+.legend-color.past {
+  background: var(--gray-d4d4d4);
+  border: 1px solid var(--gray-737373);
 }
 
 .legend-label {

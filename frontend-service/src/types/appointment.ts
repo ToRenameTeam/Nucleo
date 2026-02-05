@@ -5,6 +5,7 @@ export interface Appointment {
   date: string;
   time?: string;
   user?: string;
+  patientName?: string;
   fiscalCode?: string;
   location?: string;
   patientId?: string;

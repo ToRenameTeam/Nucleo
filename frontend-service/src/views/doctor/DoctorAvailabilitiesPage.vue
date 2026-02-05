@@ -10,6 +10,7 @@ import {
 import WeeklyAvailabilityCalendar from '../../components/doctor/weekly-calendar/WeeklyAvailabilityCalendar.vue'
 import ScheduleModal from '../../components/shared/ScheduleModal.vue'
 import Toast from '../../components/shared/Toast.vue'
+import StatCard from '../../components/doctor/StatCard.vue'
 import type { AvailabilityDisplay } from '../../types/availability'
 import { availabilitiesApi } from '../../api/availabilities'
 
@@ -60,7 +61,17 @@ const stats = computed(() => {
   const available = active.filter(a => !a.isBooked).length
   const booked = active.filter(a => a.isBooked).length
   
-  return { total, available, booked }
+  // Filter past availabilities (ended before now)
+  const now = new Date()
+  const past = active.filter(a => a.endDateTime < now).length
+  
+  return { total, available, booked, past }
+})
+
+// Computed properties for filtering availabilities
+const pastAvailabilities = computed(() => {
+  const now = new Date()
+  return activeAvailabilities.value.filter(a => a.endDateTime < now)
 })
 
 // Load availabilities
@@ -268,29 +279,34 @@ onMounted(() => {
 
     <!-- Stats Section -->
     <div class="stats-section">
-      <div class="stat-card">
-        <CalendarDaysIcon class="stat-icon total" />
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.total }}</span>
-          <span class="stat-label">{{ t('doctor.availabilities.stats.total') }}</span>
-        </div>
-      </div>
+      <StatCard
+        :value="stats.total"
+        :label="t('doctor.availabilities.stats.total')"
+        :icon="CalendarDaysIcon"
+        icon-bg-color="var(--accent-primary-15)"
+        icon-color="var(--accent-primary)"
+      />
       
-      <div class="stat-card">
-        <div class="stat-indicator available"></div>
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.available }}</span>
-          <span class="stat-label">{{ t('doctor.availabilities.stats.available') }}</span>
-        </div>
-      </div>
+      <StatCard
+        :value="stats.available"
+        :label="t('doctor.availabilities.stats.available')"
+        indicator-bg-color="var(--success-30)"
+        indicator-border-color="var(--success)"
+      />
       
-      <div class="stat-card">
-        <div class="stat-indicator booked"></div>
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.booked }}</span>
-          <span class="stat-label">{{ t('doctor.availabilities.stats.booked') }}</span>
-        </div>
-      </div>
+      <StatCard
+        :value="stats.booked"
+        :label="t('doctor.availabilities.stats.booked')"
+        indicator-bg-color="var(--accent-primary-30)"
+        indicator-border-color="var(--accent-primary)"
+      />
+      
+      <StatCard
+        :value="stats.past"
+        :label="t('doctor.availabilities.stats.past')"
+        indicator-bg-color="var(--gray-d4d4d4)"
+        indicator-border-color="var(--gray-737373)"
+      />
     </div>
 
     <!-- Loading State -->
@@ -474,64 +490,6 @@ onMounted(() => {
   animation-fill-mode: both;
 }
 
-.stat-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.25rem;
-  background: var(--white-40);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--white-60);
-  border-radius: 1rem;
-  box-shadow: 0 4px 16px var(--black-6);
-}
-
-.stat-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0.5rem;
-  border-radius: 0.75rem;
-}
-
-.stat-icon.total {
-  background: var(--accent-primary-15);
-  color: var(--accent-primary);
-}
-
-.stat-indicator {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 0.5rem;
-}
-
-.stat-indicator.available {
-  background: var(--success-30);
-  border: 2px solid var(--success);
-}
-
-.stat-indicator.booked {
-  background: var(--accent-primary-30);
-  border: 2px solid var(--accent-primary);
-}
-
-.stat-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--gray-171717);
-  line-height: 1;
-}
-
-.stat-label {
-  font-size: 0.75rem;
-  color: var(--gray-525252);
-  margin-top: 0.25rem;
-}
-
 .loading-container,
 .error-container {
   display: flex;
@@ -592,6 +550,29 @@ onMounted(() => {
   animation-delay: 0.2s;
   animation-fill-mode: both;
   margin-bottom: 2rem;
+}
+
+/* Past Availabilities Section */
+.past-availabilities-section {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
+  animation: fadeIn 0.5s cubic-bezier(0, 0, 0.2, 1);
+  animation-delay: 0.3s;
+  animation-fill-mode: both;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-171717);
+  margin: 0 0 1rem;
+}
+
+.past-availabilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
 }
 
 /* Delete Confirmation Modal */

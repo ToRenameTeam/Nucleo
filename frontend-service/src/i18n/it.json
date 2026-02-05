@@ -434,7 +434,8 @@
       "stats": {
         "total": "Totale",
         "available": "Disponibili",
-        "booked": "Prenotate"
+        "booked": "Prenotate",
+        "past": "Passate"
       },
       "calendar": {
         "previousWeek": "Settimana precedente",
@@ -443,7 +444,8 @@
       },
       "legend": {
         "available": "Disponibile",
-        "booked": "Prenotato"
+        "booked": "Prenotato",
+        "past": "Passato"
       },
       "actions": {
         "edit": "Modifica disponibilità",

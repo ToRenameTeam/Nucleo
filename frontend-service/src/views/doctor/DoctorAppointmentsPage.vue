@@ -197,8 +197,9 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
     meta.push({ icon: ClockIcon, label: appointment.time })
   }
   
-  if (appointment.user) {
-    meta.push({ icon: UserIcon, label: appointment.user })
+  // In doctor's view, show patient name instead of doctor name
+  if (appointment.patientName) {
+    meta.push({ icon: UserIcon, label: appointment.patientName })
   }
   
   if (appointment.location) {
@@ -517,7 +518,7 @@ onMounted(() => {
 
               <template #actions>
                 <button
-                  v-if="appointment.status === 'SCHEDULED'"
+                  v-if="appointment.status === 'SCHEDULED' && !isAppointmentCurrentOrFuture(appointment)"
                   class="action-button edit-button"
                   @click.stop="handleEditAppointment(appointment.id)"
                   :title="$t('appointments.editAppointment')"
@@ -604,7 +605,7 @@ onMounted(() => {
 
                 <template #actions>
                   <button
-                    v-if="appointment.status === 'SCHEDULED'"
+                    v-if="appointment.status === 'SCHEDULED' && !isAppointmentCurrentOrFuture(appointment)"
                     class="action-button edit-button"
                     @click.stop="handleEditAppointment(appointment.id)"
                     :title="$t('appointments.editAppointment')"

@@ -433,7 +433,8 @@
       "stats": {
         "total": "Total this week",
         "available": "Available",
-        "booked": "Booked"
+        "booked": "Booked",
+        "past": "Past"
       },
       "calendar": {
         "previousWeek": "Previous week",
@@ -442,7 +443,8 @@
       },
       "legend": {
         "available": "Available",
-        "booked": "Booked"
+        "booked": "Booked",
+        "past": "Past"
       },
       "actions": {
         "edit": "Edit availability",
