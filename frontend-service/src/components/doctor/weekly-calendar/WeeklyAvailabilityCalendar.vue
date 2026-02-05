@@ -76,6 +76,12 @@ function handleDelete(event: Event, availability: AvailabilityDisplay) {
 function formatTime(date: Date): string {
   return formatTimeUtil(date, locale.value)
 }
+
+// Check if availability is in the past
+function isPastAvailability(availability: AvailabilityDisplay): boolean {
+  const now = new Date()
+  return availability.endDateTime < now
+}
 </script>
 
 <template>
@@ -153,7 +159,8 @@ function formatTime(date: Date): string {
             class="availability-block"
             :class="{ 
               'is-booked': availability.isBooked,
-              'is-available': !availability.isBooked
+              'is-available': !availability.isBooked,
+              'is-past': isPastAvailability(availability)
             }"
             :style="getAvailabilityStyle(availability)"
             @click.stop
@@ -171,9 +178,9 @@ function formatTime(date: Date): string {
                   <CheckCircleIcon class="booked-icon" />
                 </div>
                 
-                <!-- Edit button (only for non-booked) -->
+                <!-- Edit button (only for non-booked and not past) -->
                 <button 
-                  v-if="!availability.isBooked"
+                  v-if="!availability.isBooked && !isPastAvailability(availability)"
                   class="action-btn edit-btn"
                   @click="handleEdit($event, availability)"
                   :title="t('doctor.availabilities.actions.edit')"
@@ -181,9 +188,9 @@ function formatTime(date: Date): string {
                   <PencilSquareIcon class="action-icon" />
                 </button>
                 
-                <!-- Delete button (only for non-booked) -->
+                <!-- Delete button (only for non-booked and not past) -->
                 <button 
-                  v-if="!availability.isBooked"
+                  v-if="!availability.isBooked && !isPastAvailability(availability)"
                   class="action-btn delete-btn"
                   @click="handleDelete($event, availability)"
                   :title="t('doctor.availabilities.actions.delete')"
@@ -401,6 +408,23 @@ function formatTime(date: Date): string {
 .availability-block.is-booked {
   background: var(--accent-primary-20);
   border: 1px solid var(--accent-primary-30);
+}
+
+.availability-block.is-past {
+  background: var(--gray-e5e5e5);
+  border: 1px solid var(--gray-d4d4d4);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.availability-block.is-past:hover {
+  background: var(--gray-e5e5e5);
+  box-shadow: none;
+  transform: none;
+}
+
+.availability-block.is-past .availability-time {
+  color: var(--gray-737373);
 }
 
 .availability-content {

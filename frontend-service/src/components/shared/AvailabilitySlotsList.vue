@@ -24,10 +24,14 @@ const { t } = useI18n()
 
 // Group availabilities by date
 const availableDates = computed(() => {
+  const now = new Date()
   const dateMap = new Map<string, AvailabilityDisplay[]>()
   
   props.availabilities
-    .filter(a => a.status === 'AVAILABLE' && !a.isBooked)
+    .filter(a => {
+      // Filter only available, not booked, and future availabilities
+      return a.status === 'AVAILABLE' && !a.isBooked && a.startDateTime > now
+    })
     .forEach(availability => {
       const dateKey = formatDateSlash(availability.startDateTime)
       if (!dateMap.has(dateKey)) {
