@@ -57,17 +57,6 @@ const changeUser = () => {
       <h1 class="topbar-title" @click="router.push('/patient/home')">{{ t('app.title') }}</h1>
     </div>
     <div class="topbar-actions">
-      <button 
-        class="topbar-icon-button notification-button"
-        :title="t('topbar.notifications')"
-        :aria-label="`${t('topbar.notifications')} - 1 ${t('topbar.unread')}`"
-      >
-        <svg class="topbar-icon notification-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-        </svg>
-        <span class="notification-badge" aria-label="1 {{ t('topbar.notification') }}">1</span>
-      </button>
       <!-- Language Selector -->
       <div class="language-selector">
         <button 
@@ -212,31 +201,6 @@ const changeUser = () => {
   background: var(--white-80);
   box-shadow: 0 4px 16px var(--black-12), inset 0 1px 0 var(--white-90);
   transform: translateY(-1px);
-}
-
-.notification-button {
-  width: clamp(2rem, 5vw, 2.25rem);
-  height: clamp(2rem, 5vw, 2.25rem);
-}
-.notification-icon {
-  color: var(--topbar-icon-color);
-  width: clamp(1rem, 3vw, 1.25rem);
-  height: clamp(1rem, 3vw, 1.25rem);
-}
-.notification-badge {
-  position: absolute;
-  top: -0.5rem;
-  right: -0.5rem;
-  background: var(--notification-red);
-  color: var(--white);
-  font-size: clamp(0.5rem, 1.5vw, 0.625rem);
-  font-weight: 600;
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .language-selector {

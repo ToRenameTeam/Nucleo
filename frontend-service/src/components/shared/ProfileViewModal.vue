@@ -2,9 +2,8 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseModal from './BaseModal.vue'
-import { UserCircleIcon, IdentificationIcon, CalendarIcon } from '@heroicons/vue/24/outline'
+import { UserCircleIcon, IdentificationIcon } from '@heroicons/vue/24/outline'
 import type { Profile } from '../../types/auth'
-import { parseItalianDate } from '../../utils/dateUtils'
 
 interface Props {
   isOpen: boolean
@@ -87,42 +86,6 @@ const modalTitle = computed(() => props.title || t('settings.profileModal.title'
           <div class="detail-content">
             <div class="detail-label">{{ t('settings.profileModal.fiscalCode') }}</div>
             <div class="detail-value">{{ profileData.fiscalCode }}</div>
-          </div>
-        </div>
-
-        <div class="detail-item">
-          <div class="detail-icon">
-            <CalendarIcon />
-          </div>
-          <div class="detail-content">
-            <div class="detail-label">{{ t('settings.profileModal.dateOfBirth') }}</div>
-            <div class="detail-value">{{ parseItalianDate(profileData.dateOfBirth) }}</div>
-          </div>
-        </div>
-
-        <div v-if="profileData.medicalLicenseNumber" class="detail-item">
-          <div class="detail-icon">
-            <IdentificationIcon />
-          </div>
-          <div class="detail-content">
-            <div class="detail-label">{{ t('settings.profileModal.medicalLicense') }}</div>
-            <div class="detail-value">{{ profileData.medicalLicenseNumber }}</div>
-          </div>
-        </div>
-
-        <div v-if="profileData.specializations?.length" class="detail-item">
-          <div class="detail-icon">
-            <UserCircleIcon />
-          </div>
-          <div class="detail-content">
-            <div class="detail-label">{{ t('settings.profileModal.specializations') }}</div>
-            <div class="detail-value">
-              <div class="specializations-list">
-                <span v-for="spec in profileData.specializations" :key="spec" class="specialization-tag">
-                  {{ spec }}
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -313,24 +276,6 @@ const modalTitle = computed(() => props.title || t('settings.profileModal.title'
 .profile-empty p {
   margin: 0;
   font-size: 1rem;
-}
-
-.specializations-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.specialization-tag {
-  display: inline-block;
-  padding: 0.375rem 0.75rem;
-  background: linear-gradient(135deg, var(--sky-0ea5e9-10) 0%, var(--purple-a855f7-10) 100%);
-  border: 1px solid var(--sky-0ea5e9-30);
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--sky-0ea5e9);
-  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
 }
 
 @media (max-width: 768px) {
