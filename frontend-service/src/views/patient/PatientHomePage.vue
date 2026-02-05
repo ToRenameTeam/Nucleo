@@ -57,6 +57,7 @@ const upcomingAppointments = computed(() => {
 const recentDocuments = computed(() => documentsData.value.slice(0, 2))
 const selectedDocument = ref<Document | null>(null)
 const isDocumentModalOpen = ref(false)
+const preselectedVisitType = ref<string | null>(null)
 const showSuccessToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref<'success' | 'error'>('success')
@@ -206,10 +207,6 @@ const handleUploadCancel = () => {
   selectedFile.value = null
 }
 
-function handleOpenBooking() {
-  isBookingModalOpen.value = true
-}
-
 function handleCloseBooking() {
   isBookingModalOpen.value = false
 }
@@ -235,6 +232,18 @@ async function handleBookingConfirmed(availabilityId: string) {
     showSuccessToast.value = true
   }
 }
+
+const handleNewAppointment = () => {
+  preselectedVisitType.value = null
+  isBookingModalOpen.value = true
+}
+
+/*
+const handleNewAppointmentWithType = (visitType: string) => {
+  preselectedVisitType.value = visitType
+  isBookingModalOpen.value = true
+}
+*/
 
 const handleAppointmentClick = (id: string) => {
   console.log('Appointment clicked:', id)
@@ -295,7 +304,7 @@ const handleCloseToast = () => {
               <span>{{ $t('home.uploadDocument') }}</span>
             </button>
             <button 
-              @click="handleOpenBooking"
+              @click="handleNewAppointment"
               class="quick-action-btn quick-action-btn-flex"
             >
               <PlusIcon class="quick-action-icon" />

@@ -18,6 +18,7 @@ import { hasMatchingSpecialization } from '../../utils/specialization'
 
 interface Props {
   isOpen: boolean
+  preselectedVisit?: string | null
 }
 
 const props = defineProps<Props>()
@@ -193,11 +194,21 @@ function formatDoctorName(doctor: UserInfo): string {
 }
 
 // Watch for modal open
-watch(() => props.isOpen, (isOpen) => {
+watch(() => props.isOpen, async (isOpen) => {
   if (isOpen) {
     resetModal()
     if (serviceTypes.value.length === 0) {
-      loadServiceTypes()
+      await loadServiceTypes()
+    }
+    
+    // Preselect service type if provided
+    if (props.preselectedVisit) {
+      const preselected = serviceTypes.value.find(
+        st => st.name.toLowerCase() === props.preselectedVisit?.toLowerCase()
+      )
+      if (preselected) {
+        selectServiceType(preselected)
+      }
     }
   }
 })
