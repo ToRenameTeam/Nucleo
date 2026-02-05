@@ -5,6 +5,7 @@ import BaseCard from './BaseCard.vue'
 import type { CardMetadata } from '../../types/shared'
 import type { DocumentCard, BadgeColors } from '../../types/document'
 import { TAG_COLOR_MAP, TAG_ICON_MAP } from '../../constants/categoryBadgeConfig'
+import { normalizeToSpecialization } from '../../utils/specialization'
 
 const props = withDefaults(defineProps<DocumentCard>(), {
   selectable: false,
@@ -98,7 +99,7 @@ const metadata = computed<CardMetadata[]>(() => {
           }"
         >
           <span class="badge-icon">{{ getBadgeIcon(tag) }}</span>
-          <span class="badge-label">{{ tag }}</span>
+          <span class="badge-label">{{ normalizeToSpecialization(tag) }}</span>
         </div>
       </div>
 

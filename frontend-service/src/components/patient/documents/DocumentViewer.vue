@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
 import { useI18n } from 'vue-i18n'
 import type { DocumentViewer } from '../../../types/document'
+import { normalizeToSpecialization } from '../../../utils/specialization'
 
 // Import report images (currently the same for all)
 import referto1 from '../../../assets/documents/referto_ECG_1.jpg'
@@ -95,7 +96,7 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
                 :key="index"
                 class="info-tag"
               >
-                {{ tag }}
+                {{ normalizeToSpecialization(tag) }}
               </span>
             </div>
             <span v-else class="info-value">--</span>
