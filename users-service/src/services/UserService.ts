@@ -89,7 +89,7 @@ export class UserService {
             name: userData.name,
             lastName: userData.lastName,
             dateOfBirth: userData.dateOfBirth.toISOString(),
-            patientData: patientData,
+            patient: patientData,
             doctor: doctorData ? {
                 medicalLicenseNumber: doctorData.medicalLicenseNumber,
                 specializations: doctorData.specializations,
@@ -111,7 +111,7 @@ export class UserService {
                     name: userData.name,
                     lastName: userData.lastName,
                     dateOfBirth: userData.dateOfBirth.toISOString(),
-                    patientData: patientData,
+                    patient: patientData,
                     doctor: doctorData ? {
                         medicalLicenseNumber: doctorData.medicalLicenseNumber,
                         specializations: doctorData.specializations,
@@ -141,7 +141,7 @@ export class UserService {
             name: userData.name,
             lastName: userData.lastName,
             dateOfBirth: userData.dateOfBirth.toISOString(),
-            patientData: patientData,
+            patient: patientData,
             doctor: doctorData ? {
                 medicalLicenseNumber: doctorData.medicalLicenseNumber,
                 specializations: doctorData.specializations,
