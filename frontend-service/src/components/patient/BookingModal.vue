@@ -2,9 +2,8 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { 
-  BuildingOffice2Icon,
-  UserIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/vue/24/outline'
 import BaseModal from '../shared/BaseModal.vue'
 import AvailabilitySlotsList from '../shared/AvailabilitySlotsList.vue'
@@ -37,6 +36,19 @@ const currentStep = ref(1)
 const serviceTypes = ref<ServiceType[]>([])
 const selectedServiceType = ref<ServiceType | null>(null)
 const loadingServiceTypes = ref(false)
+const searchQuery = ref('')
+
+const filteredServiceTypes = computed(() => {
+  if (!searchQuery.value.trim()) {
+    return serviceTypes.value
+  }
+  
+  const query = searchQuery.value.toLowerCase().trim()
+  return serviceTypes.value.filter(st => 
+    st.name.toLowerCase().includes(query) ||
+    (st.description && st.description.toLowerCase().includes(query))
+  )
+})
 
 // Step 2: Doctor selection
 const doctors = ref<UserInfo[]>([])
@@ -184,6 +196,7 @@ function resetModal() {
   selectedDoctor.value = null
   selectedAvailability.value = null
   availabilities.value = []
+  searchQuery.value = ''
 }
 
 // Format doctor name with specializations
@@ -225,7 +238,7 @@ onMounted(() => {
     :is-open="isOpen"
     :title="t('patient.booking.modal.title')"
     :subtitle="t('patient.booking.modal.subtitle')"
-    max-width="lg"
+    max-width="xl"
     :close-on-backdrop="true"
     @close="handleClose"
   >
@@ -254,20 +267,34 @@ onMounted(() => {
       <div v-if="currentStep === 1" class="step-content">
         <h3 class="step-title">{{ t('patient.booking.modal.selectServiceType') }}</h3>
         
+        <!-- Search Bar -->
+        <div class="search-bar">
+          <MagnifyingGlassIcon class="search-icon" />
+          <input
+            v-model="searchQuery"
+            type="text"
+            class="search-input"
+            :placeholder="t('appointmentBooking.searchPlaceholder')"
+          />
+        </div>
+        
         <div v-if="loadingServiceTypes" class="loading-state">
           <div class="spinner"></div>
           <p>{{ t('common.loading') }}</p>
         </div>
 
+        <div v-else-if="filteredServiceTypes.length === 0" class="empty-state">
+          <p>{{ t('common.noResults') || 'Nessun risultato trovato' }}</p>
+        </div>
+
         <div v-else class="options-list">
           <button
-            v-for="serviceType in serviceTypes"
+            v-for="serviceType in filteredServiceTypes"
             :key="serviceType._id"
             class="option-card"
             :class="{ selected: selectedServiceType?._id === serviceType._id }"
             @click="selectServiceType(serviceType)"
           >
-            <BuildingOffice2Icon class="option-icon" />
             <div class="option-content">
               <div class="option-name">{{ serviceType.name }}</div>
               <div v-if="serviceType.description" class="option-description">
@@ -305,7 +332,6 @@ onMounted(() => {
             :class="{ selected: selectedDoctor?.userId === doctor.userId }"
             @click="selectDoctor(doctor)"
           >
-            <UserIcon class="option-icon" />
             <div class="option-content">
               <div class="option-name">{{ formatDoctorName(doctor) }}</div>
             </div>
@@ -464,7 +490,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  height: 22rem;
+  height: 28rem;
   overflow: hidden;
 }
 
@@ -474,6 +500,53 @@ onMounted(() => {
   font-size: 1.125rem;
   font-weight: var(--font-bold);
   color: var(--text-primary);
+}
+
+/* Search Bar */
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 2.75rem;
+  font-size: var(--text-base);
+  font-family: var(--font-primary);
+  color: var(--text-primary);
+  background: var(--white-20);
+  backdrop-filter: blur(var(--blur-md));
+  border: 2px solid var(--white-30);
+  border-radius: var(--radius-xl);
+  transition: all var(--duration-base) var(--ease-out);
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.search-input:focus {
+  background: var(--white-30);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 4px var(--accent-primary-10);
+}
+
+.search-input:hover:not(:focus) {
+  border-color: var(--white-50);
 }
 
 /* Selected Info */
@@ -510,7 +583,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  max-height: 22rem;
+  max-height: 28rem;
   overflow-y: auto;
   overflow-x: hidden;
   padding: var(--space-2) var(--space-3) var(--space-2) var(--space-1);
@@ -541,8 +614,9 @@ onMounted(() => {
 .option-card {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-5);
+  justify-content: space-between;
+  width: 100%;
+  padding: 1.25rem 1.5rem;
   background: var(--white-20);
   backdrop-filter: blur(var(--blur-md));
   border: 2px solid var(--white-30);
@@ -551,6 +625,18 @@ onMounted(() => {
   cursor: pointer;
   transition: all var(--duration-base) var(--ease-out);
   text-align: left;
+}
+
+@media (min-width: 640px) {
+  .option-card {
+    padding: 1.5rem 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .option-card {
+    padding: 1.75rem 2.5rem;
+  }
 }
 
 .option-card:hover {
@@ -566,48 +652,69 @@ onMounted(() => {
   box-shadow: 0 0 0 4px var(--accent-primary-10), var(--shadow-glass-md);
 }
 
-.option-icon {
-  width: 48px;
-  height: 48px;
-  padding: var(--space-2);
-  color: var(--accent-primary);
-  background: var(--white-30);
-  border-radius: var(--radius-lg);
-  flex-shrink: 0;
-}
-
-.option-card.selected .option-icon {
-  color: white;
-  background: var(--accent-primary);
-}
-
 .option-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .option-content {
+    gap: 0.625rem;
+  }
 }
 
 .option-name {
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: var(--font-bold);
   color: var(--text-primary);
-  line-height: 1.4;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+@media (min-width: 640px) {
+  .option-name {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .option-name {
+    font-size: 1.0625rem;
+  }
 }
 
 .option-description {
-  font-size: var(--text-sm);
+  font-size: 0.8125rem;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+@media (min-width: 640px) {
+  .option-description {
+    font-size: 0.875rem;
+  }
 }
 
 .option-arrow {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   color: var(--text-secondary);
   flex-shrink: 0;
   opacity: 0.5;
   transition: all var(--duration-base) var(--ease-out);
+  margin-left: 1rem;
+}
+
+@media (min-width: 640px) {
+  .option-arrow {
+    width: 24px;
+    height: 24px;
+    margin-left: 1.5rem;
+  }
 }
 
 .option-card:hover .option-arrow {
@@ -622,7 +729,7 @@ onMounted(() => {
 
 /* Availabilities Section */
 .availabilities-wrapper {
-  max-height: 22rem;
+  max-height: 28rem;
   overflow-y: auto;
   overflow-x: hidden;
   padding: var(--space-2) var(--space-3) var(--space-2) var(--space-1);
@@ -710,20 +817,18 @@ onMounted(() => {
 }
 
 .btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 48px;
-  padding: var(--space-3) var(--space-6);
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  font-weight: var(--font-bold);
-  border-radius: var(--radius-xl);
-  border: 2px solid transparent;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
   cursor: pointer;
-  transition: all var(--duration-base) var(--ease-out);
-  user-select: none;
+  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+  border: 1px solid transparent;
+  min-width: 6rem;
 }
 
 .btn:focus-visible {
@@ -732,17 +837,15 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-  color: white;
-  box-shadow: var(--shadow-glass-md), 0 0 0 0 var(--accent-primary-30);
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  color: var(--white);
+  border-color: var(--white-20);
+  box-shadow: 0 4px 16px var(--accent-primary-30), inset 0 1px 0 var(--white-20);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--sky-0369a1);
-  border-color: var(--sky-0369a1);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-glass-lg), 0 0 0 6px var(--accent-primary-20);
+  box-shadow: 0 6px 20px var(--accent-primary-40), inset 0 1px 0 var(--white-30);
 }
 
 .btn-primary:active:not(:disabled) {
@@ -750,26 +853,25 @@ onMounted(() => {
 }
 
 .btn-primary:disabled {
-  opacity: 0.4;
+  opacity: 0.6;
   cursor: not-allowed;
-  filter: grayscale(0.5);
 }
 
 .btn-outline {
-  background: var(--white-15);
-  backdrop-filter: blur(var(--blur-md));
-  border-color: var(--white-40);
+  background: var(--white-40);
+  backdrop-filter: blur(12px);
   color: var(--text-primary);
+  border-color: var(--white-60);
+  box-shadow: 0 2px 8px var(--shadow), inset 0 1px 0 var(--white-60);
 }
 
-.btn-outline:hover {
-  background: var(--white-25);
-  border-color: var(--white-50);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-glass-sm);
+.btn-outline:hover:not(:disabled) {
+  background: var(--white-50);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow), inset 0 1px 0 var(--white-70);
 }
 
-.btn-outline:active {
+.btn-outline:active:not(:disabled) {
   transform: translateY(0);
 }
 </style>
