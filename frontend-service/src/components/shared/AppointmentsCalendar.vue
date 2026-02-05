@@ -5,7 +5,7 @@ import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import type { Appointment } from '../../types/appointment'
-import { parseItalianDate, formatDateToISO } from '../../utils/dateUtils'
+import { parseItalianDate, parseItalianDateSlash, formatDateToISO } from '../../utils/dateUtils'
 
 interface Props {
   /** Appointments to display on calendar */
@@ -51,11 +51,16 @@ const emit = defineEmits<{
 }>()
 
 function parseDateToISO(dateString: string): string {
-  const date = parseItalianDate(dateString)
-  if (date) {
-    return formatDateToISO(date)
+  // Try parsing with slash format first (dd/mm/yyyy or d/m/yyyy)
+  let date = parseItalianDateSlash(dateString)
+  
+  // If slash format fails, try Italian format (dd Mese yyyy)
+  if (!date) {
+    date = parseItalianDate(dateString)
   }
-  return formatDateToISO(new Date())
+  
+  // If all parsing fails, use current date
+  return date ? formatDateToISO(date) : formatDateToISO(new Date())
 }
 
 const calendarEvents = computed(() => {

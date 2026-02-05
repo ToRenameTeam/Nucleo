@@ -106,7 +106,7 @@ function handleCalendarEventClick(appointmentId: string) {
   selectedAppointmentId.value = appointmentId
   
   if (window.innerWidth >= 768) {
-    const element = document.getElementById(`appointment-${appointmentId}`)
+    const element = document.getElementById(appointmentId)
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
@@ -247,7 +247,7 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
       <!-- Calendar -->
       <div class="calendar-container">
         <AppointmentsCalendar
-          :appointments="appointments"
+          :appointments="filteredAppointments"
           :selected-appointment-id="selectedAppointmentId"
           @event-click="handleCalendarEventClick"
           @date-select="handleDateSelect"
