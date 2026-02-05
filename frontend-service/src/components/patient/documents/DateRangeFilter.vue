@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { CalendarIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { useI18n } from 'vue-i18n'
 import type { DateRange } from '../../../types/date-range'
+import { formatDateToISO, startOfDay, endOfDay } from '../../../utils/dateUtils'
 
 interface DateRangeFilter {
   modelValue: DateRange
@@ -24,11 +25,9 @@ const presets = computed(() => [
     id: 'last-month',
     label: t('documents.dateRange.lastMonth'),
     getDates: () => {
-      const to = new Date()
-      to.setHours(23, 59, 59, 999)
-      const from = new Date()
+      const to = endOfDay(new Date())
+      const from = startOfDay(new Date())
       from.setMonth(from.getMonth() - 1)
-      from.setHours(0, 0, 0, 0)
       return { from, to }
     }
   },
@@ -36,11 +35,9 @@ const presets = computed(() => [
     id: 'last-3-months',
     label: t('documents.dateRange.last3Months'),
     getDates: () => {
-      const to = new Date()
-      to.setHours(23, 59, 59, 999)
-      const from = new Date()
+      const to = endOfDay(new Date())
+      const from = startOfDay(new Date())
       from.setMonth(from.getMonth() - 3)
-      from.setHours(0, 0, 0, 0)
       return { from, to }
     }
   },
@@ -48,11 +45,9 @@ const presets = computed(() => [
     id: 'last-6-months',
     label: t('documents.dateRange.last6Months'),
     getDates: () => {
-      const to = new Date()
-      to.setHours(23, 59, 59, 999)
-      const from = new Date()
+      const to = endOfDay(new Date())
+      const from = startOfDay(new Date())
       from.setMonth(from.getMonth() - 6)
-      from.setHours(0, 0, 0, 0)
       return { from, to }
     }
   },
@@ -60,11 +55,9 @@ const presets = computed(() => [
     id: 'last-year',
     label: t('documents.dateRange.lastYear'),
     getDates: () => {
-      const to = new Date()
-      to.setHours(23, 59, 59, 999)
-      const from = new Date()
+      const to = endOfDay(new Date())
+      const from = startOfDay(new Date())
       from.setFullYear(from.getFullYear() - 1)
-      from.setHours(0, 0, 0, 0)
       return { from, to }
     }
   }
@@ -105,13 +98,13 @@ const formattedRange = computed(() => {
 // Initialize input values from props
 watch(() => props.modelValue, (value) => {
   if (value.from) {
-    fromDate.value = value.from.toISOString().split('T')[0] || ''
+    fromDate.value = formatDateToISO(value.from)
   } else {
     fromDate.value = ''
   }
   
   if (value.to) {
-    toDate.value = value.to.toISOString().split('T')[0] || ''
+    toDate.value = formatDateToISO(value.to)
   } else {
     toDate.value = ''
   }
@@ -125,16 +118,8 @@ const applyPreset = (preset: typeof presets.value[0]) => {
 
 const applyCustomRange = () => {
   const range: DateRange = {
-    from: fromDate.value ? (() => {
-      const date = new Date(fromDate.value)
-      date.setHours(0, 0, 0, 0)
-      return date
-    })() : null,
-    to: toDate.value ? (() => {
-      const date = new Date(toDate.value)
-      date.setHours(23, 59, 59, 999)
-      return date
-    })() : null
+    from: fromDate.value ? startOfDay(new Date(fromDate.value)) : null,
+    to: toDate.value ? endOfDay(new Date(toDate.value)) : null
   }
   emit('update:modelValue', range)
   showPicker.value = false

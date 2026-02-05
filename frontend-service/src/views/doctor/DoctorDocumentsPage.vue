@@ -14,7 +14,7 @@ import PrescriptionsManager from '../../components/doctor/prescriptions/Prescrip
 import type { DateRange } from '../../types/date-range'
 import type { Tag } from '../../types/tag'
 import type { AnyDocument, MedicinePrescription } from '../../types/document'
-import { parseItalianDate } from '../../utils/dateUtils'
+import { parseAnyDate, isDateInRange } from '../../utils/dateUtils'
 import { documentsApiService } from '../../api/documents'
 import { useAuth } from '../../composables/useAuth'
 
@@ -120,27 +120,16 @@ const filteredDocuments = computed(() => {
     // Filter by date range
     if (dateRange.value.from || dateRange.value.to) {
         filtered = filtered.filter(doc => {
-            const docDate = parseItalianDate(doc.date)
+            const docDate = parseAnyDate(doc.date)
             if (!docDate) return false
-
-            const from = dateRange.value.from
-            const to = dateRange.value.to
-
-            if (from && to) {
-                return docDate >= from && docDate <= to
-            } else if (from) {
-                return docDate >= from
-            } else if (to) {
-                return docDate <= to
-            }
-            return true
+            return isDateInRange(docDate, dateRange.value.from, dateRange.value.to)
         })
     }
 
     // Always sort by newest first
     filtered.sort((a, b) => {
-        const dateA = parseItalianDate(a.date)
-        const dateB = parseItalianDate(b.date)
+        const dateA = parseAnyDate(a.date)
+        const dateB = parseAnyDate(b.date)
         if (!dateA || !dateB) return 0
         return dateB.getTime() - dateA.getTime()
     })

@@ -13,9 +13,10 @@ import type { DateRange } from '../../types/date-range'
 import BatchActionsBar from '../../components/patient/documents/BatchActionsBar.vue'
 import type { Tag } from '../../types/tag'
 import type { Document, ServicePrescription, AnyDocument } from '../../types/document'
-import { parseItalianDate } from '../../utils/dateUtils'
+import { parseAnyDate, isDateInRange } from '../../utils/dateUtils'
 import { documentsApiService } from '../../api/documents'
 import { masterDataApi, type ServiceType } from '../../api/masterData'
+import { normalizeToSpecialization } from '../../utils/specialization'
 
 const { currentUser, currentPatientProfile } = useAuth()
 const router = useRouter()
@@ -39,16 +40,35 @@ const dateRange = ref<DateRange>({
 const documents = ref<AnyDocument[]>([])
 const serviceTypes = ref<ServiceType[]>([])
 
-const tags = computed<Tag[]>(() => [
-  { id: 'tutti', label: 'Tutti', count: documents.value.length },
-  { id: 'prescrizione', label: 'Prescrizione', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'prescrizione')).length },
-  { id: 'diabete', label: 'Diabete', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'diabete')).length },
-  { id: 'cardiologia', label: 'Cardiologia', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'cardiologia')).length },
-  { id: 'analisi', label: 'Analisi', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'analisi')).length },
-  { id: 'diagnostica', label: 'Diagnostica', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'diagnostica')).length },
-  { id: 'oculistica', label: 'Oculistica', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'oculistica')).length },
-  { id: 'ortopedia', label: 'Ortopedia', count: documents.value.filter(d => d.tags.some(tag => tag.toLowerCase() === 'ortopedia')).length },
-])
+const tags = computed<Tag[]>(() => {
+  // Estrai tutti i tag unici dai documenti
+  const tagCounts = new Map<string, number>()
+  
+  documents.value.forEach(doc => {
+    doc.tags.forEach(tag => {
+      const normalizedTag = tag.toLowerCase().trim()
+      if (normalizedTag) {
+        tagCounts.set(normalizedTag, (tagCounts.get(normalizedTag) || 0) + 1)
+      }
+    })
+  })
+  
+  // Converti in array e ordina per conteggio (decrescente)
+  const sortedTags = Array.from(tagCounts.entries())
+    .map(([tag, count]) => ({
+      id: tag,
+      label: normalizeToSpecialization(tag), // Usa la funzione utility
+      count
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5) // Limita a 5 tag
+  
+  // Aggiungi "Tutti" all'inizio
+  return [
+    { id: 'tutti', label: 'Tutti', count: documents.value.length },
+    ...sortedTags
+  ]
+})
 
 // Type guard for ServicePrescription
 function isServicePrescription(doc: AnyDocument): doc is ServicePrescription {
@@ -148,31 +168,9 @@ const filteredDocuments = computed(() => {
   // Filter by date range
   if (dateRange.value.from || dateRange.value.to) {
     filtered = filtered.filter(doc => {
-      const docDate = parseItalianDate(doc.date)
+      const docDate = parseAnyDate(doc.date)
       if (!docDate) return false
-
-      // Set docDate to start of day for accurate comparison
-      docDate.setHours(0, 0, 0, 0)
-
-      const from = dateRange.value.from
-      const to = dateRange.value.to
-
-      if (from && to) {
-        const fromCompare = new Date(from)
-        fromCompare.setHours(0, 0, 0, 0)
-        const toCompare = new Date(to)
-        toCompare.setHours(23, 59, 59, 999)
-        return docDate >= fromCompare && docDate <= toCompare
-      } else if (from) {
-        const fromCompare = new Date(from)
-        fromCompare.setHours(0, 0, 0, 0)
-        return docDate >= fromCompare
-      } else if (to) {
-        const toCompare = new Date(to)
-        toCompare.setHours(23, 59, 59, 999)
-        return docDate <= toCompare
-      }
-      return true
+      return isDateInRange(docDate, dateRange.value.from, dateRange.value.to)
     })
   }
 

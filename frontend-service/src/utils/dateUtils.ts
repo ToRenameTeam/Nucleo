@@ -143,3 +143,87 @@ export function formatDayName(dateStr: string): string {
   const days = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
   return days[date.getDay()] || ''
 }
+
+/**
+ * Parse date string in ISO format (YYYY-MM-DD) or Italian format
+ * @param dateStr - Date string to parse
+ * @returns Date object or null if parsing fails
+ */
+export function parseAnyDate(dateStr: string): Date | null {
+  // Prova prima formato italiano
+  let date = parseItalianDate(dateStr)
+  
+  // Se non funziona, prova formato ISO (YYYY-MM-DD)
+  if (!date) {
+    date = new Date(dateStr)
+    // Verifica che sia una data valida
+    if (isNaN(date.getTime())) {
+      return null
+    }
+  }
+  
+  return date
+}
+
+/**
+ * Get date with time set to start of day (00:00:00.000)
+ * @param date - Date object
+ * @returns New Date object at start of day
+ */
+export function startOfDay(date: Date): Date {
+  const newDate = new Date(date)
+  newDate.setHours(0, 0, 0, 0)
+  return newDate
+}
+
+/**
+ * Get date with time set to end of day (23:59:59.999)
+ * @param date - Date object
+ * @returns New Date object at end of day
+ */
+export function endOfDay(date: Date): Date {
+  const newDate = new Date(date)
+  newDate.setHours(23, 59, 59, 999)
+  return newDate
+}
+
+/**
+ * Compare two dates ignoring time (only year, month, day)
+ * Returns: -1 if date1 < date2, 0 if equal, 1 if date1 > date2
+ * @param date1 - First date
+ * @param date2 - Second date
+ * @returns Comparison result
+ */
+export function compareDatesOnly(date1: Date, date2: Date): number {
+  const num1 = date1.getFullYear() * 10000 + date1.getMonth() * 100 + date1.getDate()
+  const num2 = date2.getFullYear() * 10000 + date2.getMonth() * 100 + date2.getDate()
+  
+  if (num1 < num2) return -1
+  if (num1 > num2) return 1
+  return 0
+}
+
+/**
+ * Check if a date is within a range (inclusive, ignores time)
+ * @param date - Date to check
+ * @param from - Start of range (optional)
+ * @param to - End of range (optional)
+ * @returns True if date is within range
+ */
+export function isDateInRange(date: Date, from: Date | null, to: Date | null): boolean {
+  const dateNum = date.getFullYear() * 10000 + date.getMonth() * 100 + date.getDate()
+  
+  if (from && to) {
+    const fromNum = from.getFullYear() * 10000 + from.getMonth() * 100 + from.getDate()
+    const toNum = to.getFullYear() * 10000 + to.getMonth() * 100 + to.getDate()
+    return dateNum >= fromNum && dateNum <= toNum
+  } else if (from) {
+    const fromNum = from.getFullYear() * 10000 + from.getMonth() * 100 + from.getDate()
+    return dateNum >= fromNum
+  } else if (to) {
+    const toNum = to.getFullYear() * 10000 + to.getMonth() * 100 + to.getDate()
+    return dateNum <= toNum
+  }
+  
+  return true
+}
