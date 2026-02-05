@@ -77,6 +77,7 @@ const progress = computed(() => {
 
 const getStepStatus = (index: number) => {
   if (props.error) return 'error'
+  if (props.currentStep === 'upload-completed') return 'completed'
   if (index < currentStepIndex.value) return 'completed'
   if (index === currentStepIndex.value) return 'active'
   return 'pending'
