@@ -7,7 +7,6 @@ import SearchBar from '../../components/shared/SearchBar.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
 import CardList from '../../components/shared/CardList.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
-import MedicinePrescriptionDetails from '../../components/doctor/document-details/MedicinePrescriptionDetails.vue'
 import TagBar from '../../components/shared/TagBar.vue'
 import { userApi, type UserInfo } from '../../api/users'
 import { documentsApiService } from '../../api/documents'
@@ -435,9 +434,6 @@ const handleTagSelected = (tagId: string) => {
           :document="doc"
           @click="handleDocumentClick(doc)"
         >
-          <template #details>
-            <MedicinePrescriptionDetails v-if="isMedicinePrescription(doc)" :document="doc" />
-          </template>
         </DocumentCard>
       </CardList>
 

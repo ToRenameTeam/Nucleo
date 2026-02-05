@@ -68,12 +68,6 @@ const stats = computed(() => {
   return { total, available, booked, past }
 })
 
-// Computed properties for filtering availabilities
-const pastAvailabilities = computed(() => {
-  const now = new Date()
-  return activeAvailabilities.value.filter(a => a.endDateTime < now)
-})
-
 // Load availabilities
 async function loadAvailabilities() {
   if (!currentUser.value?.userId) {

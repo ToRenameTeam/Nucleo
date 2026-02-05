@@ -5,7 +5,6 @@ import { CheckCircleIcon } from '@heroicons/vue/24/outline'
 import SearchBar from '../../components/shared/SearchBar.vue'
 import TagBar from '../../components/shared/TagBar.vue'
 import DocumentCard from '../../components/shared/DocumentCard.vue'
-import MedicinePrescriptionDetails from '../../components/doctor/document-details/MedicinePrescriptionDetails.vue'
 import CardList from '../../components/shared/CardList.vue'
 import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
 import DateRangeFilter from '../../components/patient/documents/DateRangeFilter.vue'
@@ -302,9 +301,6 @@ const handleCloseModal = () => {
             <DocumentCard v-for="doc in filteredDocuments" :key="doc.id" :document="doc" :selectable="selectionMode"
                 :selected="selectedDocumentIds.has(doc.id)" @click="handleDocumentClick(doc)"
                 @toggle-select="() => toggleDocumentSelection(doc.id)">
-                <template #details>
-                    <MedicinePrescriptionDetails v-if="isMedicinePrescription(doc)" :document="doc" />
-                </template>
             </DocumentCard>
         </CardList>
 
