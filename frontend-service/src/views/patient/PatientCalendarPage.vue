@@ -183,8 +183,43 @@ async function handleSelectAvailability(availabilityId: string) {
   }
 }
 
-// Get actions for appointment card
-function getAppointmentActions(): CardAction[] {
+// Parse date and time for comparison
+function parseDateForComparison(dateStr: string, timeStr?: string): Date {
+  const parts = dateStr.split('/').map(Number)
+  const day = parts[0] || 1
+  const month = parts[1] || 1
+  const year = parts[2] || new Date().getFullYear()
+  const date = new Date(year, month - 1, day)
+  
+  if (timeStr) {
+    const timeParts = timeStr.split(':').map(Number)
+    const hours = timeParts[0] || 0
+    const minutes = timeParts[1] || 0
+    date.setHours(hours, minutes)
+  }
+  
+  return date
+}
+
+// Check if appointment is in the future (can be modified/cancelled)
+function isAppointmentFuture(appointment: Appointment): boolean {
+  if (!appointment.date) return false
+  
+  const timeStr = appointment.time?.split(' - ')[0] || '00:00'
+  const appointmentDateTime = parseDateForComparison(appointment.date, timeStr)
+  const now = new Date()
+  
+  // Appointment is in the future if its start time hasn't passed yet
+  return appointmentDateTime >= now
+}
+
+// Get actions for appointment card (only for future appointments)
+function getAppointmentActions(appointment: Appointment): CardAction[] {
+  // Only show actions for future appointments
+  if (!isAppointmentFuture(appointment)) {
+    return []
+  }
+  
   return [
     {
       id: 'edit',
@@ -281,7 +316,7 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
             :description="appointment.serviceTypeDescription || appointment.description"
             :icon="CalendarIcon"
             :metadata="getAppointmentMetadata(appointment)"
-            :actions="getAppointmentActions()"
+            :actions="getAppointmentActions(appointment)"
             :selected="selectedAppointmentId === appointment.id"
             @click="handleAppointmentClick(appointment.id)"
           >
