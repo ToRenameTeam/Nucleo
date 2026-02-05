@@ -59,7 +59,7 @@ const loadPatients = async () => {
   try {
     const users = await userApi.getAllUsers()
     // Filter only users who have a patient profile
-    allPatients.value = users.filter(user => user.patientData)
+    allPatients.value = users.filter(user => user.patient)
     console.log('[DoctorPatientsPage] Loaded', allPatients.value.length, 'patients')
   } catch (error) {
     console.error('[DoctorPatientsPage] Error loading patients:', error)
