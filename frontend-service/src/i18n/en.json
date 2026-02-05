@@ -54,7 +54,10 @@
     "home": "Home",
     "documents": "Documents",
     "calendar": "Calendar",
-    "settings": "Settings"
+    "appointments": "Appointments",
+    "settings": "Settings",
+    "patients": "Patients",
+    "availability": "Availability"
   },
   "tags": {
     "all": "All",
@@ -118,26 +121,43 @@
     "subtitle": "Your family's shared calendar",
     "appointments": "Appointments",
     "noAppointments": "No appointments found",
+    "loading": "Loading appointments...",
+    "retry": "Retry",
     "today": "Today",
     "month": "Month",
     "week": "Week",
+    "errors": {
+      "loadingAppointments": "Error loading appointments",
+      "appointmentNotFound": "Appointment not found",
+      "loadingDetails": "Error loading appointment details",
+      "cancellingAppointment": "Error cancelling appointment",
+      "reschedulingAppointment": "Error rescheduling appointment"
+    },
     "categories": {
       "all": "All",
       "cardiologia": "Cardiology",
       "analisi": "Analysis",
       "pediatria": "Pediatrics"
+    },
+    "tags": {
+      "all": "All",
+      "health": "Health",
+      "work": "Work",
+      "family": "Family"
     }
   },
   "appointments": {
-    "editAppointment": "Edit appointment",
-    "cancelAppointment": "Cancel appointment"
+    "editAppointment": "Edit",
+    "cancelAppointment": "Cancel",
+    "confirmCancel": "Are you sure you want to cancel this appointment?"
   },
   "home": {
     "uploadDocument": "Upload Document",
     "newAppointment": "Book Visit",
     "upcomingAppointments": "Upcoming Appointments",
     "noAppointments": "No scheduled appointments",
-    "recentDocuments": "Recent Documents"
+    "recentDocuments": "Recent Documents",
+    "loadingAppointments": "Loading appointments..."
   },
   "appointmentBooking": {
     "title": "Book a Visit",
@@ -258,6 +278,11 @@
     "patient-documents": "Documents",
     "patient-calendar": "Calendar",
     "patient-settings": "Settings",
+    "doctor-appointments": "Appointments",
+    "doctor-availabilities": "Availability",
+    "doctor-documents": "Documents",
+    "doctor-patients": "Patients",
+    "doctor-settings": "Settings",
     "goTo": "Go to"
   },
   "delegations": {
@@ -555,7 +580,38 @@
       "save": "Save",
       "saving": "Saving...",
       "back": "Back",
-      "close": "Close"
+      "close": "Close",
+      "next": "Next"
+    },
+    "prescriptionTags": {
+      "prescription": "prescription",
+      "medicines": "medicines",
+      "services": "services"
+    },
+    "patient": {
+      "booking": {
+        "title": "Book Visit",
+        "subtitle": "Select date and time for your visit",
+        "modal": {
+          "title": "Book Visit",
+          "subtitle": "Follow the steps to book your visit",
+          "step1": "Visit Type",
+          "step2": "Doctor",
+          "step3": "Time",
+          "selectServiceType": "Select visit type",
+          "selectDoctor": "Select doctor",
+          "selectSlot": "Select date and time",
+          "selectedService": "Selected visit type",
+          "selectedDoctor": "Selected doctor",
+          "noDoctorsAvailable": "No doctors available for this visit type",
+          "noSlotsAvailable": "No availability found for this doctor",
+          "confirmBooking": "Confirm Booking"
+        }
+      },
+      "reschedule": {
+        "title": "Reschedule Appointment",
+        "subtitle": "Select a new date and time for your appointment"
+      }
     },
     "prescriptionTags": {
       "prescription": "prescription",

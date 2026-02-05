@@ -34,7 +34,16 @@
   },
   "topbar": {
     "notifications": "Notifiche",
-    "user": "Main User"
+    "user": "Main User",
+    "languageSelectorAria": "Cambia lingua in {lang}",
+    "italianSelectedAria": "Lingua italiana selezionata",
+    "selectItalianAria": "Seleziona lingua italiana",
+    "englishSelectedAria": "Lingua inglese selezionata",
+    "selectEnglishAria": "Seleziona lingua inglese",
+    "userMenuAria": "Menu utente per {user}",
+    "userProfileAria": "Profilo di {user}",
+    "unread": "non letto",
+    "notification": "notifica"
   },
   "userMenu": {
     "profile": "Profilo",
@@ -85,7 +94,8 @@
       "lastMonth": "Ultimo mese",
       "last3Months": "Ultimi 3 mesi",
       "last6Months": "Ultimi 6 mesi",
-      "lastYear": "Ultimo anno"
+      "lastYear": "Ultimo anno",
+      "clearRange": "Cancella filtro"
     },
     "viewer": {
       "title": "Confronto Documenti",
