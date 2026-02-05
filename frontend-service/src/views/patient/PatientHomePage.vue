@@ -57,7 +57,20 @@ const upcomingAppointments = computed(() => {
     .slice(0, 3)
 })
 
-const recentDocuments = computed(() => documentsData.value.slice(0, 2))
+const recentDocuments = computed(() => {
+  return documentsData.value
+    .sort((a, b) => {
+      const dateA = parseItalianDateSlash(a.date)
+      const dateB = parseItalianDateSlash(b.date)
+      
+      if (!dateA || !dateB) return 0
+      
+      // Sort by most recent first (descending order)
+      return dateB.getTime() - dateA.getTime()
+    })
+    .slice(0, 2)
+})
+
 const selectedDocument = ref<Document | null>(null)
 const isDocumentModalOpen = ref(false)
 const preselectedVisitType = ref<string | null>(null)

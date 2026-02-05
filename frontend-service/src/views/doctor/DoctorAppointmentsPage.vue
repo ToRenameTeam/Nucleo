@@ -84,11 +84,11 @@ const filteredAppointments = computed(() => {
     )
   }
   
-  // Sort by proximity (most recent appointments first - descending order)
+  // Sort by proximity (nearest appointments first - ascending order)
   return filtered.sort((a, b) => {
     const dateA = parseDateForSorting(a.date, a.time)
     const dateB = parseDateForSorting(b.date, b.time)
-    return dateB.getTime() - dateA.getTime()
+    return dateA.getTime() - dateB.getTime()
   })
 })
 
