@@ -1,0 +1,116 @@
+{
+  "name": "Nucleo",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+
+  // ──────────────────────────────────────────────
+  // Runtime features
+  // ──────────────────────────────────────────────
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "installGradle": "true",
+      "gradleVersion": "8.14"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.13"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "dockerDashComposeVersion": "v2"
+    }
+  },
+
+  // ──────────────────────────────────────────────
+  // Codespace machine requirements
+  // ──────────────────────────────────────────────
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+
+  // ──────────────────────────────────────────────
+  // Port forwarding
+  // ──────────────────────────────────────────────
+  "forwardPorts": [
+    3000, 3030, 3040, 5173, 5432,
+    8080, 8081, 8090, 8001,
+    9000, 9001,
+    27017, 27027, 27037
+  ],
+
+  "portsAttributes": {
+    "3000":  { "label": "Frontend",              "onAutoForward": "notify"  },
+    "3030":  { "label": "Users Service",         "onAutoForward": "silent"  },
+    "3040":  { "label": "Master Data Service",   "onAutoForward": "silent"  },
+    "5173":  { "label": "Frontend (Dev)",        "onAutoForward": "notify"  },
+    "5432":  { "label": "PostgreSQL",            "onAutoForward": "silent"  },
+    "8080":  { "label": "Appointments Service",  "onAutoForward": "silent"  },
+    "8081":  { "label": "Mongo Express",         "onAutoForward": "silent"  },
+    "8090":  { "label": "Documents Service",     "onAutoForward": "silent"  },
+    "8001":  { "label": "AI Service",            "onAutoForward": "silent"  },
+    "9000":  { "label": "MinIO API",             "onAutoForward": "silent"  },
+    "9001":  { "label": "MinIO Console",         "onAutoForward": "silent"  },
+    "27017": { "label": "MongoDB (Users)",       "onAutoForward": "silent"  },
+    "27027": { "label": "MongoDB (Master Data)", "onAutoForward": "silent"  },
+    "27037": { "label": "MongoDB (Documents)",   "onAutoForward": "silent"  }
+  },
+
+  // ──────────────────────────────────────────────
+  // Lifecycle scripts
+  // ──────────────────────────────────────────────
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  // ──────────────────────────────────────────────
+  // Environment variables
+  // ──────────────────────────────────────────────
+  "remoteEnv": {
+    "JAVA_HOME": "${containerEnv:JAVA_HOME}",
+    "GRADLE_HOME": "${containerEnv:GRADLE_HOME}"
+  },
+
+  // ──────────────────────────────────────────────
+  // IDE customizations
+  // ──────────────────────────────────────────────
+  "customizations": {
+    // VS Code
+    "vscode": {
+      "settings": {
+        "java.jdt.ls.java.home": "${containerEnv:JAVA_HOME}",
+        "java.configuration.detectJdksAtStart": true,
+        "kotlin.java.home": "${containerEnv:JAVA_HOME}",
+        "python.defaultInterpreterPath": "/usr/local/bin/python3",
+        "editor.formatOnSave": true,
+        "files.eol": "\n",
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      },
+      "extensions": [
+        "fwcd.kotlin",
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-gradle",
+        "Vue.volar",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "ms-azuretools.vscode-docker",
+        "redhat.vscode-yaml",
+        "eamodio.gitlens"
+      ]
+    },
+
+    // JetBrains Gateway (IntelliJ IDEA)
+    "jetbrains": {
+      "backend": {
+        "plugins": [
+          "Docker",
+          "NodeJS",
+          "PythonCore"
+        ]
+      }
+    }
+  }
+}
