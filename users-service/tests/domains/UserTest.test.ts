@@ -1,7 +1,7 @@
 import { User } from '../../src/domains/User.js';
-import { FiscalCode } from '../../src/domains/value-objects/FiscalCode.js';
-import { Credentials } from '../../src/domains/value-objects/Credentials.js';
-import { ProfileInfo } from '../../src/domains/value-objects/ProfileInfo.js';
+import { FiscalCode } from '../../src/domains/FiscalCode.js';
+import { Credentials } from '../../src/domains/Credentials.js';
+import { ProfileInfo } from '../../src/domains/ProfileInfo.js';
 import { randomUUID } from 'crypto';
 
 describe('User', () => {

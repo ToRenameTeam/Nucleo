@@ -1,10 +1,5 @@
 import crypto from 'crypto';
-import { User } from '../domains/User.js';
-import { Patient } from '../domains/Patient.js';
-import { Doctor } from '../domains/Doctor.js';
-import { FiscalCode } from '../domains/value-objects/FiscalCode.js';
-import { Credentials } from '../domains/value-objects/Credentials.js';
-import { ProfileInfo } from '../domains/value-objects/ProfileInfo.js';
+import { User, Patient, Doctor, FiscalCode, Credentials, ProfileInfo } from '../domains/index.js';
 import type { IUserRepository } from '../infrastructure/repositories/IUserRepository.js';
 import type { IPatientRepository } from '../infrastructure/repositories/IPatientRepository.js';
 import type { IDoctorRepository } from '../infrastructure/repositories/IDoctorRepository.js';

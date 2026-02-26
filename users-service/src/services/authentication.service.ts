@@ -1,12 +1,7 @@
 import { IUserRepository, UserData } from '../infrastructure/repositories/IUserRepository.js';
 import { IPatientRepository } from '../infrastructure/repositories/IPatientRepository.js';
 import { IDoctorRepository } from '../infrastructure/repositories/IDoctorRepository.js';
-import { Patient } from '../domains/Patient.js';
-import { Doctor } from '../domains/Doctor.js';
-import { FiscalCode } from '../domains/value-objects/FiscalCode.js';
-import { User } from '../domains/User.js';
-import { Credentials } from '../domains/value-objects/Credentials.js';
-import { ProfileInfo } from '../domains/value-objects/ProfileInfo.js';
+import { Patient, Doctor, FiscalCode, User, Credentials, ProfileInfo } from '../domains/index.js';
 import { AuthenticatedUserFactory, IAuthenticatedUser } from './authenticated-user.factory.js';
 import { toUUID } from '../utils/uuid.js';
 

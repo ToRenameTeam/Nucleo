@@ -1,6 +1,6 @@
 import { IPatientRepository, PatientData } from '../IPatientRepository.js';
-import { PatientModel } from '../../database/models/PatientModel.js';
-import type { Patient } from '../../../domains/Patient.js';
+import { PatientModel } from '../../database/models/index.js';
+import type { Patient } from '../../../domains/index.js';
 
 export class PatientRepositoryImpl implements IPatientRepository {
     async findByUserId(userId: string): Promise<PatientData | null> {

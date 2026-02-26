@@ -1,7 +1,6 @@
 import crypto from 'crypto';
 import type { UUID } from 'crypto';
-import { Delegation } from '../domains/Delegation.js';
-import { DelegationStatus } from '../domains/value-objects/DelegationStatus.js';
+import { Delegation, DelegationStatus } from '../domains/index.js';
 import { IDelegationRepository } from '../infrastructure/repositories/IDelegationRepository.js';
 import { IPatientRepository } from '../infrastructure/repositories/IPatientRepository.js';
 import { toUUID } from '../utils/uuid.js';

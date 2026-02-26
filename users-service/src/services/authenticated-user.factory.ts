@@ -1,6 +1,4 @@
-import type { User } from '../domains/User.js';
-import type { Patient } from '../domains/Patient.js';
-import type { Doctor } from '../domains/Doctor.js';
+import type { User, Patient, Doctor } from '../domains/index.js';
 
 export type ActiveProfile = 'PATIENT' | 'DOCTOR';
 

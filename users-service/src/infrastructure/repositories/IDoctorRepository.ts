@@ -1,4 +1,4 @@
-import type { Doctor } from '../../domains/Doctor.js';
+import type { Doctor } from '../../domains/index.js';
 
 export interface DoctorData {
     userId: string;

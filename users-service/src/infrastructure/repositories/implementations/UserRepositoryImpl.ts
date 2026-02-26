@@ -1,5 +1,5 @@
-import { UserModel } from '../../database/models/UserModel.js';
-import type { User } from '../../../domains/User.js';
+import { UserModel } from '../../database/models/index.js';
+import type { User } from '../../../domains/index.js';
 import {IUserRepository, UserData} from "../IUserRepository.js";
 
 export class UserRepositoryImpl implements IUserRepository {

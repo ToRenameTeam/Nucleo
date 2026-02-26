@@ -1,5 +1,5 @@
-import { Credentials } from '../../../src/domains/value-objects/Credentials.js';
-import { FiscalCode } from '../../../src/domains/value-objects/FiscalCode.js';
+import { Credentials } from '../../../src/domains/Credentials.js';
+import { FiscalCode } from '../../../src/domains/FiscalCode.js';
 
 describe('Credentials', () => {
     function createTestFiscalCode(): FiscalCode {

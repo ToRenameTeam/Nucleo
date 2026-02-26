@@ -1,4 +1,4 @@
-import { ProfileInfo } from '../../../src/domains/value-objects/ProfileInfo.js';
+import { ProfileInfo } from '../../../src/domains/ProfileInfo.js';
 
 describe('ProfileInfo', () => {
     describe('create', () => {

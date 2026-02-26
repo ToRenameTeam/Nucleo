@@ -1,4 +1,4 @@
-import type { Delegation } from '../../domains/Delegation.js';
+import type { Delegation } from '../../domains/index.js';
 
 export interface DelegationData {
     delegationId: string;

@@ -1,6 +1,6 @@
 import { IDoctorRepository, DoctorData } from '../IDoctorRepository.js';
-import { DoctorModel } from '../../database/models/DoctorModel.js';
-import type { Doctor } from '../../../domains/Doctor.js';
+import { DoctorModel } from '../../database/models/index.js';
+import type { Doctor } from '../../../domains/index.js';
 import type {UUID} from "crypto";
 
 export class DoctorRepositoryImpl implements IDoctorRepository {
