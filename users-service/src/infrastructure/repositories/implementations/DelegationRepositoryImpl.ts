@@ -1,4 +1,5 @@
 import { DelegationModel } from '../../database/models/index.js';
+import type { IDelegationDocument } from '../../database/models/Delegation.schema.js';
 import { IDelegationRepository, DelegationData } from '../IDelegationRepository.js';
 import type { Delegation } from '../../../domains/index.js';
 
@@ -13,36 +14,24 @@ export class DelegationRepositoryImpl implements IDelegationRepository {
     }
 
     async findAll(status?: string): Promise<DelegationData[]> {
-        const filter: any = {};
-
-        if (status) {
-            filter.status = status;
-        }
+        const filter = this.buildFilter({}, status);
 
         const delegations = await DelegationModel.find(filter);
-        return delegations.map(d => this.toDelegationData(d));
+        return delegations.map((delegation) => this.toDelegationData(delegation));
     }
 
     async findByDelegatingUserId(userId: string, status?: string): Promise<DelegationData[]> {
-        const filter: any = { delegatingUserId: userId };
-
-        if (status) {
-            filter.status = status;
-        }
+        const filter = this.buildFilter({ delegatingUserId: userId }, status);
 
         const delegations = await DelegationModel.find(filter);
-        return delegations.map(d => this.toDelegationData(d));
+        return delegations.map((delegation) => this.toDelegationData(delegation));
     }
 
     async findByDelegatorUserId(userId: string, status?: string): Promise<DelegationData[]> {
-        const filter: any = { delegatorUserId: userId };
-
-        if (status) {
-            filter.status = status;
-        }
+        const filter = this.buildFilter({ delegatorUserId: userId }, status);
 
         const delegations = await DelegationModel.find(filter);
-        return delegations.map(d => this.toDelegationData(d));
+        return delegations.map((delegation) => this.toDelegationData(delegation));
     }
 
     async findDelegationByUsers(delegatingUserId: string, delegatorUserId: string): Promise<DelegationData | null> {
@@ -83,7 +72,21 @@ export class DelegationRepositoryImpl implements IDelegationRepository {
         await DelegationModel.findOneAndDelete({ delegationId });
     }
 
-    private toDelegationData(doc: any): DelegationData {
+    private buildFilter(
+        baseFilter: Partial<Pick<IDelegationDocument, 'delegatingUserId' | 'delegatorUserId'>>,
+        status?: string
+    ): Partial<Pick<IDelegationDocument, 'delegatingUserId' | 'delegatorUserId' | 'status'>> {
+        if (!status) {
+            return baseFilter;
+        }
+
+        return {
+            ...baseFilter,
+            status: status as IDelegationDocument['status'],
+        };
+    }
+
+    private toDelegationData(doc: IDelegationDocument): DelegationData {
         return {
             delegationId: doc.delegationId,
             delegatingUserId: doc.delegatingUserId,

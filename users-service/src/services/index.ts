@@ -8,27 +8,46 @@ import {
     DelegationRepositoryImpl
 } from '../infrastructure/repositories/implementations/index.js';
 
-const userRepository = new UserRepositoryImpl();
-const patientRepository = new PatientRepositoryImpl();
-const doctorRepository = new DoctorRepositoryImpl();
-const delegationRepository = new DelegationRepositoryImpl();
+function createRepositoryDependencies() {
+    return {
+        userRepository: new UserRepositoryImpl(),
+        patientRepository: new PatientRepositoryImpl(),
+        doctorRepository: new DoctorRepositoryImpl(),
+        delegationRepository: new DelegationRepositoryImpl(),
+    };
+}
 
-export const userService = new UserService(
-    userRepository,
-    patientRepository,
-    doctorRepository
-);
+function createServiceDependencies() {
+    const {
+        userRepository,
+        patientRepository,
+        doctorRepository,
+        delegationRepository,
+    } = createRepositoryDependencies();
 
-export const authenticationService = new AuthenticationService(
-    userRepository,
-    patientRepository,
-    doctorRepository
-);
+    return {
+        userService: new UserService(
+            userRepository,
+            patientRepository,
+            doctorRepository
+        ),
+        authenticationService: new AuthenticationService(
+            userRepository,
+            patientRepository,
+            doctorRepository
+        ),
+        delegationService: new DelegationService(
+            delegationRepository,
+            patientRepository
+        ),
+    };
+}
 
-export const delegationService = new DelegationService(
-    delegationRepository,
-    patientRepository
-);
+const services = createServiceDependencies();
+
+export const userService = services.userService;
+export const authenticationService = services.authenticationService;
+export const delegationService = services.delegationService;
 
 export { UserService } from './user.service.js';
 export { AuthenticationService } from './authentication.service.js';

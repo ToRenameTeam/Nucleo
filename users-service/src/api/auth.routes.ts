@@ -1,14 +1,21 @@
 import { Router, Request, Response } from 'express';
-import { authenticationService, PatientOnlyUser } from '../services/index.js';
+import { authenticationService } from '../services/index.js';
 import { success, error } from './utils/response.js';
+import { handleRouteError, hasRequiredFields, isOneOf, isNonEmptyString } from './utils/http-helpers.js';
 
 const router = Router();
+
+const AUTH_ERROR_RULES = [
+    { statusCode: 401, messageIncludes: 'Invalid credentials' },
+    { statusCode: 404, messageIncludes: 'not found' },
+    { statusCode: 400, messageIncludes: 'does not have' },
+];
 
 router.post('/login', async (req: Request, res: Response) => {
     try {
         const { fiscalCode, password } = req.body;
 
-        if (!fiscalCode || !password) {
+        if (!hasRequiredFields(req.body as Record<string, unknown>, ['fiscalCode', 'password'])) {
             return error(res, 'Fiscal code and password are required', 400);
         }
 
@@ -24,9 +31,6 @@ router.post('/login', async (req: Request, res: Response) => {
 
         // Case 1: PatientOnly - return complete data immediately
         if (!authenticatedUser.hasDoctorProfile) {
-
-            const patientUser = authenticatedUser as PatientOnlyUser;
-
             return success(res, {
                 ...baseData,
                 activeProfile: 'PATIENT',
@@ -43,15 +47,7 @@ router.post('/login', async (req: Request, res: Response) => {
         });
 
     } catch (err) {
-        console.error('Login error:', err);
-
-        if (err instanceof Error) {
-            if (err.message.includes('Invalid credentials')) {
-                return error(res, err.message, 401);
-            }
-        }
-        
-        return error(res, 'Internal server error', 500);
+        return handleRouteError(res, err, 'Login error', AUTH_ERROR_RULES);
     }
 });
 
@@ -59,11 +55,11 @@ router.post('/select-profile', async (req: Request, res: Response) => {
     try {
         const { userId, selectedProfile } = req.body;
 
-        if (!userId) {
+        if (!isNonEmptyString(userId)) {
             return error(res, 'User ID is required', 400);
         }
 
-        if (selectedProfile !== 'PATIENT' && selectedProfile !== 'DOCTOR') {
+        if (!isOneOf(selectedProfile, ['PATIENT', 'DOCTOR'])) {
             return error(res, 'Invalid profile type. Must be PATIENT or DOCTOR', 400);
         }
 
@@ -71,18 +67,7 @@ router.post('/select-profile', async (req: Request, res: Response) => {
         return success(res, profileData);
 
     } catch (err) {
-        console.error('Profile selection error:', err);
-        
-        if (err instanceof Error) {
-            if (err.message.includes('not found')) {
-                return error(res, err.message, 404);
-            }
-            if (err.message.includes('does not have')) {
-                return error(res, err.message, 400);
-            }
-        }
-        
-        return error(res, 'Internal server error', 500);
+        return handleRouteError(res, err, 'Profile selection error', AUTH_ERROR_RULES);
     }
 });
 
