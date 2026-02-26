@@ -1,4 +1,6 @@
-import { ServiceTypeModel, ServiceCategory, type IServiceType } from '../domains/service-catalog/index.js';
+import { ServiceCategory, type IServiceType } from '../domains/service-catalog/index.js';
+import type { IServiceTypeRepository } from '../infrastructure/repositories/IServiceTypeRepository.js';
+import { ServiceTypeRepositoryImpl } from '../infrastructure/repositories/implementations/index.js';
 
 export interface ServiceTypeFilter {
     category?: string;
@@ -27,6 +29,8 @@ export interface CategoryInfo {
 }
 
 export class ServiceCatalogService {
+    constructor(private readonly serviceTypeRepository: IServiceTypeRepository = new ServiceTypeRepositoryImpl()) {}
+
     /**
      * Get all service types with optional filtering
      */
@@ -46,7 +50,7 @@ export class ServiceCatalogService {
             query.$text = { $search: filter.search };
         }
 
-        return ServiceTypeModel.find(query).sort({ code: 1 });
+        return this.serviceTypeRepository.findAll(query);
     }
 
     /**
@@ -66,7 +70,7 @@ export class ServiceCatalogService {
      * Get a single service type by ID
      */
     async findById(id: string): Promise<IServiceType | null> {
-        return ServiceTypeModel.findById(id);
+        return this.serviceTypeRepository.findById(id);
     }
 
     /**
@@ -75,69 +79,58 @@ export class ServiceCatalogService {
     async create(input: CreateServiceTypeInput): Promise<IServiceType> {
         // Validate code format
         if (!input.code || !/^service-\d{3}$/.test(input.code)) {
-            throw new ValidationError('Invalid code format. Must be "service-XXX" where XXX is a 3-digit number');
+            throw new ServiceCatalogValidationError('Invalid code format. Must be "service-XXX" where XXX is a 3-digit number');
         }
 
         // Check if code already exists
-        const existing = await ServiceTypeModel.findOne({ code: input.code });
+        const existing = await this.serviceTypeRepository.findByCode(input.code);
         if (existing) {
-            throw new ConflictError('A service type with this code already exists');
+            throw new ServiceCatalogConflictError('A service type with this code already exists');
         }
 
-        const serviceType = new ServiceTypeModel({
-            _id: input.code,
+        return this.serviceTypeRepository.create({
             code: input.code,
             name: input.name,
             description: input.description,
             category: input.category,
             isActive: input.isActive ?? true
         });
-
-        return serviceType.save();
     }
 
     /**
      * Update a service type
      */
     async update(id: string, input: UpdateServiceTypeInput): Promise<IServiceType | null> {
-        return ServiceTypeModel.findByIdAndUpdate(
-            id,
-            input,
-            { new: true, runValidators: true }
-        );
+        return this.serviceTypeRepository.updateById(id, input);
     }
 
     /**
      * Soft delete a service type (sets isActive to false)
      */
     async softDelete(id: string): Promise<IServiceType | null> {
-        return ServiceTypeModel.findByIdAndUpdate(
-            id,
-            { isActive: false },
-            { new: true }
-        );
+        return this.serviceTypeRepository.softDelete(id);
     }
 
     /**
      * Permanently delete a service type
      */
     async permanentDelete(id: string): Promise<IServiceType | null> {
-        return ServiceTypeModel.findByIdAndDelete(id);
+        return this.serviceTypeRepository.permanentDelete(id);
     }
 }
 
 // Custom error classes for better error handling
-export class ValidationError extends Error {
+export class ServiceCatalogValidationError extends Error {
     constructor(message: string) {
         super(message);
-        this.name = 'ValidationError';
+        this.name = 'ServiceCatalogValidationError';
     }
 }
 
-export class ConflictError extends Error {
+export class ServiceCatalogConflictError extends Error {
     constructor(message: string) {
         super(message);
-        this.name = 'ConflictError';
+        this.name = 'ServiceCatalogConflictError';
     }
 }
 

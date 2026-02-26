@@ -1,8 +1,8 @@
 export {
     ServiceCatalogService,
     serviceCatalogService,
-    ValidationError,
-    ConflictError,
+    ServiceCatalogValidationError,
+    ServiceCatalogConflictError,
     type ServiceTypeFilter,
     type CreateServiceTypeInput,
     type UpdateServiceTypeInput,

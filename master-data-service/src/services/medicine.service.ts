@@ -1,4 +1,6 @@
-import { MedicineModel, MedicineCategory, type IMedicine } from '../domains/medicine/index.js';
+import { MedicineCategory, type IMedicine } from '../domains/medicine/index.js';
+import type { IMedicineRepository } from '../infrastructure/repositories/IMedicineRepository.js';
+import { MedicineRepositoryImpl } from '../infrastructure/repositories/implementations/index.js';
 
 export interface MedicineFilter {
     category?: string;
@@ -35,6 +37,8 @@ export interface MedicineCategoryInfo {
 }
 
 export class MedicineService {
+    constructor(private readonly medicineRepository: IMedicineRepository = new MedicineRepositoryImpl()) {}
+
     /**
      * Get all medicines with optional filtering
      */
@@ -53,7 +57,7 @@ export class MedicineService {
             query.$text = { $search: filter.search };
         }
 
-        return MedicineModel.find(query).sort({ code: 1 });
+        return this.medicineRepository.findAll(query);
     }
 
     /**
@@ -73,7 +77,7 @@ export class MedicineService {
      * Get a single medicine by ID
      */
     async findById(id: string): Promise<IMedicine | null> {
-        return MedicineModel.findById(id);
+        return this.medicineRepository.findById(id);
     }
 
     /**
@@ -86,13 +90,12 @@ export class MedicineService {
         }
 
         // Check if code already exists
-        const existing = await MedicineModel.findOne({ code: input.code });
+        const existing = await this.medicineRepository.findByCode(input.code);
         if (existing) {
             throw new MedicineConflictError('A medicine with this code already exists');
         }
 
-        const medicine = new MedicineModel({
-            _id: input.code,
+        return this.medicineRepository.create({
             code: input.code,
             name: input.name,
             description: input.description,
@@ -103,37 +106,27 @@ export class MedicineService {
             manufacturer: input.manufacturer,
             isActive: input.isActive ?? true
         });
-
-        return medicine.save();
     }
 
     /**
      * Update a medicine
      */
     async update(id: string, input: UpdateMedicineInput): Promise<IMedicine | null> {
-        return MedicineModel.findByIdAndUpdate(
-            id,
-            input,
-            { new: true, runValidators: true }
-        );
+        return this.medicineRepository.updateById(id, input);
     }
 
     /**
      * Soft delete a medicine (sets isActive to false)
      */
     async softDelete(id: string): Promise<IMedicine | null> {
-        return MedicineModel.findByIdAndUpdate(
-            id,
-            { isActive: false },
-            { new: true }
-        );
+        return this.medicineRepository.softDelete(id);
     }
 
     /**
      * Permanently delete a medicine
      */
     async permanentDelete(id: string): Promise<IMedicine | null> {
-        return MedicineModel.findByIdAndDelete(id);
+        return this.medicineRepository.permanentDelete(id);
     }
 }
 

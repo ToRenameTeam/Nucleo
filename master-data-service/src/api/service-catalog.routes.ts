@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import {
     serviceCatalogService,
-    ValidationError,
-    ConflictError
+    ServiceCatalogValidationError,
+    ServiceCatalogConflictError
 } from '../services/index.js';
 
 const router = Router();
@@ -98,7 +98,7 @@ router.post('/', async (req, res) => {
             data: serviceType
         });
     } catch (error) {
-        if (error instanceof ValidationError) {
+        if (error instanceof ServiceCatalogValidationError) {
             res.status(400).json({
                 success: false,
                 error: error.message
@@ -106,7 +106,7 @@ router.post('/', async (req, res) => {
             return;
         }
 
-        if (error instanceof ConflictError) {
+        if (error instanceof ServiceCatalogConflictError) {
             res.status(409).json({
                 success: false,
                 error: error.message
