@@ -67,9 +67,9 @@ export class MedicineService {
     getCategories(): MedicineCategoryInfo[] {
         return Object.values(MedicineCategory).map(function (category) {
             return {
-            value: category,
-            label: formatEnumLabel(category)
-        };
+                value: category,
+                label: formatEnumLabel(category)
+            };
         });
     }
 

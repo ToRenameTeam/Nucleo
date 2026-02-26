@@ -60,9 +60,9 @@ export class ServiceCatalogService {
     getCategories(): CategoryInfo[] {
         return Object.values(ServiceCategory).map(function (category) {
             return {
-            value: category,
-            label: formatEnumLabel(category)
-        };
+                value: category,
+                label: formatEnumLabel(category)
+            };
         });
     }
 
