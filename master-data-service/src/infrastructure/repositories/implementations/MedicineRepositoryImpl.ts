@@ -4,9 +4,15 @@ import type {
     MedicineCreateData,
     MedicineUpdateData
 } from '../IMedicineRepository.js';
+import type { RepositoryQuery } from '../types.js';
+import {
+    SOFT_DELETE_UPDATE,
+    UPDATE_RETURN_NEW_OPTIONS,
+    UPDATE_VALIDATED_OPTIONS
+} from './repository.constants.js';
 
 export class MedicineRepositoryImpl implements IMedicineRepository {
-    async findAll(query: Record<string, unknown>): Promise<IMedicine[]> {
+    async findAll(query: RepositoryQuery): Promise<IMedicine[]> {
         return MedicineModel.find(query).sort({ code: 1 });
     }
 
@@ -28,11 +34,11 @@ export class MedicineRepositoryImpl implements IMedicineRepository {
     }
 
     async updateById(id: string, input: MedicineUpdateData): Promise<IMedicine | null> {
-        return MedicineModel.findByIdAndUpdate(id, input, { new: true, runValidators: true });
+        return MedicineModel.findByIdAndUpdate(id, input, UPDATE_VALIDATED_OPTIONS);
     }
 
     async softDelete(id: string): Promise<IMedicine | null> {
-        return MedicineModel.findByIdAndUpdate(id, { isActive: false }, { new: true });
+        return MedicineModel.findByIdAndUpdate(id, SOFT_DELETE_UPDATE, UPDATE_RETURN_NEW_OPTIONS);
     }
 
     async permanentDelete(id: string): Promise<IMedicine | null> {

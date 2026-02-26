@@ -1,4 +1,5 @@
 import type { IFacility } from '../../domains/facility/index.js';
+import type { RepositoryQuery } from './types.js';
 
 export interface FacilityCreateData {
     code: string;
@@ -16,7 +17,7 @@ export interface FacilityUpdateData {
 }
 
 export interface IFacilityRepository {
-    findAll(query: Record<string, unknown>): Promise<IFacility[]>;
+    findAll(query: RepositoryQuery): Promise<IFacility[]>;
     findActiveCities(): Promise<string[]>;
     findById(id: string): Promise<IFacility | null>;
     findByCode(code: string): Promise<IFacility | null>;

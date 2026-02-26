@@ -1,4 +1,5 @@
 import type { IServiceType, ServiceCategory } from '../../domains/service-catalog/index.js';
+import type { RepositoryQuery } from './types.js';
 
 export interface ServiceTypeCreateData {
     code: string;
@@ -16,7 +17,7 @@ export interface ServiceTypeUpdateData {
 }
 
 export interface IServiceTypeRepository {
-    findAll(query: Record<string, unknown>): Promise<IServiceType[]>;
+    findAll(query: RepositoryQuery): Promise<IServiceType[]>;
     findById(id: string): Promise<IServiceType | null>;
     findByCode(code: string): Promise<IServiceType | null>;
     create(data: ServiceTypeCreateData): Promise<IServiceType>;

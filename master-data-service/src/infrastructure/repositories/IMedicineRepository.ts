@@ -1,4 +1,5 @@
 import type { IMedicine, MedicineCategory } from '../../domains/medicine/index.js';
+import type { RepositoryQuery } from './types.js';
 
 export interface MedicineCreateData {
     code: string;
@@ -24,7 +25,7 @@ export interface MedicineUpdateData {
 }
 
 export interface IMedicineRepository {
-    findAll(query: Record<string, unknown>): Promise<IMedicine[]>;
+    findAll(query: RepositoryQuery): Promise<IMedicine[]>;
     findById(id: string): Promise<IMedicine | null>;
     findByCode(code: string): Promise<IMedicine | null>;
     create(data: MedicineCreateData): Promise<IMedicine>;

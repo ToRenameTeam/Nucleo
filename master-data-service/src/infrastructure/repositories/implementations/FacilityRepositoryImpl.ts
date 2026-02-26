@@ -4,9 +4,15 @@ import type {
     FacilityUpdateData,
     IFacilityRepository
 } from '../IFacilityRepository.js';
+import type { RepositoryQuery } from '../types.js';
+import {
+    SOFT_DELETE_UPDATE,
+    UPDATE_RETURN_NEW_OPTIONS,
+    UPDATE_VALIDATED_OPTIONS
+} from './repository.constants.js';
 
 export class FacilityRepositoryImpl implements IFacilityRepository {
-    async findAll(query: Record<string, unknown>): Promise<IFacility[]> {
+    async findAll(query: RepositoryQuery): Promise<IFacility[]> {
         return FacilityModel.find(query).sort({ code: 1 });
     }
 
@@ -32,11 +38,11 @@ export class FacilityRepositoryImpl implements IFacilityRepository {
     }
 
     async updateById(id: string, input: FacilityUpdateData): Promise<IFacility | null> {
-        return FacilityModel.findByIdAndUpdate(id, input, { new: true, runValidators: true });
+        return FacilityModel.findByIdAndUpdate(id, input, UPDATE_VALIDATED_OPTIONS);
     }
 
     async softDelete(id: string): Promise<IFacility | null> {
-        return FacilityModel.findByIdAndUpdate(id, { isActive: false }, { new: true });
+        return FacilityModel.findByIdAndUpdate(id, SOFT_DELETE_UPDATE, UPDATE_RETURN_NEW_OPTIONS);
     }
 
     async permanentDelete(id: string): Promise<IFacility | null> {
