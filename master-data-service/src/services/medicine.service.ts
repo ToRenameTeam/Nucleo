@@ -1,6 +1,7 @@
 import { MedicineCategory, type IMedicine } from '../domains/medicine/index.js';
 import type { IMedicineRepository } from '../infrastructure/repositories/IMedicineRepository.js';
 import { MedicineRepositoryImpl } from '../infrastructure/repositories/implementations/index.js';
+import { formatEnumLabel, isValidResourceCode } from './service.utils.js';
 
 export interface MedicineFilter {
     category?: string;
@@ -64,13 +65,12 @@ export class MedicineService {
      * Get all available categories
      */
     getCategories(): MedicineCategoryInfo[] {
-        return Object.values(MedicineCategory).map(category => ({
+        return Object.values(MedicineCategory).map(function (category) {
+            return {
             value: category,
-            label: category
-                .split('_')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ')
-        }));
+            label: formatEnumLabel(category)
+        };
+        });
     }
 
     /**
@@ -85,7 +85,7 @@ export class MedicineService {
      */
     async create(input: CreateMedicineInput): Promise<IMedicine> {
         // Validate code format
-        if (!input.code || !/^medicine-\d{3}$/.test(input.code)) {
+        if (!input.code || !isValidResourceCode(input.code, 'medicine')) {
             throw new MedicineValidationError('Invalid code format. Must be "medicine-XXX" where XXX is a 3-digit number');
         }
 

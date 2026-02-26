@@ -3,6 +3,7 @@ import type {
     IFacilityRepository
 } from '../infrastructure/repositories/IFacilityRepository.js';
 import { FacilityRepositoryImpl } from '../infrastructure/repositories/implementations/index.js';
+import { isValidResourceCode } from './service.utils.js';
 
 export interface FacilityFilter {
     city?: string;
@@ -68,7 +69,7 @@ export class FacilityService {
      */
     async create(input: CreateFacilityInput): Promise<IFacility> {
         // Validate code format
-        if (!input.code || !/^facility-\d{3}$/.test(input.code)) {
+        if (!input.code || !isValidResourceCode(input.code, 'facility')) {
             throw new FacilityValidationError('Invalid code format. Must be "facility-XXX" where XXX is a 3-digit number');
         }
 

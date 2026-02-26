@@ -1,6 +1,7 @@
 import { ServiceCategory, type IServiceType } from '../domains/service-catalog/index.js';
 import type { IServiceTypeRepository } from '../infrastructure/repositories/IServiceTypeRepository.js';
 import { ServiceTypeRepositoryImpl } from '../infrastructure/repositories/implementations/index.js';
+import { formatEnumLabel, isValidResourceCode } from './service.utils.js';
 
 export interface ServiceTypeFilter {
     category?: string;
@@ -57,13 +58,12 @@ export class ServiceCatalogService {
      * Get all available categories
      */
     getCategories(): CategoryInfo[] {
-        return Object.values(ServiceCategory).map(category => ({
+        return Object.values(ServiceCategory).map(function (category) {
+            return {
             value: category,
-            label: category
-                .split('_')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ')
-        }));
+            label: formatEnumLabel(category)
+        };
+        });
     }
 
     /**
@@ -78,7 +78,7 @@ export class ServiceCatalogService {
      */
     async create(input: CreateServiceTypeInput): Promise<IServiceType> {
         // Validate code format
-        if (!input.code || !/^service-\d{3}$/.test(input.code)) {
+        if (!input.code || !isValidResourceCode(input.code, 'service')) {
             throw new ServiceCatalogValidationError('Invalid code format. Must be "service-XXX" where XXX is a 3-digit number');
         }
 
