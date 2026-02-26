@@ -1,17 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { UserService } from '../services/UserService.js';
-import { UserRepositoryImpl } from '../infrastructure/repositories/implementations/UserRepositoryImpl.js';
-import { PatientRepositoryImpl } from '../infrastructure/repositories/implementations/PatientRepositoryImpl.js';
-import { DoctorRepositoryImpl } from '../infrastructure/repositories/implementations/DoctorRepositoryImpl.js';
+import { userService } from '../services/index.js';
 import { success, error } from './utils/response.js';
 
 const router = Router();
-
-const userService = new UserService(
-    new UserRepositoryImpl(),
-    new PatientRepositoryImpl(),
-    new DoctorRepositoryImpl()
-);
 
 // Create a new user
 router.post('/', async (req: Request, res: Response) => {

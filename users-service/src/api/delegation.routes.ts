@@ -1,15 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { DelegationService } from '../services/DelegationService.js';
-import { DelegationRepositoryImpl } from '../infrastructure/repositories/implementations/DelegationRepositoryImpl.js';
-import { PatientRepositoryImpl } from '../infrastructure/repositories/implementations/PatientRepositoryImpl.js';
+import { delegationService } from '../services/index.js';
 import { success, error } from './utils/response.js';
 
 const router = Router();
-
-const delegationService = new DelegationService(
-    new DelegationRepositoryImpl(),
-    new PatientRepositoryImpl()
-);
 
 // Create a new delegation
 router.post('/', async (req: Request, res: Response) => {

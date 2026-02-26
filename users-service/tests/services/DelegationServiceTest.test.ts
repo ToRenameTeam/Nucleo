@@ -1,4 +1,4 @@
-import { DelegationService } from '../../src/services/DelegationService.js';
+import { DelegationService } from '../../src/services/delegation.service.js';
 import { IDelegationRepository } from '../../src/infrastructure/repositories/IDelegationRepository.js';
 import { IPatientRepository } from '../../src/infrastructure/repositories/IPatientRepository.js';
 import { randomUUID } from 'crypto';

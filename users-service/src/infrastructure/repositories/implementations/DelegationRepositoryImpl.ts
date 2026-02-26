@@ -1,4 +1,4 @@
-import { DelegationModel } from '../../models/DelegationModel.js';
+import { DelegationModel } from '../../database/models/DelegationModel.js';
 import { IDelegationRepository, DelegationData } from '../IDelegationRepository.js';
 import type { Delegation } from '../../../domains/Delegation.js';
 

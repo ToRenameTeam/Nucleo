@@ -1,4 +1,4 @@
-import { UserService } from '../../src/services/UserService.js';
+import { UserService } from '../../src/services/user.service.js';
 import { IUserRepository, UserData } from '../../src/infrastructure/repositories/IUserRepository.js';
 import { IPatientRepository, PatientData } from '../../src/infrastructure/repositories/IPatientRepository.js';
 import { IDoctorRepository, DoctorData } from '../../src/infrastructure/repositories/IDoctorRepository.js';
@@ -130,7 +130,7 @@ describe('UserService', () => {
                 fiscalCode: 'RSSMRA80A01H501U',
                 name: 'Mario',
                 lastName: 'Rossi',
-                patientData: {
+                patient: {
                 },
                 doctor: {
                     medicalLicenseNumber: 'ML123456',
@@ -177,7 +177,7 @@ describe('UserService', () => {
                 fiscalCode,
                 name: 'Mario',
                 lastName: 'Rossi',
-                patientData: {
+                patient: {
                 },
                 doctor: {
                     medicalLicenseNumber: 'ML123456',
@@ -210,7 +210,7 @@ describe('UserService', () => {
                 fiscalCode,
                 name: 'Mario',
                 lastName: 'Rossi',
-                patientData: {
+                patient: {
                 },
                 doctor: undefined,
             });

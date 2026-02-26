@@ -1,5 +1,5 @@
 import { IDoctorRepository, DoctorData } from '../IDoctorRepository.js';
-import { DoctorModel } from '../../models/DoctorModel.js';
+import { DoctorModel } from '../../database/models/DoctorModel.js';
 import type { Doctor } from '../../../domains/Doctor.js';
 import type {UUID} from "crypto";
 

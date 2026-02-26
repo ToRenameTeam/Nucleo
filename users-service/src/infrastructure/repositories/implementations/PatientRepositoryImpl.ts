@@ -1,5 +1,5 @@
 import { IPatientRepository, PatientData } from '../IPatientRepository.js';
-import { PatientModel } from '../../models/PatientModel.js';
+import { PatientModel } from '../../database/models/PatientModel.js';
 import type { Patient } from '../../../domains/Patient.js';
 
 export class PatientRepositoryImpl implements IPatientRepository {

@@ -1,18 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { AuthenticationService } from '../services/AuthenticationService.js';
-import { UserRepositoryImpl } from '../infrastructure/repositories/implementations/UserRepositoryImpl.js';
-import { PatientRepositoryImpl } from '../infrastructure/repositories/implementations/PatientRepositoryImpl.js';
-import { DoctorRepositoryImpl } from '../infrastructure/repositories/implementations/DoctorRepositoryImpl.js';
+import { authenticationService, PatientOnlyUser } from '../services/index.js';
 import { success, error } from './utils/response.js';
-import { PatientOnlyUser } from '../services/AuthenticatedUserFactory.js';
 
 const router = Router();
-
-const authService = new AuthenticationService(
-    new UserRepositoryImpl(),
-    new PatientRepositoryImpl(),
-    new DoctorRepositoryImpl()
-);
 
 router.post('/login', async (req: Request, res: Response) => {
     try {
@@ -22,7 +12,7 @@ router.post('/login', async (req: Request, res: Response) => {
             return error(res, 'Fiscal code and password are required', 400);
         }
 
-        const authenticatedUser = await authService.login(fiscalCode, password);
+        const authenticatedUser = await authenticationService.login(fiscalCode, password);
 
         const baseData = {
             userId: authenticatedUser.user.userId,
@@ -77,7 +67,7 @@ router.post('/select-profile', async (req: Request, res: Response) => {
             return error(res, 'Invalid profile type. Must be PATIENT or DOCTOR', 400);
         }
 
-        const profileData = await authService.getProfileData(userId, selectedProfile);
+        const profileData = await authenticationService.getProfileData(userId, selectedProfile);
         return success(res, profileData);
 
     } catch (err) {

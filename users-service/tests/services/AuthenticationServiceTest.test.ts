@@ -1,8 +1,8 @@
-import { AuthenticationService } from '../../src/services/AuthenticationService.js';
+import { AuthenticationService } from '../../src/services/authentication.service.js';
 import { IUserRepository, UserData } from '../../src/infrastructure/repositories/IUserRepository.js';
 import { IPatientRepository, PatientData } from '../../src/infrastructure/repositories/IPatientRepository.js';
 import { IDoctorRepository, DoctorData } from '../../src/infrastructure/repositories/IDoctorRepository.js';
-import { PatientOnlyUser, DoctorPatientUser } from '../../src/services/AuthenticatedUserFactory.js';
+import { PatientOnlyUser, DoctorPatientUser } from '../../src/services/authenticated-user.factory.js';
 import { randomUUID } from 'crypto';
 
 describe('AuthenticationService', () => {
