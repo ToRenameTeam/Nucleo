@@ -13,7 +13,7 @@ COPY pyproject.toml uv.lock ./
 
 RUN uv sync --frozen
 
-COPY src/ ./src/
+COPY src ./src/
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \

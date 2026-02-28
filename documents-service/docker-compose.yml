@@ -33,7 +33,7 @@ services:
 
   ai-service:
     build:
-      context: ./ai-service
+      context: ../ai-service
       dockerfile: Dockerfile
     ports:
       - "8001:8000"
