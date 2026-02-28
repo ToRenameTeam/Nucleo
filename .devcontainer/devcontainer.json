@@ -1,16 +1,13 @@
 {
   "name": "Nucleo",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
 
   // ──────────────────────────────────────────────
   // Runtime features
   // ──────────────────────────────────────────────
   "features": {
-    "ghcr.io/devcontainers/features/java:1": {
-      "version": "21",
-      "installGradle": "true",
-      "gradleVersion": "8.14"
-    },
     "ghcr.io/devcontainers/features/node:1": {
       "version": "20"
     },
@@ -81,8 +78,10 @@
         "java.jdt.ls.java.home": "${containerEnv:JAVA_HOME}",
         "java.configuration.detectJdksAtStart": true,
         "kotlin.java.home": "${containerEnv:JAVA_HOME}",
+        "kotlin.diagnostics.enabled": false,
+        "kotlin.diagnostics.level": "warning",
         "python.defaultInterpreterPath": "/usr/local/bin/python3",
-        "editor.formatOnSave": true,
+        "editor.formatOnSave": false,
         "files.eol": "\n",
         "terminal.integrated.defaultProfile.linux": "zsh"
       },
