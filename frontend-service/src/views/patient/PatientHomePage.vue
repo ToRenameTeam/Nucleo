@@ -21,7 +21,6 @@ import { parseItalianDateSlash, setTimeOnDate } from '../../utils/dateUtils'
 import { formatCategory } from '../../utils/formatters'
 import { getBadgeColors, getBadgeIcon } from '../../utils/badgeHelpers'
 import { useI18n } from 'vue-i18n'
-import type { UploadProgressEvent, UploadProgressEventType } from '../../api/documents'
 
 useI18n()
 const { currentUser, currentPatientProfile } = useAuth()
@@ -86,7 +85,7 @@ const isUploadModalOpen = ref(false)
 const isUploadProgressModalOpen = ref(false)
 const selectedFile = ref<File | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
-const uploadProgress = ref<UploadProgressEventType | null>(null)
+const isUploading = ref(false)
 const uploadError = ref<string | null>(null)
 const uploadingFilename = ref<string>('')
 
@@ -195,21 +194,14 @@ const handleUploadConfirm = async () => {
 
   // Open the progress modal
   isUploadProgressModalOpen.value = true
-  uploadProgress.value = null
+  isUploading.value = true
   uploadError.value = null
 
   const fileToUpload = selectedFile.value
   selectedFile.value = null
 
   try {
-    await documentsApiService.uploadDocumentWithProgress(
-        patientId,
-        fileToUpload,
-        (event: UploadProgressEvent) => {
-          console.log('[PatientHomePage] Upload progress:', event.type, event.data)
-          uploadProgress.value = event.type
-        }
-    )
+    await documentsApiService.uploadDocument(patientId, fileToUpload)
 
     // Success - reload documents
     await loadData()
@@ -231,6 +223,8 @@ const handleUploadConfirm = async () => {
     // Also show error toast after closing progress modal
     toastMessage.value = uploadError.value || 'upload.error'
     toastType.value = 'error'
+  } finally {
+    isUploading.value = false
   }
 }
 
@@ -243,7 +237,7 @@ const handleUploadProgressClose = () => {
   }
   
   // Reset state
-  uploadProgress.value = null
+  isUploading.value = false
   uploadError.value = null
   uploadingFilename.value = ''
 }
@@ -442,7 +436,7 @@ const handleCloseToast = () => {
     <!-- Upload Progress Modal -->
     <UploadProgressModal
       :is-open="isUploadProgressModalOpen"
-      :current-step="uploadProgress"
+      :is-loading="isUploading"
       :error="uploadError"
       :filename="uploadingFilename"
       @close="handleUploadProgressClose"

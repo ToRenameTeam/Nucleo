@@ -642,14 +642,8 @@
       "progress": {
         "title": "Uploading",
         "successTitle": "Upload Complete",
-        "received": "Document Received",
-        "receivedDesc": "File was successfully received by the server",
-        "stored": "Document Stored",
-        "storedDesc": "File has been securely saved",
-        "analyzed": "Analysis Complete",
-        "analyzedDesc": "Document has been analyzed by AI",
-        "completed": "Upload Complete",
-        "completedDesc": "Document is ready and available"
+        "loadingMessage": "Your document is being uploaded and analyzed. This may take a moment.",
+        "successMessage": "The document has been successfully uploaded and analyzed, and is now available."
       }
     }
   }

@@ -16,7 +16,6 @@ import type { Appointment } from '../../types/appointment'
 import type { CardMetadata } from '../../types/shared'
 import { appointmentsApi } from '../../api/appointments'
 import { documentsApiService } from '../../api/documents'
-import type { UploadProgressEvent, UploadProgressEventType } from '../../api/documents'
 import { TAG_COLOR_MAP } from '../../constants/categoryBadgeConfig'
 import type { BadgeColors } from '../../types/document'
 
@@ -40,7 +39,7 @@ const isUploadModalOpen = ref(false)
 const isUploadProgressModalOpen = ref(false)
 const selectedFile = ref<File | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
-const uploadProgress = ref<UploadProgressEventType | null>(null)
+const isUploading = ref(false)
 const uploadError = ref<string | null>(null)
 const uploadingFilename = ref<string>('')
 
@@ -361,22 +360,15 @@ const handleUploadConfirm = async () => {
   
   // Open the progress modal
   isUploadProgressModalOpen.value = true
-  uploadProgress.value = null
+  isUploading.value = true
   uploadError.value = null
   
   const fileToUpload = selectedFile.value
   selectedFile.value = null
   
   try {
-    await documentsApiService.uploadDocumentWithProgress(
-      patientId,
-      fileToUpload,
-      (event: UploadProgressEvent) => {
-        console.log('[DoctorAppointmentsPage] Upload progress:', event.type, event.data)
-        uploadProgress.value = event.type
-      }
-    )
-    
+    await documentsApiService.uploadDocument(patientId, fileToUpload)
+
     // Success - show success toast
     toastMessage.value = 'upload.success'
     toastType.value = 'success'
@@ -393,6 +385,8 @@ const handleUploadConfirm = async () => {
     // Also show error toast after closing progress modal
     toastMessage.value = uploadError.value || 'upload.error'
     toastType.value = 'error'
+  } finally {
+    isUploading.value = false
   }
 }
 
@@ -684,7 +678,7 @@ onMounted(() => {
     <!-- Upload Progress Modal -->
     <UploadProgressModal
       :is-open="isUploadProgressModalOpen"
-      :current-step="uploadProgress"
+      :is-loading="isUploading"
       :error="uploadError"
       :filename="uploadingFilename"
       @close="handleUploadProgressClose"
