@@ -1,19 +1,20 @@
-FROM gradle:8-jdk22 AS build
+FROM eclipse-temurin:22-jdk AS builder
+
 WORKDIR /app
 
-COPY build.gradle.kts settings.gradle.kts gradle.properties ./
+COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties ./
 COPY gradle ./gradle
-COPY gradlew ./
 COPY build-logic ./build-logic
 
 COPY appointments-service ./appointments-service
 
-RUN ./gradlew :appointments-service:build -x test --no-daemon
+RUN chmod +x gradlew && ./gradlew :appointments-service:buildFatJar --no-daemon
 
 FROM eclipse-temurin:22-jre-alpine
+
 WORKDIR /app
 
-COPY --from=build /app/appointments-service/build/libs/*-all.jar app.jar
+COPY --from=builder /app/appointments-service/build/libs/*-all.jar app.jar
 
 EXPOSE 8080
 

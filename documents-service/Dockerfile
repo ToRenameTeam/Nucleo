@@ -10,7 +10,7 @@ COPY documents-service ./documents-service
 
 RUN chmod +x gradlew && ./gradlew :documents-service:buildFatJar --no-daemon
 
-FROM eclipse-temurin:22-jre
+FROM eclipse-temurin:22-jre-alpine
 
 WORKDIR /app
 
