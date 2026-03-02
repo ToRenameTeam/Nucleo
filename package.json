@@ -11,7 +11,10 @@
     "dev:users": "pnpm --filter @nucleo/users-service dev",
     "start:users": "pnpm --filter @nucleo/users-service start",
     "dev:master-data": "pnpm --filter @nucleo/master-data-service dev",
-    "start:master-data": "pnpm --filter @nucleo/master-data-service start"
+    "start:master-data": "pnpm --filter @nucleo/master-data-service start",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +28,7 @@
     "prettier": "^3.8.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.53.1"
+    "typescript-eslint": "^8.53.1",
+    "vitepress": "2.0.0-alpha.16"
   }
 }

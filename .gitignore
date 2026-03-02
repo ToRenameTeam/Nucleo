@@ -82,3 +82,6 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+
+### Documentation ###
+docs/.vitepress/cache
