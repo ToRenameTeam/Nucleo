@@ -5,9 +5,13 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import it.nucleo.api.dto.*
+import it.nucleo.api.respondEitherJson
+import it.nucleo.api.respondEitherStatus
 import it.nucleo.application.DocumentService
 import it.nucleo.domain.*
+import it.nucleo.domain.errors.map
 import it.nucleo.infrastructure.logging.logger
+import kotlinx.serialization.builtins.ListSerializer
 
 private val logger = logger("it.nucleo.api.routes.DocumentRoutes")
 
@@ -34,18 +38,13 @@ private fun Route.getAllDocuments(documentService: DocumentService) {
                 )
 
         logger.debug("GET /patients/$patientId/documents - Retrieving all documents")
-        try {
-            val documents = documentService.getAllDocumentsByPatient(PatientId(patientId))
-            val response = documents.map { it.toResponse() }
-            logger.info("GET /patients/$patientId/documents - Retrieved ${response.size} documents")
-            call.respond(HttpStatusCode.OK, response)
-        } catch (e: RepositoryException) {
-            logger.error("GET /patients/$patientId/documents - Failed to retrieve documents", e)
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                ErrorResponse("internal_error", "Failed to retrieve documents", e.message)
-            )
-        }
+
+        val result =
+            documentService.getAllDocumentsByPatient(PatientId(patientId)).map { documents ->
+                documents.map { it.toResponse() }
+            }
+
+        call.respondEitherJson(result, ListSerializer(DocumentResponse.serializer()))
     }
 }
 
@@ -60,18 +59,13 @@ private fun Route.getDocumentsByDoctor(documentService: DocumentService) {
                 )
 
         logger.debug("GET /documents?doctorId=$doctorId - Retrieving all documents for doctor")
-        try {
-            val documents = documentService.getAllDocumentsByDoctor(DoctorId(doctorId))
-            val response = documents.map { it.toResponse() }
-            logger.info("GET /documents?doctorId=$doctorId - Retrieved ${response.size} documents")
-            call.respond(HttpStatusCode.OK, response)
-        } catch (e: RepositoryException) {
-            logger.error("GET /documents?doctorId=$doctorId - Failed to retrieve documents", e)
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                ErrorResponse("internal_error", "Failed to retrieve documents", e.message)
-            )
-        }
+
+        val result =
+            documentService.getAllDocumentsByDoctor(DoctorId(doctorId)).map { documents ->
+                documents.map { it.toResponse() }
+            }
+
+        call.respondEitherJson(result, ListSerializer(DocumentResponse.serializer()))
     }
 }
 
@@ -93,29 +87,13 @@ private fun Route.getDocumentById(documentService: DocumentService) {
                 )
 
         logger.debug("GET /patients/$patientId/documents/$documentId - Retrieving document")
-        try {
-            val document =
-                documentService.getDocumentById(PatientId(patientId), DocumentId(documentId))
-            logger.info(
-                "GET /patients/$patientId/documents/$documentId - Document retrieved successfully"
-            )
-            call.respond(HttpStatusCode.OK, document.toResponse())
-        } catch (e: DocumentNotFoundException) {
-            logger.warn("GET /patients/$patientId/documents/$documentId - Document not found")
-            call.respond(
-                HttpStatusCode.NotFound,
-                ErrorResponse("not_found", "Document not found", e.message)
-            )
-        } catch (e: RepositoryException) {
-            logger.error(
-                "GET /patients/$patientId/documents/$documentId - Failed to retrieve document",
-                e
-            )
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                ErrorResponse("internal_error", "Failed to retrieve document", e.message)
-            )
-        }
+
+        val result =
+            documentService.getDocumentById(PatientId(patientId), DocumentId(documentId)).map {
+                it.toResponse()
+            }
+
+        call.respondEitherJson(result, DocumentResponse.serializer())
     }
 }
 
@@ -130,6 +108,7 @@ private fun Route.addDocument(documentService: DocumentService) {
                 )
 
         logger.debug("POST /patients/$patientId/documents - Adding new document")
+
         val request =
             try {
                 call.receive<CreateDocumentRequest>()
@@ -141,31 +120,10 @@ private fun Route.addDocument(documentService: DocumentService) {
                 )
             }
 
-        try {
-            val document = documentService.createDocument(PatientId(patientId), request)
-            logger.info(
-                "POST /patients/$patientId/documents - Document created successfully with id: ${document.id.id}"
-            )
-            call.respond(HttpStatusCode.Created, document.toResponse())
-        } catch (e: DocumentNotFoundException) {
-            logger.warn("POST /patients/$patientId/documents - Referenced document not found", e)
-            call.respond(
-                HttpStatusCode.NotFound,
-                ErrorResponse("not_found", "Referenced document not found", e.message)
-            )
-        } catch (e: RepositoryException) {
-            logger.error("POST /patients/$patientId/documents - Failed to add document", e)
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                ErrorResponse("internal_error", "Failed to add document", e.message)
-            )
-        } catch (e: IllegalArgumentException) {
-            logger.warn("POST /patients/$patientId/documents - Invalid document data", e)
-            call.respond(
-                HttpStatusCode.BadRequest,
-                ErrorResponse("bad_request", e.message ?: "Invalid document data")
-            )
-        }
+        val result =
+            documentService.createDocument(PatientId(patientId), request).map { it.toResponse() }
+
+        call.respondEitherJson(result, DocumentResponse.serializer(), HttpStatusCode.Created)
     }
 }
 
@@ -190,28 +148,14 @@ private fun Route.deleteDocument(documentService: DocumentService) {
                 )
 
         logger.debug("DELETE /patients/$patientId/documents/$documentId - Deleting document")
-        try {
-            documentService.deleteDocument(PatientId(patientId), DocumentId(documentId))
-            logger.info(
-                "DELETE /patients/$patientId/documents/$documentId - Document deleted successfully"
-            )
-            call.respond(HttpStatusCode.OK, DeleteResponse("Document deleted successfully"))
-        } catch (e: DocumentNotFoundException) {
-            logger.warn("DELETE /patients/$patientId/documents/$documentId - Document not found")
-            call.respond(
-                HttpStatusCode.NotFound,
-                ErrorResponse("not_found", "Document not found", e.message)
-            )
-        } catch (e: RepositoryException) {
-            logger.error(
-                "DELETE /patients/$patientId/documents/$documentId - Failed to delete document",
-                e
-            )
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                ErrorResponse("internal_error", "Failed to delete document", e.message)
-            )
-        }
+
+        val result = documentService.deleteDocument(PatientId(patientId), DocumentId(documentId))
+
+        call.respondEitherStatus(
+            result,
+            HttpStatusCode.OK,
+            DeleteResponse("Document deleted successfully")
+        )
     }
 }
 
@@ -236,6 +180,7 @@ private fun Route.updateReport(documentService: DocumentService) {
                 )
 
         logger.debug("PUT /patients/$patientId/documents/$documentId/report - Updating report")
+
         val request =
             try {
                 call.receive<UpdateReportRequest>()
@@ -250,37 +195,11 @@ private fun Route.updateReport(documentService: DocumentService) {
                 )
             }
 
-        try {
-            val updatedReport =
-                documentService.updateReport(PatientId(patientId), DocumentId(documentId), request)
+        val result =
+            documentService
+                .updateReport(PatientId(patientId), DocumentId(documentId), request)
+                .map { it.toResponse() }
 
-            logger.info(
-                "PUT /patients/$patientId/documents/$documentId/report - Report updated successfully"
-            )
-            call.respond(HttpStatusCode.OK, updatedReport.toResponse())
-        } catch (e: DocumentNotFoundException) {
-            logger.warn(
-                "PUT /patients/$patientId/documents/$documentId/report - Document not found"
-            )
-            call.respond(
-                HttpStatusCode.NotFound,
-                ErrorResponse("not_found", "Document not found", e.message)
-            )
-        } catch (e: IllegalArgumentException) {
-            logger.warn("PUT /patients/$patientId/documents/$documentId/report - ${e.message}", e)
-            call.respond(
-                HttpStatusCode.BadRequest,
-                ErrorResponse("bad_request", e.message ?: "Invalid request")
-            )
-        } catch (e: RepositoryException) {
-            logger.error(
-                "PUT /patients/$patientId/documents/$documentId/report - Failed to update report",
-                e
-            )
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                ErrorResponse("internal_error", "Failed to update report", e.message)
-            )
-        }
+        call.respondEitherJson(result, DocumentResponse.serializer())
     }
 }

@@ -159,24 +159,7 @@ class AppointmentRoutesTest :
 
                 response.status shouldBe HttpStatusCode.NotFound
                 val body = response.bodyAsText()
-                body shouldContain "NOT_FOUND"
-            }
-        }
-
-        test("GET /appointments/{id} - should return 400 for invalid id") {
-            testApplication {
-                application {
-                    testModule(
-                        FakeAppointmentRepository(throwInvalidId = true),
-                        FakeAvailabilityRepository()
-                    )
-                }
-
-                val response = client.get("/appointments/not-a-uuid")
-
-                response.status shouldBe HttpStatusCode.BadRequest
-                val body = response.bodyAsText()
-                body shouldContain "INVALID_ID"
+                body shouldContain "APPOINTMENT_NOT_FOUND"
             }
         }
 
@@ -310,7 +293,7 @@ class AppointmentRoutesTest :
 
                 response.status shouldBe HttpStatusCode.NotFound
                 val body = response.bodyAsText()
-                body shouldContain "NOT_FOUND"
+                body shouldContain "APPOINTMENT_NOT_FOUND"
             }
         }
 
@@ -342,35 +325,24 @@ class AppointmentRoutesTest :
 
                 response.status shouldBe HttpStatusCode.NotFound
                 val body = response.bodyAsText()
-                body shouldContain "NOT_FOUND"
+                body shouldContain "APPOINTMENT_NOT_FOUND"
             }
         }
     })
 
 // Fake repository implementations for testing
-class FakeAppointmentRepository(
-    private val appointmentExists: Boolean = true,
-    private val throwInvalidId: Boolean = false
-) : AppointmentRepository {
+class FakeAppointmentRepository(private val appointmentExists: Boolean = true) :
+    AppointmentRepository {
 
     override suspend fun save(appointment: Appointment): Appointment = appointment
 
     override suspend fun findById(id: AppointmentId): Appointment? {
-        if (throwInvalidId) throw IllegalArgumentException("Invalid appointment ID format")
         if (!appointmentExists) return null
 
         return Appointment(
             id = id,
             patientId = PatientId.fromString("pat-001"),
             availabilityId = AvailabilityId.fromString("a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"),
-            doctorId = DoctorId.fromString("doc-001"),
-            facilityId = FacilityId.fromString("facility-001"),
-            serviceTypeId = ServiceTypeId.fromString("service-001"),
-            timeSlot =
-                TimeSlot(
-                    startDateTime = LocalDateTime.parse("2026-02-01T09:00:00"),
-                    durationMinutes = 30
-                ),
             status = AppointmentStatus.SCHEDULED,
             createdAt = LocalDateTime.parse("2026-01-30T10:00:00"),
             updatedAt = LocalDateTime.parse("2026-01-30T10:00:00")
@@ -380,10 +352,7 @@ class FakeAppointmentRepository(
     override suspend fun findByFilters(
         patientId: PatientId?,
         doctorId: DoctorId?,
-        facilityId: FacilityId?,
-        status: AppointmentStatus?,
-        startDate: LocalDateTime?,
-        endDate: LocalDateTime?
+        status: AppointmentStatus?
     ): List<Appointment> {
         if (!appointmentExists) return emptyList()
 
@@ -392,14 +361,6 @@ class FakeAppointmentRepository(
                 id = AppointmentId.fromString("d4e5f6a7-b8c9-40d1-e2f3-a4b5c6d7e8f9"),
                 patientId = PatientId.fromString("pat-001"),
                 availabilityId = AvailabilityId.fromString("a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"),
-                doctorId = DoctorId.fromString("doc-001"),
-                facilityId = FacilityId.fromString("facility-001"),
-                serviceTypeId = ServiceTypeId.fromString("service-001"),
-                timeSlot =
-                    TimeSlot(
-                        startDateTime = LocalDateTime.parse("2026-02-01T09:00:00"),
-                        durationMinutes = 30
-                    ),
                 status = AppointmentStatus.SCHEDULED,
                 createdAt = LocalDateTime.parse("2026-01-30T10:00:00"),
                 updatedAt = LocalDateTime.parse("2026-01-30T10:00:00")
@@ -413,5 +374,3 @@ class FakeAppointmentRepository(
         return appointment
     }
 }
-
-// Use FakeAvailabilityRepository from AvailabilityRoutesTest.kt to avoid redeclaration

@@ -4,12 +4,12 @@ import it.nucleo.domain.DocumentFactory
 import it.nucleo.domain.DocumentId
 import it.nucleo.domain.DocumentRepository
 import it.nucleo.domain.FileMetadata
-import it.nucleo.domain.FileStorageException
 import it.nucleo.domain.FileStorageRepository
 import it.nucleo.domain.PatientId
 import it.nucleo.domain.Summary
 import it.nucleo.domain.Tag
 import it.nucleo.domain.Title
+import it.nucleo.domain.errors.*
 import it.nucleo.domain.uploaded.UploadedDocumentType
 import it.nucleo.infrastructure.ai.AiAnalysisResult
 import it.nucleo.infrastructure.ai.AiServiceClient
@@ -41,16 +41,6 @@ data class UploadDocumentCommand(
     }
 }
 
-sealed class UploadResult {
-    data class Success(val documentId: DocumentId) : UploadResult()
-
-    data class ValidationError(val message: String) : UploadResult()
-
-    data class StorageError(val message: String) : UploadResult()
-
-    data class AiAnalysisError(val message: String) : UploadResult()
-}
-
 class DocumentUploadService(
     private val fileStorageRepository: FileStorageRepository,
     private val documentRepository: DocumentRepository,
@@ -69,21 +59,20 @@ class DocumentUploadService(
         private val DEFAULT_TAGS = setOf("uploaded", "unprocessed")
     }
 
-    suspend fun upload(command: UploadDocumentCommand): UploadResult {
+    suspend fun upload(command: UploadDocumentCommand): Either<DomainError, DocumentId> {
         logger.debug(
             "Processing upload for patient: ${command.patientId.id}, filename: ${command.filename}"
         )
 
-        val validationError = validate(command)
-        if (validationError != null) {
-            return validationError
+        validate(command)?.let {
+            return failure(it)
         }
 
         val documentId = DocumentId(UUID.randomUUID().toString())
 
         // Step 1: Store PDF file in MinIO
-        return try {
-            fileStorageRepository.store(
+        fileStorageRepository
+            .store(
                 patientId = command.patientId,
                 documentId = documentId,
                 filename = command.filename,
@@ -91,58 +80,54 @@ class DocumentUploadService(
                 contentLength = command.content.size.toLong(),
                 contentType = PDF_CONTENT_TYPE
             )
-            logger.info(
-                "PDF uploaded successfully with ID: ${documentId.id}, filename: ${command.filename}"
+            .getOrElse {
+                return failure(it)
+            }
+
+        logger.info(
+            "PDF uploaded successfully with ID: ${documentId.id}, filename: ${command.filename}"
+        )
+
+        // Step 2: Analyze document with AI to extract metadata
+        val metadata = analyzeDocumentWithAi(command.patientId, documentId)
+
+        // Step 2.5: Validate that document is medical-related
+        if (metadata.summary.summary.isBlank() && metadata.tags.isEmpty()) {
+            logger.warn(
+                "Document ${documentId.id} identified as non-medical by AI. Rejecting upload."
             )
-
-            // Step 2: Analyze document with AI to extract metadata
-            val metadata = analyzeDocumentWithAi(command.patientId, documentId)
-
-            // Step 2.5: Validate that document is medical-related
-            if (metadata.summary.summary.isBlank() && metadata.tags.isEmpty()) {
-                logger.warn(
-                    "Document ${documentId.id} identified as non-medical by AI. Rejecting upload."
-                )
-                // Delete the PDF from MinIO since we're rejecting it
-                try {
-                    fileStorageRepository.delete(command.patientId, documentId)
-                    logger.debug("Deleted non-medical PDF from MinIO: ${documentId.id}")
-                } catch (e: Exception) {
-                    logger.error("Failed to delete non-medical PDF from MinIO: ${documentId.id}", e)
-                }
-                return UploadResult.ValidationError(
+            fileStorageRepository.delete(command.patientId, documentId).onFailure {
+                logger.error("Failed to delete non-medical PDF from MinIO: ${documentId.id}")
+            }
+            return failure(
+                ValidationError(
                     "The uploaded document does not appear to be a medical document. " +
                         "Only medical documents (reports, prescriptions, clinical notes) are accepted."
                 )
-            }
+            )
+        }
 
-            // Step 3: Create document entity with AI-generated metadata and default values
-            val document =
-                DocumentFactory.createUploadedDocument(
-                    id = documentId,
-                    patientId = command.patientId,
-                    title = Title(command.filename.removeSuffix(".pdf")),
-                    filename = command.filename,
-                    metadata = metadata,
-                    documentType = inferDocumentType(metadata)
-                )
-
-            // Step 4: Save document entity to MongoDB
-            documentRepository.addDocument(command.patientId, document)
-            logger.info(
-                "Document entity created and saved successfully: ${documentId.id}, type: ${document.documentType}"
+        // Step 3: Create document entity with AI-generated metadata and default values
+        val document =
+            DocumentFactory.createUploadedDocument(
+                id = documentId,
+                patientId = command.patientId,
+                title = Title(command.filename.removeSuffix(".pdf")),
+                filename = command.filename,
+                metadata = metadata,
+                documentType = inferDocumentType(metadata)
             )
 
-            UploadResult.Success(documentId)
-        } catch (e: FileStorageException) {
-            logger.error("Failed to upload document for patient: ${command.patientId.id}", e)
-            UploadResult.StorageError(e.message ?: "Unknown storage error")
-        } catch (e: Exception) {
-            logger.error("Failed to create document entity for patient: ${command.patientId.id}", e)
-            UploadResult.StorageError("Failed to create document: ${e.message}")
+        // Step 4: Save document entity to MongoDB
+        documentRepository.addDocument(command.patientId, document).getOrElse {
+            return failure(it)
         }
-    }
 
+        logger.info(
+            "Document entity created and saved successfully: ${documentId.id}, type: ${document.documentType}"
+        )
+        return success(documentId)
+    }
 
     private suspend fun analyzeDocumentWithAi(
         patientId: PatientId,
@@ -201,25 +186,25 @@ class DocumentUploadService(
         }
     }
 
-    private fun validate(command: UploadDocumentCommand): UploadResult.ValidationError? {
+    private fun validate(command: UploadDocumentCommand): ValidationError? {
         if (!command.filename.lowercase().endsWith(".pdf")) {
-            return UploadResult.ValidationError("Only PDF files are accepted")
+            return ValidationError("Only PDF files are accepted")
         }
 
         if (command.contentType != PDF_CONTENT_TYPE) {
-            return UploadResult.ValidationError("Content type must be application/pdf")
+            return ValidationError("Content type must be application/pdf")
         }
 
         if (command.content.isEmpty()) {
-            return UploadResult.ValidationError("File is empty")
+            return ValidationError("File is empty")
         }
 
         if (command.content.size > MAX_FILE_SIZE) {
-            return UploadResult.ValidationError("File size exceeds maximum allowed (50 MB)")
+            return ValidationError("File size exceeds maximum allowed (50 MB)")
         }
 
         if (!isPdfFile(command.content)) {
-            return UploadResult.ValidationError("File does not appear to be a valid PDF")
+            return ValidationError("File does not appear to be a valid PDF")
         }
 
         return null

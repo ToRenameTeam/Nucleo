@@ -1,12 +1,12 @@
 package it.nucleo.appointments.application
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import it.nucleo.appointments.domain.Availability
 import it.nucleo.appointments.domain.AvailabilityRepository
+import it.nucleo.appointments.domain.errors.*
 import it.nucleo.appointments.domain.valueobjects.*
 import kotlinx.datetime.LocalDateTime
 
@@ -33,12 +33,12 @@ class AvailabilityServiceTest :
             val result = service.createAvailability(command)
 
             // Then
-            result shouldNotBe null
-            result.doctorId.value shouldBe "doc-001"
-            result.status shouldBe AvailabilityStatus.AVAILABLE
+            result.shouldBeInstanceOf<Either.Right<Availability>>()
+            result.value.doctorId.value shouldBe "doc-001"
+            result.value.status shouldBe AvailabilityStatus.AVAILABLE
         }
 
-        test("createAvailability - should throw AvailabilityOverlapException when overlap exists") {
+        test("createAvailability - should return OverlapDetected when overlap exists") {
             // Given
             val repo = FakeAvailabilityRepositoryForAvailabilityService(hasOverlap = true)
             val service = AvailabilityService(repo)
@@ -55,8 +55,11 @@ class AvailabilityServiceTest :
                         )
                 )
 
-            // When & Then
-            shouldThrow<AvailabilityOverlapException> { service.createAvailability(command) }
+            // When
+            val result = service.createAvailability(command)
+
+            // Then
+            result.shouldBeInstanceOf<Either.Left<AvailabilityError.OverlapDetected>>()
         }
 
         test("getAvailabilityById - should return availability when found") {
@@ -68,11 +71,11 @@ class AvailabilityServiceTest :
             val result = service.getAvailabilityById("a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6")
 
             // Then
-            result shouldNotBe null
-            result?.availabilityId?.value shouldBe "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"
+            result.shouldBeInstanceOf<Either.Right<Availability>>()
+            result.value.availabilityId.value shouldBe "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"
         }
 
-        test("getAvailabilityById - should return null when not found") {
+        test("getAvailabilityById - should return NotFound when not found") {
             // Given
             val repo = FakeAvailabilityRepositoryForAvailabilityService(availabilityExists = false)
             val service = AvailabilityService(repo)
@@ -81,7 +84,7 @@ class AvailabilityServiceTest :
             val result = service.getAvailabilityById("00000000-0000-0000-0000-000000000000")
 
             // Then
-            result shouldBe null
+            result.shouldBeInstanceOf<Either.Left<AvailabilityError.NotFound>>()
         }
 
         test("getAvailabilitiesByFilters - should return filtered availabilities") {
@@ -99,8 +102,9 @@ class AvailabilityServiceTest :
                 )
 
             // Then
-            result shouldHaveSize 1
-            result[0].doctorId.value shouldBe "doc-001"
+            result.shouldBeInstanceOf<Either.Right<List<Availability>>>()
+            result.value shouldHaveSize 1
+            result.value[0].doctorId.value shouldBe "doc-001"
         }
 
         test("updateAvailability - should update availability successfully") {
@@ -120,11 +124,11 @@ class AvailabilityServiceTest :
             val result = service.updateAvailability(command)
 
             // Then
-            result shouldNotBe null
-            result?.facilityId?.value shouldBe "facility-002"
+            result.shouldBeInstanceOf<Either.Right<Availability>>()
+            result.value.facilityId.value shouldBe "facility-002"
         }
 
-        test("updateAvailability - should return null when not found") {
+        test("updateAvailability - should return NotFound when not found") {
             // Given
             val repo = FakeAvailabilityRepositoryForAvailabilityService(availabilityExists = false)
             val service = AvailabilityService(repo)
@@ -141,7 +145,7 @@ class AvailabilityServiceTest :
             val result = service.updateAvailability(command)
 
             // Then
-            result shouldBe null
+            result.shouldBeInstanceOf<Either.Left<AvailabilityError.NotFound>>()
         }
 
         test("cancelAvailability - should cancel availability successfully") {
@@ -153,10 +157,10 @@ class AvailabilityServiceTest :
             val result = service.cancelAvailability("a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6")
 
             // Then
-            result shouldBe true
+            result.shouldBeInstanceOf<Either.Right<Unit>>()
         }
 
-        test("cancelAvailability - should return false when not found") {
+        test("cancelAvailability - should return NotFound when not found") {
             // Given
             val repo = FakeAvailabilityRepositoryForAvailabilityService(availabilityExists = false)
             val service = AvailabilityService(repo)
@@ -165,7 +169,7 @@ class AvailabilityServiceTest :
             val result = service.cancelAvailability("00000000-0000-0000-0000-000000000000")
 
             // Then
-            result shouldBe false
+            result.shouldBeInstanceOf<Either.Left<AvailabilityError.NotFound>>()
         }
     })
 

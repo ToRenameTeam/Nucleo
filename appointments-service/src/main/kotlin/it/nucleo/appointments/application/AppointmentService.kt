@@ -4,6 +4,7 @@ import it.nucleo.appointments.domain.Appointment
 import it.nucleo.appointments.domain.AppointmentRepository
 import it.nucleo.appointments.domain.Availability
 import it.nucleo.appointments.domain.AvailabilityRepository
+import it.nucleo.appointments.domain.errors.*
 import it.nucleo.appointments.domain.valueobjects.*
 import org.slf4j.LoggerFactory
 
@@ -22,7 +23,11 @@ class AppointmentService(
         val availabilityId: String?
     )
 
-    suspend fun createAppointment(command: CreateAppointmentCommand): Appointment {
+    data class AppointmentDetails(val appointment: Appointment, val availability: Availability)
+
+    suspend fun createAppointment(
+        command: CreateAppointmentCommand
+    ): Either<DomainError, Appointment> {
         logger.info("Creating appointment for patient: ${command.patientId}")
 
         val patientId = PatientId.fromString(command.patientId)
@@ -30,66 +35,69 @@ class AppointmentService(
 
         val availability =
             availabilityRepository.findById(availabilityId)
-                ?: throw AvailabilityNotFoundException("Availability not found: $availabilityId")
+                ?: return failure(AvailabilityError.NotFound(availabilityId.value))
 
         if (availability.status != AvailabilityStatus.AVAILABLE) {
             logger.warn("Availability is not available: ${availability.status}")
-            throw AvailabilityNotAvailableException("Availability is not available")
+            return failure(AvailabilityError.NotAvailable(availabilityId.value))
         }
 
         val appointment =
             Appointment.schedule(patientId = patientId, availabilityId = availabilityId)
-
         val savedAppointment = appointmentRepository.save(appointment)
 
-        val bookedAvailability = availability.book()
+        val bookedAvailability =
+            availability.book().getOrElse {
+                return failure(it)
+            }
         availabilityRepository.update(bookedAvailability)
 
         logger.info("Appointment created successfully with ID: ${savedAppointment.id}")
-        return savedAppointment
+        return success(savedAppointment)
     }
 
-    suspend fun getAppointmentById(id: String): Appointment? {
+    suspend fun getAppointmentById(id: String): Either<DomainError, Appointment> {
         logger.info("Fetching appointment by ID: $id")
+
         val appointment = appointmentRepository.findById(AppointmentId.fromString(id))
 
         if (appointment == null) {
             logger.warn("Appointment not found with ID: $id")
-        } else {
-            logger.info("Appointment found with ID: $id")
+            return failure(AppointmentError.NotFound(id))
         }
 
-        return appointment
+        logger.info("Appointment found with ID: $id")
+        return success(appointment)
     }
 
-    data class AppointmentDetails(val appointment: Appointment, val availability: Availability)
-
-    suspend fun getAppointmentDetails(id: String): AppointmentDetails? {
+    suspend fun getAppointmentDetails(id: String): Either<DomainError, AppointmentDetails> {
         logger.info("Fetching appointment details by ID: $id")
 
-        val appointment = appointmentRepository.findById(AppointmentId.fromString(id))
-        if (appointment == null) {
-            logger.warn("Appointment not found with ID: $id")
-            return null
-        }
+        val appointment =
+            appointmentRepository.findById(AppointmentId.fromString(id))
+                ?: run {
+                    logger.warn("Appointment not found with ID: $id")
+                    return failure(AppointmentError.NotFound(id))
+                }
 
-        val availability = availabilityRepository.findById(appointment.availabilityId)
-        if (availability == null) {
-            logger.error(
-                "Availability not found for appointment ID: $id, availabilityId: ${appointment.availabilityId}"
-            )
-            throw AvailabilityNotFoundException("Availability not found for appointment")
-        }
+        val availability =
+            availabilityRepository.findById(appointment.availabilityId)
+                ?: run {
+                    logger.error(
+                        "Availability not found for appointment ID: $id, availabilityId: ${appointment.availabilityId}"
+                    )
+                    return failure(AvailabilityError.NotFound(appointment.availabilityId.value))
+                }
 
         logger.info("Appointment details found with ID: $id")
-        return AppointmentDetails(appointment, availability)
+        return success(AppointmentDetails(appointment, availability))
     }
 
     suspend fun getAppointmentsByFilters(
         patientId: String?,
         doctorId: String?,
         status: String?
-    ): List<Appointment> {
+    ): Either<DomainError, List<Appointment>> {
         val patientIdValue = patientId?.let { PatientId.fromString(it) }
         val doctorIdValue = doctorId?.let { DoctorId.fromString(it) }
         val statusValue = status?.let { AppointmentStatus.valueOf(it) }
@@ -102,14 +110,17 @@ class AppointmentService(
             appointmentRepository.findByFilters(patientIdValue, doctorIdValue, statusValue)
 
         logger.info("Found ${appointments.size} appointments")
-        return appointments
+        return success(appointments)
     }
 
-    suspend fun updateAppointment(command: UpdateAppointmentCommand): Appointment? {
+    suspend fun updateAppointment(
+        command: UpdateAppointmentCommand
+    ): Either<DomainError, Appointment> {
         logger.info("Updating appointment with ID: ${command.id}")
 
         val appointment =
-            appointmentRepository.findById(AppointmentId.fromString(command.id)) ?: return null
+            appointmentRepository.findById(AppointmentId.fromString(command.id))
+                ?: return failure(AppointmentError.NotFound(command.id))
 
         val updated =
             when {
@@ -120,73 +131,94 @@ class AppointmentService(
                         AppointmentStatus.CANCELLED -> appointment.cancel()
                         AppointmentStatus.NO_SHOW -> appointment.markNoShow()
                         else ->
-                            throw IllegalArgumentException(
-                                "Cannot update to status: $newStatus. Use appropriate endpoints."
+                            return failure(
+                                AppointmentError.InvalidRequest(
+                                    "Cannot update to status: $newStatus. Use appropriate endpoints."
+                                )
                             )
+                    }.getOrElse {
+                        return failure(it)
                     }
                 }
                 command.availabilityId != null -> {
                     val newAvailabilityId = AvailabilityId.fromString(command.availabilityId)
 
-                    // Validate new availability
                     val newAvailability =
                         availabilityRepository.findById(newAvailabilityId)
-                            ?: throw AvailabilityNotFoundException("New availability not found")
+                            ?: return failure(AvailabilityError.NotFound(newAvailabilityId.value))
 
                     if (newAvailability.status != AvailabilityStatus.AVAILABLE) {
-                        throw AvailabilityNotAvailableException("New availability is not available")
+                        return failure(AvailabilityError.NotAvailable(newAvailabilityId.value))
                     }
 
-                    // Free up the old availability and book the new one
+                    // Free up the old availability (only if it's currently booked) and book the new
+                    // one
                     val oldAvailability =
                         availabilityRepository.findById(appointment.availabilityId)
-                    oldAvailability?.let { availabilityRepository.update(it.makeAvailable()) }
-                    availabilityRepository.update(newAvailability.book())
+                    if (oldAvailability?.status == AvailabilityStatus.BOOKED) {
+                        val freed =
+                            oldAvailability.makeAvailable().getOrElse { err ->
+                                return failure(err)
+                            }
+                        availabilityRepository.update(freed)
+                    }
+                    val booked =
+                        newAvailability.book().getOrElse {
+                            return failure(it)
+                        }
+                    availabilityRepository.update(booked)
 
-                    appointment.reschedule(newAvailabilityId)
+                    appointment.reschedule(newAvailabilityId).getOrElse {
+                        return failure(it)
+                    }
                 }
                 else ->
-                    throw IllegalArgumentException("Must provide either status or availabilityId")
+                    return failure(
+                        AppointmentError.InvalidRequest(
+                            "Must provide either status or availabilityId"
+                        )
+                    )
             }
 
         val saved = appointmentRepository.update(updated)
 
         if (saved == null) {
             logger.warn("Appointment not found when updating with ID: ${command.id}")
-        } else {
-            logger.info("Appointment updated successfully with ID: ${command.id}")
+            return failure(AppointmentError.NotFound(command.id))
         }
 
-        return saved
+        logger.info("Appointment updated successfully with ID: ${command.id}")
+        return success(saved)
     }
 
-    suspend fun deleteAppointment(id: String): Boolean {
+    suspend fun deleteAppointment(id: String): Either<DomainError, Unit> {
         logger.info("Deleting appointment with ID: $id")
 
         val appointmentId = AppointmentId.fromString(id)
-        val appointment = appointmentRepository.findById(appointmentId)
+        val appointment =
+            appointmentRepository.findById(appointmentId)
+                ?: run {
+                    logger.warn("Appointment not found with ID: $id")
+                    return failure(AppointmentError.NotFound(id))
+                }
 
-        if (appointment == null) {
-            logger.warn("Appointment not found with ID: $id")
-            return false
-        }
-
-        // Update appointment status to CANCELLED
-        val cancelled = appointment.cancel()
+        val cancelled =
+            appointment.cancel().getOrElse {
+                return failure(it)
+            }
         appointmentRepository.update(cancelled)
 
-        // Free up the availability
+        // Free up the availability if it was booked
         val availability = availabilityRepository.findById(appointment.availabilityId)
-        if (availability != null) {
-            val freedAvailability = availability.makeAvailable()
-            availabilityRepository.update(freedAvailability)
+        if (availability?.status == AvailabilityStatus.BOOKED) {
+            val freed =
+                availability.makeAvailable().getOrElse {
+                    return failure(it)
+                }
+            availabilityRepository.update(freed)
         }
 
         logger.info("Appointment deleted successfully with ID: $id")
-        return true
+        return success(Unit)
     }
 }
-
-class AvailabilityNotFoundException(message: String) : Exception(message)
-
-class AvailabilityNotAvailableException(message: String) : Exception(message)

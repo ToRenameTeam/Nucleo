@@ -8,10 +8,11 @@ import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import it.nucleo.api.dto.ErrorResponse
 import it.nucleo.api.dto.UploadResponse
+import it.nucleo.api.respondEither
 import it.nucleo.application.DocumentUploadService
 import it.nucleo.application.UploadDocumentCommand
-import it.nucleo.application.UploadResult
 import it.nucleo.domain.PatientId
+import it.nucleo.domain.errors.map
 import it.nucleo.infrastructure.logging.logger
 
 private val logger = logger("it.nucleo.api.routes.UploadRoutes")
@@ -19,9 +20,7 @@ private val logger = logger("it.nucleo.api.routes.UploadRoutes")
 private const val PDF_CONTENT_TYPE = "application/pdf"
 
 fun Route.uploadRoutes(uploadService: DocumentUploadService) {
-    route("/patients/{patientId}/documents") {
-        uploadDocument(uploadService)
-    }
+    route("/patients/{patientId}/documents") { uploadDocument(uploadService) }
 }
 
 /** POST /patients/{patientId}/documents/upload Uploads a PDF document for a patient. */
@@ -75,56 +74,16 @@ private fun Route.uploadDocument(uploadService: DocumentUploadService) {
                                     contentType = contentType
                                 )
 
-                            when (val result = uploadService.upload(command)) {
-                                is UploadResult.Success -> {
-                                    logger.info(
-                                        "POST /patients/$patientId/documents/upload - Success, documentId: ${result.documentId.id}"
-                                    )
-                                    call.respond(
-                                        HttpStatusCode.Created,
-                                        UploadResponse(
-                                            success = true,
-                                            message = "Document uploaded successfully",
-                                            documentId = result.documentId.id
-                                        )
+                            val result =
+                                uploadService.upload(command).map { documentId ->
+                                    UploadResponse(
+                                        success = true,
+                                        message = "Document uploaded successfully",
+                                        documentId = documentId.id
                                     )
                                 }
-                                is UploadResult.ValidationError -> {
-                                    logger.warn(
-                                        "POST /patients/$patientId/documents/upload - ${result.message}"
-                                    )
-                                    call.respond(
-                                        HttpStatusCode.BadRequest,
-                                        ErrorResponse("bad_request", result.message)
-                                    )
-                                }
-                                is UploadResult.StorageError -> {
-                                    logger.error(
-                                        "POST /patients/$patientId/documents/upload - ${result.message}"
-                                    )
-                                    call.respond(
-                                        HttpStatusCode.InternalServerError,
-                                        ErrorResponse(
-                                            "internal_error",
-                                            "Failed to upload document",
-                                            result.message
-                                        )
-                                    )
-                                }
-                                is UploadResult.AiAnalysisError -> {
-                                    logger.error(
-                                        "POST /patients/$patientId/documents/upload - AI analysis failed: ${result.message}"
-                                    )
-                                    call.respond(
-                                        HttpStatusCode.InternalServerError,
-                                        ErrorResponse(
-                                            "ai_analysis_error",
-                                            "Failed to analyze document with AI",
-                                            result.message
-                                        )
-                                    )
-                                }
-                            }
+
+                            call.respondEither(result, HttpStatusCode.Created)
                         }
                     }
                     part.dispose()
@@ -145,4 +104,3 @@ private fun Route.uploadDocument(uploadService: DocumentUploadService) {
         }
     }
 }
-

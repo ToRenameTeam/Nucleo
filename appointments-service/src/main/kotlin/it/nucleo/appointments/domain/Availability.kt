@@ -1,5 +1,6 @@
 package it.nucleo.appointments.domain
 
+import it.nucleo.appointments.domain.errors.*
 import it.nucleo.appointments.domain.valueobjects.*
 import kotlinx.serialization.Serializable
 
@@ -30,39 +31,53 @@ data class Availability(
         }
     }
 
-    fun book(): Availability {
-        require(status == AvailabilityStatus.AVAILABLE) {
-            "Cannot book availability that is not AVAILABLE"
+    fun book(): Either<AvailabilityError, Availability> {
+        if (status != AvailabilityStatus.AVAILABLE) {
+            return failure(AvailabilityError.NotAvailable(availabilityId.value))
         }
-        return copy(status = AvailabilityStatus.BOOKED)
+        return success(copy(status = AvailabilityStatus.BOOKED))
     }
 
-    fun makeAvailable(): Availability {
-        require(status == AvailabilityStatus.BOOKED) {
-            "Cannot make available an availability that is not BOOKED"
+    fun makeAvailable(): Either<AvailabilityError.InvalidRequest, Availability> {
+        if (status != AvailabilityStatus.BOOKED) {
+            return failure(
+                AvailabilityError.InvalidRequest(
+                    "Cannot make available an availability that is not BOOKED"
+                )
+            )
         }
-        return copy(status = AvailabilityStatus.AVAILABLE)
+        return success(copy(status = AvailabilityStatus.AVAILABLE))
     }
 
-    fun cancel(): Availability {
-        require(status != AvailabilityStatus.BOOKED) {
-            "Cannot cancel availability that is already BOOKED"
+    fun cancel(): Either<AvailabilityError.InvalidRequest, Availability> {
+        if (status == AvailabilityStatus.BOOKED) {
+            return failure(
+                AvailabilityError.InvalidRequest(
+                    "Cannot cancel availability that is already BOOKED"
+                )
+            )
         }
-        return copy(status = AvailabilityStatus.CANCELLED)
+        return success(copy(status = AvailabilityStatus.CANCELLED))
     }
 
     fun update(
         facilityId: FacilityId? = null,
         serviceTypeId: ServiceTypeId? = null,
         timeSlot: TimeSlot? = null
-    ): Availability {
-        require(status != AvailabilityStatus.BOOKED) {
-            "Cannot modify availability that is already BOOKED"
+    ): Either<AvailabilityError.InvalidRequest, Availability> {
+        if (status == AvailabilityStatus.BOOKED) {
+            return failure(
+                AvailabilityError.InvalidRequest(
+                    "Cannot modify availability that is already BOOKED"
+                )
+            )
         }
-        return copy(
-            facilityId = facilityId ?: this.facilityId,
-            serviceTypeId = serviceTypeId ?: this.serviceTypeId,
-            timeSlot = timeSlot ?: this.timeSlot
+        return success(
+            copy(
+                facilityId = facilityId ?: this.facilityId,
+                serviceTypeId = serviceTypeId ?: this.serviceTypeId,
+                timeSlot = timeSlot ?: this.timeSlot
+            )
         )
     }
 }

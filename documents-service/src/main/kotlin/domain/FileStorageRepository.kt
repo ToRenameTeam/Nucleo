@@ -1,5 +1,6 @@
 package it.nucleo.domain
 
+import it.nucleo.domain.errors.*
 import java.io.InputStream
 
 interface FileStorageRepository {
@@ -11,11 +12,11 @@ interface FileStorageRepository {
         inputStream: InputStream,
         contentLength: Long,
         contentType: String
-    )
+    ): Either<StorageError, Unit>
 
-    fun retrieve(patientId: PatientId, documentId: DocumentId): StoredFile
+    fun retrieve(patientId: PatientId, documentId: DocumentId): Either<StorageError, StoredFile>
 
-    fun delete(patientId: PatientId, documentId: DocumentId)
+    fun delete(patientId: PatientId, documentId: DocumentId): Either<StorageError, Unit>
 }
 
 data class StoredFile(
@@ -24,8 +25,3 @@ data class StoredFile(
     val contentLength: Long,
     val filename: String
 )
-
-class FileStorageException(message: String, cause: Throwable? = null) :
-    RuntimeException(message, cause)
-
-class FileNotFoundException(message: String) : RuntimeException(message)

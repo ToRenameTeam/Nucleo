@@ -7,6 +7,7 @@ import it.nucleo.api.dto.CreateServicePrescriptionRequest
 import it.nucleo.api.dto.UpdateReportRequest
 import it.nucleo.api.dto.toDomain
 import it.nucleo.domain.*
+import it.nucleo.domain.errors.*
 import it.nucleo.domain.prescription.implementation.FacilityId
 import it.nucleo.domain.prescription.implementation.Priority
 import it.nucleo.domain.prescription.implementation.ServiceId
@@ -26,19 +27,27 @@ class DocumentService(
 ) {
     private val logger = logger()
 
-    suspend fun getAllDocumentsByPatient(patientId: PatientId): Iterable<Document> {
+    suspend fun getAllDocumentsByPatient(
+        patientId: PatientId
+    ): Either<DomainError, List<Document>> {
         return repository.findAllDocumentsByPatient(patientId)
     }
 
-    suspend fun getAllDocumentsByDoctor(doctorId: DoctorId): Iterable<Document> {
+    suspend fun getAllDocumentsByDoctor(doctorId: DoctorId): Either<DomainError, List<Document>> {
         return repository.findAllDocumentsByDoctor(doctorId)
     }
 
-    suspend fun getDocumentById(patientId: PatientId, documentId: DocumentId): Document {
+    suspend fun getDocumentById(
+        patientId: PatientId,
+        documentId: DocumentId
+    ): Either<DomainError, Document> {
         return repository.findDocumentById(patientId, documentId)
     }
 
-    suspend fun createDocument(patientId: PatientId, request: CreateDocumentRequest): Document {
+    suspend fun createDocument(
+        patientId: PatientId,
+        request: CreateDocumentRequest
+    ): Either<DomainError, Document> {
         val doctorId = DoctorId(request.doctorId)
         val title = Title(request.title)
 
@@ -76,14 +85,18 @@ class DocumentService(
                 }
                 is CreateReportRequest -> {
                     val servicePrescriptionDoc =
-                        repository.findDocumentById(
-                            patientId,
-                            DocumentId(request.servicePrescriptionId)
-                        )
+                        repository
+                            .findDocumentById(patientId, DocumentId(request.servicePrescriptionId))
+                            .getOrElse {
+                                return failure(it)
+                            }
 
                     if (servicePrescriptionDoc !is ServicePrescription) {
-                        throw IllegalArgumentException(
-                            "Document '${request.servicePrescriptionId}' is not a service prescription"
+                        return failure(
+                            DocumentError.InvalidType(
+                                "ServicePrescription",
+                                servicePrescriptionDoc::class.simpleName ?: "Unknown"
+                            )
                         )
                     }
 
@@ -103,28 +116,40 @@ class DocumentService(
                 }
             }
 
-        generateAndStorePdf(document)
+        generateAndStorePdf(document).getOrElse {
+            return failure(it)
+        }
 
         val finalDocument = analyzeDocumentWithAi(document, patientId)
 
-        repository.addDocument(patientId, finalDocument)
+        repository.addDocument(patientId, finalDocument).getOrElse {
+            return failure(it)
+        }
 
-        return finalDocument
+        return success(finalDocument)
     }
 
-    suspend fun deleteDocument(patientId: PatientId, documentId: DocumentId) {
-        repository.deleteDocument(patientId, documentId)
+    suspend fun deleteDocument(
+        patientId: PatientId,
+        documentId: DocumentId
+    ): Either<DomainError, Unit> {
+        return repository.deleteDocument(patientId, documentId)
     }
 
     suspend fun updateReport(
         patientId: PatientId,
         documentId: DocumentId,
         request: UpdateReportRequest
-    ): Report {
-        val existingDocument = repository.findDocumentById(patientId, documentId)
+    ): Either<DomainError, Report> {
+        val existingDocument =
+            repository.findDocumentById(patientId, documentId).getOrElse {
+                return failure(it)
+            }
 
         if (existingDocument !is Report) {
-            throw IllegalArgumentException("Only reports can be updated")
+            return failure(
+                DocumentError.InvalidType("Report", existingDocument::class.simpleName ?: "Unknown")
+            )
         }
 
         request.findings?.let { existingDocument.updateFindings(Findings(it)) }
@@ -132,25 +157,31 @@ class DocumentService(
         request.conclusion?.let { existingDocument.setConclusion(Conclusion(it)) }
         request.recommendations?.let { existingDocument.setRecommendations(Recommendations(it)) }
 
-        repository.updateReport(patientId, existingDocument)
+        repository.updateReport(patientId, existingDocument).getOrElse {
+            return failure(it)
+        }
 
         // Regenerate PDF after update
-        generateAndStorePdf(existingDocument)
+        generateAndStorePdf(existingDocument).getOrElse {
+            return failure(it)
+        }
 
         // Re-analyze with AI after update
         val updatedDocument = analyzeDocumentWithAi(existingDocument, patientId) as Report
-        repository.updateReport(patientId, updatedDocument)
+        repository.updateReport(patientId, updatedDocument).getOrElse {
+            return failure(it)
+        }
 
-        return updatedDocument
+        return success(updatedDocument)
     }
 
-    private fun generateAndStorePdf(document: Document) {
-        try {
-            logger.debug("Generating PDF for document: ${document.id.id}")
-            val pdfBytes = pdfGenerator.generate(document)
-            val filename = "${document.id.id}.pdf"
+    private fun generateAndStorePdf(document: Document): Either<DomainError, Unit> {
+        logger.debug("Generating PDF for document: ${document.id.id}")
+        val pdfBytes = pdfGenerator.generate(document)
+        val filename = "${document.id.id}.pdf"
 
-            fileStorageRepository.store(
+        return fileStorageRepository
+            .store(
                 patientId = document.patientId,
                 documentId = document.id,
                 filename = filename,
@@ -158,11 +189,10 @@ class DocumentService(
                 contentLength = pdfBytes.size.toLong(),
                 contentType = "application/pdf"
             )
-            logger.info("PDF stored successfully for document: ${document.id.id}")
-        } catch (e: Exception) {
-            logger.error("Failed to generate/store PDF for document: ${document.id.id}", e)
-            throw e
-        }
+            .onSuccess { logger.info("PDF stored successfully for document: ${document.id.id}") }
+            .onFailure {
+                logger.error("Failed to generate/store PDF for document: ${document.id.id}")
+            }
     }
 
     private suspend fun analyzeDocumentWithAi(document: Document, patientId: PatientId): Document {
@@ -199,7 +229,6 @@ class DocumentService(
             }
         } catch (e: Exception) {
             logger.error("Error during AI analysis for document ${document.id.id}", e)
-            // Fallback to original metadata if AI fails
             document
         }
     }

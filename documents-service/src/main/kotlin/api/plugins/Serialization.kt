@@ -9,8 +9,6 @@ import io.ktor.server.request.httpMethod
 import io.ktor.server.request.uri
 import io.ktor.server.response.*
 import it.nucleo.api.dto.ErrorResponse
-import it.nucleo.domain.DocumentNotFoundException
-import it.nucleo.domain.RepositoryException
 import it.nucleo.infrastructure.logging.logger
 import kotlinx.serialization.json.Json
 
@@ -32,30 +30,6 @@ fun Application.configureSerialization() {
 
 fun Application.configureStatusPages() {
     install(StatusPages) {
-        exception<DocumentNotFoundException> { call, cause ->
-            logger.warn("Document not found: ${cause.message}")
-            call.respond(
-                HttpStatusCode.NotFound,
-                ErrorResponse(
-                    error = "not_found",
-                    message = "Document not found",
-                    details = cause.message
-                )
-            )
-        }
-
-        exception<RepositoryException> { call, cause ->
-            logger.error("Repository operation failed: ${cause.message}", cause)
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                ErrorResponse(
-                    error = "internal_error",
-                    message = "Repository operation failed",
-                    details = cause.message
-                )
-            )
-        }
-
         exception<IllegalArgumentException> { call, cause ->
             logger.warn("Invalid request: ${cause.message}")
             call.respond(

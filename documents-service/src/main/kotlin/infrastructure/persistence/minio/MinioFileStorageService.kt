@@ -10,11 +10,10 @@ import io.minio.RemoveObjectArgs
 import io.minio.StatObjectArgs
 import io.minio.errors.ErrorResponseException
 import it.nucleo.domain.DocumentId
-import it.nucleo.domain.FileNotFoundException
-import it.nucleo.domain.FileStorageException
 import it.nucleo.domain.FileStorageRepository
 import it.nucleo.domain.PatientId
 import it.nucleo.domain.StoredFile
+import it.nucleo.domain.errors.*
 import it.nucleo.infrastructure.logging.logger
 import java.io.InputStream
 
@@ -38,12 +37,12 @@ class MinioFileStorageRepository(
         inputStream: InputStream,
         contentLength: Long,
         contentType: String
-    ) {
+    ): Either<StorageError, Unit> {
         val sanitizedFilename = sanitizeFilename(filename)
         val objectKey = generateObjectKey(patientId, documentId, sanitizedFilename)
         logger.debug("Storing document with key: $objectKey")
 
-        try {
+        return try {
             minioClient.putObject(
                 PutObjectArgs.builder()
                     .bucket(bucketName)
@@ -53,18 +52,21 @@ class MinioFileStorageRepository(
                     .build()
             )
             logger.info("Document stored successfully: $objectKey (documentId: ${documentId.id})")
+            success(Unit)
         } catch (e: Exception) {
             logger.error("Failed to store document: $objectKey", e)
-            throw FileStorageException("Failed to store document: ${e.message}", e)
+            failure(StorageError.OperationFailed("Failed to store document: ${e.message}", e))
         }
     }
 
-    override fun retrieve(patientId: PatientId, documentId: DocumentId): StoredFile {
+    override fun retrieve(
+        patientId: PatientId,
+        documentId: DocumentId
+    ): Either<StorageError, StoredFile> {
         val prefix = "patients/${patientId.id}/documents/${documentId.id}/"
         logger.debug("Retrieving document with prefix: $prefix")
 
-        try {
-            // List objects in the document folder to find the file
+        return try {
             val objects =
                 minioClient.listObjects(
                     ListObjectsArgs.builder().bucket(bucketName).prefix(prefix).build()
@@ -72,7 +74,7 @@ class MinioFileStorageRepository(
 
             val objectKey =
                 objects.firstOrNull()?.get()?.objectName()
-                    ?: throw FileNotFoundException("Document not found: ${documentId.id}")
+                    ?: return failure(StorageError.FileNotFound(documentId.id))
 
             val stat =
                 minioClient.statObject(
@@ -84,18 +86,17 @@ class MinioFileStorageRepository(
                     GetObjectArgs.builder().bucket(bucketName).`object`(objectKey).build()
                 )
 
-            // Extract filename from the object key
             val filename = objectKey.substringAfterLast('/')
 
             logger.info("Document retrieval initiated: $objectKey")
-            return StoredFile(
-                inputStream = inputStream,
-                contentType = stat.contentType() ?: "application/pdf",
-                contentLength = stat.size(),
-                filename = filename
+            success(
+                StoredFile(
+                    inputStream = inputStream,
+                    contentType = stat.contentType() ?: "application/pdf",
+                    contentLength = stat.size(),
+                    filename = filename
+                )
             )
-        } catch (e: FileNotFoundException) {
-            throw e
         } catch (e: ErrorResponseException) {
             val errorCode = e.errorResponse().code()
             val httpStatusCode = e.response().code
@@ -103,22 +104,24 @@ class MinioFileStorageRepository(
 
             if (httpStatusCode == 404 || errorCode == "NoSuchKey" || errorCode == "NoSuchObject") {
                 logger.warn("Document not found: ${documentId.id}")
-                throw FileNotFoundException("Document not found: ${documentId.id}")
+                failure(StorageError.FileNotFound(documentId.id))
+            } else {
+                logger.error("Failed to retrieve document: ${documentId.id}", e)
+                failure(
+                    StorageError.OperationFailed("Failed to retrieve document: ${e.message}", e)
+                )
             }
-            logger.error("Failed to retrieve document: ${documentId.id}", e)
-            throw FileStorageException("Failed to retrieve document: ${e.message}", e)
         } catch (e: Exception) {
             logger.error("Failed to retrieve document: ${documentId.id}", e)
-            throw FileStorageException("Failed to retrieve document: ${e.message}", e)
+            failure(StorageError.OperationFailed("Failed to retrieve document: ${e.message}", e))
         }
     }
 
-    override fun delete(patientId: PatientId, documentId: DocumentId) {
+    override fun delete(patientId: PatientId, documentId: DocumentId): Either<StorageError, Unit> {
         val prefix = "patients/${patientId.id}/documents/${documentId.id}/"
         logger.debug("Deleting document with prefix: $prefix")
 
-        try {
-            // List all objects in the document folder
+        return try {
             val objects =
                 minioClient.listObjects(
                     ListObjectsArgs.builder().bucket(bucketName).prefix(prefix).build()
@@ -141,9 +144,10 @@ class MinioFileStorageRepository(
             } else {
                 logger.warn("No files found to delete for document: ${documentId.id}")
             }
+            success(Unit)
         } catch (e: Exception) {
             logger.error("Failed to delete document: ${documentId.id}", e)
-            throw FileStorageException("Failed to delete document: ${e.message}", e)
+            failure(StorageError.OperationFailed("Failed to delete document: ${e.message}", e))
         }
     }
 
@@ -172,7 +176,7 @@ class MinioFileStorageRepository(
             }
         } catch (e: Exception) {
             logger.error("Failed to check/create bucket '$bucketName'", e)
-            throw FileStorageException("Failed to initialize storage bucket: ${e.message}", e)
+            throw RuntimeException("Failed to initialize storage bucket: ${e.message}", e)
         }
     }
 }

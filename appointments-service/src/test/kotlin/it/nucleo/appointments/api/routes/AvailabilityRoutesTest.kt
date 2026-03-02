@@ -117,7 +117,7 @@ class AvailabilityRoutesTest :
 
                 response.status shouldBe HttpStatusCode.NotFound
                 val body = response.bodyAsText()
-                body shouldContain "NOT_FOUND"
+                body shouldContain "AVAILABILITY_NOT_FOUND"
             }
         }
 
@@ -199,7 +199,7 @@ class AvailabilityRoutesTest :
 
                 response.status shouldBe HttpStatusCode.NotFound
                 val body = response.bodyAsText()
-                body shouldContain "NOT_FOUND"
+                body shouldContain "AVAILABILITY_NOT_FOUND"
             }
         }
 
@@ -221,12 +221,12 @@ class AvailabilityRoutesTest :
 
                 response.status shouldBe HttpStatusCode.NotFound
                 val body = response.bodyAsText()
-                body shouldContain "NOT_FOUND"
+                body shouldContain "AVAILABILITY_NOT_FOUND"
             }
         }
     })
 
-// Fake repository for testing
+// Fake repository for testing — shared with AppointmentRoutesTest
 class FakeAvailabilityRepository(
     private val availabilityExists: Boolean = true,
     private val overlapDetected: Boolean = false,
