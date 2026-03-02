@@ -4,6 +4,22 @@ import it.nucleo.appointments.domain.valueobjects.TimeSlot
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class CreateAppointmentRequest(val patientId: String, val availabilityId: String)
+
+@Serializable
+data class UpdateAppointmentRequest(val availabilityId: String? = null, val status: String? = null)
+
+@Serializable
+data class AppointmentResponse(
+    val appointmentId: String,
+    val patientId: String,
+    val availabilityId: String,
+    val status: String,
+    val createdAt: String,
+    val updatedAt: String
+)
+
+@Serializable
 data class AppointmentDetailsResponse(
     val appointmentId: String,
     val patientId: String,
