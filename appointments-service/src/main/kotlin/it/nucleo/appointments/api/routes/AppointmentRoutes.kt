@@ -7,10 +7,10 @@ import io.ktor.server.routing.*
 import it.nucleo.appointments.api.dto.CreateAppointmentRequest
 import it.nucleo.appointments.api.dto.ErrorResponse
 import it.nucleo.appointments.api.dto.UpdateAppointmentRequest
+import it.nucleo.appointments.api.dto.toDetailsResponse
+import it.nucleo.appointments.api.dto.toResponse
 import it.nucleo.appointments.api.respondEither
 import it.nucleo.appointments.api.respondEitherNoContent
-import it.nucleo.appointments.api.toDetailsResponse
-import it.nucleo.appointments.api.toResponse
 import it.nucleo.appointments.application.AppointmentService
 import it.nucleo.appointments.domain.errors.map
 

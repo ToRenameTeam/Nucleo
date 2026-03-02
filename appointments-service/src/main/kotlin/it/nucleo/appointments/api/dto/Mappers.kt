@@ -1,8 +1,5 @@
-package it.nucleo.appointments.api
+package it.nucleo.appointments.api.dto
 
-import it.nucleo.appointments.api.dto.AppointmentDetailsResponse
-import it.nucleo.appointments.api.dto.AppointmentResponse
-import it.nucleo.appointments.api.dto.AvailabilityResponse
 import it.nucleo.appointments.application.AppointmentService
 import it.nucleo.appointments.domain.Appointment
 import it.nucleo.appointments.domain.Availability

@@ -7,7 +7,6 @@ import io.ktor.server.routing.*
 import it.nucleo.appointments.api.dto.*
 import it.nucleo.appointments.api.respondEither
 import it.nucleo.appointments.api.respondEitherNoContent
-import it.nucleo.appointments.api.toResponse
 import it.nucleo.appointments.application.AvailabilityService
 import it.nucleo.appointments.domain.errors.map
 
