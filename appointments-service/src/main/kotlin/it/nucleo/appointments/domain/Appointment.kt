@@ -1,7 +1,7 @@
 package it.nucleo.appointments.domain
 
 import it.nucleo.appointments.domain.errors.*
-import it.nucleo.appointments.domain.valueobjects.*
+import java.util.UUID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -66,4 +66,40 @@ data class Appointment(
             copy(status = target, updatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC))
         )
     }
+}
+
+@JvmInline
+value class AppointmentId(val value: String) {
+    companion object {
+        fun generate(): AppointmentId = AppointmentId(UUID.randomUUID().toString())
+
+        fun fromString(value: String): AppointmentId = AppointmentId(value)
+    }
+
+    override fun toString(): String = value
+}
+
+enum class AppointmentStatus {
+    SCHEDULED,
+    COMPLETED,
+    NO_SHOW,
+    CANCELLED;
+
+    fun canTransitionTo(newStatus: AppointmentStatus): Boolean {
+        return when (this) {
+            SCHEDULED -> newStatus in setOf(COMPLETED, NO_SHOW, CANCELLED)
+            COMPLETED,
+            NO_SHOW,
+            CANCELLED -> false
+        }
+    }
+}
+
+@JvmInline
+value class PatientId(val value: String) {
+    companion object {
+        fun fromString(value: String): PatientId = PatientId(value)
+    }
+
+    override fun toString(): String = value
 }

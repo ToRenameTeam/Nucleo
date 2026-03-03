@@ -1,7 +1,6 @@
 package it.nucleo.appointments.infrastructure.persistence
 
-import it.nucleo.appointments.domain.Appointment
-import it.nucleo.appointments.domain.valueobjects.*
+import it.nucleo.appointments.domain.*
 import kotlinx.datetime.toKotlinLocalDateTime
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.datetime

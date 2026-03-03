@@ -1,6 +1,6 @@
 package it.nucleo.appointments.api.dto
 
-import it.nucleo.appointments.domain.valueobjects.TimeSlot
+import it.nucleo.appointments.domain.TimeSlot
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -13,8 +13,8 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import it.nucleo.appointments.application.AvailabilityService
+import it.nucleo.appointments.domain.*
 import it.nucleo.appointments.domain.AvailabilityRepository
-import it.nucleo.appointments.domain.valueobjects.*
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.json.Json
 

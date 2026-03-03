@@ -1,11 +1,7 @@
 package it.nucleo.appointments.application
 
-import it.nucleo.appointments.domain.Appointment
-import it.nucleo.appointments.domain.AppointmentRepository
-import it.nucleo.appointments.domain.Availability
-import it.nucleo.appointments.domain.AvailabilityRepository
+import it.nucleo.appointments.domain.*
 import it.nucleo.appointments.domain.errors.*
-import it.nucleo.appointments.domain.valueobjects.*
 import org.slf4j.LoggerFactory
 
 class AppointmentService(

@@ -4,10 +4,10 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import it.nucleo.appointments.domain.*
 import it.nucleo.appointments.domain.Availability
 import it.nucleo.appointments.domain.AvailabilityRepository
 import it.nucleo.appointments.domain.errors.*
-import it.nucleo.appointments.domain.valueobjects.*
 import kotlinx.datetime.LocalDateTime
 
 class AvailabilityServiceTest :
