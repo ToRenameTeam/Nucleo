@@ -1,7 +1,6 @@
 import crypto from 'crypto';
 import type { UUID } from 'crypto';
-import { Delegation } from '../domains/Delegation.js';
-import { DelegationStatus } from '../domains/value-objects/DelegationStatus.js';
+import { Delegation, DelegationStatus } from '../domains/index.js';
 import { IDelegationRepository } from '../infrastructure/repositories/IDelegationRepository.js';
 import { IPatientRepository } from '../infrastructure/repositories/IPatientRepository.js';
 import { toUUID } from '../utils/uuid.js';
@@ -16,14 +15,13 @@ export class DelegationService {
         delegatingUserId: string;
         delegatorUserId: string;
     }) {
-        // Validate patients exist
-        const delegatingPatient = await this.patientRepository.findByUserId(data.delegatingUserId);
-        if (!delegatingPatient) {
+        const delegatingExists = await this.patientExists(data.delegatingUserId);
+        if (!delegatingExists) {
             throw new Error('Delegating patient not found');
         }
 
-        const delegatorPatient = await this.patientRepository.findByUserId(data.delegatorUserId);
-        if (!delegatorPatient) {
+        const delegatorExists = await this.patientExists(data.delegatorUserId);
+        if (!delegatorExists) {
             throw new Error('Delegator patient not found');
         }
 
@@ -45,24 +43,19 @@ export class DelegationService {
 
         await this.delegationRepository.create(delegation);
 
-        return {
+        return this.toDelegationResponse({
             delegationId: delegation.delegationId,
             delegatingUserId: delegation.delegatingUserId,
             delegatorUserId: delegation.delegatorUserId,
-            status: delegation.status.value
-        };
+            status: delegation.status.value,
+        });
     }
 
     async getAllDelegations(status?: string) {
         const delegations = await this.delegationRepository.findAll(status);
 
         return {
-            delegations: delegations.map(d => ({
-                delegationId: d.delegationId,
-                delegatingUserId: d.delegatingUserId,
-                delegatorUserId: d.delegatorUserId,
-                status: d.status
-            }))
+            delegations: delegations.map((delegation) => this.toDelegationResponse(delegation))
         };
     }
 
@@ -74,12 +67,7 @@ export class DelegationService {
             throw new Error('Delegation not found');
         }
 
-        return {
-            delegationId: data.delegationId,
-            delegatingUserId: data.delegatingUserId,
-            delegatorUserId: data.delegatorUserId,
-            status: data.status
-        };
+        return this.toDelegationResponse(data);
     }
 
     async getDelegationsForUser(userId: string, role: 'delegating' | 'delegator', status?: string) {
@@ -88,12 +76,7 @@ export class DelegationService {
             : await this.delegationRepository.findByDelegatorUserId(userId, status);
 
         return {
-            delegations: delegations.map(d => ({
-                delegationId: d.delegationId,
-                delegatingUserId: d.delegatingUserId,
-                delegatorUserId: d.delegatorUserId,
-                status: d.status
-            }))
+            delegations: delegations.map((delegation) => this.toDelegationResponse(delegation))
         };
     }
 
@@ -119,18 +102,7 @@ export class DelegationService {
     }
 
     async acceptDelegation(delegationId: string, userId: string) {
-        const data = await this.delegationRepository.findDelegationById(delegationId);
-
-        if (!data) {
-            throw new Error('Delegation not found');
-        }
-
-        const delegation = Delegation.reconstitute(
-            toUUID(data.delegationId),
-            toUUID(data.delegatingUserId),
-            toUUID(data.delegatorUserId),
-            DelegationStatus.reconstitute(data.status)
-        );
+        const delegation = await this.getDelegationOrThrow(delegationId);
 
         if (!delegation.canBeAcceptedBy(toUUID(userId))) {
             throw new Error('You are not authorized to accept this delegation');
@@ -146,18 +118,7 @@ export class DelegationService {
     }
 
     async declineDelegation(delegationId: string, userId: string) {
-        const data = await this.delegationRepository.findDelegationById(delegationId);
-
-        if (!data) {
-            throw new Error('Delegation not found');
-        }
-
-        const delegation = Delegation.reconstitute(
-            toUUID(data.delegationId),
-            toUUID(data.delegatingUserId),
-            toUUID(data.delegatorUserId),
-            DelegationStatus.reconstitute(data.status)
-        );
+        const delegation = await this.getDelegationOrThrow(delegationId);
 
         if (!delegation.canBeAcceptedBy(toUUID(userId))) {
             throw new Error('You are not authorized to decline this delegation');
@@ -173,18 +134,7 @@ export class DelegationService {
     }
 
     async deleteDelegation(delegationId: string, userId: string) {
-        const data = await this.delegationRepository.findDelegationById(delegationId);
-
-        if (!data) {
-            throw new Error('Delegation not found');
-        }
-
-        const delegation = Delegation.reconstitute(
-            toUUID(data.delegationId),
-            toUUID(data.delegatingUserId),
-            toUUID(data.delegatorUserId),
-            DelegationStatus.reconstitute(data.status)
-        );
+        const delegation = await this.getDelegationOrThrow(delegationId);
 
         if (!delegation.canBeDeletedBy(toUUID(userId))) {
             throw new Error('You are not authorized to delete this delegation');
@@ -197,5 +147,39 @@ export class DelegationService {
             delegationId: delegation.delegationId,
             status: delegation.status.value
         };
+    }
+
+    private async patientExists(userId: string) {
+        const patient = await this.patientRepository.findByUserId(userId);
+        return Boolean(patient);
+    }
+
+    private toDelegationResponse(data: {
+        delegationId: string;
+        delegatingUserId: string;
+        delegatorUserId: string;
+        status: string;
+    }) {
+        return {
+            delegationId: data.delegationId,
+            delegatingUserId: data.delegatingUserId,
+            delegatorUserId: data.delegatorUserId,
+            status: data.status,
+        };
+    }
+
+    private async getDelegationOrThrow(delegationId: string) {
+        const data = await this.delegationRepository.findDelegationById(delegationId);
+
+        if (!data) {
+            throw new Error('Delegation not found');
+        }
+
+        return Delegation.reconstitute(
+            toUUID(data.delegationId),
+            toUUID(data.delegatingUserId),
+            toUUID(data.delegatorUserId),
+            DelegationStatus.reconstitute(data.status)
+        );
     }
 }

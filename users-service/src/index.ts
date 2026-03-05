@@ -1,10 +1,8 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import authRoutes from './api/auth.js';
-import userRoutes from './api/user.js';
-import delegationRoutes from './api/delegation.js';
-import {runSeeds} from "./infrastructure/seeds/index.js";
+import { authRoutes, userRoutes, delegationRoutes } from './api/index.js';
+import { runSeeds } from './infrastructure/database/index.js';
 
 const app = express();
 const PORT = process.env.PORT || 3030;
@@ -38,6 +36,9 @@ async function startServer() {
     app.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT}`);
         console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+        console.log(`👤 Users API: http://localhost:${PORT}/api/users`);
+        console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
+        console.log(`🤝 Delegations API: http://localhost:${PORT}/api/delegations`);
     });
 }
 

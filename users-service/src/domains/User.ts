@@ -1,6 +1,6 @@
-import { FiscalCode } from "./value-objects/FiscalCode.js";
-import { ProfileInfo } from "./value-objects/ProfileInfo.js";
-import { Credentials } from "./value-objects/Credentials.js";
+import { FiscalCode } from "./FiscalCode.js";
+import { ProfileInfo } from "./ProfileInfo.js";
+import { Credentials } from "./Credentials.js";
 import type { UUID } from "crypto";
 
 export class User {

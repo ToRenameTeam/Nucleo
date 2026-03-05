@@ -1,5 +1,5 @@
 import type {UUID} from 'crypto';
-import { DelegationStatus } from './value-objects/DelegationStatus.js';
+import { DelegationStatus } from './DelegationStatus.js';
 
 export class Delegation {
     private readonly _delegationId: UUID;

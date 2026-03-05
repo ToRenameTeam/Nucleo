@@ -1,4 +1,4 @@
-import { DelegationStatus } from '../../../src/domains/value-objects/DelegationStatus.js';
+import { DelegationStatus } from '../../../src/domains/DelegationStatus.js';
 
 describe('DelegationStatus', () => {
     describe('creation', () => {

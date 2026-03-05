@@ -1,5 +1,6 @@
-import { UserModel } from '../../models/UserModel.js';
-import type { User } from '../../../domains/User.js';
+import { UserModel } from '../../database/models/index.js';
+import type { IUserDocument } from '../../database/models/User.schema.js';
+import type { User } from '../../../domains/index.js';
 import {IUserRepository, UserData} from "../IUserRepository.js";
 
 export class UserRepositoryImpl implements IUserRepository {
@@ -21,18 +22,10 @@ export class UserRepositoryImpl implements IUserRepository {
     }
 
     async findAll(): Promise<{ users: UserData[]}> {
-
         const users= await UserModel.find();
 
         return {
-            users: users.map(user => ({
-                userId: user.userId,
-                fiscalCode: user.fiscalCode,
-                passwordHash: user.passwordHash,
-                name: user.name,
-                lastName: user.lastName,
-                dateOfBirth: user.dateOfBirth,
-            }))
+            users: users.map((user) => this.toUserData(user))
         };
     }
 
@@ -74,7 +67,7 @@ export class UserRepositoryImpl implements IUserRepository {
         await UserModel.findOneAndDelete({ userId });
     }
 
-    private toUserData(user: any): UserData {
+    private toUserData(user: IUserDocument): UserData {
         return {
             userId: user.userId,
             fiscalCode: user.fiscalCode,

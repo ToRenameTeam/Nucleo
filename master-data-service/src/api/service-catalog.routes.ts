@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import {
     serviceCatalogService,
-    ValidationError,
-    ConflictError
+    ServiceCatalogValidationError,
+    ServiceCatalogConflictError
 } from '../services/index.js';
+import { parseBooleanQuery, sendError, sendServerError, sendSuccess } from './route.utils.js';
 
 const router = Router();
 
@@ -17,21 +18,14 @@ router.get('/', async (req, res) => {
 
         const serviceTypes = await serviceCatalogService.findAll({
             category: category as string | undefined,
-            active: active !== undefined ? active === 'true' : undefined,
+            active: parseBooleanQuery(active),
             search: search as string | undefined
         });
 
-        res.json({
-            success: true,
-            count: serviceTypes.length,
-            data: serviceTypes
-        });
+        sendSuccess(res, serviceTypes, 200, { count: serviceTypes.length });
     } catch (error) {
         console.error('Error fetching service types:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to fetch service types'
-        });
+        sendServerError(res, 'Failed to fetch service types');
     }
 });
 
@@ -42,10 +36,7 @@ router.get('/', async (req, res) => {
 router.get('/categories', (_req, res) => {
     const categories = serviceCatalogService.getCategories();
 
-    res.json({
-        success: true,
-        data: categories
-    });
+    sendSuccess(res, categories);
 });
 
 /**
@@ -57,23 +48,14 @@ router.get('/:id', async (req, res) => {
         const serviceType = await serviceCatalogService.findById(req.params.id);
 
         if (!serviceType) {
-            res.status(404).json({
-                success: false,
-                error: 'Service type not found'
-            });
+            sendError(res, 404, 'Service type not found');
             return;
         }
 
-        res.json({
-            success: true,
-            data: serviceType
-        });
+        sendSuccess(res, serviceType);
     } catch (error) {
         console.error('Error fetching service type:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to fetch service type'
-        });
+        sendServerError(res, 'Failed to fetch service type');
     }
 });
 
@@ -93,32 +75,20 @@ router.post('/', async (req, res) => {
             isActive
         });
 
-        res.status(201).json({
-            success: true,
-            data: serviceType
-        });
+        sendSuccess(res, serviceType, 201);
     } catch (error) {
-        if (error instanceof ValidationError) {
-            res.status(400).json({
-                success: false,
-                error: error.message
-            });
+        if (error instanceof ServiceCatalogValidationError) {
+            sendError(res, 400, error.message);
             return;
         }
 
-        if (error instanceof ConflictError) {
-            res.status(409).json({
-                success: false,
-                error: error.message
-            });
+        if (error instanceof ServiceCatalogConflictError) {
+            sendError(res, 409, error.message);
             return;
         }
 
         console.error('Error creating service type:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to create service type'
-        });
+        sendServerError(res, 'Failed to create service type');
     }
 });
 
@@ -138,23 +108,14 @@ router.put('/:id', async (req, res) => {
         });
 
         if (!serviceType) {
-            res.status(404).json({
-                success: false,
-                error: 'Service type not found'
-            });
+            sendError(res, 404, 'Service type not found');
             return;
         }
 
-        res.json({
-            success: true,
-            data: serviceType
-        });
+        sendSuccess(res, serviceType);
     } catch (error) {
         console.error('Error updating service type:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to update service type'
-        });
+        sendServerError(res, 'Failed to update service type');
     }
 });
 
@@ -167,24 +128,14 @@ router.delete('/:id', async (req, res) => {
         const serviceType = await serviceCatalogService.softDelete(req.params.id);
 
         if (!serviceType) {
-            res.status(404).json({
-                success: false,
-                error: 'Service type not found'
-            });
+            sendError(res, 404, 'Service type not found');
             return;
         }
 
-        res.json({
-            success: true,
-            message: 'Service type deactivated successfully',
-            data: serviceType
-        });
+        sendSuccess(res, serviceType, 200, { message: 'Service type deactivated successfully' });
     } catch (error) {
         console.error('Error deleting service type:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to delete service type'
-        });
+        sendServerError(res, 'Failed to delete service type');
     }
 });
 
@@ -197,23 +148,14 @@ router.delete('/:id/permanent', async (req, res) => {
         const serviceType = await serviceCatalogService.permanentDelete(req.params.id);
 
         if (!serviceType) {
-            res.status(404).json({
-                success: false,
-                error: 'Service type not found'
-            });
+            sendError(res, 404, 'Service type not found');
             return;
         }
 
-        res.json({
-            success: true,
-            message: 'Service type permanently deleted'
-        });
+        sendSuccess(res, null, 200, { message: 'Service type permanently deleted' });
     } catch (error) {
         console.error('Error permanently deleting service type:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to permanently delete service type'
-        });
+        sendServerError(res, 'Failed to permanently delete service type');
     }
 });
 

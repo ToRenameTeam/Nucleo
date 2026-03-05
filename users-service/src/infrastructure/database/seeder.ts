@@ -1,9 +1,5 @@
-import { UserModel } from '../models/UserModel.js';
-import { PatientModel } from '../models/PatientModel.js';
-import { DoctorModel } from '../models/DoctorModel.js';
-import { DelegationModel } from '../models/DelegationModel.js';
-import { userSeeds } from './users.seed.js';
-import { delegationSeeds } from './delegations.seed.js';
+import { UserModel, PatientModel, DoctorModel, DelegationModel } from './models/index.js';
+import { userSeeds, delegationSeeds } from './seeds/index.js';
 import crypto from 'crypto';
 
 export async function runSeeds(): Promise<void> {

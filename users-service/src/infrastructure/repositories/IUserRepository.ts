@@ -1,4 +1,4 @@
-import type { User } from '../../domains/User.js';
+import type { User } from '../../domains/index.js';
 
 export interface UserData {
     userId: string;

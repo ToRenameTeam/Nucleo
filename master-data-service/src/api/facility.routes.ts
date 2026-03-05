@@ -4,6 +4,7 @@ import {
     FacilityValidationError,
     FacilityConflictError
 } from '../services/facility.service.js';
+import { parseBooleanQuery, sendError, sendServerError, sendSuccess } from './route.utils.js';
 
 const router = Router();
 
@@ -17,21 +18,14 @@ router.get('/', async (req, res) => {
 
         const facilities = await facilityService.findAll({
             city: city as string | undefined,
-            active: active !== undefined ? active === 'true' : undefined,
+            active: parseBooleanQuery(active),
             search: search as string | undefined
         });
 
-        res.json({
-            success: true,
-            count: facilities.length,
-            data: facilities
-        });
+        sendSuccess(res, facilities, 200, { count: facilities.length });
     } catch (error) {
         console.error('Error fetching facilities:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to fetch facilities'
-        });
+        sendServerError(res, 'Failed to fetch facilities');
     }
 });
 
@@ -43,16 +37,10 @@ router.get('/cities', async (_req, res) => {
     try {
         const cities = await facilityService.getCities();
 
-        res.json({
-            success: true,
-            data: cities
-        });
+        sendSuccess(res, cities);
     } catch (error) {
         console.error('Error fetching cities:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to fetch cities'
-        });
+        sendServerError(res, 'Failed to fetch cities');
     }
 });
 
@@ -65,23 +53,14 @@ router.get('/:id', async (req, res) => {
         const facility = await facilityService.findById(req.params.id);
 
         if (!facility) {
-            res.status(404).json({
-                success: false,
-                error: 'Facility not found'
-            });
+            sendError(res, 404, 'Facility not found');
             return;
         }
 
-        res.json({
-            success: true,
-            data: facility
-        });
+        sendSuccess(res, facility);
     } catch (error) {
         console.error('Error fetching facility:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to fetch facility'
-        });
+        sendServerError(res, 'Failed to fetch facility');
     }
 });
 
@@ -93,32 +72,20 @@ router.post('/', async (req, res) => {
     try {
         const facility = await facilityService.create(req.body);
 
-        res.status(201).json({
-            success: true,
-            data: facility
-        });
+        sendSuccess(res, facility, 201);
     } catch (error) {
         if (error instanceof FacilityValidationError) {
-            res.status(400).json({
-                success: false,
-                error: error.message
-            });
+            sendError(res, 400, error.message);
             return;
         }
 
         if (error instanceof FacilityConflictError) {
-            res.status(409).json({
-                success: false,
-                error: error.message
-            });
+            sendError(res, 409, error.message);
             return;
         }
 
         console.error('Error creating facility:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to create facility'
-        });
+        sendServerError(res, 'Failed to create facility');
     }
 });
 
@@ -131,23 +98,14 @@ router.put('/:id', async (req, res) => {
         const facility = await facilityService.update(req.params.id, req.body);
 
         if (!facility) {
-            res.status(404).json({
-                success: false,
-                error: 'Facility not found'
-            });
+            sendError(res, 404, 'Facility not found');
             return;
         }
 
-        res.json({
-            success: true,
-            data: facility
-        });
+        sendSuccess(res, facility);
     } catch (error) {
         console.error('Error updating facility:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to update facility'
-        });
+        sendServerError(res, 'Failed to update facility');
     }
 });
 
@@ -160,24 +118,14 @@ router.delete('/:id', async (req, res) => {
         const facility = await facilityService.softDelete(req.params.id);
 
         if (!facility) {
-            res.status(404).json({
-                success: false,
-                error: 'Facility not found'
-            });
+            sendError(res, 404, 'Facility not found');
             return;
         }
 
-        res.json({
-            success: true,
-            message: 'Facility deactivated successfully',
-            data: facility
-        });
+        sendSuccess(res, facility, 200, { message: 'Facility deactivated successfully' });
     } catch (error) {
         console.error('Error deleting facility:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to delete facility'
-        });
+        sendServerError(res, 'Failed to delete facility');
     }
 });
 
@@ -190,23 +138,14 @@ router.delete('/:id/permanent', async (req, res) => {
         const facility = await facilityService.permanentDelete(req.params.id);
 
         if (!facility) {
-            res.status(404).json({
-                success: false,
-                error: 'Facility not found'
-            });
+            sendError(res, 404, 'Facility not found');
             return;
         }
 
-        res.json({
-            success: true,
-            message: 'Facility permanently deleted'
-        });
+        sendSuccess(res, null, 200, { message: 'Facility permanently deleted' });
     } catch (error) {
         console.error('Error permanently deleting facility:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to permanently delete facility'
-        });
+        sendServerError(res, 'Failed to permanently delete facility');
     }
 });
 

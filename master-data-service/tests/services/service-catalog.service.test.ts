@@ -1,8 +1,8 @@
 import '../setup.js';
 import { 
     ServiceCatalogService, 
-    ValidationError, 
-    ConflictError,
+    ServiceCatalogValidationError, 
+    ServiceCatalogConflictError,
     type CreateServiceTypeInput 
 } from '../../src/services/service-catalog.service.js';
 import { ServiceCategory } from '../../src/domains/service-catalog/index.js';
@@ -47,7 +47,7 @@ describe('ServiceCatalogService', () => {
             expect(result.isActive).toBe(true);
         });
 
-        it('should throw ValidationError for invalid code', async () => {
+        it('should throw ServiceCatalogValidationError for invalid code', async () => {
             const input: CreateServiceTypeInput = {
                 code: 'invalid-code',
                 name: 'Test Service',
@@ -55,11 +55,11 @@ describe('ServiceCatalogService', () => {
                 category: [ServiceCategory.ALTRO]
             };
 
-            await expect(service.create(input)).rejects.toThrow(ValidationError);
+            await expect(service.create(input)).rejects.toThrow(ServiceCatalogValidationError);
             await expect(service.create(input)).rejects.toThrow('Invalid code format');
         });
 
-        it('should throw ValidationError for empty code', async () => {
+        it('should throw ServiceCatalogValidationError for empty code', async () => {
             const input: CreateServiceTypeInput = {
                 code: '',
                 name: 'Test Service',
@@ -67,10 +67,10 @@ describe('ServiceCatalogService', () => {
                 category: [ServiceCategory.ALTRO]
             };
 
-            await expect(service.create(input)).rejects.toThrow(ValidationError);
+            await expect(service.create(input)).rejects.toThrow(ServiceCatalogValidationError);
         });
 
-        it('should throw ConflictError for duplicate code', async () => {
+        it('should throw ServiceCatalogConflictError for duplicate code', async () => {
             const input: CreateServiceTypeInput = {
                 code: 'service-003',
                 name: 'Analisi del Sangue',
@@ -79,7 +79,7 @@ describe('ServiceCatalogService', () => {
             };
 
             await service.create(input);
-            await expect(service.create(input)).rejects.toThrow(ConflictError);
+            await expect(service.create(input)).rejects.toThrow(ServiceCatalogConflictError);
             await expect(service.create(input)).rejects.toThrow('already exists');
         });
     });
