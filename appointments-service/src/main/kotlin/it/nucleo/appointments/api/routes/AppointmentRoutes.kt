@@ -14,11 +14,30 @@ import it.nucleo.appointments.api.respondEitherNoContent
 import it.nucleo.appointments.application.AppointmentService
 import it.nucleo.appointments.domain.errors.map
 
+/**
+ * Registers all appointment-related routes under `/appointments`.
+ * - `POST /appointments` – book a new appointment
+ * - `GET /appointments` – list appointments (filterable by patientId, doctorId, status)
+ * - `GET /appointments/{id}` – retrieve an appointment by ID
+ * - `GET /appointments/{id}/details` – retrieve an appointment with full availability data
+ * - `PUT /appointments/{id}` – update an appointment's status or availability slot
+ * - `DELETE /appointments/{id}` – cancel an appointment
+ */
 fun Route.appointmentRoutes(service: AppointmentService) {
     route("/appointments") {
-        // Create appointment
+
+        // POST /appointments
+        // Books a new appointment by linking a patient to an available slot.
         post {
-            val request = call.receive<CreateAppointmentRequest>()
+            val request =
+                try {
+                    call.receive<CreateAppointmentRequest>()
+                } catch (_: Exception) {
+                    return@post call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(message = "Invalid request body", code = "INVALID_BODY")
+                    )
+                }
 
             val command =
                 AppointmentService.CreateAppointmentCommand(
@@ -30,33 +49,8 @@ fun Route.appointmentRoutes(service: AppointmentService) {
             call.respondEither(result, HttpStatusCode.Created) { it.toResponse() }
         }
 
-        // Get appointment by ID
-        get("/{id}") {
-            val id =
-                call.parameters["id"]
-                    ?: return@get call.respond(
-                        HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Missing ID", code = "MISSING_ID")
-                    )
-
-            val result = service.getAppointmentById(id).map { it.toResponse() }
-            call.respondEither(result)
-        }
-
-        // Get appointment details by ID (with joined availability data)
-        get("/{id}/details") {
-            val id =
-                call.parameters["id"]
-                    ?: return@get call.respond(
-                        HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Missing ID", code = "MISSING_ID")
-                    )
-
-            val result = service.getAppointmentDetails(id).map { it.toDetailsResponse() }
-            call.respondEither(result)
-        }
-
-        // Get all appointments (with filters)
+        // GET /appointments?patientId=&doctorId=&status=
+        // Returns all appointments, optionally filtered by patient, doctor, and/or status.
         get {
             val patientId = call.request.queryParameters["patientId"]
             val doctorId = call.request.queryParameters["doctorId"]
@@ -74,16 +68,54 @@ fun Route.appointmentRoutes(service: AppointmentService) {
             call.respondEither(result)
         }
 
-        // Update appointment
+        // GET /appointments/{id}
+        // Retrieves an appointment by its ID.
+        get("/{id}") {
+            val id =
+                call.parameters["id"]
+                    ?: return@get call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(message = "Appointment ID is required", code = "MISSING_ID")
+                    )
+
+            val result = service.getAppointmentById(id).map { it.toResponse() }
+            call.respondEither(result)
+        }
+
+        // GET /appointments/{id}/details
+        // Retrieves an appointment enriched with the joined availability data (doctor, facility,
+        // slot).
+        get("/{id}/details") {
+            val id =
+                call.parameters["id"]
+                    ?: return@get call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(message = "Appointment ID is required", code = "MISSING_ID")
+                    )
+
+            val result = service.getAppointmentDetails(id).map { it.toDetailsResponse() }
+            call.respondEither(result)
+        }
+
+        // PUT /appointments/{id}
+        // Updates an appointment's status and/or reassigns it to a different availability slot.
         put("/{id}") {
             val id =
                 call.parameters["id"]
                     ?: return@put call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Missing ID", code = "MISSING_ID")
+                        ErrorResponse(message = "Appointment ID is required", code = "MISSING_ID")
                     )
 
-            val request = call.receive<UpdateAppointmentRequest>()
+            val request =
+                try {
+                    call.receive<UpdateAppointmentRequest>()
+                } catch (_: Exception) {
+                    return@put call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(message = "Invalid request body", code = "INVALID_BODY")
+                    )
+                }
 
             val command =
                 AppointmentService.UpdateAppointmentCommand(
@@ -96,13 +128,14 @@ fun Route.appointmentRoutes(service: AppointmentService) {
             call.respondEither(result)
         }
 
-        // Delete appointment
+        // DELETE /appointments/{id}
+        // Cancels an appointment. Responds with 204 No Content on success.
         delete("/{id}") {
             val id =
                 call.parameters["id"]
                     ?: return@delete call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Missing ID", code = "MISSING_ID")
+                        ErrorResponse(message = "Appointment ID is required", code = "MISSING_ID")
                     )
 
             val result = service.deleteAppointment(id)

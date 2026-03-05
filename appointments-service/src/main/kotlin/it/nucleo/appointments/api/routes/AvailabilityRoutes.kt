@@ -10,13 +10,30 @@ import it.nucleo.appointments.api.respondEitherNoContent
 import it.nucleo.appointments.application.AvailabilityService
 import it.nucleo.appointments.domain.errors.map
 
+/**
+ * Registers all availability-related routes under `/availabilities`.
+ * - `POST /availabilities` – create a new availability slot for a doctor
+ * - `GET /availabilities` – list availability slots (filterable by doctorId, facilityId,
+ *   serviceTypeId, status)
+ * - `GET /availabilities/{id}` – retrieve an availability slot by ID
+ * - `PUT /availabilities/{id}` – update an availability slot
+ * - `DELETE /availabilities/{id}` – cancel an availability slot
+ */
 fun Route.availabilityRoutes(service: AvailabilityService) {
-
     route("/availabilities") {
 
-        // Create availability
+        // POST /availabilities
+        // Creates a new availability slot and assigns it to the given doctor and facility.
         post {
-            val request = call.receive<CreateAvailabilityRequest>()
+            val request =
+                try {
+                    call.receive<CreateAvailabilityRequest>()
+                } catch (_: Exception) {
+                    return@post call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(message = "Invalid request body", code = "INVALID_BODY")
+                    )
+                }
 
             val command =
                 AvailabilityService.CreateAvailabilityCommand(
@@ -30,20 +47,9 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
             call.respondEither(result, HttpStatusCode.Created) { it.toResponse() }
         }
 
-        // Get availability by ID
-        get("/{id}") {
-            val id =
-                call.parameters["id"]
-                    ?: return@get call.respond(
-                        HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Missing ID", code = "MISSING_ID")
-                    )
-
-            val result = service.getAvailabilityById(id).map { it.toResponse() }
-            call.respondEither(result)
-        }
-
-        // Get all availabilities (with filters)
+        // GET /availabilities?doctorId=&facilityId=&serviceTypeId=&status=
+        // Returns all availability slots, optionally filtered by doctor, facility, service type,
+        // and/or status.
         get {
             val doctorId = call.request.queryParameters["doctorId"]
             val facilityId = call.request.queryParameters["facilityId"]
@@ -63,16 +69,39 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
             call.respondEither(result)
         }
 
-        // Update availability
+        // GET /availabilities/{id}
+        // Retrieves an availability slot by its ID.
+        get("/{id}") {
+            val id =
+                call.parameters["id"]
+                    ?: return@get call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(message = "Availability ID is required", code = "MISSING_ID")
+                    )
+
+            val result = service.getAvailabilityById(id).map { it.toResponse() }
+            call.respondEither(result)
+        }
+
+        // PUT /availabilities/{id}
+        // Updates the facility, service type, and/or time slot of an existing availability.
         put("/{id}") {
             val id =
                 call.parameters["id"]
                     ?: return@put call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Missing ID", code = "MISSING_ID")
+                        ErrorResponse(message = "Availability ID is required", code = "MISSING_ID")
                     )
 
-            val request = call.receive<UpdateAvailabilityRequest>()
+            val request =
+                try {
+                    call.receive<UpdateAvailabilityRequest>()
+                } catch (_: Exception) {
+                    return@put call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(message = "Invalid request body", code = "INVALID_BODY")
+                    )
+                }
 
             val command =
                 AvailabilityService.UpdateAvailabilityCommand(
@@ -86,13 +115,14 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
             call.respondEither(result)
         }
 
-        // Delete availability
+        // DELETE /availabilities/{id}
+        // Cancels an availability slot. Responds with 204 No Content on success.
         delete("/{id}") {
             val id =
                 call.parameters["id"]
                     ?: return@delete call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Missing ID", code = "MISSING_ID")
+                        ErrorResponse(message = "Availability ID is required", code = "MISSING_ID")
                     )
 
             val result = service.cancelAvailability(id)

@@ -13,94 +13,89 @@ import it.nucleo.application.DocumentUploadService
 import it.nucleo.application.UploadDocumentCommand
 import it.nucleo.domain.PatientId
 import it.nucleo.domain.errors.map
-import it.nucleo.infrastructure.logging.logger
-
-private val logger = logger("it.nucleo.api.routes.UploadRoutes")
 
 private const val PDF_CONTENT_TYPE = "application/pdf"
 
+/**
+ * Registers upload-related routes under `/patients/{patientId}/documents`.
+ * - `POST /patients/{patientId}/documents/upload` – upload a PDF document for a patient
+ */
 fun Route.uploadRoutes(uploadService: DocumentUploadService) {
-    route("/patients/{patientId}/documents") { uploadDocument(uploadService) }
-}
+    route("/patients/{patientId}/documents") {
 
-/** POST /patients/{patientId}/documents/upload Uploads a PDF document for a patient. */
-private fun Route.uploadDocument(uploadService: DocumentUploadService) {
-    post("/upload") {
-        val patientId =
-            call.parameters["patientId"]
-                ?: return@post call.respond(
-                    HttpStatusCode.BadRequest,
-                    ErrorResponse("bad_request", "Patient ID is required")
-                )
+        // POST /patients/{patientId}/documents/upload
+        // Accepts a multipart/form-data request with a "file" field containing a PDF document.
+        // Returns the generated document ID on success.
+        post("/upload") {
+            val patientId =
+                call.parameters["patientId"]
+                    ?: return@post call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse("bad_request", "Patient ID is required")
+                    )
 
-        logger.debug("POST /patients/$patientId/documents/upload - Uploading document")
-
-        val multipart =
-            try {
-                call.receiveMultipart()
-            } catch (e: Exception) {
-                logger.warn(
-                    "POST /patients/$patientId/documents/upload - Invalid multipart request",
-                    e
-                )
-                return@post call.respond(
-                    HttpStatusCode.BadRequest,
-                    ErrorResponse("bad_request", "Invalid multipart request", e.message)
-                )
-            }
-
-        var fileProcessed = false
-
-        multipart.forEachPart { part ->
-            when (part) {
-                is PartData.FileItem -> {
-                    if (part.name == "file") {
-                        fileProcessed = true
-                        val filename = part.originalFileName
-                        val contentType = part.contentType?.toString() ?: PDF_CONTENT_TYPE
-                        val bytes = part.provider().toByteArray()
-
-                        if (filename == null) {
-                            call.respond(
-                                HttpStatusCode.BadRequest,
-                                ErrorResponse("bad_request", "Filename is required")
-                            )
-                        } else {
-                            val command =
-                                UploadDocumentCommand(
-                                    patientId = PatientId(patientId),
-                                    filename = filename,
-                                    content = bytes,
-                                    contentType = contentType
-                                )
-
-                            val result =
-                                uploadService.upload(command).map { documentId ->
-                                    UploadResponse(
-                                        success = true,
-                                        message = "Document uploaded successfully",
-                                        documentId = documentId.id
-                                    )
-                                }
-
-                            call.respondEither(result, HttpStatusCode.Created)
-                        }
-                    }
-                    part.dispose()
+            val multipart =
+                try {
+                    call.receiveMultipart()
+                } catch (e: Exception) {
+                    return@post call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse("bad_request", "Invalid multipart request", e.message)
+                    )
                 }
-                else -> part.dispose()
-            }
-        }
 
-        if (!fileProcessed) {
-            logger.warn("POST /patients/$patientId/documents/upload - No file provided")
-            call.respond(
-                HttpStatusCode.BadRequest,
-                ErrorResponse(
-                    "bad_request",
-                    "No file provided. Please include a 'file' field in the multipart request."
+            var fileProcessed = false
+
+            multipart.forEachPart { part ->
+                when (part) {
+                    is PartData.FileItem -> {
+                        if (part.name == "file") {
+                            fileProcessed = true
+                            val filename = part.originalFileName
+                            val contentType = part.contentType?.toString() ?: PDF_CONTENT_TYPE
+                            val bytes = part.provider().toByteArray()
+
+                            if (filename == null) {
+                                call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    ErrorResponse("bad_request", "Filename is required")
+                                )
+                            } else {
+                                val command =
+                                    UploadDocumentCommand(
+                                        patientId = PatientId(patientId),
+                                        filename = filename,
+                                        content = bytes,
+                                        contentType = contentType
+                                    )
+
+                                val result =
+                                    uploadService.upload(command).map { documentId ->
+                                        UploadResponse(
+                                            success = true,
+                                            message = "Document uploaded successfully",
+                                            documentId = documentId.id
+                                        )
+                                    }
+
+                                call.respondEither(result, HttpStatusCode.Created)
+                            }
+                        }
+                        part.dispose()
+                    }
+                    else -> part.dispose()
+                }
+            }
+
+            if (!fileProcessed) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(
+                        "bad_request",
+                        "No file provided. Please include a 'file' field in the multipart request."
+                    )
                 )
-            )
+            }
         }
     }
 }
