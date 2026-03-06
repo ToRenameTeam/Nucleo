@@ -4,9 +4,9 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.testing.testApplication
-import it.nucleo.api.plugins.configureRouting
-import it.nucleo.api.plugins.configureSerialization
-import it.nucleo.api.plugins.configureStatusPages
+import it.nucleo.configureRouting
+import it.nucleo.configureSerialization
+import it.nucleo.configureStatusPages
 import it.nucleo.infrastructure.persistence.minio.MinioClientFactory
 import it.nucleo.infrastructure.persistence.minio.MinioFileStorageRepository
 import it.nucleo.infrastructure.persistence.mongodb.MongoDbFactory
