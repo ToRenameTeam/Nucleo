@@ -11,13 +11,55 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Examples', link: '/markdown-examples' }
     ],
+    
 
     sidebar: [
       {
-        text: 'Examples',
+        text: 'Nucleo Documentation',
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
+          { text: 'Introduction', link: '/introduction' },
+          { text: 'Deliverables', 
+            items: [
+              { text: 'Glossary', link: '/deliverables/glossary' },
+              { text: 'Domain Model', link: '/deliverables/domain-model' },
+            ]
+          },
+          { text: 'Analysis', 
+            items: [
+              { text: 'Business Requirements', link: '/analysis/business-requirements' },
+              { text: 'Functional Requirements', link: '/analysis/functional-requirements' },
+              { text: 'Non-Functional Requirements', link: '/analysis/non-functional-requirements' },
+            ]
+          },
+          { text: 'Design', 
+            items: [
+              { text: 'Event Storming', link: '/design/event-storming' },
+              { text: 'Bounded Context', link: '/design/bounded-context' },
+              { text: 'Architecture', link: '/design/architecture' },
+              { text: 'Microservices', link: '/design/microservices' },
+              { text: 'Patterns', link: '/design/patterns'}
+            ]
+          },
+          { text: 'Implementation', 
+            items: [
+              { text: 'Microservices', link: '/implementation/microservices' },
+              { text: 'Testing', link: '/implementation/testing'},
+              { text: 'Multiplatform', link: '/implementation/multiplatform'},
+              { text: 'Experiments', link: '/implementation/experiments'},
+              { text: 'Monitoring', link: '/implementation/monitoring'}
+            ]
+          },
+          { text: 'DevOps', 
+            items: [
+              { text: 'Project Structure', link: '/devops/project-structure' },
+              { text: 'VCS & Repo', link: '/devops/vcs-and-repo' },
+              { text: 'Quality Assurance', link: '/devops/quality-assurance' },
+              { text: 'Monitoring', link: '/devops/monitoring' }
+            ]
+          },
+          { text: 'Deployment', link: '/deployment' },
+          { text: 'Benchmark', link: '/benchmark' },
+          { text: 'Conclusions', link: '/conclusions' },
         ]
       }
     ],
