@@ -10,20 +10,22 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import it.nucleo.api.dto.ErrorResponse
-import it.nucleo.api.routes.documentRoutes
-import it.nucleo.api.routes.downloadRoutes
-import it.nucleo.api.routes.uploadRoutes
-import it.nucleo.application.DocumentDownloadService
-import it.nucleo.application.DocumentPdfGenerator
-import it.nucleo.application.DocumentService
-import it.nucleo.application.DocumentUploadService
-import it.nucleo.infrastructure.ai.AiServiceClient
-import it.nucleo.infrastructure.logging.logger
-import it.nucleo.infrastructure.persistence.minio.MinioClientFactory
-import it.nucleo.infrastructure.persistence.minio.MinioFileStorageRepository
-import it.nucleo.infrastructure.persistence.mongodb.MongoDbFactory
-import it.nucleo.infrastructure.persistence.mongodb.MongoDocumentRepository
+import it.nucleo.documents.api.dto.ErrorResponse
+import it.nucleo.documents.api.routes.documentRoutes
+import it.nucleo.documents.api.routes.downloadRoutes
+import it.nucleo.documents.api.routes.uploadRoutes
+import it.nucleo.documents.application.DocumentDownloadService
+import it.nucleo.documents.application.DocumentPdfGenerator
+import it.nucleo.documents.application.DocumentService
+import it.nucleo.documents.application.DocumentUploadService
+import it.nucleo.documents.domain.DocumentRepository
+import it.nucleo.documents.domain.FileStorageRepository
+import it.nucleo.documents.infrastructure.ai.AiServiceClient
+import it.nucleo.documents.infrastructure.logging.logger
+import it.nucleo.documents.infrastructure.persistence.minio.MinioClientFactory
+import it.nucleo.documents.infrastructure.persistence.minio.MinioFileStorageRepository
+import it.nucleo.documents.infrastructure.persistence.mongodb.MongoDbFactory
+import it.nucleo.documents.infrastructure.persistence.mongodb.MongoDocumentRepository
 import kotlinx.serialization.json.Json
 
 private val logger = logger("it.nucleo.Application")
@@ -119,8 +121,8 @@ private fun Application.configureCors() {
 
 /** Overload accepting explicit dependencies — used by integration tests. */
 internal fun Application.configureRouting(
-    documentRepository: it.nucleo.domain.DocumentRepository,
-    fileStorageRepository: it.nucleo.domain.FileStorageRepository,
+    documentRepository: DocumentRepository,
+    fileStorageRepository: FileStorageRepository,
     aiServiceClient: AiServiceClient? = null
 ) {
     val pdfGenerator = DocumentPdfGenerator()
