@@ -11,23 +11,16 @@ class AppointmentService(
 
     private val logger = LoggerFactory.getLogger(AppointmentService::class.java)
 
-    data class CreateAppointmentCommand(val patientId: String, val availabilityId: String)
-
-    data class UpdateAppointmentCommand(
-        val id: String,
-        val status: String?,
-        val availabilityId: String?
-    )
-
     data class AppointmentDetails(val appointment: Appointment, val availability: Availability)
 
     suspend fun createAppointment(
-        command: CreateAppointmentCommand
+        patientId: String,
+        availabilityId: String,
     ): Either<DomainError, Appointment> {
-        logger.info("Creating appointment for patient: ${command.patientId}")
+        logger.info("Creating appointment for patient: $patientId")
 
-        val patientId = PatientId.fromString(command.patientId)
-        val availabilityId = AvailabilityId.fromString(command.availabilityId)
+        val patientId = PatientId.fromString(patientId)
+        val availabilityId = AvailabilityId.fromString(availabilityId)
 
         val availability =
             availabilityRepository.findById(availabilityId)
@@ -110,18 +103,20 @@ class AppointmentService(
     }
 
     suspend fun updateAppointment(
-        command: UpdateAppointmentCommand
+        id: String,
+        status: String?,
+        availabilityId: String?,
     ): Either<DomainError, Appointment> {
-        logger.info("Updating appointment with ID: ${command.id}")
+        logger.info("Updating appointment with ID: $id")
 
         val appointment =
-            appointmentRepository.findById(AppointmentId.fromString(command.id))
-                ?: return failure(AppointmentError.NotFound(command.id))
+            appointmentRepository.findById(AppointmentId.fromString(id))
+                ?: return failure(AppointmentError.NotFound(id))
 
         val updated =
             when {
-                command.status != null -> {
-                    val newStatus = AppointmentStatus.valueOf(command.status)
+                status != null -> {
+                    val newStatus = AppointmentStatus.valueOf(status)
                     when (newStatus) {
                         AppointmentStatus.COMPLETED -> appointment.complete()
                         AppointmentStatus.CANCELLED -> appointment.cancel()
@@ -136,8 +131,8 @@ class AppointmentService(
                         return failure(it)
                     }
                 }
-                command.availabilityId != null -> {
-                    val newAvailabilityId = AvailabilityId.fromString(command.availabilityId)
+                availabilityId != null -> {
+                    val newAvailabilityId = AvailabilityId.fromString(availabilityId)
 
                     val newAvailability =
                         availabilityRepository.findById(newAvailabilityId)
@@ -179,11 +174,11 @@ class AppointmentService(
         val saved = appointmentRepository.update(updated)
 
         if (saved == null) {
-            logger.warn("Appointment not found when updating with ID: ${command.id}")
-            return failure(AppointmentError.NotFound(command.id))
+            logger.warn("Appointment not found when updating with ID: $id")
+            return failure(AppointmentError.NotFound(id))
         }
 
-        logger.info("Appointment updated successfully with ID: ${command.id}")
+        logger.info("Appointment updated successfully with ID: $id")
         return success(saved)
     }
 

@@ -35,15 +35,13 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
                     )
                 }
 
-            val command =
-                AvailabilityService.CreateAvailabilityCommand(
+            val result =
+                service.createAvailability(
                     doctorId = request.doctorId,
                     facilityId = request.facilityId,
                     serviceTypeId = request.serviceTypeId,
-                    timeSlot = request.timeSlot
+                    timeSlot = request.timeSlot,
                 )
-
-            val result = service.createAvailability(command)
             call.respondEither(result, HttpStatusCode.Created) { it.toResponse() }
         }
 
@@ -103,15 +101,15 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
                     )
                 }
 
-            val command =
-                AvailabilityService.UpdateAvailabilityCommand(
-                    id = id,
-                    facilityId = request.facilityId,
-                    serviceTypeId = request.serviceTypeId,
-                    timeSlot = request.timeSlot
-                )
-
-            val result = service.updateAvailability(command).map { it.toResponse() }
+            val result =
+                service
+                    .updateAvailability(
+                        id = id,
+                        facilityId = request.facilityId,
+                        serviceTypeId = request.serviceTypeId,
+                        timeSlot = request.timeSlot,
+                    )
+                    .map { it.toResponse() }
             call.respondEither(result)
         }
 

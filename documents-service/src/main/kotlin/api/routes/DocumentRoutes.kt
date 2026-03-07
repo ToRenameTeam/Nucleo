@@ -8,8 +8,16 @@ import it.nucleo.api.dto.*
 import it.nucleo.api.respondEitherJson
 import it.nucleo.api.respondEitherStatus
 import it.nucleo.application.DocumentService
+import it.nucleo.application.UpdateReportCommand
 import it.nucleo.domain.*
+import it.nucleo.domain.errors.failure
+import it.nucleo.domain.errors.getOrElse
 import it.nucleo.domain.errors.map
+import it.nucleo.domain.report.ClinicalQuestion
+import it.nucleo.domain.report.Conclusion
+import it.nucleo.domain.report.Findings
+import it.nucleo.domain.report.Recommendations
+import java.util.UUID
 import kotlinx.serialization.builtins.ListSerializer
 
 /**
@@ -26,8 +34,6 @@ import kotlinx.serialization.builtins.ListSerializer
  * - `GET /documents?doctorId={doctorId}` – list all documents by doctor
  */
 fun Route.documentRoutes(documentService: DocumentService) {
-
-    // ── Patient-scoped document endpoints ─────────────────────────────────────────────────────
 
     route("/patients/{patientId}/documents") {
 
@@ -51,6 +57,7 @@ fun Route.documentRoutes(documentService: DocumentService) {
 
         // POST /patients/{patientId}/documents
         // Creates a new document and associates it with the given patient.
+        // The route is responsible for building the domain Document from the request.
         post {
             val patientId =
                 call.parameters["patientId"]
@@ -69,10 +76,26 @@ fun Route.documentRoutes(documentService: DocumentService) {
                     )
                 }
 
-            val result =
-                documentService.createDocument(PatientId(patientId), request).map {
-                    it.toResponse()
-                }
+            val patientIdDomain = PatientId(patientId)
+            val documentId = DocumentId(UUID.randomUUID().toString())
+
+            val document =
+                request
+                    .toDomain(
+                        patientId = patientIdDomain,
+                        documentId = documentId,
+                        resolveServicePrescription = { prescriptionId ->
+                            documentService.getServicePrescription(patientIdDomain, prescriptionId)
+                        }
+                    )
+                    .getOrElse { error ->
+                        return@post call.respondEitherJson(
+                            failure(error),
+                            DocumentResponse.serializer()
+                        )
+                    }
+
+            val result = documentService.createDocument(document).map { it.toResponse() }
 
             call.respondEitherJson(result, DocumentResponse.serializer(), HttpStatusCode.Created)
         }
@@ -104,6 +127,8 @@ fun Route.documentRoutes(documentService: DocumentService) {
 
         // PUT /patients/{patientId}/documents/{documentId}/report
         // Updates the content of a report document. Only report-type documents can be updated.
+        // The route maps UpdateReportRequest fields to domain value objects before calling the
+        // service.
         put("/{documentId}/report") {
             val patientId =
                 call.parameters["patientId"]
@@ -129,9 +154,17 @@ fun Route.documentRoutes(documentService: DocumentService) {
                     )
                 }
 
+            val command =
+                UpdateReportCommand(
+                    findings = request.findings?.let { Findings(it) },
+                    clinicalQuestion = request.clinicalQuestion?.let { ClinicalQuestion(it) },
+                    conclusion = request.conclusion?.let { Conclusion(it) },
+                    recommendations = request.recommendations?.let { Recommendations(it) },
+                )
+
             val result =
                 documentService
-                    .updateReport(PatientId(patientId), DocumentId(documentId), request)
+                    .updateReport(PatientId(patientId), DocumentId(documentId), command)
                     .map { it.toResponse() }
 
             call.respondEitherJson(result, DocumentResponse.serializer())
@@ -164,8 +197,6 @@ fun Route.documentRoutes(documentService: DocumentService) {
             )
         }
     }
-
-    // ── Global document endpoints ──────────────────────────────────────────────────────────────
 
     route("/documents") {
 

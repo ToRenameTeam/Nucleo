@@ -1,6 +1,11 @@
 package it.nucleo.api.dto
 
 import it.nucleo.domain.*
+import it.nucleo.domain.DocumentFactory
+import it.nucleo.domain.errors.DocumentError
+import it.nucleo.domain.errors.Either
+import it.nucleo.domain.errors.failure
+import it.nucleo.domain.errors.success
 import it.nucleo.domain.prescription.Validity
 import it.nucleo.domain.prescription.implementation.*
 import it.nucleo.domain.report.*
@@ -96,3 +101,72 @@ fun DosageRequest.toDomain(): Dosage =
 
 fun FileMetadataDto.toDomain(): FileMetadata =
     FileMetadata(summary = Summary(summary), tags = tags.map { Tag(it) }.toSet())
+
+suspend fun CreateDocumentRequest.toDomain(
+    patientId: PatientId,
+    documentId: DocumentId,
+    resolveServicePrescription:
+        (suspend (DocumentId) -> Either<DocumentError, ServicePrescription>)? =
+        null,
+): Either<DocumentError, Document> {
+    val doctorId = DoctorId(this.doctorId)
+    val title = Title(this.title)
+    val metadata = this.metadata.toDomain()
+
+    return when (this) {
+        is CreateMedicinePrescriptionRequest ->
+            success(
+                DocumentFactory.createMedicinePrescription(
+                    id = documentId,
+                    doctorId = doctorId,
+                    patientId = patientId,
+                    title = title,
+                    metadata = metadata,
+                    validity = validity.toDomain(),
+                    dosage = dosage.toDomain()
+                )
+            )
+        is CreateServicePrescriptionRequest ->
+            success(
+                DocumentFactory.createServicePrescription(
+                    id = documentId,
+                    doctorId = doctorId,
+                    patientId = patientId,
+                    title = title,
+                    metadata = metadata,
+                    validity = validity.toDomain(),
+                    serviceId = ServiceId(serviceId),
+                    facilityId = FacilityId(facilityId),
+                    priority = Priority.valueOf(priority)
+                )
+            )
+        is CreateReportRequest -> {
+            val prescriptionId = DocumentId(servicePrescriptionId)
+            val servicePrescription =
+                resolveServicePrescription?.invoke(prescriptionId)
+                    ?: return failure(
+                        DocumentError.InvalidRequest("Service prescription resolver not provided")
+                    )
+
+            when (servicePrescription) {
+                is Either.Left -> failure(servicePrescription.error)
+                is Either.Right ->
+                    success(
+                        DocumentFactory.createReport(
+                            id = documentId,
+                            doctorId = doctorId,
+                            patientId = patientId,
+                            title = title,
+                            metadata = metadata,
+                            servicePrescription = servicePrescription.value,
+                            executionDate = ExecutionDate(LocalDate.parse(executionDate)),
+                            findings = Findings(findings),
+                            clinicalQuestion = clinicalQuestion?.let { ClinicalQuestion(it) },
+                            conclusion = conclusion?.let { Conclusion(it) },
+                            recommendations = recommendations?.let { Recommendations(it) }
+                        )
+                    )
+            }
+        }
+    }
+}

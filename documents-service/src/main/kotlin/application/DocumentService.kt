@@ -1,23 +1,12 @@
 package it.nucleo.application
 
-import it.nucleo.api.dto.CreateDocumentRequest
-import it.nucleo.api.dto.CreateMedicinePrescriptionRequest
-import it.nucleo.api.dto.CreateReportRequest
-import it.nucleo.api.dto.CreateServicePrescriptionRequest
-import it.nucleo.api.dto.UpdateReportRequest
-import it.nucleo.api.dto.toDomain
 import it.nucleo.domain.*
 import it.nucleo.domain.errors.*
-import it.nucleo.domain.prescription.implementation.FacilityId
-import it.nucleo.domain.prescription.implementation.Priority
-import it.nucleo.domain.prescription.implementation.ServiceId
 import it.nucleo.domain.prescription.implementation.ServicePrescription
-import it.nucleo.domain.report.*
+import it.nucleo.domain.report.Report
 import it.nucleo.infrastructure.ai.AiAnalysisResult
 import it.nucleo.infrastructure.ai.AiServiceClient
 import it.nucleo.infrastructure.logging.logger
-import java.time.LocalDate
-import java.util.UUID
 
 class DocumentService(
     private val repository: DocumentRepository,
@@ -44,85 +33,42 @@ class DocumentService(
         return repository.findDocumentById(patientId, documentId)
     }
 
-    suspend fun createDocument(
+    /**
+     * Resolves an existing [ServicePrescription] by [documentId] for the given [patientId]. Exposed
+     * so that the api layer can use it as a resolver callback when building a Report document
+     * before calling [createDocument].
+     */
+    suspend fun getServicePrescription(
         patientId: PatientId,
-        request: CreateDocumentRequest
-    ): Either<DomainError, Document> {
-        val doctorId = DoctorId(request.doctorId)
-        val title = Title(request.title)
-
-        // Generate document ID upfront - needed for PDF storage and AI analysis
-        val documentId = DocumentId(UUID.randomUUID().toString())
-
-        // Create document with placeholder metadata initially
-        val placeholderMetadata = request.metadata.toDomain()
-
-        val document =
-            when (request) {
-                is CreateMedicinePrescriptionRequest -> {
-                    DocumentFactory.createMedicinePrescription(
-                        id = documentId,
-                        doctorId = doctorId,
-                        patientId = patientId,
-                        title = title,
-                        metadata = placeholderMetadata,
-                        validity = request.validity.toDomain(),
-                        dosage = request.dosage.toDomain()
-                    )
-                }
-                is CreateServicePrescriptionRequest -> {
-                    DocumentFactory.createServicePrescription(
-                        id = documentId,
-                        doctorId = doctorId,
-                        patientId = patientId,
-                        title = title,
-                        metadata = placeholderMetadata,
-                        validity = request.validity.toDomain(),
-                        serviceId = ServiceId(request.serviceId),
-                        facilityId = FacilityId(request.facilityId),
-                        priority = Priority.valueOf(request.priority)
-                    )
-                }
-                is CreateReportRequest -> {
-                    val servicePrescriptionDoc =
-                        repository
-                            .findDocumentById(patientId, DocumentId(request.servicePrescriptionId))
-                            .getOrElse {
-                                return failure(it)
-                            }
-
-                    if (servicePrescriptionDoc !is ServicePrescription) {
-                        return failure(
-                            DocumentError.InvalidType(
-                                "ServicePrescription",
-                                servicePrescriptionDoc::class.simpleName ?: "Unknown"
-                            )
-                        )
-                    }
-
-                    DocumentFactory.createReport(
-                        id = documentId,
-                        doctorId = doctorId,
-                        patientId = patientId,
-                        title = title,
-                        metadata = placeholderMetadata,
-                        servicePrescription = servicePrescriptionDoc,
-                        executionDate = ExecutionDate(LocalDate.parse(request.executionDate)),
-                        findings = Findings(request.findings),
-                        clinicalQuestion = request.clinicalQuestion?.let { ClinicalQuestion(it) },
-                        conclusion = request.conclusion?.let { Conclusion(it) },
-                        recommendations = request.recommendations?.let { Recommendations(it) }
-                    )
-                }
+        documentId: DocumentId,
+    ): Either<DocumentError, ServicePrescription> {
+        val doc =
+            repository.findDocumentById(patientId, documentId).getOrElse {
+                return failure(
+                    it as? DocumentError ?: DocumentError.NotFound(patientId.id, documentId.id)
+                )
             }
+        return if (doc is ServicePrescription) success(doc)
+        else
+            failure(
+                DocumentError.InvalidType("ServicePrescription", doc::class.simpleName ?: "Unknown")
+            )
+    }
 
+    /**
+     * Persists a fully-constructed domain [Document], generates its PDF and runs AI analysis. The
+     * caller (api layer) is responsible for building the [Document] via [DocumentFactory].
+     */
+    suspend fun createDocument(
+        document: Document,
+    ): Either<DomainError, Document> {
         generateAndStorePdf(document).getOrElse {
             return failure(it)
         }
 
-        val finalDocument = analyzeDocumentWithAi(document, patientId)
+        val finalDocument = analyzeDocumentWithAi(document, document.patientId)
 
-        repository.addDocument(patientId, finalDocument).getOrElse {
+        repository.addDocument(document.patientId, finalDocument).getOrElse {
             return failure(it)
         }
 
@@ -136,10 +82,14 @@ class DocumentService(
         return repository.deleteDocument(patientId, documentId)
     }
 
+    /**
+     * Updates the editable fields of a [Report] using domain value objects from
+     * [UpdateReportCommand].
+     */
     suspend fun updateReport(
         patientId: PatientId,
         documentId: DocumentId,
-        request: UpdateReportRequest
+        command: UpdateReportCommand,
     ): Either<DomainError, Report> {
         val existingDocument =
             repository.findDocumentById(patientId, documentId).getOrElse {
@@ -152,10 +102,10 @@ class DocumentService(
             )
         }
 
-        request.findings?.let { existingDocument.updateFindings(Findings(it)) }
-        request.clinicalQuestion?.let { existingDocument.setClinicalQuestion(ClinicalQuestion(it)) }
-        request.conclusion?.let { existingDocument.setConclusion(Conclusion(it)) }
-        request.recommendations?.let { existingDocument.setRecommendations(Recommendations(it)) }
+        command.findings?.let { existingDocument.updateFindings(it) }
+        command.clinicalQuestion?.let { existingDocument.setClinicalQuestion(it) }
+        command.conclusion?.let { existingDocument.setConclusion(it) }
+        command.recommendations?.let { existingDocument.setRecommendations(it) }
 
         repository.updateReport(patientId, existingDocument).getOrElse {
             return failure(it)

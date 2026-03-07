@@ -39,13 +39,11 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                     )
                 }
 
-            val command =
-                AppointmentService.CreateAppointmentCommand(
+            val result =
+                service.createAppointment(
                     patientId = request.patientId,
-                    availabilityId = request.availabilityId
+                    availabilityId = request.availabilityId,
                 )
-
-            val result = service.createAppointment(command)
             call.respondEither(result, HttpStatusCode.Created) { it.toResponse() }
         }
 
@@ -117,14 +115,14 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                     )
                 }
 
-            val command =
-                AppointmentService.UpdateAppointmentCommand(
-                    id = id,
-                    status = request.status,
-                    availabilityId = request.availabilityId
-                )
-
-            val result = service.updateAppointment(command).map { it.toResponse() }
+            val result =
+                service
+                    .updateAppointment(
+                        id = id,
+                        status = request.status,
+                        availabilityId = request.availabilityId,
+                    )
+                    .map { it.toResponse() }
             call.respondEither(result)
         }
 
