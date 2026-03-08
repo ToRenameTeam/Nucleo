@@ -251,7 +251,7 @@
     "footer": {
       "version": "Nucleo v0.1 · Prototipo"
     }
-  }, 
+  },
   "footer": {
     "privacy": "Privacy",
     "privacyAria": "Apri informativa privacy e cookie policy",
@@ -572,9 +572,7 @@
         }
       }
     },
-    "settings":{
-
-    }
+    "settings": {}
   },
   "common": {
     "loading": "Caricamento...",

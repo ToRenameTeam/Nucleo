@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
+import { ref } from 'vue';
+import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
 
-const searchQuery = ref('')
+const searchQuery = ref('');
 
 const props = defineProps<{
-  placeholder?: string
-}>()
+  placeholder?: string;
+}>();
 
 const emit = defineEmits<{
-  search: [query: string]
-}>()
+  search: [query: string];
+}>();
 
 const handleSearch = () => {
-  emit('search', searchQuery.value)
-}
+  emit('search', searchQuery.value);
+};
 </script>
 
 <template>
@@ -63,7 +63,9 @@ const handleSearch = () => {
   backdrop-filter: blur(16px);
   border: 1px solid var(--bg-secondary-50);
   border-radius: 1rem;
-  box-shadow: 0 4px 16px var(--text-primary-8), inset 0 1px 0 var(--bg-secondary-60);
+  box-shadow:
+    0 4px 16px var(--text-primary-8),
+    inset 0 1px 0 var(--bg-secondary-60);
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 

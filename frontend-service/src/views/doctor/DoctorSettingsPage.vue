@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useAuth } from '../../composables/useAuth'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-import type { Profile } from '../../types/auth'
-import SettingsItem from '../../components/shared/SettingsItem.vue'
-import BaseModal from '../../components/shared/BaseModal.vue'
-import ProfileViewModal from '../../components/shared/ProfileViewModal.vue'
-import AppearanceSettings from '../../components/shared/AppearanceSettings.vue'
+import { ref, computed } from 'vue';
+import { useAuth } from '../../composables/useAuth';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import type { Profile } from '../../types/auth';
+import SettingsItem from '../../components/shared/SettingsItem.vue';
+import BaseModal from '../../components/shared/BaseModal.vue';
+import ProfileViewModal from '../../components/shared/ProfileViewModal.vue';
+import AppearanceSettings from '../../components/shared/AppearanceSettings.vue';
 import {
   UserCircleIcon,
   BellIcon,
   SwatchIcon,
   DocumentTextIcon,
-  ArrowRightOnRectangleIcon
-} from '@heroicons/vue/24/outline'
+  ArrowRightOnRectangleIcon,
+} from '@heroicons/vue/24/outline';
 
-const { t } = useI18n()
-const router = useRouter()
-const showAppearanceModal = ref(false)
-const showProfileModal = ref(false)
-const { currentUser, logout: authLogout } = useAuth()
+const { t } = useI18n();
+const router = useRouter();
+const showAppearanceModal = ref(false);
+const showProfileModal = ref(false);
+const { currentUser, logout: authLogout } = useAuth();
 
 // Mappa currentUser a Profile per il modal
 const doctorProfile = computed<Profile | null>(() => {
-  if (!currentUser.value) return null
+  if (!currentUser.value) return null;
   return {
     userId: currentUser.value.userId,
     name: currentUser.value.name,
@@ -32,34 +32,33 @@ const doctorProfile = computed<Profile | null>(() => {
     fiscalCode: currentUser.value.fiscalCode,
     dateOfBirth: currentUser.value.dateOfBirth,
     medicalLicenseNumber: currentUser.value.doctor?.medicalLicenseNumber,
-    specializations: currentUser.value.doctor?.specializations
-  }
-})
+    specializations: currentUser.value.doctor?.specializations,
+  };
+});
 
 const handleItemClick = (item: string) => {
   if (item === 'appearance') {
-    showAppearanceModal.value = true
+    showAppearanceModal.value = true;
   } else if (item === 'myProfile') {
-    showProfileModal.value = true
+    showProfileModal.value = true;
   } else if (item === 'logout') {
-    logout()
+    logout();
   } else {
-    console.log('Clicked:', item)
+    console.log('Clicked:', item);
   }
-}
+};
 
 const logout = () => {
-  authLogout()
-  router.push('/login')
-}
+  authLogout();
+  router.push('/login');
+};
 
 const displayUserName = computed(() => {
   if (!currentUser.value) {
-    return t('topbar.user')
+    return t('topbar.user');
   }
-  return `${currentUser.value.name} ${currentUser.value.lastName}`
-})
-
+  return `${currentUser.value.name} ${currentUser.value.lastName}`;
+});
 </script>
 
 <template>
@@ -90,8 +89,12 @@ const displayUserName = computed(() => {
         {{ t('settings.profileFamily.title') }}
       </div>
       <div class="settings-list">
-        <SettingsItem :icon="UserCircleIcon" :title="t('settings.profileFamily.myProfile.title')"
-          :subtitle="t('settings.profileFamily.myProfile.subtitle')" @click="handleItemClick('myProfile')" />
+        <SettingsItem
+          :icon="UserCircleIcon"
+          :title="t('settings.profileFamily.myProfile.title')"
+          :subtitle="t('settings.profileFamily.myProfile.subtitle')"
+          @click="handleItemClick('myProfile')"
+        />
       </div>
     </div>
 
@@ -101,10 +104,18 @@ const displayUserName = computed(() => {
         {{ t('settings.app.title') }}
       </div>
       <div class="settings-list">
-        <SettingsItem :icon="BellIcon" :title="t('settings.app.notifications.title')"
-          :subtitle="t('settings.app.notifications.subtitle')" @click="handleItemClick('notifications')" />
-        <SettingsItem :icon="SwatchIcon" :title="t('settings.app.appearance.title')"
-          :subtitle="t('settings.app.appearance.subtitle')" @click="handleItemClick('appearance')" />
+        <SettingsItem
+          :icon="BellIcon"
+          :title="t('settings.app.notifications.title')"
+          :subtitle="t('settings.app.notifications.subtitle')"
+          @click="handleItemClick('notifications')"
+        />
+        <SettingsItem
+          :icon="SwatchIcon"
+          :title="t('settings.app.appearance.title')"
+          :subtitle="t('settings.app.appearance.subtitle')"
+          @click="handleItemClick('appearance')"
+        />
       </div>
     </div>
 
@@ -114,16 +125,25 @@ const displayUserName = computed(() => {
         {{ t('settings.dataPrivacy.title') }}
       </div>
       <div class="settings-list">
-        <SettingsItem :icon="DocumentTextIcon" :title="t('settings.dataPrivacy.terms.title')"
-          :subtitle="t('settings.dataPrivacy.terms.subtitle')" @click="handleItemClick('terms')" />
+        <SettingsItem
+          :icon="DocumentTextIcon"
+          :title="t('settings.dataPrivacy.terms.title')"
+          :subtitle="t('settings.dataPrivacy.terms.subtitle')"
+          @click="handleItemClick('terms')"
+        />
       </div>
     </div>
 
     <!-- Logout -->
     <div class="settings-section">
       <div class="settings-list">
-        <SettingsItem :icon="ArrowRightOnRectangleIcon" :title="t('settings.logout')" variant="danger"
-          :show-chevron="false" @click="handleItemClick('logout')" />
+        <SettingsItem
+          :icon="ArrowRightOnRectangleIcon"
+          :title="t('settings.logout')"
+          variant="danger"
+          :show-chevron="false"
+          @click="handleItemClick('logout')"
+        />
       </div>
     </div>
 
@@ -133,14 +153,17 @@ const displayUserName = computed(() => {
     </div>
 
     <!-- Modal Aspect -->
-    <BaseModal :is-open="showAppearanceModal" :title="t('settings.app.appearance.title')"
-      @close="showAppearanceModal = false">
+    <BaseModal
+      :is-open="showAppearanceModal"
+      :title="t('settings.app.appearance.title')"
+      @close="showAppearanceModal = false"
+    >
       <AppearanceSettings />
     </BaseModal>
 
     <!-- Modal Profilo -->
-    <ProfileViewModal 
-      :is-open="showProfileModal" 
+    <ProfileViewModal
+      :is-open="showProfileModal"
       :profile-data="doctorProfile"
       :title="t('settings.profileFamily.myProfile.title')"
       @close="showProfileModal = false"
@@ -155,7 +178,12 @@ const displayUserName = computed(() => {
   min-height: 100vh;
   overflow-x: hidden;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
   position: relative;
 }
 
@@ -181,7 +209,9 @@ const displayUserName = computed(() => {
   backdrop-filter: blur(20px);
   border: 1px solid var(--white-60);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   animation: slideInDown 0.5s cubic-bezier(0, 0, 0.2, 1);
 }
 
@@ -248,15 +278,17 @@ const displayUserName = computed(() => {
   border: 1px solid var(--white-50);
   border-radius: 1.25rem;
   overflow: hidden;
-  box-shadow: 0 4px 24px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 4px 24px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
-.settings-list>* {
+.settings-list > * {
   border-bottom: 1px solid var(--white-20);
 }
 
-.settings-list>*:last-child {
+.settings-list > *:last-child {
   border-bottom: none;
 }
 
@@ -269,14 +301,18 @@ const displayUserName = computed(() => {
   backdrop-filter: blur(16px);
   border: 1px solid var(--white-50);
   border-radius: 1.25rem;
-  box-shadow: 0 4px 24px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 4px 24px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
 .settings-account:hover {
   background: var(--white-40);
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px var(--black-12), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-12),
+    inset 0 1px 0 var(--white-80);
 }
 
 .settings-account-avatar {

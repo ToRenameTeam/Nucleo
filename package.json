@@ -21,7 +21,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.28.1",
   "lint-staged": {
-    "*.{ts,tsx}": [
+    "*.{js,ts,json,yaml,css,vue}": [
       "prettier --write"
     ],
     "*.kt": [

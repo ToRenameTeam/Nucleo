@@ -5,27 +5,21 @@
 
 export interface CardListProps {
   /** Gap between cards (default: 1rem) */
-  gap?: 'sm' | 'md' | 'lg'
+  gap?: 'sm' | 'md' | 'lg';
   /** Layout direction (default: column) */
-  direction?: 'column' | 'row'
+  direction?: 'column' | 'row';
   /** Additional CSS class */
-  class?: string
+  class?: string;
 }
 
 withDefaults(defineProps<CardListProps>(), {
   gap: 'md',
-  direction: 'column'
-})
+  direction: 'column',
+});
 </script>
 
 <template>
-  <div 
-    class="card-list"
-    :class="[
-      `card-list--gap-${gap}`,
-      `card-list--${direction}`
-    ]"
-  >
+  <div class="card-list" :class="[`card-list--gap-${gap}`, `card-list--${direction}`]">
     <slot />
   </div>
 </template>

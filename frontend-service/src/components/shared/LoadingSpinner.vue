@@ -1,36 +1,29 @@
 <script setup lang="ts">
-import type { LoadingSpinner } from '../../types/shared'
+import type { LoadingSpinner } from '../../types/shared';
 
 // Props definition
 const props = withDefaults(defineProps<LoadingSpinner>(), {
   size: 'medium',
-  inline: false
-})
+  inline: false,
+});
 
 const sizeClasses = {
   small: 'spinner-small',
   medium: 'spinner-medium',
-  large: 'spinner-large'
-}
+  large: 'spinner-large',
+};
 
 const textSizeClasses = {
   small: 'text-small',
   medium: 'text-medium',
-  large: 'text-large'
-}
+  large: 'text-large',
+};
 </script>
 
 <template>
-  <div 
-    class="loading-container" 
-    :class="{ 'loading-inline': inline }"
-  >
+  <div class="loading-container" :class="{ 'loading-inline': inline }">
     <div class="spinner" :class="sizeClasses[size]"></div>
-    <p 
-      v-if="message" 
-      class="loading-text"
-      :class="textSizeClasses[size]"
-    >
+    <p v-if="message" class="loading-text" :class="textSizeClasses[size]">
       {{ message }}
     </p>
   </div>

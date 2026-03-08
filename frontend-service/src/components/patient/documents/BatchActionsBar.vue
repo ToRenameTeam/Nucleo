@@ -1,31 +1,31 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ArrowDownTrayIcon, XMarkIcon, CheckIcon } from '@heroicons/vue/24/outline'
-import type { BatchActions } from '../../../types/document'
+import { computed } from 'vue';
+import { ArrowDownTrayIcon, XMarkIcon, CheckIcon } from '@heroicons/vue/24/outline';
+import type { BatchActions } from '../../../types/document';
 
-const props = defineProps<BatchActions>()
+const props = defineProps<BatchActions>();
 const emit = defineEmits<{
-  downloadAll: []
-  deselectAll: []
-  cancel: []
-}>()
+  downloadAll: [];
+  deselectAll: [];
+  cancel: [];
+}>();
 
 // Group documents by category
 const categoryCounts = computed(() => {
-  const counts: Record<string, number> = {}
-  props.selectedDocuments.forEach(doc => {
-    doc.tags.forEach(tag => {
-      counts[tag] = (counts[tag] || 0) + 1
-    })
-  })
+  const counts: Record<string, number> = {};
+  props.selectedDocuments.forEach((doc) => {
+    doc.tags.forEach((tag) => {
+      counts[tag] = (counts[tag] || 0) + 1;
+    });
+  });
   return Object.entries(counts)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 3) // Show top 3 categories
-})
+    .slice(0, 3); // Show top 3 categories
+});
 
 const allSelected = computed(() => {
-  return props.selectedDocuments.length === props.totalDocuments
-})
+  return props.selectedDocuments.length === props.totalDocuments;
+});
 </script>
 
 <template>
@@ -36,32 +36,44 @@ const allSelected = computed(() => {
           <div class="selection-header">
             <CheckIcon class="icon-check" aria-label="check" />
             <span class="selection-count">
-              {{ selectedDocuments.length }} 
-              {{ selectedDocuments.length === 1 ? $t('documents.batch.documentSelected') : $t('documents.batch.documentsSelected') }}
+              {{ selectedDocuments.length }}
+              {{
+                selectedDocuments.length === 1
+                  ? $t('documents.batch.documentSelected')
+                  : $t('documents.batch.documentsSelected')
+              }}
             </span>
             <span v-if="allSelected" class="all-badge">{{ $t('documents.batch.all') }}</span>
           </div>
-          
+
           <div v-if="categoryCounts.length > 0" class="category-breakdown">
-            <span
-              v-for="[category, count] in categoryCounts"
-              :key="category"
-              class="category-pill"
-            >
+            <span v-for="[category, count] in categoryCounts" :key="category" class="category-pill">
               {{ category }} ({{ count }})
             </span>
           </div>
         </div>
 
         <div class="action-buttons">
-          <button class="action-btn download-btn" @click="emit('downloadAll')" :aria-label="$t('documents.batch.downloadAll')">
+          <button
+            class="action-btn download-btn"
+            @click="emit('downloadAll')"
+            :aria-label="$t('documents.batch.downloadAll')"
+          >
             <ArrowDownTrayIcon class="icon-action" />
             <span class="btn-label">{{ $t('documents.batch.downloadAll') }}</span>
           </button>
-          <button class="action-btn deselect-btn" @click="emit('deselectAll')" :aria-label="$t('documents.batch.deselectAll')">
+          <button
+            class="action-btn deselect-btn"
+            @click="emit('deselectAll')"
+            :aria-label="$t('documents.batch.deselectAll')"
+          >
             <span class="btn-label">{{ $t('documents.batch.deselectAll') }}</span>
           </button>
-          <button class="action-btn cancel-btn" @click="emit('cancel')" :aria-label="$t('documents.selection.cancel')">
+          <button
+            class="action-btn cancel-btn"
+            @click="emit('cancel')"
+            :aria-label="$t('documents.selection.cancel')"
+          >
             <XMarkIcon class="icon-action" />
           </button>
         </div>
@@ -93,7 +105,10 @@ const allSelected = computed(() => {
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--white-60);
   border-radius: 1.25rem;
-  box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 var(--white-80), 0 0 0 1px var(--text-primary-10);
+  box-shadow:
+    0 8px 32px var(--shadow),
+    inset 0 1px 0 var(--white-80),
+    0 0 0 1px var(--text-primary-10);
 }
 
 .selection-info {

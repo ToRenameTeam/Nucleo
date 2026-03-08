@@ -5,5 +5,5 @@ services:
       dockerfile: frontend-service/Dockerfile
     container_name: nucleo-frontend
     ports:
-      - "3000:4173"
+      - '3000:4173'
     restart: unless-stopped

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { 
-  ChevronLeftIcon, 
-  ChevronRightIcon, 
-  PencilSquareIcon, 
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  PencilSquareIcon,
   XMarkIcon,
   CalendarDaysIcon,
-  CheckCircleIcon
-} from '@heroicons/vue/24/outline'
-import type { AvailabilityDisplay } from '../../../types/availability'
+  CheckCircleIcon,
+} from '@heroicons/vue/24/outline';
+import type { AvailabilityDisplay } from '../../../types/availability';
 import {
   formatHour,
   formatTime as formatTimeUtil,
@@ -18,69 +18,69 @@ import {
   generateHoursArray,
   getAvailabilitiesForSlot,
   hasAvailability,
-  getAvailabilityStyle
-} from './calendarUtils'
+  getAvailabilityStyle,
+} from './calendarUtils';
 
 interface Props {
-  availabilities: AvailabilityDisplay[]
-  currentWeekStart: Date
-  startHour?: number
-  endHour?: number
+  availabilities: AvailabilityDisplay[];
+  currentWeekStart: Date;
+  startHour?: number;
+  endHour?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   startHour: 8,
-  endHour: 18
-})
+  endHour: 18,
+});
 
 const emit = defineEmits<{
-  previousWeek: []
-  nextWeek: []
-  todayWeek: []
-  editAvailability: [availability: AvailabilityDisplay]
-  deleteAvailability: [availability: AvailabilityDisplay]
-  slotClick: [date: Date, hour: number]
-}>()
+  previousWeek: [];
+  nextWeek: [];
+  todayWeek: [];
+  editAvailability: [availability: AvailabilityDisplay];
+  deleteAvailability: [availability: AvailabilityDisplay];
+  slotClick: [date: Date, hour: number];
+}>();
 
-const { t, locale } = useI18n()
+const { t, locale } = useI18n();
 
 const weekDays = computed(() => {
-  return generateWeekDays(props.currentWeekStart, locale.value)
-})
+  return generateWeekDays(props.currentWeekStart, locale.value);
+});
 
 const hours = computed(() => {
-  return generateHoursArray(props.startHour, props.endHour)
-})
+  return generateHoursArray(props.startHour, props.endHour);
+});
 
 const weekRangeLabel = computed(() => {
-  return getWeekRangeLabel(props.currentWeekStart, locale.value)
-})
+  return getWeekRangeLabel(props.currentWeekStart, locale.value);
+});
 
 // Handle slot click for creating new availability
 function handleSlotClick(dayDate: Date, hour: number) {
-  const slotDate = new Date(dayDate)
-  slotDate.setHours(hour, 0, 0, 0)
-  emit('slotClick', slotDate, hour)
+  const slotDate = new Date(dayDate);
+  slotDate.setHours(hour, 0, 0, 0);
+  emit('slotClick', slotDate, hour);
 }
 
 function handleEdit(event: Event, availability: AvailabilityDisplay) {
-  event.stopPropagation()
-  emit('editAvailability', availability)
+  event.stopPropagation();
+  emit('editAvailability', availability);
 }
 
 function handleDelete(event: Event, availability: AvailabilityDisplay) {
-  event.stopPropagation()
-  emit('deleteAvailability', availability)
+  event.stopPropagation();
+  emit('deleteAvailability', availability);
 }
 
 function formatTime(date: Date): string {
-  return formatTimeUtil(date, locale.value)
+  return formatTimeUtil(date, locale.value);
 }
 
 // Check if availability is in the past
 function isPastAvailability(availability: AvailabilityDisplay): boolean {
-  const now = new Date()
-  return availability.endDateTime < now
+  const now = new Date();
+  return availability.endDateTime < now;
 }
 </script>
 
@@ -89,23 +89,20 @@ function isPastAvailability(availability: AvailabilityDisplay): boolean {
     <!-- Calendar Header -->
     <div class="calendar-header">
       <div class="week-navigation">
-        <button 
+        <button
           class="nav-btn"
           @click="emit('previousWeek')"
           :title="t('doctor.availabilities.calendar.previousWeek')"
         >
           <ChevronLeftIcon class="nav-icon" />
         </button>
-        
-        <button 
-          class="today-btn"
-          @click="emit('todayWeek')"
-        >
+
+        <button class="today-btn" @click="emit('todayWeek')">
           <CalendarDaysIcon class="today-icon" />
           {{ t('doctor.availabilities.calendar.today') }}
         </button>
-        
-        <button 
+
+        <button
           class="nav-btn"
           @click="emit('nextWeek')"
           :title="t('doctor.availabilities.calendar.nextWeek')"
@@ -113,7 +110,7 @@ function isPastAvailability(availability: AvailabilityDisplay): boolean {
           <ChevronRightIcon class="nav-icon" />
         </button>
       </div>
-      
+
       <h3 class="week-range">{{ weekRangeLabel }}</h3>
     </div>
 
@@ -122,45 +119,34 @@ function isPastAvailability(availability: AvailabilityDisplay): boolean {
       <!-- Time Column -->
       <div class="time-column">
         <div class="time-header"></div>
-        <div 
-          v-for="hour in hours" 
-          :key="hour" 
-          class="time-cell"
-        >
+        <div v-for="hour in hours" :key="hour" class="time-cell">
           <span class="time-label">{{ formatHour(hour) }}</span>
         </div>
       </div>
 
       <!-- Days Columns -->
-      <div 
-        v-for="day in weekDays" 
-        :key="day.date.toISOString()" 
-        class="day-column"
-      >
-        <div 
-          class="day-header"
-          :class="{ 'is-today': day.isToday }"
-        >
+      <div v-for="day in weekDays" :key="day.date.toISOString()" class="day-column">
+        <div class="day-header" :class="{ 'is-today': day.isToday }">
           {{ day.label }}
         </div>
-        
+
         <!-- Hour Slots -->
-        <div 
-          v-for="hour in hours" 
-          :key="hour" 
+        <div
+          v-for="hour in hours"
+          :key="hour"
           class="hour-slot"
           :class="{ 'has-availability': hasAvailability(props.availabilities, day.date, hour) }"
           @click="handleSlotClick(day.date, hour)"
         >
           <!-- Availability Blocks -->
-          <div 
+          <div
             v-for="availability in getAvailabilitiesForSlot(props.availabilities, day.date, hour)"
             :key="availability.id"
             class="availability-block"
-            :class="{ 
+            :class="{
               'is-booked': availability.isBooked,
               'is-available': !availability.isBooked,
-              'is-past': isPastAvailability(availability)
+              'is-past': isPastAvailability(availability),
             }"
             :style="getAvailabilityStyle(availability)"
             @click.stop
@@ -168,18 +154,19 @@ function isPastAvailability(availability: AvailabilityDisplay): boolean {
             <div class="availability-content">
               <div class="availability-info">
                 <span class="availability-time">
-                  {{ formatTime(availability.startDateTime) }} - {{ formatTime(availability.endDateTime) }}
+                  {{ formatTime(availability.startDateTime) }} -
+                  {{ formatTime(availability.endDateTime) }}
                 </span>
               </div>
-              
+
               <div class="availability-actions">
                 <!-- Status indicator for booked -->
                 <div v-if="availability.isBooked" class="booked-indicator">
                   <CheckCircleIcon class="booked-icon" />
                 </div>
-                
+
                 <!-- Edit button (only for non-booked and not past) -->
-                <button 
+                <button
                   v-if="!availability.isBooked && !isPastAvailability(availability)"
                   class="action-btn edit-btn"
                   @click="handleEdit($event, availability)"
@@ -187,9 +174,9 @@ function isPastAvailability(availability: AvailabilityDisplay): boolean {
                 >
                   <PencilSquareIcon class="action-icon" />
                 </button>
-                
+
                 <!-- Delete button (only for non-booked and not past) -->
-                <button 
+                <button
                   v-if="!availability.isBooked && !isPastAvailability(availability)"
                   class="action-btn delete-btn"
                   @click="handleDelete($event, availability)"
@@ -231,7 +218,9 @@ function isPastAvailability(availability: AvailabilityDisplay): boolean {
   border: 1px solid var(--white-60);
   border-radius: 1.5rem;
   padding: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   overflow: hidden;
 }
 
@@ -494,18 +483,20 @@ function isPastAvailability(availability: AvailabilityDisplay): boolean {
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3),
-              0 2px 4px rgba(0, 0, 0, 0.1),
-              inset 0 1px 1px rgba(255, 255, 255, 0.25),
-              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 4px 16px rgba(245, 158, 11, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .action-btn.edit-btn:hover {
   background: rgba(217, 119, 6, 0.85);
   border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 6px 24px rgba(245, 158, 11, 0.4),
-              0 3px 8px rgba(0, 0, 0, 0.15),
-              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 6px 24px rgba(245, 158, 11, 0.4),
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .action-btn.delete-btn {
@@ -513,18 +504,20 @@ function isPastAvailability(availability: AvailabilityDisplay): boolean {
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3),
-              0 2px 4px rgba(0, 0, 0, 0.1),
-              inset 0 1px 1px rgba(255, 255, 255, 0.25),
-              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 4px 16px rgba(239, 68, 68, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .action-btn.delete-btn:hover {
   background: rgba(220, 38, 38, 0.85);
   border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 6px 24px rgba(239, 68, 68, 0.4),
-              0 3px 8px rgba(0, 0, 0, 0.15),
-              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 6px 24px rgba(239, 68, 68, 0.4),
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .action-icon {

@@ -5,7 +5,7 @@ services:
       dockerfile: frontend-service/Dockerfile.dev
     container_name: nucleo-frontend-dev
     ports:
-      - "5173:5173"
+      - '5173:5173'
     volumes:
       - ..:/app
       - /app/frontend-service/node_modules

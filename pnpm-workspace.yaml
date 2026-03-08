@@ -4,19 +4,19 @@ packages:
   - frontend-service
 
 catalog:
-  "@fullcalendar/core": ^6.1.19
-  "@fullcalendar/daygrid": ^6.1.19
-  "@fullcalendar/interaction": ^6.1.19
-  "@fullcalendar/vue3": ^6.1.19
-  "@heroicons/vue": ^2.2.0
-  "@types/cors": ^2.8.17
-  "@types/express": ^5.0.6
-  "@types/express-session": ^1.18.2
-  "@types/jest": ^30.0.0
-  "@types/node": ^25.0.10
-  "@vitejs/plugin-vue": ^6.0.1
-  "@vue/tsconfig": ^0.8.1
-  "@vueuse/core": ^14.1.0
+  '@fullcalendar/core': ^6.1.19
+  '@fullcalendar/daygrid': ^6.1.19
+  '@fullcalendar/interaction': ^6.1.19
+  '@fullcalendar/vue3': ^6.1.19
+  '@heroicons/vue': ^2.2.0
+  '@types/cors': ^2.8.17
+  '@types/express': ^5.0.6
+  '@types/express-session': ^1.18.2
+  '@types/jest': ^30.0.0
+  '@types/node': ^25.0.10
+  '@vitejs/plugin-vue': ^6.0.1
+  '@vue/tsconfig': ^0.8.1
+  '@vueuse/core': ^14.1.0
   cors: ^2.8.5
   express: ^5.2.1
   express-session: ^1.19.0

@@ -1,41 +1,41 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import { UserIcon, BuildingOfficeIcon } from '@heroicons/vue/24/outline'
-import { useAuth } from '../composables/useAuth'
+import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import { UserIcon, BuildingOfficeIcon } from '@heroicons/vue/24/outline';
+import { useAuth } from '../composables/useAuth';
 
-const { t } = useI18n()
-const router = useRouter()
-const { setAuthenticatedUser, selectPatientProfile: setProfile, currentUser } = useAuth()
+const { t } = useI18n();
+const router = useRouter();
+const { setAuthenticatedUser, selectPatientProfile: setProfile, currentUser } = useAuth();
 
 const selectDoctor = () => {
   if (currentUser.value) {
     setAuthenticatedUser({
       ...currentUser.value,
-      activeProfile: 'DOCTOR'
-    })
+      activeProfile: 'DOCTOR',
+    });
 
-  setProfile({
-    userId: currentUser.value.userId,
-    name: currentUser.value.name,
-    lastName: currentUser.value.lastName,
-    fiscalCode: currentUser.value.fiscalCode,
-    dateOfBirth: currentUser.value.dateOfBirth
-  })
+    setProfile({
+      userId: currentUser.value.userId,
+      name: currentUser.value.name,
+      lastName: currentUser.value.lastName,
+      fiscalCode: currentUser.value.fiscalCode,
+      dateOfBirth: currentUser.value.dateOfBirth,
+    });
 
-    router.push('/doctor/appointments')
+    router.push('/doctor/appointments');
   }
-}
+};
 
 const selectPatient = () => {
   if (currentUser.value) {
     setAuthenticatedUser({
       ...currentUser.value,
-      activeProfile: 'PATIENT'
-    })
-    router.push('/patient-choice')
+      activeProfile: 'PATIENT',
+    });
+    router.push('/patient-choice');
   }
-}
+};
 </script>
 
 <template>
@@ -86,7 +86,12 @@ const selectPatient = () => {
   justify-content: center;
   gap: 2rem;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
   position: relative;
 }
 
@@ -97,7 +102,7 @@ const selectPatient = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, var(--accent-primary-15) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, var(--accent-secondary-15) 0%, transparent 50%);
   pointer-events: none;
@@ -164,12 +169,16 @@ const selectPatient = () => {
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
   text-align: left;
   width: 100%;
-  box-shadow: 0 4px 24px var(--shadow), 0 1px 2px var(--white-90);
+  box-shadow:
+    0 4px 24px var(--shadow),
+    0 1px 2px var(--white-90);
 }
 
 .option-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px var(--text-primary-15), 0 1px 2px var(--white-90);
+  box-shadow:
+    0 12px 40px var(--text-primary-15),
+    0 1px 2px var(--white-90);
   background: var(--bg-secondary-35);
 }
 
@@ -265,33 +274,33 @@ const selectPatient = () => {
   .doctor-patient-choice-page {
     padding: 1.5rem;
   }
-  
+
   .choice-title {
     font-size: 2.5rem;
   }
-  
+
   .choice-subtitle {
     font-size: 1rem;
   }
-  
+
   .option-card {
     padding: 1.5rem;
   }
-  
+
   .option-icon-bg {
     width: 3rem;
     height: 3rem;
   }
-  
+
   .option-icon {
     width: 1.5rem;
     height: 1.5rem;
   }
-  
+
   .option-title {
     font-size: 1.25rem;
   }
-  
+
   .option-description {
     font-size: 0.875rem;
   }
@@ -301,15 +310,15 @@ const selectPatient = () => {
   .doctor-patient-choice-page {
     padding: 1rem;
   }
-  
+
   .choice-title {
     font-size: 2rem;
   }
-  
+
   .options-container {
     gap: 1rem;
   }
-  
+
   .option-card {
     flex-direction: column;
     text-align: center;

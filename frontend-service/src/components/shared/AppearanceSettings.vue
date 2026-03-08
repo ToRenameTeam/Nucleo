@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-import { useTheme } from '../../composables/useTheme'
-import { SunIcon, MoonIcon, CheckCircleIcon } from '@heroicons/vue/24/solid'
+import { useI18n } from 'vue-i18n';
+import { useTheme } from '../../composables/useTheme';
+import { SunIcon, MoonIcon, CheckCircleIcon } from '@heroicons/vue/24/solid';
 
-const { t } = useI18n()
-const { themeMode, setThemeMode } = useTheme()
+const { t } = useI18n();
+const { themeMode, setThemeMode } = useTheme();
 </script>
 
 <template>
@@ -102,7 +102,9 @@ const { themeMode, setThemeMode } = useTheme()
 .theme-button.active {
   background: var(--accent-primary-20);
   border-color: var(--accent-primary);
-  box-shadow: 0 4px 12px var(--accent-primary-30), 0 2px 4px var(--black-10);
+  box-shadow:
+    0 4px 12px var(--accent-primary-30),
+    0 2px 4px var(--black-10);
 }
 
 .check-icon {
@@ -154,7 +156,9 @@ const { themeMode, setThemeMode } = useTheme()
 .radio-option.active {
   background: var(--accent-primary-20);
   border-color: var(--accent-primary);
-  box-shadow: 0 2px 8px var(--accent-primary-30), 0 1px 2px var(--black-10);
+  box-shadow:
+    0 2px 8px var(--accent-primary-30),
+    0 1px 2px var(--black-10);
 }
 
 .radio-label {
@@ -190,6 +194,8 @@ const { themeMode, setThemeMode } = useTheme()
 :root.dark .theme-button.active,
 :root.dark .radio-option.active {
   background: var(--accent-primary-20);
-  box-shadow: 0 4px 12px var(--white-20), 0 2px 4px var(--black-10);
+  box-shadow:
+    0 4px 12px var(--white-20),
+    0 2px 4px var(--black-10);
 }
 </style>

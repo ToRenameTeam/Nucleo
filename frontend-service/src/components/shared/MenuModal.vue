@@ -1,26 +1,26 @@
 <script setup lang="ts">
-import { type Component } from 'vue'
-import BaseModal from './BaseModal.vue'
+import { type Component } from 'vue';
+import BaseModal from './BaseModal.vue';
 
 export interface MenuOption {
-  id: string
-  title: string
-  subtitle: string
-  icon: Component
-  action: () => void
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: Component;
+  action: () => void;
 }
 
 defineProps<{
-  isOpen: boolean
-  title: string
-  subtitle: string
-  options: MenuOption[]
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl'
-}>()
+  isOpen: boolean;
+  title: string;
+  subtitle: string;
+  options: MenuOption[];
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
+}>();
 
 const emit = defineEmits<{
-  close: []
-}>()
+  close: [];
+}>();
 </script>
 
 <template>
@@ -33,12 +33,7 @@ const emit = defineEmits<{
     @close="emit('close')"
   >
     <div class="menu-options">
-      <button
-        v-for="option in options"
-        :key="option.id"
-        class="menu-option"
-        @click="option.action"
-      >
+      <button v-for="option in options" :key="option.id" class="menu-option" @click="option.action">
         <div class="option-icon">
           <component :is="option.icon" class="icon" />
         </div>
@@ -71,14 +66,18 @@ const emit = defineEmits<{
   transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
   text-align: left;
   width: 100%;
-  box-shadow: 0 2px 8px var(--shadow), inset 0 1px 0 var(--white-60);
+  box-shadow:
+    0 2px 8px var(--shadow),
+    inset 0 1px 0 var(--white-60);
   border: 1px solid transparent;
 }
 
 .menu-option:hover {
   background: var(--bg-secondary-35);
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px var(--text-primary-15), 0 1px 2px var(--white-90);
+  box-shadow:
+    0 12px 40px var(--text-primary-15),
+    0 1px 2px var(--white-90);
   border-color: var(--white-50);
 }
 
@@ -95,7 +94,9 @@ const emit = defineEmits<{
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px var(--accent-primary-30), inset 0 1px 0 var(--white-20);
+  box-shadow:
+    0 4px 12px var(--accent-primary-30),
+    inset 0 1px 0 var(--white-20);
 }
 
 .icon {

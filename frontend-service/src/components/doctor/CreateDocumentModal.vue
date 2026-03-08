@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { DocumentPlusIcon, CloudArrowUpIcon } from '@heroicons/vue/24/outline'
-import BaseModal from '../shared/BaseModal.vue'
-import type { CreateReportRequest } from '../../api/documents'
+import { ref, computed } from 'vue';
+import { DocumentPlusIcon, CloudArrowUpIcon } from '@heroicons/vue/24/outline';
+import BaseModal from '../shared/BaseModal.vue';
+import type { CreateReportRequest } from '../../api/documents';
 
 interface Props {
-  isOpen: boolean
-  patientId: string
-  appointmentId: string
+  isOpen: boolean;
+  patientId: string;
+  appointmentId: string;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 const emit = defineEmits<{
-  close: []
-  'document-created': [documentId: string]
-}>()
+  close: [];
+  'document-created': [documentId: string];
+}>();
 
 // Form state
-const documentType = ref<'report' | 'upload'>('report')
-const isLoading = ref(false)
-const errorMessage = ref('')
+const documentType = ref<'report' | 'upload'>('report');
+const isLoading = ref(false);
+const errorMessage = ref('');
 
 // Report form fields
 const reportForm = ref({
@@ -31,35 +31,37 @@ const reportForm = ref({
   findings: '',
   clinicalQuestion: '',
   conclusion: '',
-  recommendations: ''
-})
+  recommendations: '',
+});
 
 // Upload form fields
-const uploadFile = ref<File | null>(null)
+const uploadFile = ref<File | null>(null);
 
 // Tag input
-const tagInput = ref('')
+const tagInput = ref('');
 
 const isFormValid = computed(() => {
   if (documentType.value === 'report') {
-    return reportForm.value.summary.trim() !== '' &&
-           reportForm.value.findings.trim() !== '' &&
-           reportForm.value.executionDate !== ''
+    return (
+      reportForm.value.summary.trim() !== '' &&
+      reportForm.value.findings.trim() !== '' &&
+      reportForm.value.executionDate !== ''
+    );
   } else {
-    return uploadFile.value !== null
+    return uploadFile.value !== null;
   }
-})
+});
 
 function handleClose() {
   if (!isLoading.value) {
-    resetForm()
-    emit('close')
+    resetForm();
+    emit('close');
   }
 }
 
 function resetForm() {
-  documentType.value = 'report'
-  errorMessage.value = ''
+  documentType.value = 'report';
+  errorMessage.value = '';
   reportForm.value = {
     doctorId: 'doc-001',
     summary: '',
@@ -69,39 +71,39 @@ function resetForm() {
     findings: '',
     clinicalQuestion: '',
     conclusion: '',
-    recommendations: ''
-  }
-  uploadFile.value = null
-  tagInput.value = ''
+    recommendations: '',
+  };
+  uploadFile.value = null;
+  tagInput.value = '';
 }
 
 function addTag() {
-  const tag = tagInput.value.trim()
+  const tag = tagInput.value.trim();
   if (tag && !reportForm.value.tags.includes(tag)) {
-    reportForm.value.tags.push(tag)
-    tagInput.value = ''
+    reportForm.value.tags.push(tag);
+    tagInput.value = '';
   }
 }
 
 function removeTag(index: number) {
-  reportForm.value.tags.splice(index, 1)
+  reportForm.value.tags.splice(index, 1);
 }
 
 function handleFileChange(event: Event) {
-  const target = event.target as HTMLInputElement
+  const target = event.target as HTMLInputElement;
   if (target.files && target.files.length > 0) {
-    uploadFile.value = target.files[0] ?? null
+    uploadFile.value = target.files[0] ?? null;
   }
 }
 
 async function handleSubmit() {
-  if (!isFormValid.value) return
+  if (!isFormValid.value) return;
 
-  isLoading.value = true
-  errorMessage.value = ''
+  isLoading.value = true;
+  errorMessage.value = '';
 
   try {
-    const { documentsApiService } = await import('../../api/documents')
+    const { documentsApiService } = await import('../../api/documents');
 
     if (documentType.value === 'report') {
       // Create report document
@@ -110,38 +112,47 @@ async function handleSubmit() {
         doctorId: reportForm.value.doctorId,
         metadata: {
           summary: reportForm.value.summary,
-          tags: reportForm.value.tags
+          tags: reportForm.value.tags,
         },
         servicePrescriptionId: reportForm.value.servicePrescriptionId || 'default-prescription-id',
-        executionDate: reportForm.value.executionDate || (new Date().toISOString().split('T')[0] ?? ''),
+        executionDate:
+          reportForm.value.executionDate || (new Date().toISOString().split('T')[0] ?? ''),
         findings: reportForm.value.findings,
-        ...(reportForm.value.clinicalQuestion && { clinicalQuestion: reportForm.value.clinicalQuestion }),
+        ...(reportForm.value.clinicalQuestion && {
+          clinicalQuestion: reportForm.value.clinicalQuestion,
+        }),
         ...(reportForm.value.conclusion && { conclusion: reportForm.value.conclusion }),
-        ...(reportForm.value.recommendations && { recommendations: reportForm.value.recommendations })
-      }
+        ...(reportForm.value.recommendations && {
+          recommendations: reportForm.value.recommendations,
+        }),
+      };
 
-      const response = await documentsApiService.createDocument(props.patientId, request)
-      emit('document-created', response.id)
+      const response = await documentsApiService.createDocument(props.patientId, request);
+      emit('document-created', response.id);
     } else {
       // Upload document file
       if (!uploadFile.value) {
-        throw new Error('No file selected')
+        throw new Error('No file selected');
       }
-      
-      const uploadResponse = await documentsApiService.uploadDocument(props.patientId, uploadFile.value)
+
+      const uploadResponse = await documentsApiService.uploadDocument(
+        props.patientId,
+        uploadFile.value
+      );
       if (uploadResponse.success && uploadResponse.documentId) {
-        emit('document-created', uploadResponse.documentId)
+        emit('document-created', uploadResponse.documentId);
       } else {
-        throw new Error(uploadResponse.message || 'Upload failed')
+        throw new Error(uploadResponse.message || 'Upload failed');
       }
     }
 
-    resetForm()
+    resetForm();
   } catch (error: any) {
-    console.error('Error creating document:', error)
-    errorMessage.value = error.response?.data?.message || error.message || 'Failed to create document'
+    console.error('Error creating document:', error);
+    errorMessage.value =
+      error.response?.data?.message || error.message || 'Failed to create document';
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 </script>
@@ -202,11 +213,7 @@ async function handleSubmit() {
           <label class="form-label">Tag</label>
           <div class="tags-container">
             <div v-if="reportForm.tags.length > 0" class="tags-list">
-              <span
-                v-for="(tag, index) in reportForm.tags"
-                :key="index"
-                class="tag"
-              >
+              <span v-for="(tag, index) in reportForm.tags" :key="index" class="tag">
                 {{ tag }}
                 <button
                   type="button"
@@ -304,9 +311,7 @@ async function handleSubmit() {
               class="file-input"
               :disabled="isLoading"
             />
-            <div v-if="uploadFile" class="file-name">
-              📄 {{ uploadFile.name }}
-            </div>
+            <div v-if="uploadFile" class="file-name">📄 {{ uploadFile.name }}</div>
           </div>
         </div>
       </form>
@@ -320,12 +325,7 @@ async function handleSubmit() {
     <!-- Footer -->
     <template #footer>
       <div class="modal-actions">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          @click="handleClose"
-          :disabled="isLoading"
-        >
+        <button type="button" class="btn btn-secondary" @click="handleClose" :disabled="isLoading">
           Annulla
         </button>
         <button
@@ -378,7 +378,9 @@ async function handleSubmit() {
   backdrop-filter: blur(12px);
   border: 1px solid var(--white-50);
   border-radius: 0.75rem;
-  box-shadow: 0 2px 8px var(--black-6), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 2px 8px var(--black-6),
+    inset 0 1px 0 var(--white-80);
   transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
 }
 
@@ -386,7 +388,9 @@ async function handleSubmit() {
 .form-textarea:focus {
   outline: none;
   border-color: var(--sky-0ea5e9);
-  box-shadow: 0 0 0 3px var(--sky-0ea5e9-20), 0 2px 8px var(--black-8);
+  box-shadow:
+    0 0 0 3px var(--sky-0ea5e9-20),
+    0 2px 8px var(--black-8);
   background: var(--white-80);
 }
 
@@ -421,7 +425,9 @@ async function handleSubmit() {
   color: var(--gray-525252);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
-  box-shadow: 0 2px 8px var(--black-6), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 2px 8px var(--black-6),
+    inset 0 1px 0 var(--white-80);
 }
 
 .type-btn:hover:not(:disabled) {
@@ -429,14 +435,18 @@ async function handleSubmit() {
   border-color: var(--sky-0ea5e9);
   color: var(--sky-0ea5e9);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--black-8), inset 0 1px 0 var(--white-90);
+  box-shadow:
+    0 4px 12px var(--black-8),
+    inset 0 1px 0 var(--white-90);
 }
 
 .type-btn.active {
   background: var(--sky-0ea5e9-15);
   border-color: var(--sky-0ea5e9);
   color: var(--sky-0ea5e9);
-  box-shadow: 0 4px 16px var(--sky-0ea5e9-20), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 4px 16px var(--sky-0ea5e9-20),
+    inset 0 1px 0 var(--white-80);
 }
 
 .type-btn:disabled {
@@ -472,7 +482,9 @@ async function handleSubmit() {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--sky-0ea5e9);
-  box-shadow: 0 2px 4px var(--black-5), inset 0 1px 0 var(--white-40);
+  box-shadow:
+    0 2px 4px var(--black-5),
+    inset 0 1px 0 var(--white-40);
 }
 
 .tag-remove {
@@ -510,7 +522,9 @@ async function handleSubmit() {
   border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 8px var(--black-6), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 2px 8px var(--black-6),
+    inset 0 1px 0 var(--white-80);
 }
 
 .file-input:hover:not(:disabled) {
@@ -525,7 +539,9 @@ async function handleSubmit() {
   border-radius: 0.75rem;
   font-size: 0.875rem;
   color: var(--sky-0ea5e9);
-  box-shadow: 0 2px 4px var(--black-5), inset 0 1px 0 var(--white-40);
+  box-shadow:
+    0 2px 4px var(--black-5),
+    inset 0 1px 0 var(--white-40);
 }
 
 .error-message {
@@ -559,7 +575,9 @@ async function handleSubmit() {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
   min-width: 100px;
-  box-shadow: 0 2px 8px var(--black-6), inset 0 1px 0 var(--white-50);
+  box-shadow:
+    0 2px 8px var(--black-6),
+    inset 0 1px 0 var(--white-50);
 }
 
 .btn-secondary {
@@ -574,7 +592,9 @@ async function handleSubmit() {
   border-color: var(--white-80);
   color: var(--gray-171717);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--black-8), inset 0 1px 0 var(--white-70);
+  box-shadow:
+    0 4px 12px var(--black-8),
+    inset 0 1px 0 var(--white-70);
 }
 
 .btn-primary {
@@ -582,13 +602,17 @@ async function handleSubmit() {
   backdrop-filter: blur(12px);
   border-color: var(--white-30);
   color: #ffffff;
-  box-shadow: 0 4px 16px var(--sky-0ea5e9-30), inset 0 1px 0 var(--white-25);
+  box-shadow:
+    0 4px 16px var(--sky-0ea5e9-30),
+    inset 0 1px 0 var(--white-25);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--sky-0284c7-85);
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px var(--sky-0ea5e9-40), inset 0 1px 0 var(--white-30);
+  box-shadow:
+    0 6px 24px var(--sky-0ea5e9-40),
+    inset 0 1px 0 var(--white-30);
 }
 
 .btn:disabled {

@@ -499,51 +499,51 @@
         "servicePrescriptions": "Visit Prescriptions"
       },
       "prescriptions": {
-      "addPrescription": "Add Prescription",
-      "noPatientResults": "No patients found",
-      "menu": {
-        "title": "New Prescription",
-        "subtitle": "Select the type of prescription you want to create",
+        "addPrescription": "Add Prescription",
+        "noPatientResults": "No patients found",
+        "menu": {
+          "title": "New Prescription",
+          "subtitle": "Select the type of prescription you want to create",
+          "medicine": {
+            "title": "Medicine Prescription",
+            "subtitle": "Create a prescription for medications"
+          },
+          "service": {
+            "title": "Visit Prescription",
+            "subtitle": "Request visits or diagnostic exams"
+          }
+        },
         "medicine": {
-          "title": "Medicine Prescription",
-          "subtitle": "Create a prescription for medications"
+          "title": "New Medicine Prescription",
+          "subtitle": "Fill in the details for the medicine prescription",
+          "patientName": "Patient Name and/or Surname",
+          "patientNamePlaceholder": "Enter patient's name and/or surname",
+          "medicineName": "Medicine Name",
+          "medicineNamePlaceholder": "e.g., Amoxicillin",
+          "dosage": "Dosage",
+          "dosagePlaceholder": "e.g., 500mg",
+          "frequency": "Frequency",
+          "frequencyPlaceholder": "e.g., 3 times a day",
+          "duration": "Duration",
+          "durationPlaceholder": "e.g., 7 days",
+          "notes": "Notes",
+          "notesPlaceholder": "Additional instructions or notes..."
         },
         "service": {
-          "title": "Visit Prescription",
-          "subtitle": "Request visits or diagnostic exams"
-        }
-      },
-      "medicine": {
-        "title": "New Medicine Prescription",
-        "subtitle": "Fill in the details for the medicine prescription",
-        "patientName": "Patient Name and/or Surname",
-        "patientNamePlaceholder": "Enter patient's name and/or surname",
-        "medicineName": "Medicine Name",
-        "medicineNamePlaceholder": "e.g., Amoxicillin",
-        "dosage": "Dosage",
-        "dosagePlaceholder": "e.g., 500mg",
-        "frequency": "Frequency",
-        "frequencyPlaceholder": "e.g., 3 times a day",
-        "duration": "Duration",
-        "durationPlaceholder": "e.g., 7 days",
-        "notes": "Notes",
-        "notesPlaceholder": "Additional instructions or notes..."
-      },
-      "service": {
-        "title": "New Visit Prescription",
-        "subtitle": "Fill in the details for the visit prescription",
-        "patientName": "Patient Name and/or Surname",
-        "patientNamePlaceholder": "Enter patient's name and/or surname",
-        "serviceType": "Visit/Exam Type",
-        "serviceTypePlaceholder": "e.g., Cardiology visit, X-ray",
-        "description": "Description",
-        "descriptionPlaceholder": "Describe the visit or exam needed...",
-        "urgency": "Urgency",
-        "urgencyLow": "Low",
-        "urgencyMedium": "Medium",
-        "urgencyHigh": "High",
-        "notes": "Notes",
-        "notesPlaceholder": "Additional instructions or notes..."
+          "title": "New Visit Prescription",
+          "subtitle": "Fill in the details for the visit prescription",
+          "patientName": "Patient Name and/or Surname",
+          "patientNamePlaceholder": "Enter patient's name and/or surname",
+          "serviceType": "Visit/Exam Type",
+          "serviceTypePlaceholder": "e.g., Cardiology visit, X-ray",
+          "description": "Description",
+          "descriptionPlaceholder": "Describe the visit or exam needed...",
+          "urgency": "Urgency",
+          "urgencyLow": "Low",
+          "urgencyMedium": "Medium",
+          "urgencyHigh": "High",
+          "notes": "Notes",
+          "notesPlaceholder": "Additional instructions or notes..."
         },
         "toast": {
           "medicineSaved": "Medicine prescription created successfully",
@@ -552,7 +552,7 @@
         "errors": {
           "saveFailed": "Error saving prescription. Please try again."
         }
-      }, 
+      },
       "medicineDetails": {
         "units": {
           "day": "day",
@@ -571,79 +571,77 @@
         }
       }
     },
-    "settings": {
-
+    "settings": {}
+  },
+  "common": {
+    "loading": "Loading...",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "back": "Back",
+    "close": "Close",
+    "next": "Next"
+  },
+  "prescriptionTags": {
+    "prescription": "prescription",
+    "medicines": "medicines",
+    "services": "services"
+  },
+  "patient": {
+    "booking": {
+      "title": "Book Visit",
+      "subtitle": "Select date and time for your visit",
+      "modal": {
+        "title": "Book Visit",
+        "subtitle": "Follow the steps to book your visit",
+        "step1": "Visit Type",
+        "step2": "Doctor",
+        "step3": "Time",
+        "selectServiceType": "Select visit type",
+        "selectDoctor": "Select doctor",
+        "selectSlot": "Select date and time",
+        "selectedService": "Selected visit type",
+        "selectedDoctor": "Selected doctor",
+        "noDoctorsAvailable": "No doctors available for this visit type",
+        "noSlotsAvailable": "No availability found for this doctor",
+        "confirmBooking": "Confirm Booking"
+      }
+    },
+    "reschedule": {
+      "title": "Reschedule Appointment",
+      "subtitle": "Select a new date and time for your appointment"
     }
   },
-    "common": {
-      "loading": "Loading...",
-      "retry": "Retry",
-      "cancel": "Cancel",
-      "save": "Save",
-      "saving": "Saving...",
-      "back": "Back",
-      "close": "Close",
-      "next": "Next"
-    },
-    "prescriptionTags": {
-      "prescription": "prescription",
-      "medicines": "medicines",
-      "services": "services"
-    },
-    "patient": {
-      "booking": {
-        "title": "Book Visit",
-        "subtitle": "Select date and time for your visit",
-        "modal": {
-          "title": "Book Visit",
-          "subtitle": "Follow the steps to book your visit",
-          "step1": "Visit Type",
-          "step2": "Doctor",
-          "step3": "Time",
-          "selectServiceType": "Select visit type",
-          "selectDoctor": "Select doctor",
-          "selectSlot": "Select date and time",
-          "selectedService": "Selected visit type",
-          "selectedDoctor": "Selected doctor",
-          "noDoctorsAvailable": "No doctors available for this visit type",
-          "noSlotsAvailable": "No availability found for this doctor",
-          "confirmBooking": "Confirm Booking"
-        }
-      },
-      "reschedule": {
-        "title": "Reschedule Appointment",
-        "subtitle": "Select a new date and time for your appointment"
-      }
-    },
-    "prescriptionTags": {
-      "prescription": "prescription",
-      "medicines": "medicines",
-      "services": "services"
-    },
-    "prescriptionSummary": {
-      "medicine": "Prescription: {medicine}",
-      "service": "Prescription: {service}"
-    },
-    "facilities": {
-      "default": "Default facility"
-    },
-    "upload": {
-      "confirmTitle": "Confirm Upload",
-      "confirmSubtitle": "Review file details before uploading",
-      "confirmMessage": "The document will be uploaded to your personal archive and will be visible in the Documents section.",
-      "cancel": "Cancel",
-      "confirmUpload": "Upload Document",
-      "uploading": "Uploading...",
-      "success": "Document uploaded successfully",
-      "error": "Error uploading document",
-      "invalidFileType": "Invalid file type. Only PDF files are accepted.",
-      "fileTooLarge": "File is too large. Maximum size: 10 MB",
-      "nonMedicalDocument": "The document was not accepted. Only medical documents (reports, prescriptions, clinical notes) are allowed.",
-      "progress": {
-        "title": "Uploading",
-        "successTitle": "Upload Complete",
-        "loadingMessage": "Your document is being uploaded and analyzed. This may take a moment.",
-        "successMessage": "The document has been successfully uploaded and analyzed, and is now available."
-      }
+  "prescriptionTags": {
+    "prescription": "prescription",
+    "medicines": "medicines",
+    "services": "services"
+  },
+  "prescriptionSummary": {
+    "medicine": "Prescription: {medicine}",
+    "service": "Prescription: {service}"
+  },
+  "facilities": {
+    "default": "Default facility"
+  },
+  "upload": {
+    "confirmTitle": "Confirm Upload",
+    "confirmSubtitle": "Review file details before uploading",
+    "confirmMessage": "The document will be uploaded to your personal archive and will be visible in the Documents section.",
+    "cancel": "Cancel",
+    "confirmUpload": "Upload Document",
+    "uploading": "Uploading...",
+    "success": "Document uploaded successfully",
+    "error": "Error uploading document",
+    "invalidFileType": "Invalid file type. Only PDF files are accepted.",
+    "fileTooLarge": "File is too large. Maximum size: 10 MB",
+    "nonMedicalDocument": "The document was not accepted. Only medical documents (reports, prescriptions, clinical notes) are allowed.",
+    "progress": {
+      "title": "Uploading",
+      "successTitle": "Upload Complete",
+      "loadingMessage": "Your document is being uploaded and analyzed. This may take a moment.",
+      "successMessage": "The document has been successfully uploaded and analyzed, and is now available."
     }
   }
+}

@@ -1,426 +1,451 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useAuth } from '../../composables/useAuth'
-import { CalendarIcon, ListBulletIcon, UserIcon, ClockIcon, MapPinIcon, PencilIcon, CheckCircleIcon, XCircleIcon, DocumentPlusIcon } from '@heroicons/vue/24/outline'
-import TagBar from '../../components/shared/TagBar.vue'
-import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue'
-import BaseCard from '../../components/shared/BaseCard.vue'
-import CardList from '../../components/shared/CardList.vue'
-import ScheduleModal from '../../components/shared/ScheduleModal.vue'
-import UploadDocumentModal from '../../components/patient/documents/UploadDocumentModal.vue'
-import UploadProgressModal from '../../components/patient/documents/UploadProgressModal.vue'
-import Toast from '../../components/shared/Toast.vue'
-import type { Tag } from '../../types/tag'
-import type { Appointment } from '../../types/appointment'
-import type { CardMetadata } from '../../types/shared'
-import { appointmentsApi } from '../../api/appointments'
-import { documentsApiService } from '../../api/documents'
-import { TAG_COLOR_MAP } from '../../constants/categoryBadgeConfig'
-import type { BadgeColors } from '../../types/document'
+import { ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useAuth } from '../../composables/useAuth';
+import {
+  CalendarIcon,
+  ListBulletIcon,
+  UserIcon,
+  ClockIcon,
+  MapPinIcon,
+  PencilIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  DocumentPlusIcon,
+} from '@heroicons/vue/24/outline';
+import TagBar from '../../components/shared/TagBar.vue';
+import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue';
+import BaseCard from '../../components/shared/BaseCard.vue';
+import CardList from '../../components/shared/CardList.vue';
+import ScheduleModal from '../../components/shared/ScheduleModal.vue';
+import UploadDocumentModal from '../../components/patient/documents/UploadDocumentModal.vue';
+import UploadProgressModal from '../../components/patient/documents/UploadProgressModal.vue';
+import Toast from '../../components/shared/Toast.vue';
+import type { Tag } from '../../types/tag';
+import type { Appointment } from '../../types/appointment';
+import type { CardMetadata } from '../../types/shared';
+import { appointmentsApi } from '../../api/appointments';
+import { documentsApiService } from '../../api/documents';
+import { TAG_COLOR_MAP } from '../../constants/categoryBadgeConfig';
+import type { BadgeColors } from '../../types/document';
 
-const { t } = useI18n()
-const { currentUser } = useAuth()
+const { t } = useI18n();
+const { currentUser } = useAuth();
 
-const viewMode = ref<'list' | 'calendar'>('list')
+const viewMode = ref<'list' | 'calendar'>('list');
 
 // State
-const appointments = ref<Appointment[]>([])
-const isLoading = ref(false)
-const error = ref<string | null>(null)
-const selectedAppointmentId = ref<string | null>(null)
-const selectedTag = ref('scheduled')
-const isRescheduleModalOpen = ref(false)
-const appointmentToReschedule = ref<Appointment | null>(null)
+const appointments = ref<Appointment[]>([]);
+const isLoading = ref(false);
+const error = ref<string | null>(null);
+const selectedAppointmentId = ref<string | null>(null);
+const selectedTag = ref('scheduled');
+const isRescheduleModalOpen = ref(false);
+const appointmentToReschedule = ref<Appointment | null>(null);
 
 // Document upload state
-const appointmentForDocument = ref<Appointment | null>(null)
-const isUploadModalOpen = ref(false)
-const isUploadProgressModalOpen = ref(false)
-const selectedFile = ref<File | null>(null)
-const fileInputRef = ref<HTMLInputElement | null>(null)
-const isUploading = ref(false)
-const uploadError = ref<string | null>(null)
-const uploadingFilename = ref<string>('')
+const appointmentForDocument = ref<Appointment | null>(null);
+const isUploadModalOpen = ref(false);
+const isUploadProgressModalOpen = ref(false);
+const selectedFile = ref<File | null>(null);
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const isUploading = ref(false);
+const uploadError = ref<string | null>(null);
+const uploadingFilename = ref<string>('');
 
 // Toast state
-const showToast = ref(false)
-const toastMessage = ref('')
-const toastType = ref<'success' | 'error' | 'info'>('success')
+const showToast = ref(false);
+const toastMessage = ref('');
+const toastType = ref<'success' | 'error' | 'info'>('success');
 
 // Computed tags based on appointments
 const tags = computed<Tag[]>(() => [
   { id: 'all', label: t('calendar.categories.all'), count: appointments.value.length },
-  { id: 'scheduled', label: t('doctor.appointments.categories.scheduled'), count: appointments.value.filter(a => a.status === 'SCHEDULED').length },
-  { id: 'completed', label: t('doctor.appointments.categories.completed'), count: appointments.value.filter(a => a.status === 'COMPLETED').length },
-  { id: 'no-show', label: t('doctor.appointments.categories.noShow'), count: appointments.value.filter(a => a.status === 'NO_SHOW').length },
-  { id: 'cancelled', label: t('doctor.appointments.categories.cancelled'), count: appointments.value.filter(a => a.status === 'CANCELLED').length }
-])
+  {
+    id: 'scheduled',
+    label: t('doctor.appointments.categories.scheduled'),
+    count: appointments.value.filter((a) => a.status === 'SCHEDULED').length,
+  },
+  {
+    id: 'completed',
+    label: t('doctor.appointments.categories.completed'),
+    count: appointments.value.filter((a) => a.status === 'COMPLETED').length,
+  },
+  {
+    id: 'no-show',
+    label: t('doctor.appointments.categories.noShow'),
+    count: appointments.value.filter((a) => a.status === 'NO_SHOW').length,
+  },
+  {
+    id: 'cancelled',
+    label: t('doctor.appointments.categories.cancelled'),
+    count: appointments.value.filter((a) => a.status === 'CANCELLED').length,
+  },
+]);
 
 // Get status label
 function getStatusLabel(status: string): string {
-  return t(`doctor.appointments.status.${status}`)
+  return t(`doctor.appointments.status.${status}`);
 }
 
 // Get status icon
 function getStatusIcon(status: string): string {
   const iconMap: Record<string, string> = {
-    'SCHEDULED': '📅',
-    'COMPLETED': '✅',
-    'NO_SHOW': '❌',
-    'CANCELLED': '🚫'
-  }
-  return iconMap[status] || '📋'
+    SCHEDULED: '📅',
+    COMPLETED: '✅',
+    NO_SHOW: '❌',
+    CANCELLED: '🚫',
+  };
+  return iconMap[status] || '📋';
 }
 
 // Filtered and sorted appointments
 const filteredAppointments = computed(() => {
-  let filtered = appointments.value
-  
+  let filtered = appointments.value;
+
   if (selectedTag.value !== 'all') {
     const statusMap: Record<string, string> = {
-      'scheduled': 'SCHEDULED',
-      'completed': 'COMPLETED',
+      scheduled: 'SCHEDULED',
+      completed: 'COMPLETED',
       'no-show': 'NO_SHOW',
-      'cancelled': 'CANCELLED'
-    }
-    
-    const tagToFilter = statusMap[selectedTag.value] || selectedTag.value.toUpperCase()
-    
-    filtered = filtered.filter(apt => 
-      apt.status === tagToFilter
-    )
+      cancelled: 'CANCELLED',
+    };
+
+    const tagToFilter = statusMap[selectedTag.value] || selectedTag.value.toUpperCase();
+
+    filtered = filtered.filter((apt) => apt.status === tagToFilter);
   }
-  
+
   // Sort by proximity (nearest appointments first - ascending order)
   return filtered.sort((a, b) => {
-    const dateA = parseDateForSorting(a.date, a.time)
-    const dateB = parseDateForSorting(b.date, b.time)
-    return dateA.getTime() - dateB.getTime()
-  })
-})
+    const dateA = parseDateForSorting(a.date, a.time);
+    const dateB = parseDateForSorting(b.date, b.time);
+    return dateA.getTime() - dateB.getTime();
+  });
+});
 
 // Current appointment info for reschedule modal
 const currentAppointmentInfo = computed(() => {
-  if (!appointmentToReschedule.value) return null
+  if (!appointmentToReschedule.value) return null;
   return {
     user: appointmentToReschedule.value.user,
     date: appointmentToReschedule.value.date,
     time: appointmentToReschedule.value.time,
-    location: appointmentToReschedule.value.location
-  }
-})
+    location: appointmentToReschedule.value.location,
+  };
+});
 
 // Parse date and time for sorting
 function parseDateForSorting(dateStr: string, timeStr?: string): Date {
-  const parts = dateStr.split('/').map(Number)
-  const day = parts[0] || 1
-  const month = parts[1] || 1
-  const year = parts[2] || new Date().getFullYear()
-  const date = new Date(year, month - 1, day)
-  
+  const parts = dateStr.split('/').map(Number);
+  const day = parts[0] || 1;
+  const month = parts[1] || 1;
+  const year = parts[2] || new Date().getFullYear();
+  const date = new Date(year, month - 1, day);
+
   if (timeStr) {
-    const timeParts = timeStr.split(':').map(Number)
-    const hours = timeParts[0] || 0
-    const minutes = timeParts[1] || 0
-    date.setHours(hours, minutes)
+    const timeParts = timeStr.split(':').map(Number);
+    const hours = timeParts[0] || 0;
+    const minutes = timeParts[1] || 0;
+    date.setHours(hours, minutes);
   }
-  
-  return date
+
+  return date;
 }
 
 // Check if appointment is current or past (date/time <= now)
 function isAppointmentCurrentOrFuture(appointment: Appointment): boolean {
-  if (!appointment.date) return false
-  
-  const timeStr = appointment.time?.split(' - ')[0] || '00:00'
-  const appointmentDateTime = parseDateForSorting(appointment.date, timeStr)
-  const now = new Date()
-  
-  return appointmentDateTime <= now
+  if (!appointment.date) return false;
+
+  const timeStr = appointment.time?.split(' - ')[0] || '00:00';
+  const appointmentDateTime = parseDateForSorting(appointment.date, timeStr);
+  const now = new Date();
+
+  return appointmentDateTime <= now;
 }
 
 async function handleUpdateAppointmentStatus(appointmentId: string, newStatus: string) {
   try {
-    isLoading.value = true
-    
-    await appointmentsApi.updateAppointment(appointmentId, newStatus)
-    
-    showToastMessage(t('doctor.appointments.actions.statusUpdateSuccess'), 'success')
-    
-    await loadAppointments()
+    isLoading.value = true;
+
+    await appointmentsApi.updateAppointment(appointmentId, newStatus);
+
+    showToastMessage(t('doctor.appointments.actions.statusUpdateSuccess'), 'success');
+
+    await loadAppointments();
   } catch (err) {
-    console.error('[DoctorAppointmentsPage] Error updating appointment status:', err)
-    showToastMessage(t('doctor.appointments.actions.statusUpdateError'), 'error')
+    console.error('[DoctorAppointmentsPage] Error updating appointment status:', err);
+    showToastMessage(t('doctor.appointments.actions.statusUpdateError'), 'error');
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 function handleMarkAsCompleted(appointmentId: string) {
-  handleUpdateAppointmentStatus(appointmentId, 'COMPLETED')
+  handleUpdateAppointmentStatus(appointmentId, 'COMPLETED');
 }
 
 function handleMarkAsNoShow(appointmentId: string) {
-  handleUpdateAppointmentStatus(appointmentId, 'NO_SHOW')
+  handleUpdateAppointmentStatus(appointmentId, 'NO_SHOW');
 }
 
 function getBadgeColors(tag: string): BadgeColors {
-  const normalizedTag = tag.toLowerCase()
+  const normalizedTag = tag
+    .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u0300-\u036f]/g, '');
 
-  const colorKey = TAG_COLOR_MAP[normalizedTag]
+  const colorKey = TAG_COLOR_MAP[normalizedTag];
 
   if (colorKey) {
     return {
       color: `var(--badge-${colorKey})`,
       bgColor: `var(--badge-${colorKey}-bg)`,
-      borderColor: `var(--badge-${colorKey}-border)`
-    }
+      borderColor: `var(--badge-${colorKey}-border)`,
+    };
   }
 
   return {
     color: 'var(--text-primary)',
     bgColor: 'var(--bg-secondary-30)',
-    borderColor: 'var(--border-color)'
-  }
+    borderColor: 'var(--border-color)',
+  };
 }
 
 function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
-  const meta: CardMetadata[] = [
-    { icon: CalendarIcon, label: appointment.date }
-  ]
-  
+  const meta: CardMetadata[] = [{ icon: CalendarIcon, label: appointment.date }];
+
   if (appointment.time) {
-    meta.push({ icon: ClockIcon, label: appointment.time })
+    meta.push({ icon: ClockIcon, label: appointment.time });
   }
-  
+
   // In doctor's view, show patient name instead of doctor name
   if (appointment.patientName) {
-    meta.push({ icon: UserIcon, label: appointment.patientName })
+    meta.push({ icon: UserIcon, label: appointment.patientName });
   }
-  
+
   if (appointment.location) {
-    meta.push({ icon: MapPinIcon, label: appointment.location })
+    meta.push({ icon: MapPinIcon, label: appointment.location });
   }
-  
-  return meta
+
+  return meta;
 }
 
 async function loadAppointments() {
   if (!currentUser.value?.userId) {
-    console.log('[DoctorAppointmentsPage] No current user ID available')
-    return
+    console.log('[DoctorAppointmentsPage] No current user ID available');
+    return;
   }
 
-  isLoading.value = true
-  error.value = null
-  
+  isLoading.value = true;
+  error.value = null;
+
   try {
-    const fetchedAppointments = await appointmentsApi.getAppointmentsByDoctor(currentUser.value.userId)
-    appointments.value = fetchedAppointments
+    const fetchedAppointments = await appointmentsApi.getAppointmentsByDoctor(
+      currentUser.value.userId
+    );
+    appointments.value = fetchedAppointments;
   } catch (err) {
-    console.error('[DoctorAppointmentsPage] Error loading appointments:', err)
-    error.value = t('doctor.appointments.errorLoading')
-    appointments.value = []
+    console.error('[DoctorAppointmentsPage] Error loading appointments:', err);
+    error.value = t('doctor.appointments.errorLoading');
+    appointments.value = [];
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 // Event handlers
 function handleTagSelected(tagId: string) {
-  selectedTag.value = tagId
+  selectedTag.value = tagId;
 }
 
 function handleAppointmentClick(id: string) {
-  selectedAppointmentId.value = id
-  
+  selectedAppointmentId.value = id;
+
   // Scroll to appointment if in list view on desktop
   if (viewMode.value === 'list' && window.innerWidth >= 768) {
-    const element = document.getElementById(`appointment-${id}`)
+    const element = document.getElementById(`appointment-${id}`);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
 }
 
 function handleCalendarEventClick(appointmentId: string) {
-  selectedAppointmentId.value = appointmentId
-  
+  selectedAppointmentId.value = appointmentId;
+
   // Scroll to appointment in the list if both are visible
   if (window.innerWidth >= 1024) {
-    const element = document.getElementById(`appointment-${appointmentId}`)
+    const element = document.getElementById(`appointment-${appointmentId}`);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
 }
 
 async function handleEditAppointment(id: string) {
   try {
-    isLoading.value = true
-    
-    const appointment = await appointmentsApi.getAppointmentById(id)
-    
+    isLoading.value = true;
+
+    const appointment = await appointmentsApi.getAppointmentById(id);
+
     if (appointment) {
-      appointmentToReschedule.value = appointment
-      isRescheduleModalOpen.value = true
+      appointmentToReschedule.value = appointment;
+      isRescheduleModalOpen.value = true;
     } else {
-      console.error('[DoctorAppointmentsPage] Appuntamento non trovato:', id)
-      showToastMessage(t('doctor.appointments.errors.notFound'), 'error')
+      console.error('[DoctorAppointmentsPage] Appuntamento non trovato:', id);
+      showToastMessage(t('doctor.appointments.errors.notFound'), 'error');
     }
   } catch (err) {
-    console.error('[DoctorAppointmentsPage] Errore nel recupero dei dettagli:', err)
-    showToastMessage(t('doctor.appointments.errors.loadFailed'), 'error')
+    console.error('[DoctorAppointmentsPage] Errore nel recupero dei dettagli:', err);
+    showToastMessage(t('doctor.appointments.errors.loadFailed'), 'error');
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 async function handleSelectAvailability(availabilityId: string) {
-  if (!appointmentToReschedule.value) return
-  
+  if (!appointmentToReschedule.value) return;
+
   try {
-    isLoading.value = true
-    
+    isLoading.value = true;
+
     await appointmentsApi.updateAppointment(
       appointmentToReschedule.value.id,
       undefined,
       availabilityId
-    )
-    
-    isRescheduleModalOpen.value = false
-    appointmentToReschedule.value = null
-    
-    showToastMessage(t('doctor.appointments.reschedule.success'), 'success')
-    
-    await loadAppointments()
+    );
+
+    isRescheduleModalOpen.value = false;
+    appointmentToReschedule.value = null;
+
+    showToastMessage(t('doctor.appointments.reschedule.success'), 'success');
+
+    await loadAppointments();
   } catch (err) {
-    console.error('Errore durante la ripianificazione:', err)
-    showToastMessage(t('doctor.appointments.reschedule.error'), 'error')
+    console.error('Errore durante la ripianificazione:', err);
+    showToastMessage(t('doctor.appointments.reschedule.error'), 'error');
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 // Document management
 function handleAddDocument(appointment: Appointment) {
   if (!appointment.patientId) {
-    showToastMessage(t('doctor.appointments.errors.noPatientId'), 'error')
-    return
+    showToastMessage(t('doctor.appointments.errors.noPatientId'), 'error');
+    return;
   }
-  appointmentForDocument.value = appointment
+  appointmentForDocument.value = appointment;
   // Trigger file input click
-  fileInputRef.value?.click()
+  fileInputRef.value?.click();
 }
 
 function handleFileSelected(event: Event) {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0] || null
-  
-  if (!file) return
-  
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0] || null;
+
+  if (!file) return;
+
   // Validate file type (PDF only)
   if (file.type !== 'application/pdf') {
-    toastMessage.value = 'upload.invalidFileType'
-    toastType.value = 'error'
-    showToast.value = true
-    return
+    toastMessage.value = 'upload.invalidFileType';
+    toastType.value = 'error';
+    showToast.value = true;
+    return;
   }
-  
+
   // Validate file size (max 10MB)
-  const maxSize = 10 * 1024 * 1024 // 10MB in bytes
+  const maxSize = 10 * 1024 * 1024; // 10MB in bytes
   if (file.size > maxSize) {
-    toastMessage.value = 'upload.fileTooLarge'
-    toastType.value = 'error'
-    showToast.value = true
-    return
+    toastMessage.value = 'upload.fileTooLarge';
+    toastType.value = 'error';
+    showToast.value = true;
+    return;
   }
-  
-  selectedFile.value = file
-  isUploadModalOpen.value = true
-  
+
+  selectedFile.value = file;
+  isUploadModalOpen.value = true;
+
   // Reset input value to allow re-selecting the same file
   if (target) {
-    target.value = ''
+    target.value = '';
   }
 }
 
 const handleUploadConfirm = async () => {
-  const patientId = appointmentForDocument.value?.patientId
-  if (!selectedFile.value || !patientId) return
-  
+  const patientId = appointmentForDocument.value?.patientId;
+  if (!selectedFile.value || !patientId) return;
+
   // Save filename before clearing selectedFile
-  uploadingFilename.value = selectedFile.value.name
-  
+  uploadingFilename.value = selectedFile.value.name;
+
   // Close the confirmation modal
-  isUploadModalOpen.value = false
-  
+  isUploadModalOpen.value = false;
+
   // Open the progress modal
-  isUploadProgressModalOpen.value = true
-  isUploading.value = true
-  uploadError.value = null
-  
-  const fileToUpload = selectedFile.value
-  selectedFile.value = null
-  
+  isUploadProgressModalOpen.value = true;
+  isUploading.value = true;
+  uploadError.value = null;
+
+  const fileToUpload = selectedFile.value;
+  selectedFile.value = null;
+
   try {
-    await documentsApiService.uploadDocument(patientId, fileToUpload)
+    await documentsApiService.uploadDocument(patientId, fileToUpload);
 
     // Success - show success toast
-    toastMessage.value = 'upload.success'
-    toastType.value = 'success'
-    showToast.value = true
+    toastMessage.value = 'upload.success';
+    toastType.value = 'success';
+    showToast.value = true;
   } catch (error: any) {
-    console.error('[DoctorAppointmentsPage] Error uploading document:', error)
+    console.error('[DoctorAppointmentsPage] Error uploading document:', error);
     // Set error in progress modal
     if (error.message && error.message.includes('does not appear to be a medical document')) {
-      uploadError.value = 'upload.nonMedicalDocument'
+      uploadError.value = 'upload.nonMedicalDocument';
     } else {
-      uploadError.value = error.message || 'upload.error'
+      uploadError.value = error.message || 'upload.error';
     }
-    
+
     // Also show error toast after closing progress modal
-    toastMessage.value = uploadError.value || 'upload.error'
-    toastType.value = 'error'
+    toastMessage.value = uploadError.value || 'upload.error';
+    toastType.value = 'error';
   } finally {
-    isUploading.value = false
+    isUploading.value = false;
   }
-}
+};
 
 const handleUploadCancel = () => {
-  isUploadModalOpen.value = false
-  selectedFile.value = null
-  appointmentForDocument.value = null
-}
+  isUploadModalOpen.value = false;
+  selectedFile.value = null;
+  appointmentForDocument.value = null;
+};
 
 const handleUploadProgressClose = () => {
-  isUploadProgressModalOpen.value = false
-  appointmentForDocument.value = null
-  
+  isUploadProgressModalOpen.value = false;
+  appointmentForDocument.value = null;
+
   // If there was an error, show toast
   if (uploadError.value) {
-    showToast.value = true
+    showToast.value = true;
   }
-}
+};
 
 // Toast helper
 function showToastMessage(message: string, type: 'success' | 'error' | 'info' = 'success') {
-  toastMessage.value = message
-  toastType.value = type
-  showToast.value = true
+  toastMessage.value = message;
+  toastType.value = type;
+  showToast.value = true;
 }
 
 function closeToast() {
-  showToast.value = false
+  showToast.value = false;
 }
 
 // Load appointments on mount
 onMounted(() => {
-  loadAppointments()
-})
+  loadAppointments();
+});
 </script>
 
 <template>
@@ -432,10 +457,10 @@ onMounted(() => {
           <h1 class="page-title">{{ $t('doctor.appointments.title') }}</h1>
           <p class="page-subtitle">{{ $t('doctor.appointments.subtitle') }}</p>
         </div>
-        
+
         <!-- View Mode Toggle -->
         <div class="view-toggle">
-          <button 
+          <button
             class="view-toggle-btn"
             :class="{ active: viewMode === 'list' }"
             @click="viewMode = 'list'"
@@ -444,7 +469,7 @@ onMounted(() => {
             <ListBulletIcon class="icon" />
             <span class="view-toggle-label">{{ $t('doctor.appointments.listView') }}</span>
           </button>
-          <button 
+          <button
             class="view-toggle-btn"
             :class="{ active: viewMode === 'calendar' }"
             @click="viewMode = 'calendar'"
@@ -481,7 +506,7 @@ onMounted(() => {
       <div v-if="viewMode === 'list'" class="list-view">
         <div class="appointments-list-container">
           <h2 class="appointments-list-title">{{ $t('doctor.appointments.appointmentsList') }}</h2>
-          
+
           <CardList v-if="filteredAppointments.length > 0" gap="sm">
             <BaseCard
               v-for="appointment in filteredAppointments"
@@ -496,12 +521,12 @@ onMounted(() => {
             >
               <template v-if="appointment.status" #badges>
                 <div class="badges-row">
-                  <div 
-                    class="appointment-badge" 
+                  <div
+                    class="appointment-badge"
                     :style="{
                       color: getBadgeColors(appointment.status).color,
                       backgroundColor: getBadgeColors(appointment.status).bgColor,
-                      borderColor: getBadgeColors(appointment.status).borderColor
+                      borderColor: getBadgeColors(appointment.status).borderColor,
                     }"
                   >
                     <span class="badge-icon">{{ getStatusIcon(appointment.status) }}</span>
@@ -512,7 +537,9 @@ onMounted(() => {
 
               <template #actions>
                 <button
-                  v-if="appointment.status === 'SCHEDULED' && !isAppointmentCurrentOrFuture(appointment)"
+                  v-if="
+                    appointment.status === 'SCHEDULED' && !isAppointmentCurrentOrFuture(appointment)
+                  "
                   class="action-button edit-button"
                   @click.stop="handleEditAppointment(appointment.id)"
                   :title="$t('appointments.editAppointment')"
@@ -521,7 +548,9 @@ onMounted(() => {
                   <span>{{ $t('appointments.editAppointment') }}</span>
                 </button>
                 <button
-                  v-if="appointment.status === 'SCHEDULED' && isAppointmentCurrentOrFuture(appointment)"
+                  v-if="
+                    appointment.status === 'SCHEDULED' && isAppointmentCurrentOrFuture(appointment)
+                  "
                   class="action-button completed-button"
                   @click.stop="handleMarkAsCompleted(appointment.id)"
                   :title="$t('doctor.appointments.actions.visitCompleted')"
@@ -530,7 +559,9 @@ onMounted(() => {
                   <span>{{ $t('doctor.appointments.actions.visitCompleted') }}</span>
                 </button>
                 <button
-                  v-if="appointment.status === 'SCHEDULED' && isAppointmentCurrentOrFuture(appointment)"
+                  v-if="
+                    appointment.status === 'SCHEDULED' && isAppointmentCurrentOrFuture(appointment)
+                  "
                   class="action-button noshow-button"
                   @click.stop="handleMarkAsNoShow(appointment.id)"
                   :title="$t('doctor.appointments.actions.patientNoShow')"
@@ -550,7 +581,7 @@ onMounted(() => {
               </template>
             </BaseCard>
           </CardList>
-          
+
           <div v-else class="empty-state">
             <p class="empty-state-text">{{ $t('doctor.appointments.noAppointments') }}</p>
           </div>
@@ -565,10 +596,12 @@ onMounted(() => {
             :selected-appointment-id="selectedAppointmentId"
             @event-click="handleCalendarEventClick"
           />
-          
+
           <div class="appointments-list-container">
-            <h2 class="appointments-list-title">{{ $t('doctor.appointments.appointmentsList') }}</h2>
-            
+            <h2 class="appointments-list-title">
+              {{ $t('doctor.appointments.appointmentsList') }}
+            </h2>
+
             <CardList v-if="filteredAppointments.length > 0" gap="sm">
               <BaseCard
                 v-for="appointment in filteredAppointments"
@@ -583,12 +616,12 @@ onMounted(() => {
               >
                 <template v-if="appointment.status" #badges>
                   <div class="badges-row">
-                    <div 
-                      class="appointment-badge" 
+                    <div
+                      class="appointment-badge"
                       :style="{
                         color: getBadgeColors(appointment.status).color,
                         backgroundColor: getBadgeColors(appointment.status).bgColor,
-                        borderColor: getBadgeColors(appointment.status).borderColor
+                        borderColor: getBadgeColors(appointment.status).borderColor,
                       }"
                     >
                       <span class="badge-icon">{{ getStatusIcon(appointment.status) }}</span>
@@ -599,7 +632,10 @@ onMounted(() => {
 
                 <template #actions>
                   <button
-                    v-if="appointment.status === 'SCHEDULED' && !isAppointmentCurrentOrFuture(appointment)"
+                    v-if="
+                      appointment.status === 'SCHEDULED' &&
+                      !isAppointmentCurrentOrFuture(appointment)
+                    "
                     class="action-button edit-button"
                     @click.stop="handleEditAppointment(appointment.id)"
                     :title="$t('appointments.editAppointment')"
@@ -608,7 +644,10 @@ onMounted(() => {
                     <span>{{ $t('appointments.editAppointment') }}</span>
                   </button>
                   <button
-                    v-if="appointment.status === 'SCHEDULED' && isAppointmentCurrentOrFuture(appointment)"
+                    v-if="
+                      appointment.status === 'SCHEDULED' &&
+                      isAppointmentCurrentOrFuture(appointment)
+                    "
                     class="action-button completed-button"
                     @click.stop="handleMarkAsCompleted(appointment.id)"
                     :title="$t('doctor.appointments.actions.visitCompleted')"
@@ -617,7 +656,10 @@ onMounted(() => {
                     <span>{{ $t('doctor.appointments.actions.visitCompleted') }}</span>
                   </button>
                   <button
-                    v-if="appointment.status === 'SCHEDULED' && isAppointmentCurrentOrFuture(appointment)"
+                    v-if="
+                      appointment.status === 'SCHEDULED' &&
+                      isAppointmentCurrentOrFuture(appointment)
+                    "
                     class="action-button noshow-button"
                     @click.stop="handleMarkAsNoShow(appointment.id)"
                     :title="$t('doctor.appointments.actions.patientNoShow')"
@@ -637,7 +679,7 @@ onMounted(() => {
                 </template>
               </BaseCard>
             </CardList>
-            
+
             <div v-else class="empty-state">
               <p class="empty-state-text">{{ $t('doctor.appointments.noAppointments') }}</p>
             </div>
@@ -685,12 +727,7 @@ onMounted(() => {
     />
 
     <!-- Toast Notification -->
-    <Toast 
-      :show="showToast"
-      :message="toastMessage"
-      :type="toastType"
-      @close="closeToast"
-    />
+    <Toast :show="showToast" :message="toastMessage" :type="toastType" @close="closeToast" />
   </div>
 </template>
 
@@ -702,7 +739,12 @@ onMounted(() => {
   max-width: 100vw;
   overflow-x: hidden;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
   position: relative;
 }
 
@@ -713,7 +755,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, var(--sky-0ea5e9-20) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, var(--purple-a855f7-20) 0%, transparent 50%);
   pointer-events: none;
@@ -736,7 +778,9 @@ onMounted(() => {
   backdrop-filter: blur(20px);
   border: 1px solid var(--white-60);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   animation: slideInDown 0.5s cubic-bezier(0, 0, 0.2, 1);
 }
 
@@ -877,13 +921,17 @@ onMounted(() => {
   border: 1px solid var(--white-60);
   border-radius: 1.5rem;
   padding: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
   width: 100%;
 }
 
 .appointments-list-container:hover {
-  box-shadow: 0 12px 40px var(--black-12), inset 0 1px 0 var(--white-90);
+  box-shadow:
+    0 12px 40px var(--black-12),
+    inset 0 1px 0 var(--white-90);
 }
 
 .appointments-list-title {
@@ -911,7 +959,9 @@ onMounted(() => {
   -webkit-backdrop-filter: blur(12px);
   font-weight: 600;
   font-size: 0.8125rem;
-  box-shadow: 0 2px 8px var(--badge-shadow), inset 0 1px 0 var(--white-40);
+  box-shadow:
+    0 2px 8px var(--badge-shadow),
+    inset 0 1px 0 var(--white-40);
   width: fit-content;
   animation: fadeInScale 0.4s cubic-bezier(0, 0, 0.2, 1);
   transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
@@ -953,19 +1003,21 @@ onMounted(() => {
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3),
-              0 2px 4px rgba(0, 0, 0, 0.1),
-              inset 0 1px 1px rgba(255, 255, 255, 0.25),
-              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 4px 16px rgba(245, 158, 11, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .edit-button:hover {
   background: rgba(217, 119, 6, 0.85);
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(245, 158, 11, 0.4),
-              0 3px 8px rgba(0, 0, 0, 0.15),
-              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 6px 24px rgba(245, 158, 11, 0.4),
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .completed-button {
@@ -974,19 +1026,21 @@ onMounted(() => {
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(5, 150, 105, 0.3),
-              0 2px 4px rgba(0, 0, 0, 0.1),
-              inset 0 1px 1px rgba(255, 255, 255, 0.25),
-              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 4px 16px rgba(5, 150, 105, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .completed-button:hover {
   background: rgba(4, 120, 87, 0.85);
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(5, 150, 105, 0.4),
-              0 3px 8px rgba(0, 0, 0, 0.15),
-              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 6px 24px rgba(5, 150, 105, 0.4),
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .noshow-button {
@@ -995,19 +1049,21 @@ onMounted(() => {
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3),
-              0 2px 4px rgba(0, 0, 0, 0.1),
-              inset 0 1px 1px rgba(255, 255, 255, 0.25),
-              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 4px 16px rgba(220, 38, 38, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .noshow-button:hover {
   background: rgba(185, 28, 28, 0.85);
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(220, 38, 38, 0.4),
-              0 3px 8px rgba(0, 0, 0, 0.15),
-              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 6px 24px rgba(220, 38, 38, 0.4),
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .document-button {
@@ -1016,19 +1072,21 @@ onMounted(() => {
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3),
-              0 2px 4px rgba(0, 0, 0, 0.1),
-              inset 0 1px 1px rgba(255, 255, 255, 0.25),
-              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 4px 16px rgba(14, 165, 233, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .document-button:hover {
   background: rgba(2, 132, 199, 0.85);
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(14, 165, 233, 0.4),
-              0 3px 8px rgba(0, 0, 0, 0.15),
-              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 6px 24px rgba(14, 165, 233, 0.4),
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .icon-md {
@@ -1130,7 +1188,7 @@ onMounted(() => {
   .view-toggle-btn {
     padding: 0.625rem;
   }
-  
+
   .appointments-list-title {
     font-size: 1.125rem;
   }
@@ -1140,7 +1198,7 @@ onMounted(() => {
   .action-button span {
     display: none;
   }
-  
+
   .action-button {
     padding: 0.5rem;
     justify-content: center;

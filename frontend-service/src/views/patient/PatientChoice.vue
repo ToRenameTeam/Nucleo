@@ -1,47 +1,47 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import ProfileCard from '../../components/shared/ProfileCard.vue'
-import DelegationsManager from '../../components/patient/delegations/DelegationsManager.vue'
-import { useAuth } from '../../composables/useAuth'
-import { authApi } from '../../api/users'
-import type { Profile, UserData } from '../../types/auth'
-import type { DelegationsResponse } from '../../types/delegation'
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import ProfileCard from '../../components/shared/ProfileCard.vue';
+import DelegationsManager from '../../components/patient/delegations/DelegationsManager.vue';
+import { useAuth } from '../../composables/useAuth';
+import { authApi } from '../../api/users';
+import type { Profile, UserData } from '../../types/auth';
+import type { DelegationsResponse } from '../../types/delegation';
 
-const { t } = useI18n()
-const router = useRouter()
-const { selectPatientProfile: setProfile, currentUser } = useAuth()
+const { t } = useI18n();
+const router = useRouter();
+const { selectPatientProfile: setProfile, currentUser } = useAuth();
 
-const profiles = ref<Profile[]>([])
-const loading = ref(true)
-const error = ref<string | null>(null)
+const profiles = ref<Profile[]>([]);
+const loading = ref(true);
+const error = ref<string | null>(null);
 
 onMounted(async () => {
-  await loadDelegatedProfiles()
+  await loadDelegatedProfiles();
   // Listen for delegation updates
-  window.addEventListener('delegations-updated', handleDelegationsUpdate)
-})
+  window.addEventListener('delegations-updated', handleDelegationsUpdate);
+});
 
 onUnmounted(() => {
   // Clean up event listener
-  window.removeEventListener('delegations-updated', handleDelegationsUpdate)
-})
+  window.removeEventListener('delegations-updated', handleDelegationsUpdate);
+});
 
 const handleDelegationsUpdate = async () => {
-  await loadDelegatedProfiles()
-}
+  await loadDelegatedProfiles();
+};
 
 const loadDelegatedProfiles = async () => {
   if (!currentUser.value?.userId) {
-    error.value = 'Utente non autenticato'
-    loading.value = false
-    return
+    error.value = 'Utente non autenticato';
+    loading.value = false;
+    return;
   }
 
   try {
-    loading.value = true
-    error.value = null
+    loading.value = true;
+    error.value = null;
 
     // Add always the personal profile
     const personalProfile: Profile = {
@@ -49,54 +49,55 @@ const loadDelegatedProfiles = async () => {
       name: `${currentUser.value.name}`,
       lastName: currentUser.value.lastName,
       dateOfBirth: currentUser.value.dateOfBirth,
-      fiscalCode: currentUser.value.fiscalCode
-    }
+      fiscalCode: currentUser.value.fiscalCode,
+    };
 
-    const delegatedProfiles: Profile[] = []
+    const delegatedProfiles: Profile[] = [];
 
     // Get delegated profiles
     try {
-      const response = await authApi.getActiveDelegations(currentUser.value.userId) as DelegationsResponse
-      
+      const response = (await authApi.getActiveDelegations(
+        currentUser.value.userId
+      )) as DelegationsResponse;
+
       if (response.delegations && response.delegations.length > 0) {
         const profilePromises = response.delegations.map(async (delegation) => {
           try {
-            const userData = await authApi.getUserById(delegation.delegatorUserId) as UserData
+            const userData = (await authApi.getUserById(delegation.delegatorUserId)) as UserData;
             const profile: Profile = {
               userId: delegation.delegatorUserId,
               name: userData.name,
               lastName: userData.lastName,
               fiscalCode: userData.fiscalCode,
-              dateOfBirth: userData.dateOfBirth
-            }
-            return profile
+              dateOfBirth: userData.dateOfBirth,
+            };
+            return profile;
           } catch (err) {
-            console.error(`Errore nel caricamento dell'utente ${delegation.delegatorUserId}:`, err)
-            return null
+            console.error(`Errore nel caricamento dell'utente ${delegation.delegatorUserId}:`, err);
+            return null;
           }
-        })
+        });
 
-        const loadedProfiles = await Promise.all(profilePromises)
-        delegatedProfiles.push(...loadedProfiles.filter((p): p is Profile => p !== null))
+        const loadedProfiles = await Promise.all(profilePromises);
+        delegatedProfiles.push(...loadedProfiles.filter((p): p is Profile => p !== null));
       }
     } catch (err) {
-      console.error('Errore nel caricamento delle deleghe:', err)
+      console.error('Errore nel caricamento delle deleghe:', err);
     }
 
-    profiles.value = [personalProfile, ...delegatedProfiles]
-
+    profiles.value = [personalProfile, ...delegatedProfiles];
   } catch (err) {
-    console.error('Errore nel caricamento dei profili:', err)
-    error.value = 'Impossibile caricare i profili'
+    console.error('Errore nel caricamento dei profili:', err);
+    error.value = 'Impossibile caricare i profili';
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const selectPatientProfile = (profile: Profile) => {
-  setProfile(profile)
-  router.push('/patient/home')
-}
+  setProfile(profile);
+  router.push('/patient/home');
+};
 </script>
 
 <template>
@@ -115,7 +116,9 @@ const selectPatientProfile = (profile: Profile) => {
 
     <div v-else-if="error" class="error-container">
       <p class="error-text">{{ error }}</p>
-      <button @click="loadDelegatedProfiles" class="retry-button">{{ t('patientChoice.retry') }}</button>
+      <button @click="loadDelegatedProfiles" class="retry-button">
+        {{ t('patientChoice.retry') }}
+      </button>
     </div>
 
     <div v-else class="profiles-container">
@@ -142,7 +145,12 @@ const selectPatientProfile = (profile: Profile) => {
   justify-content: center;
   gap: 2rem;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
   position: relative;
 }
 
@@ -153,7 +161,7 @@ const selectPatientProfile = (profile: Profile) => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, var(--sky-0ea5e9-15) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, var(--purple-a855f7-15) 0%, transparent 50%);
   pointer-events: none;

@@ -1,119 +1,119 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { UsersIcon } from '@heroicons/vue/24/outline'
-import DelegationsMenuModal from './DelegationsMenuModal.vue'
-import NewDelegationModal from './NewDelegationModal.vue'
-import DelegationsListModal from './DelegationsListModal.vue'
-import Toast from '../../shared/Toast.vue'
-import { useAuth } from '../../../composables/useAuth'
-import { useDelegations } from '../../../composables/useDelegations'
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { UsersIcon } from '@heroicons/vue/24/outline';
+import DelegationsMenuModal from './DelegationsMenuModal.vue';
+import NewDelegationModal from './NewDelegationModal.vue';
+import DelegationsListModal from './DelegationsListModal.vue';
+import Toast from '../../shared/Toast.vue';
+import { useAuth } from '../../../composables/useAuth';
+import { useDelegations } from '../../../composables/useDelegations';
 
-const { t } = useI18n()
-const { currentUser } = useAuth()
-const { createDelegation } = useDelegations()
+const { t } = useI18n();
+const { currentUser } = useAuth();
+const { createDelegation } = useDelegations();
 
-const isDelegationsModalOpen = ref(false)
-const isNewDelegationModalOpen = ref(false)
-const isDelegationsListModalOpen = ref(false)
-const delegationsListType = ref<'received' | 'sent'>('received')
-const showSuccessToast = ref(false)
-const successToastMessage = ref('')
-const delegationSendError = ref('')
-const newDelegationModalKey = ref(0)
-const isSending = ref(false)
+const isDelegationsModalOpen = ref(false);
+const isNewDelegationModalOpen = ref(false);
+const isDelegationsListModalOpen = ref(false);
+const delegationsListType = ref<'received' | 'sent'>('received');
+const showSuccessToast = ref(false);
+const successToastMessage = ref('');
+const delegationSendError = ref('');
+const newDelegationModalKey = ref(0);
+const isSending = ref(false);
 
 const openDelegationsModal = () => {
-  isDelegationsModalOpen.value = true
-}
+  isDelegationsModalOpen.value = true;
+};
 
 const closeDelegationsModal = () => {
-  isDelegationsModalOpen.value = false
-}
+  isDelegationsModalOpen.value = false;
+};
 
 const handleNewDelegation = () => {
-  closeDelegationsModal()
-  isNewDelegationModalOpen.value = true
-}
+  closeDelegationsModal();
+  isNewDelegationModalOpen.value = true;
+};
 
 const closeNewDelegationModal = () => {
-  isNewDelegationModalOpen.value = false
-  delegationSendError.value = ''
-}
+  isNewDelegationModalOpen.value = false;
+  delegationSendError.value = '';
+};
 
 const handleBackFromNewDelegation = () => {
-  isNewDelegationModalOpen.value = false
-  delegationSendError.value = ''
-  isDelegationsModalOpen.value = true
-}
+  isNewDelegationModalOpen.value = false;
+  delegationSendError.value = '';
+  isDelegationsModalOpen.value = true;
+};
 
 const handleReceivedDelegations = () => {
-  closeDelegationsModal()
-  delegationsListType.value = 'received'
-  isDelegationsListModalOpen.value = true
-}
+  closeDelegationsModal();
+  delegationsListType.value = 'received';
+  isDelegationsListModalOpen.value = true;
+};
 
 const handleSentDelegations = () => {
-  closeDelegationsModal()
-  delegationsListType.value = 'sent'
-  isDelegationsListModalOpen.value = true
-}
+  closeDelegationsModal();
+  delegationsListType.value = 'sent';
+  isDelegationsListModalOpen.value = true;
+};
 
 const closeDelegationsListModal = () => {
-  isDelegationsListModalOpen.value = false
-}
+  isDelegationsListModalOpen.value = false;
+};
 
 const handleBackFromDelegationsList = () => {
-  isDelegationsListModalOpen.value = false
-  isDelegationsModalOpen.value = true
-}
+  isDelegationsListModalOpen.value = false;
+  isDelegationsModalOpen.value = true;
+};
 
 const handleSendDelegationRequest = async (fiscalCode: string) => {
-  if (!currentUser.value?.userId) return
+  if (!currentUser.value?.userId) return;
 
-  delegationSendError.value = ''
-  isSending.value = true
+  delegationSendError.value = '';
+  isSending.value = true;
 
   try {
-    const result = await createDelegation(fiscalCode, currentUser.value.userId)
-    
+    const result = await createDelegation(fiscalCode, currentUser.value.userId);
+
     if (result.success) {
-      isNewDelegationModalOpen.value = false
-      newDelegationModalKey.value++
-      
-      successToastMessage.value = t('delegations.toast.delegationSent', { name: result.userName })
-      showSuccessToast.value = true
-      
+      isNewDelegationModalOpen.value = false;
+      newDelegationModalKey.value++;
+
+      successToastMessage.value = t('delegations.toast.delegationSent', { name: result.userName });
+      showSuccessToast.value = true;
+
       // Emit event to update delegation counts
-      window.dispatchEvent(new CustomEvent('delegations-updated'))
+      window.dispatchEvent(new CustomEvent('delegations-updated'));
     } else {
-      delegationSendError.value = mapErrorToMessage(new Error(result.error || 'Unknown error'))
+      delegationSendError.value = mapErrorToMessage(new Error(result.error || 'Unknown error'));
     }
   } finally {
-    isSending.value = false
+    isSending.value = false;
   }
-}
+};
 
 const handleCloseToast = () => {
-  showSuccessToast.value = false
-}
+  showSuccessToast.value = false;
+};
 
 const mapErrorToMessage = (error: Error): string => {
-  const errorMessage = error.message.toLowerCase()
-  console.error('Delegation error:', errorMessage)
-  
+  const errorMessage = error.message.toLowerCase();
+  console.error('Delegation error:', errorMessage);
+
   if (errorMessage.includes('already exists')) {
-    return t('delegations.errors.delegationAlreadyExists')
+    return t('delegations.errors.delegationAlreadyExists');
   }
   if (errorMessage.includes('not found')) {
-    return t('delegations.errors.userNotFound')
+    return t('delegations.errors.userNotFound');
   }
   if (errorMessage.includes('cannot delegate to yourself')) {
-    return t('delegations.errors.cannotDelegateToYourself')
+    return t('delegations.errors.cannotDelegateToYourself');
   }
-  
-  return t('delegations.errors.actionFailed')
-}
+
+  return t('delegations.errors.actionFailed');
+};
 </script>
 
 <template>
@@ -185,7 +185,10 @@ const mapErrorToMessage = (error: Error): string => {
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
   backdrop-filter: blur(12px);
-  box-shadow: 0 4px 16px var(--accent-primary-30), 0 2px 8px var(--accent-primary-20), inset 0 1px 0 var(--white-20);
+  box-shadow:
+    0 4px 16px var(--accent-primary-30),
+    0 2px 8px var(--accent-primary-20),
+    inset 0 1px 0 var(--white-20);
   z-index: 1000;
   pointer-events: all;
   animation: fadeIn 0.6s cubic-bezier(0, 0, 0.2, 1);
@@ -195,7 +198,10 @@ const mapErrorToMessage = (error: Error): string => {
 
 .manage-delegations-btn:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px var(--accent-primary-40), 0 4px 12px var(--accent-primary-30), inset 0 1px 0 var(--white-30);
+  box-shadow:
+    0 8px 24px var(--accent-primary-40),
+    0 4px 12px var(--accent-primary-30),
+    inset 0 1px 0 var(--white-30);
 }
 
 .manage-delegations-btn:active {

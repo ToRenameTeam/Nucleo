@@ -1,33 +1,29 @@
 <script setup lang="ts">
-import { ChevronRightIcon } from '@heroicons/vue/24/outline'
-import type { SettingItem } from '../../types/setting'
+import { ChevronRightIcon } from '@heroicons/vue/24/outline';
+import type { SettingItem } from '../../types/setting';
 
 const props = withDefaults(defineProps<SettingItem>(), {
   showChevron: true,
-  variant: 'default'
-})
+  variant: 'default',
+});
 
 const emit = defineEmits<{
-  click: []
-}>()
+  click: [];
+}>();
 
 const handleClick = () => {
-  emit('click')
-}
+  emit('click');
+};
 </script>
 
 <template>
-  <div 
+  <div
     class="settings-item"
     :class="{ 'settings-item--danger': variant === 'danger' }"
     @click="handleClick"
   >
-    <component 
-      v-if="icon" 
-      :is="icon" 
-      class="settings-item__icon"
-    />
-    
+    <component v-if="icon" :is="icon" class="settings-item__icon" />
+
     <div class="settings-item__content">
       <div class="settings-item__title">
         {{ title }}
@@ -36,11 +32,8 @@ const handleClick = () => {
         {{ subtitle }}
       </div>
     </div>
-    
-    <ChevronRightIcon 
-      v-if="showChevron" 
-      class="settings-item__chevron"
-    />
+
+    <ChevronRightIcon v-if="showChevron" class="settings-item__chevron" />
   </div>
 </template>
 

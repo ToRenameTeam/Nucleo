@@ -1,40 +1,40 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import FormModal from '../../shared/FormModal.vue'
-import type { UserInfo } from '../../../api/users'
-import { masterDataApi, type ServiceType, type Facility } from '../../../api/masterData'
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import FormModal from '../../shared/FormModal.vue';
+import type { UserInfo } from '../../../api/users';
+import { masterDataApi, type ServiceType, type Facility } from '../../../api/masterData';
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 // Props
 const props = defineProps<{
-  isOpen: boolean
-  saveError?: string
-  isSaving?: boolean
-  isLoadingUsers?: boolean
-  users?: UserInfo[]
-}>()
+  isOpen: boolean;
+  saveError?: string;
+  isSaving?: boolean;
+  isLoadingUsers?: boolean;
+  users?: UserInfo[];
+}>();
 
 // Emits
 const emit = defineEmits<{
-  close: []
-  back: []
-  save: [prescription: ServicePrescriptionFormData]
-}>()
+  close: [];
+  back: [];
+  save: [prescription: ServicePrescriptionFormData];
+}>();
 
 // Types
 export interface ServicePrescriptionFormData {
-  patientId: string
-  patientName: string
-  patientFiscalCode: string
-  serviceId: string
-  serviceName: string
-  facilityId: string
-  facilityName: string
-  validityType: 'until_date' | 'until_execution'
-  validityDate: string
-  priority: 'ROUTINE' | 'URGENT' | 'EMERGENCY'
+  patientId: string;
+  patientName: string;
+  patientFiscalCode: string;
+  serviceId: string;
+  serviceName: string;
+  facilityId: string;
+  facilityName: string;
+  validityType: 'until_date' | 'until_execution';
+  validityDate: string;
+  priority: 'ROUTINE' | 'URGENT' | 'EMERGENCY';
 }
 
 // Form data
@@ -48,79 +48,85 @@ const formData = ref<ServicePrescriptionFormData>({
   facilityName: '',
   validityType: 'until_date',
   validityDate: getDefaultValidityDate(),
-  priority: 'ROUTINE'
-})
+  priority: 'ROUTINE',
+});
 
 // Patient search state
-const patientSearchQuery = ref('')
-const showPatientSuggestions = ref(false)
-const selectedPatient = ref<UserInfo | null>(null)
+const patientSearchQuery = ref('');
+const showPatientSuggestions = ref(false);
+const selectedPatient = ref<UserInfo | null>(null);
 
 // Service search state
-const serviceSearchQuery = ref('')
-const showServiceSuggestions = ref(false)
-const selectedService = ref<ServiceType | null>(null)
-const allServices = ref<ServiceType[]>([])
-const isLoadingServices = ref(false)
+const serviceSearchQuery = ref('');
+const showServiceSuggestions = ref(false);
+const selectedService = ref<ServiceType | null>(null);
+const allServices = ref<ServiceType[]>([]);
+const isLoadingServices = ref(false);
 
 // Facility search state
-const facilitySearchQuery = ref('')
-const showFacilitySuggestions = ref(false)
-const selectedFacility = ref<Facility | null>(null)
-const allFacilities = ref<Facility[]>([])
-const isLoadingFacilities = ref(false)
+const facilitySearchQuery = ref('');
+const showFacilitySuggestions = ref(false);
+const selectedFacility = ref<Facility | null>(null);
+const allFacilities = ref<Facility[]>([]);
+const isLoadingFacilities = ref(false);
 
 // Priority options
 const priorityOptions = [
   { value: 'ROUTINE', label: 'Routine', description: 'Non urgente' },
   { value: 'URGENT', label: 'Urgente', description: 'Da eseguire prima possibile' },
-  { value: 'EMERGENCY', label: 'Emergenza', description: 'Richiede attenzione immediata' }
-]
+  { value: 'EMERGENCY', label: 'Emergenza', description: 'Richiede attenzione immediata' },
+];
 
 // Computed: filtered patients based on search
 const filteredPatients = computed(() => {
   if (!patientSearchQuery.value || patientSearchQuery.value.length < 2) {
-    return []
+    return [];
   }
 
-  const query = patientSearchQuery.value.toLowerCase().trim()
-  return (props.users || []).filter(user => {
-    const fullName = `${user.name} ${user.lastName}`.toLowerCase()
-    const fiscalCode = user.fiscalCode.toLowerCase()
-    return fullName.includes(query) || fiscalCode.includes(query)
-  }).slice(0, 8)
-})
+  const query = patientSearchQuery.value.toLowerCase().trim();
+  return (props.users || [])
+    .filter((user) => {
+      const fullName = `${user.name} ${user.lastName}`.toLowerCase();
+      const fiscalCode = user.fiscalCode.toLowerCase();
+      return fullName.includes(query) || fiscalCode.includes(query);
+    })
+    .slice(0, 8);
+});
 
 // Computed: filtered services based on search
 const filteredServices = computed(() => {
   // Se non c'è query, mostra tutti i servizi
   if (!serviceSearchQuery.value || serviceSearchQuery.value.trim().length === 0) {
-    return allServices.value.slice(0, 10)
+    return allServices.value.slice(0, 10);
   }
 
-  const query = serviceSearchQuery.value.toLowerCase().trim()
-  return allServices.value.filter(service => {
-    const name = service.name.toLowerCase()
-    const code = service.code.toLowerCase()
-    const description = service.description?.toLowerCase() || ''
-    return name.includes(query) || code.includes(query) || description.includes(query)
-  }).slice(0, 10)
-})
+  const query = serviceSearchQuery.value.toLowerCase().trim();
+  return allServices.value
+    .filter((service) => {
+      const name = service.name.toLowerCase();
+      const code = service.code.toLowerCase();
+      const description = service.description?.toLowerCase() || '';
+      return name.includes(query) || code.includes(query) || description.includes(query);
+    })
+    .slice(0, 10);
+});
 
 // Computed: filtered facilities based on search
 const filteredFacilities = computed(() => {
   // Se non c'è query, mostra tutte le strutture
   if (!facilitySearchQuery.value || facilitySearchQuery.value.trim().length === 0) {
-    return allFacilities.value.slice(0, 10)
+    return allFacilities.value.slice(0, 10);
   }
 
-  const query = facilitySearchQuery.value.toLowerCase().trim()
-  return allFacilities.value.filter(facility => {
-    const name = facility.name.toLowerCase()
-    const city = facility.city?.toLowerCase() || ''
-    return name.includes(query) || city.includes(query)
-  }).slice(0, 10)
-})
+  const query = facilitySearchQuery.value.toLowerCase().trim();
+  return allFacilities.value
+    .filter((facility) => {
+      const name = facility.name.toLowerCase();
+      const city = facility.city?.toLowerCase() || '';
+      return name.includes(query) || city.includes(query);
+    })
+    .slice(0, 10);
+});
 
 // Computed: form validity check
 const isFormValid = computed(() => {
@@ -130,139 +136,141 @@ const isFormValid = computed(() => {
     formData.value.facilityId &&
     formData.value.priority &&
     (formData.value.validityType === 'until_execution' || formData.value.validityDate)
-  )
-})
+  );
+});
 
 // Helper functions
 function getDefaultValidityDate(): string {
-  const date = new Date()
-  date.setDate(date.getDate() + 90) // Default 90 days validity for service prescriptions
-  return date.toISOString().split('T')[0] ?? ''
+  const date = new Date();
+  date.setDate(date.getDate() + 90); // Default 90 days validity for service prescriptions
+  return date.toISOString().split('T')[0] ?? '';
 }
 
 function getMinDate(): string {
-  return new Date().toISOString().split('T')[0] ?? ''
+  return new Date().toISOString().split('T')[0] ?? '';
 }
 
 function getPriorityLabel(priority: string): { label: string; description: string } {
-  const found = priorityOptions.find(p => p.value === priority)
-  return found ? { label: found.label, description: found.description } : { label: priority, description: '' }
+  const found = priorityOptions.find((p) => p.value === priority);
+  return found
+    ? { label: found.label, description: found.description }
+    : { label: priority, description: '' };
 }
 
 // Patient handlers
 const handlePatientInput = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  patientSearchQuery.value = target.value
-  selectedPatient.value = null
-  formData.value.patientId = ''
-  formData.value.patientName = ''
-  formData.value.patientFiscalCode = ''
-  showPatientSuggestions.value = patientSearchQuery.value.length >= 2
-}
+  const target = event.target as HTMLInputElement;
+  patientSearchQuery.value = target.value;
+  selectedPatient.value = null;
+  formData.value.patientId = '';
+  formData.value.patientName = '';
+  formData.value.patientFiscalCode = '';
+  showPatientSuggestions.value = patientSearchQuery.value.length >= 2;
+};
 
 const selectPatient = (user: UserInfo) => {
-  selectedPatient.value = user
-  formData.value.patientId = user.userId
-  formData.value.patientName = `${user.name} ${user.lastName}`
-  formData.value.patientFiscalCode = user.fiscalCode
-  patientSearchQuery.value = `${user.name} ${user.lastName}`
-  showPatientSuggestions.value = false
-}
+  selectedPatient.value = user;
+  formData.value.patientId = user.userId;
+  formData.value.patientName = `${user.name} ${user.lastName}`;
+  formData.value.patientFiscalCode = user.fiscalCode;
+  patientSearchQuery.value = `${user.name} ${user.lastName}`;
+  showPatientSuggestions.value = false;
+};
 
 const handlePatientFocus = () => {
   if (patientSearchQuery.value.length >= 2) {
-    showPatientSuggestions.value = true
+    showPatientSuggestions.value = true;
   }
-}
+};
 
 const handlePatientBlur = () => {
   setTimeout(() => {
-    showPatientSuggestions.value = false
-  }, 200)
-}
+    showPatientSuggestions.value = false;
+  }, 200);
+};
 
 // Service handlers
 const handleServiceInput = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  serviceSearchQuery.value = target.value
-  selectedService.value = null
-  formData.value.serviceId = ''
-  formData.value.serviceName = ''
-  showServiceSuggestions.value = true
-}
+  const target = event.target as HTMLInputElement;
+  serviceSearchQuery.value = target.value;
+  selectedService.value = null;
+  formData.value.serviceId = '';
+  formData.value.serviceName = '';
+  showServiceSuggestions.value = true;
+};
 
 const selectService = (service: ServiceType) => {
-  selectedService.value = service
-  formData.value.serviceId = service._id
-  formData.value.serviceName = service.name
-  serviceSearchQuery.value = service.name
-  showServiceSuggestions.value = false
-}
+  selectedService.value = service;
+  formData.value.serviceId = service._id;
+  formData.value.serviceName = service.name;
+  serviceSearchQuery.value = service.name;
+  showServiceSuggestions.value = false;
+};
 
 const handleServiceFocus = () => {
   // Mostra sempre i suggerimenti al focus
-  showServiceSuggestions.value = true
-}
+  showServiceSuggestions.value = true;
+};
 
 const handleServiceBlur = () => {
   setTimeout(() => {
-    showServiceSuggestions.value = false
-  }, 200)
-}
+    showServiceSuggestions.value = false;
+  }, 200);
+};
 
 // Facility handlers
 const handleFacilityInput = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  facilitySearchQuery.value = target.value
-  selectedFacility.value = null
-  formData.value.facilityId = ''
-  formData.value.facilityName = ''
-  showFacilitySuggestions.value = true
-}
+  const target = event.target as HTMLInputElement;
+  facilitySearchQuery.value = target.value;
+  selectedFacility.value = null;
+  formData.value.facilityId = '';
+  formData.value.facilityName = '';
+  showFacilitySuggestions.value = true;
+};
 
 const selectFacility = (facility: Facility) => {
-  selectedFacility.value = facility
-  formData.value.facilityId = facility._id
-  formData.value.facilityName = facility.name
-  facilitySearchQuery.value = facility.name
-  showFacilitySuggestions.value = false
-}
+  selectedFacility.value = facility;
+  formData.value.facilityId = facility._id;
+  formData.value.facilityName = facility.name;
+  facilitySearchQuery.value = facility.name;
+  showFacilitySuggestions.value = false;
+};
 
 const handleFacilityFocus = () => {
   // Mostra sempre i suggerimenti al focus
-  showFacilitySuggestions.value = true
-}
+  showFacilitySuggestions.value = true;
+};
 
 const handleFacilityBlur = () => {
   setTimeout(() => {
-    showFacilitySuggestions.value = false
-  }, 200)
-}
+    showFacilitySuggestions.value = false;
+  }, 200);
+};
 
 // Load services and facilities on mount
 const loadMasterData = async () => {
   // Load services
-  isLoadingServices.value = true
+  isLoadingServices.value = true;
   try {
-    allServices.value = await masterDataApi.getServiceTypes()
-    console.log('[ServicePrescriptionForm] Loaded service types:', allServices.value.length)
+    allServices.value = await masterDataApi.getServiceTypes();
+    console.log('[ServicePrescriptionForm] Loaded service types:', allServices.value.length);
   } catch (error) {
-    console.error('[ServicePrescriptionForm] Error loading service types:', error)
+    console.error('[ServicePrescriptionForm] Error loading service types:', error);
   } finally {
-    isLoadingServices.value = false
+    isLoadingServices.value = false;
   }
 
   // Load facilities
-  isLoadingFacilities.value = true
+  isLoadingFacilities.value = true;
   try {
-    allFacilities.value = await masterDataApi.getFacilities()
-    console.log('[ServicePrescriptionForm] Loaded facilities:', allFacilities.value.length)
+    allFacilities.value = await masterDataApi.getFacilities();
+    console.log('[ServicePrescriptionForm] Loaded facilities:', allFacilities.value.length);
   } catch (error) {
-    console.error('[ServicePrescriptionForm] Error loading facilities:', error)
+    console.error('[ServicePrescriptionForm] Error loading facilities:', error);
   } finally {
-    isLoadingFacilities.value = false
+    isLoadingFacilities.value = false;
   }
-}
+};
 
 // Reset form
 const resetForm = () => {
@@ -276,79 +284,80 @@ const resetForm = () => {
     facilityName: '',
     validityType: 'until_date',
     validityDate: getDefaultValidityDate(),
-    priority: 'ROUTINE'
-  }
-  patientSearchQuery.value = ''
-  serviceSearchQuery.value = ''
-  facilitySearchQuery.value = ''
-  selectedPatient.value = null
-  selectedService.value = null
-  selectedFacility.value = null
-  showPatientSuggestions.value = false
-  showServiceSuggestions.value = false
-  showFacilitySuggestions.value = false
-}
+    priority: 'ROUTINE',
+  };
+  patientSearchQuery.value = '';
+  serviceSearchQuery.value = '';
+  facilitySearchQuery.value = '';
+  selectedPatient.value = null;
+  selectedService.value = null;
+  selectedFacility.value = null;
+  showPatientSuggestions.value = false;
+  showServiceSuggestions.value = false;
+  showFacilitySuggestions.value = false;
+};
 
 // Watch for modal open/close
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen) {
-    loadMasterData()
-  } else {
-    resetForm()
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen) {
+      loadMasterData();
+    } else {
+      resetForm();
+    }
   }
-})
+);
 
 // Handle save
 const handleSave = () => {
   if (!isFormValid.value) {
-    return
+    return;
   }
-  emit('save', { ...formData.value })
-}
+  emit('save', { ...formData.value });
+};
 
 // Handle cancel
 const handleCancel = () => {
-  emit('close')
-}
+  emit('close');
+};
 
 // Close dropdowns when clicking outside
 const handleClickOutside = (event: MouseEvent) => {
-  const target = event.target as HTMLElement
+  const target = event.target as HTMLElement;
   if (!target.closest('.autocomplete-container')) {
-    showPatientSuggestions.value = false
-    showServiceSuggestions.value = false
-    showFacilitySuggestions.value = false
+    showPatientSuggestions.value = false;
+    showServiceSuggestions.value = false;
+    showFacilitySuggestions.value = false;
   }
-}
+};
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
+  document.addEventListener('click', handleClickOutside);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
-
 <template>
-  <FormModal 
-    :is-open="isOpen" 
+  <FormModal
+    :is-open="isOpen"
     :title="t('doctor.documents.prescriptions.service.title')"
-    :subtitle="t('doctor.documents.prescriptions.service.subtitle')" 
-    :show-back="true" 
+    :subtitle="t('doctor.documents.prescriptions.service.subtitle')"
+    :show-back="true"
     :save-label="t('common.save')"
-    :cancel-label="t('common.cancel')" 
-    :is-saving="isSaving" 
-    :save-error="saveError" 
+    :cancel-label="t('common.cancel')"
+    :is-saving="isSaving"
+    :save-error="saveError"
     max-width="md"
-    @close="emit('close')" 
-    @back="emit('back')" 
-    @save="handleSave" 
+    @close="emit('close')"
+    @back="emit('back')"
+    @save="handleSave"
     @cancel="handleCancel"
   >
     <form class="prescription-form" @submit.prevent="handleSave">
-      
       <!-- Patient Search -->
       <div class="form-group">
         <label for="patient-search" class="form-label">
@@ -356,13 +365,17 @@ onUnmounted(() => {
           <span class="required">*</span>
         </label>
         <div class="autocomplete-container">
-          <input 
-            id="patient-search" 
-            :value="patientSearchQuery" 
-            type="text" 
+          <input
+            id="patient-search"
+            :value="patientSearchQuery"
+            type="text"
             class="form-input"
             :class="{ 'has-selection': selectedPatient }"
-            :placeholder="isLoadingUsers ? 'Caricamento pazienti...' : t('doctor.documents.prescriptions.medicine.patientNamePlaceholder')"
+            :placeholder="
+              isLoadingUsers
+                ? 'Caricamento pazienti...'
+                : t('doctor.documents.prescriptions.medicine.patientNamePlaceholder')
+            "
             :disabled="isLoadingUsers"
             autocomplete="off"
             required
@@ -370,12 +383,15 @@ onUnmounted(() => {
             @focus="handlePatientFocus"
             @blur="handlePatientBlur"
           />
-          
+
           <Transition name="dropdown">
-            <div v-if="showPatientSuggestions && filteredPatients.length > 0" class="suggestions-dropdown">
+            <div
+              v-if="showPatientSuggestions && filteredPatients.length > 0"
+              class="suggestions-dropdown"
+            >
               <button
-                v-for="user in filteredPatients" 
-                :key="user.userId" 
+                v-for="user in filteredPatients"
+                :key="user.userId"
                 type="button"
                 class="suggestion-item"
                 @mousedown.prevent="selectPatient(user)"
@@ -387,20 +403,30 @@ onUnmounted(() => {
               </button>
             </div>
           </Transition>
-          
+
           <Transition name="dropdown">
-            <div v-if="showPatientSuggestions && patientSearchQuery.length >= 2 && filteredPatients.length === 0" class="suggestions-dropdown">
+            <div
+              v-if="
+                showPatientSuggestions &&
+                patientSearchQuery.length >= 2 &&
+                filteredPatients.length === 0
+              "
+              class="suggestions-dropdown"
+            >
               <div class="suggestion-item no-results">
                 {{ t('doctor.documents.prescriptions.noPatientResults') }}
               </div>
             </div>
           </Transition>
         </div>
-        
+
         <!-- Selected patient info badge -->
         <div v-if="selectedPatient" class="selected-badge">
           <span class="badge-label">Paziente selezionato:</span>
-          <span class="badge-value">{{ selectedPatient.name }} {{ selectedPatient.lastName }} - {{ selectedPatient.fiscalCode }}</span>
+          <span class="badge-value"
+            >{{ selectedPatient.name }} {{ selectedPatient.lastName }} -
+            {{ selectedPatient.fiscalCode }}</span
+          >
         </div>
       </div>
 
@@ -411,13 +437,15 @@ onUnmounted(() => {
           <span class="required">*</span>
         </label>
         <div class="autocomplete-container">
-          <input 
-            id="service-search" 
-            :value="serviceSearchQuery" 
-            type="text" 
+          <input
+            id="service-search"
+            :value="serviceSearchQuery"
+            type="text"
             class="form-input"
             :class="{ 'has-selection': selectedService }"
-            :placeholder="isLoadingServices ? 'Caricamento servizi...' : 'Cerca tipo di visita o esame...'"
+            :placeholder="
+              isLoadingServices ? 'Caricamento servizi...' : 'Cerca tipo di visita o esame...'
+            "
             :disabled="isLoadingServices"
             autocomplete="off"
             required
@@ -425,38 +453,53 @@ onUnmounted(() => {
             @focus="handleServiceFocus"
             @blur="handleServiceBlur"
           />
-          
+
           <Transition name="dropdown">
-            <div v-if="showServiceSuggestions && filteredServices.length > 0" class="suggestions-dropdown">
+            <div
+              v-if="showServiceSuggestions && filteredServices.length > 0"
+              class="suggestions-dropdown"
+            >
               <button
-                v-for="service in filteredServices" 
-                :key="service._id" 
+                v-for="service in filteredServices"
+                :key="service._id"
                 type="button"
                 class="suggestion-item"
                 @mousedown.prevent="selectService(service)"
               >
                 <div class="suggestion-main">
                   <span class="suggestion-name">{{ service.name }}</span>
-                  <span v-if="service.category" class="suggestion-strength">{{ service.category }}</span>
+                  <span v-if="service.category" class="suggestion-strength">{{
+                    service.category
+                  }}</span>
                 </div>
-                <span v-if="service.description" class="suggestion-detail">{{ service.description }}</span>
+                <span v-if="service.description" class="suggestion-detail">{{
+                  service.description
+                }}</span>
               </button>
             </div>
           </Transition>
-          
+
           <Transition name="dropdown">
-            <div v-if="showServiceSuggestions && serviceSearchQuery.length >= 2 && filteredServices.length === 0" class="suggestions-dropdown">
-              <div class="suggestion-item no-results">
-                Nessun servizio trovato
-              </div>
+            <div
+              v-if="
+                showServiceSuggestions &&
+                serviceSearchQuery.length >= 2 &&
+                filteredServices.length === 0
+              "
+              class="suggestions-dropdown"
+            >
+              <div class="suggestion-item no-results">Nessun servizio trovato</div>
             </div>
           </Transition>
         </div>
-        
+
         <!-- Selected service info badge -->
         <div v-if="selectedService" class="selected-badge service-badge">
           <span class="badge-label">Servizio selezionato:</span>
-          <span class="badge-value">{{ selectedService.name }}<span v-if="selectedService.category"> ({{ selectedService.category }})</span></span>
+          <span class="badge-value"
+            >{{ selectedService.name
+            }}<span v-if="selectedService.category"> ({{ selectedService.category }})</span></span
+          >
         </div>
       </div>
 
@@ -467,13 +510,15 @@ onUnmounted(() => {
           <span class="required">*</span>
         </label>
         <div class="autocomplete-container">
-          <input 
-            id="facility-search" 
-            :value="facilitySearchQuery" 
-            type="text" 
+          <input
+            id="facility-search"
+            :value="facilitySearchQuery"
+            type="text"
             class="form-input"
             :class="{ 'has-selection': selectedFacility }"
-            :placeholder="isLoadingFacilities ? 'Caricamento strutture...' : 'Cerca struttura sanitaria...'"
+            :placeholder="
+              isLoadingFacilities ? 'Caricamento strutture...' : 'Cerca struttura sanitaria...'
+            "
             :disabled="isLoadingFacilities"
             autocomplete="off"
             required
@@ -481,12 +526,15 @@ onUnmounted(() => {
             @focus="handleFacilityFocus"
             @blur="handleFacilityBlur"
           />
-          
+
           <Transition name="dropdown">
-            <div v-if="showFacilitySuggestions && filteredFacilities.length > 0" class="suggestions-dropdown">
+            <div
+              v-if="showFacilitySuggestions && filteredFacilities.length > 0"
+              class="suggestions-dropdown"
+            >
               <button
-                v-for="facility in filteredFacilities" 
-                :key="facility._id" 
+                v-for="facility in filteredFacilities"
+                :key="facility._id"
                 type="button"
                 class="suggestion-item"
                 @mousedown.prevent="selectFacility(facility)"
@@ -498,45 +546,53 @@ onUnmounted(() => {
               </button>
             </div>
           </Transition>
-          
+
           <Transition name="dropdown">
-            <div v-if="showFacilitySuggestions && facilitySearchQuery.length >= 2 && filteredFacilities.length === 0" class="suggestions-dropdown">
-              <div class="suggestion-item no-results">
-                Nessuna struttura trovata
-              </div>
+            <div
+              v-if="
+                showFacilitySuggestions &&
+                facilitySearchQuery.length >= 2 &&
+                filteredFacilities.length === 0
+              "
+              class="suggestions-dropdown"
+            >
+              <div class="suggestion-item no-results">Nessuna struttura trovata</div>
             </div>
           </Transition>
         </div>
-        
+
         <!-- Selected facility info badge -->
         <div v-if="selectedFacility" class="selected-badge facility-badge">
           <span class="badge-label">Struttura selezionata:</span>
-          <span class="badge-value">{{ selectedFacility.name }}<span v-if="selectedFacility.city"> - {{ selectedFacility.city }}</span></span>
+          <span class="badge-value"
+            >{{ selectedFacility.name
+            }}<span v-if="selectedFacility.city"> - {{ selectedFacility.city }}</span></span
+          >
         </div>
       </div>
 
       <!-- Validity Section -->
       <div class="form-section">
         <h3 class="section-title">Validità prescrizione</h3>
-        
+
         <div class="form-row">
           <div class="form-group flex-1">
             <label class="form-label">Tipo validità <span class="required">*</span></label>
             <div class="radio-group">
               <label class="radio-option">
-                <input 
-                  v-model="formData.validityType" 
-                  type="radio" 
-                  value="until_date" 
+                <input
+                  v-model="formData.validityType"
+                  type="radio"
+                  value="until_date"
                   name="validityType"
                 />
                 <span class="radio-label">Fino a data</span>
               </label>
               <label class="radio-option">
-                <input 
-                  v-model="formData.validityType" 
-                  type="radio" 
-                  value="until_execution" 
+                <input
+                  v-model="formData.validityType"
+                  type="radio"
+                  value="until_execution"
                   name="validityType"
                 />
                 <span class="radio-label">Fino ad esecuzione</span>
@@ -544,16 +600,16 @@ onUnmounted(() => {
             </div>
           </div>
         </div>
-        
+
         <div v-if="formData.validityType === 'until_date'" class="form-row">
           <div class="form-group flex-1">
             <label for="validity-date" class="form-label">
               Data scadenza <span class="required">*</span>
             </label>
-            <input 
+            <input
               id="validity-date"
-              v-model="formData.validityDate" 
-              type="date" 
+              v-model="formData.validityDate"
+              type="date"
               class="form-input"
               :min="getMinDate()"
               required
@@ -565,20 +621,20 @@ onUnmounted(() => {
       <!-- Priority Section -->
       <div class="form-section">
         <h3 class="section-title">Priorità</h3>
-        
+
         <div class="form-group">
           <label class="form-label">Livello di priorità <span class="required">*</span></label>
           <div class="priority-options">
-            <label 
-              v-for="option in priorityOptions" 
-              :key="option.value" 
+            <label
+              v-for="option in priorityOptions"
+              :key="option.value"
               class="priority-option"
-              :class="{ 'selected': formData.priority === option.value }"
+              :class="{ selected: formData.priority === option.value }"
             >
-              <input 
-                v-model="formData.priority" 
-                type="radio" 
-                :value="option.value" 
+              <input
+                v-model="formData.priority"
+                type="radio"
+                :value="option.value"
                 name="priority"
                 class="priority-radio"
               />
@@ -595,15 +651,16 @@ onUnmounted(() => {
       <div v-if="isFormValid" class="prescription-summary">
         <h4 class="summary-title">Riepilogo prescrizione</h4>
         <p class="summary-text">
-          <strong>{{ selectedService?.name }}</strong><br>
-          Struttura: {{ selectedFacility?.name }}<br>
-          Priorità: {{ getPriorityLabel(formData.priority).label }} - {{ getPriorityLabel(formData.priority).description }}
+          <strong>{{ selectedService?.name }}</strong
+          ><br />
+          Struttura: {{ selectedFacility?.name }}<br />
+          Priorità: {{ getPriorityLabel(formData.priority).label }} -
+          {{ getPriorityLabel(formData.priority).description }}
         </p>
       </div>
     </form>
   </FormModal>
 </template>
-
 
 <style scoped>
 .prescription-form {
@@ -665,7 +722,9 @@ onUnmounted(() => {
   font-size: 0.9375rem;
   color: var(--text-primary);
   transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
-  box-shadow: 0 2px 4px var(--shadow), inset 0 1px 0 var(--white-90);
+  box-shadow:
+    0 2px 4px var(--shadow),
+    inset 0 1px 0 var(--white-90);
 }
 
 .form-input:focus,
@@ -673,7 +732,9 @@ onUnmounted(() => {
   outline: none;
   border-color: var(--accent-primary);
   background: var(--white-80);
-  box-shadow: 0 4px 12px var(--accent-primary-20), inset 0 1px 0 var(--white);
+  box-shadow:
+    0 4px 12px var(--accent-primary-20),
+    inset 0 1px 0 var(--white);
 }
 
 .form-input::placeholder {
@@ -790,7 +851,11 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 0.25rem;
   padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, var(--accent-primary-10) 0%, var(--accent-secondary-10, var(--accent-primary-10)) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-primary-10) 0%,
+    var(--accent-secondary-10, var(--accent-primary-10)) 100%
+  );
   border: 1px solid var(--accent-primary-30);
   border-radius: 0.75rem;
   margin-top: 0.5rem;
@@ -834,7 +899,7 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.radio-option input[type="radio"] {
+.radio-option input[type='radio'] {
   width: 1.125rem;
   height: 1.125rem;
   accent-color: var(--accent-primary);
@@ -940,7 +1005,7 @@ onUnmounted(() => {
   .prescription-form {
     gap: 1.25rem;
   }
-  
+
   .form-section {
     padding: 0.875rem 1rem;
   }

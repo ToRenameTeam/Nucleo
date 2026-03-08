@@ -1,64 +1,64 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import { authApi, AuthApiError } from '../api/users'
-import { useAuth } from '../composables/useAuth'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import { authApi, AuthApiError } from '../api/users';
+import { useAuth } from '../composables/useAuth';
 
-const { t } = useI18n()
-const router = useRouter()
-const { setAuthenticatedUser } = useAuth()
+const { t } = useI18n();
+const router = useRouter();
+const { setAuthenticatedUser } = useAuth();
 
-const fiscalCode = ref('')
-const password = ref('')
-const isLoading = ref(false)
-const showPassword = ref(false)
-const errorMessage = ref('')
+const fiscalCode = ref('');
+const password = ref('');
+const isLoading = ref(false);
+const showPassword = ref(false);
+const errorMessage = ref('');
 
 async function handleLogin() {
   if (!fiscalCode.value || !password.value) {
-    return
+    return;
   }
-  
-  isLoading.value = true
-  errorMessage.value = ''
-  
+
+  isLoading.value = true;
+  errorMessage.value = '';
+
   try {
     const response = await authApi.login({
       fiscalCode: fiscalCode.value.toUpperCase(),
       password: password.value,
-    })
+    });
 
     if (!response.requiresProfileSelection && response.activeProfile) {
       // Case 1: Patient only - patient profile selected
       setAuthenticatedUser({
         ...response,
-        activeProfile: response.activeProfile
-      })
-      router.push('/patient-choice')
+        activeProfile: response.activeProfile,
+      });
+      router.push('/patient-choice');
     } else {
       // Case 2: Doctor and Patient - select profile
-      setAuthenticatedUser({ ...response, activeProfile: 'PATIENT' })
-      router.push('/doctor-patient-choice')
+      setAuthenticatedUser({ ...response, activeProfile: 'PATIENT' });
+      router.push('/doctor-patient-choice');
     }
   } catch (error) {
     if (error instanceof AuthApiError) {
       if (error.statusCode === 401) {
-        errorMessage.value = t('auth.invalidCredentials')
+        errorMessage.value = t('auth.invalidCredentials');
       } else {
-        errorMessage.value = t('auth.loginError')
+        errorMessage.value = t('auth.loginError');
       }
     } else {
-      errorMessage.value = t('auth.networkError')
+      errorMessage.value = t('auth.networkError');
     }
-    console.error('Login error:', error)
+    console.error('Login error:', error);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 function togglePasswordVisibility() {
-  showPassword.value = !showPassword.value
+  showPassword.value = !showPassword.value;
 }
 </script>
 
@@ -121,11 +121,7 @@ function togglePasswordVisibility() {
           </div>
         </div>
 
-        <button
-          type="submit"
-          class="login-btn"
-          :disabled="isLoading || !fiscalCode || !password"
-        >
+        <button type="submit" class="login-btn" :disabled="isLoading || !fiscalCode || !password">
           <span v-if="isLoading" class="loading-spinner"></span>
           <span v-else>{{ t('auth.loginButton') }}</span>
         </button>
@@ -143,7 +139,12 @@ function togglePasswordVisibility() {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
   position: relative;
 }
 
@@ -154,7 +155,7 @@ function togglePasswordVisibility() {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, var(--accent-primary-15) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, var(--accent-secondary-15) 0%, transparent 50%);
   pointer-events: none;
@@ -172,7 +173,9 @@ function togglePasswordVisibility() {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--white-50);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-15), inset 0 1px 0 var(--white-60);
+  box-shadow:
+    0 8px 32px var(--black-15),
+    inset 0 1px 0 var(--white-60);
   animation: fadeInUp 0.6s cubic-bezier(0, 0, 0.2, 1);
 }
 
@@ -264,7 +267,9 @@ function togglePasswordVisibility() {
 .form-input:focus {
   background: var(--white-50);
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px var(--accent-primary-15), inset 0 1px 0 var(--white-60);
+  box-shadow:
+    0 0 0 3px var(--accent-primary-15),
+    inset 0 1px 0 var(--white-60);
 }
 
 .password-input-wrapper {
@@ -314,13 +319,17 @@ function togglePasswordVisibility() {
   border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
-  box-shadow: 0 4px 16px var(--accent-primary-30), inset 0 1px 0 var(--white-20);
+  box-shadow:
+    0 4px 16px var(--accent-primary-30),
+    inset 0 1px 0 var(--white-20);
 }
 
 .login-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--accent-primary-40), inset 0 1px 0 var(--white-30);
+  box-shadow:
+    0 6px 20px var(--accent-primary-40),
+    inset 0 1px 0 var(--white-30);
 }
 
 .login-btn:active:not(:disabled) {

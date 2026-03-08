@@ -1,37 +1,37 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import type { CalendarOptions, EventClickArg, DateSelectArg } from '@fullcalendar/core'
-import FullCalendar from '@fullcalendar/vue3'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin from '@fullcalendar/interaction'
-import type { Appointment } from '../../types/appointment'
-import { parseItalianDate, parseItalianDateSlash, formatDateToISO } from '../../utils/dateUtils'
+import { ref, computed, watch } from 'vue';
+import type { CalendarOptions, EventClickArg, DateSelectArg } from '@fullcalendar/core';
+import FullCalendar from '@fullcalendar/vue3';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import type { Appointment } from '../../types/appointment';
+import { parseItalianDate, parseItalianDateSlash, formatDateToISO } from '../../utils/dateUtils';
 
 interface Props {
   /** Appointments to display on calendar */
-  appointments: Appointment[]
+  appointments: Appointment[];
   /** ID of the currently selected appointment */
-  selectedAppointmentId?: string | null
+  selectedAppointmentId?: string | null;
   /** Whether date selection is enabled */
-  selectable?: boolean
+  selectable?: boolean;
   /** Whether to show week view option */
-  showWeekView?: boolean
+  showWeekView?: boolean;
   /** Custom header toolbar configuration */
   headerToolbar?: {
-    left?: string
-    center?: string
-    right?: string
-  }
+    left?: string;
+    center?: string;
+    right?: string;
+  };
   /** Calendar locale */
-  locale?: string
+  locale?: string;
   /** Calendar height */
-  height?: string | number
+  height?: string | number;
   /** Max dots to show per day before showing "+N" */
-  maxDotsPerDay?: number
+  maxDotsPerDay?: number;
   /** Color for appointment dots */
-  dotColor?: string
+  dotColor?: string;
   /** Color for selected appointment dot */
-  selectedDotColor?: string
+  selectedDotColor?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -42,40 +42,40 @@ const props = withDefaults(defineProps<Props>(), {
   height: 'auto',
   maxDotsPerDay: 3,
   dotColor: 'var(--blue-3b82f6)',
-  selectedDotColor: 'var(--gray-171717)'
-})
+  selectedDotColor: 'var(--gray-171717)',
+});
 
 const emit = defineEmits<{
-  eventClick: [appointmentId: string]
-  dateSelect: [dateRange: { start: string; end: string }]
-}>()
+  eventClick: [appointmentId: string];
+  dateSelect: [dateRange: { start: string; end: string }];
+}>();
 
 function parseDateToISO(dateString: string): string {
   // Try parsing with slash format first (dd/mm/yyyy or d/m/yyyy)
-  let date = parseItalianDateSlash(dateString)
-  
+  let date = parseItalianDateSlash(dateString);
+
   // If slash format fails, try Italian format (dd Mese yyyy)
   if (!date) {
-    date = parseItalianDate(dateString)
+    date = parseItalianDate(dateString);
   }
-  
+
   // If all parsing fails, use current date
-  return date ? formatDateToISO(date) : formatDateToISO(new Date())
+  return date ? formatDateToISO(date) : formatDateToISO(new Date());
 }
 
 const calendarEvents = computed(() => {
-  const appointmentsByDate = new Map<string, Appointment[]>()
-  
-  props.appointments.forEach(apt => {
-    const dateKey = parseDateToISO(apt.date)
+  const appointmentsByDate = new Map<string, Appointment[]>();
+
+  props.appointments.forEach((apt) => {
+    const dateKey = parseDateToISO(apt.date);
     if (!appointmentsByDate.has(dateKey)) {
-      appointmentsByDate.set(dateKey, [])
+      appointmentsByDate.set(dateKey, []);
     }
-    appointmentsByDate.get(dateKey)?.push(apt)
-  })
-  
-  const events: any[] = []
-  
+    appointmentsByDate.get(dateKey)?.push(apt);
+  });
+
+  const events: any[] = [];
+
   appointmentsByDate.forEach((apts, date) => {
     apts.forEach((apt, index) => {
       if (index < props.maxDotsPerDay) {
@@ -85,14 +85,18 @@ const calendarEvents = computed(() => {
           allDay: true,
           display: 'block',
           title: '●',
-          classNames: props.selectedAppointmentId === apt.id ? ['appointment-dot', 'selected'] : ['appointment-dot'],
+          classNames:
+            props.selectedAppointmentId === apt.id
+              ? ['appointment-dot', 'selected']
+              : ['appointment-dot'],
           backgroundColor: 'transparent',
           borderColor: 'transparent',
-          textColor: props.selectedAppointmentId === apt.id ? props.selectedDotColor : props.dotColor
-        })
+          textColor:
+            props.selectedAppointmentId === apt.id ? props.selectedDotColor : props.dotColor,
+        });
       }
-    })
-    
+    });
+
     if (apts.length > props.maxDotsPerDay) {
       events.push({
         id: `more-${date}`,
@@ -103,13 +107,13 @@ const calendarEvents = computed(() => {
         classNames: ['appointment-dot-more'],
         backgroundColor: 'transparent',
         borderColor: 'transparent',
-        textColor: props.dotColor
-      })
+        textColor: props.dotColor,
+      });
     }
-  })
-  
-  return events
-})
+  });
+
+  return events;
+});
 
 const calendarOptions = ref<CalendarOptions>({
   plugins: [dayGridPlugin, interactionPlugin],
@@ -118,7 +122,7 @@ const calendarOptions = ref<CalendarOptions>({
   headerToolbar: props.headerToolbar || {
     left: 'prev,next today',
     center: 'title',
-    right: props.showWeekView ? 'dayGridMonth,dayGridWeek' : 'dayGridMonth'
+    right: props.showWeekView ? 'dayGridMonth,dayGridWeek' : 'dayGridMonth',
   },
   events: calendarEvents.value,
   selectable: props.selectable,
@@ -128,29 +132,33 @@ const calendarOptions = ref<CalendarOptions>({
   eventClick: handleEventClick,
   select: handleDateSelect,
   height: props.height,
-  eventDisplay: 'block'
-})
+  eventDisplay: 'block',
+});
 
 function handleEventClick(clickInfo: EventClickArg) {
   if (!clickInfo.event.id.startsWith('more-')) {
-    emit('eventClick', clickInfo.event.id)
+    emit('eventClick', clickInfo.event.id);
   }
 }
 
 function handleDateSelect(selectInfo: DateSelectArg) {
   emit('dateSelect', {
     start: selectInfo.startStr,
-    end: selectInfo.endStr
-  })
+    end: selectInfo.endStr,
+  });
 }
 
 // Watch for changes in appointments to update calendar events
-watch(() => props.appointments, () => {
-  calendarOptions.value = {
-    ...calendarOptions.value,
-    events: calendarEvents.value
-  }
-}, { deep: true })
+watch(
+  () => props.appointments,
+  () => {
+    calendarOptions.value = {
+      ...calendarOptions.value,
+      events: calendarEvents.value,
+    };
+  },
+  { deep: true }
+);
 </script>
 
 <template>

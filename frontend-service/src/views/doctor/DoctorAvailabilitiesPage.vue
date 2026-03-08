@@ -1,164 +1,160 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useAuth } from '../../composables/useAuth'
-import { 
-  PlusIcon, 
-  CalendarDaysIcon,
-  ExclamationCircleIcon
-} from '@heroicons/vue/24/outline'
-import WeeklyAvailabilityCalendar from '../../components/doctor/weekly-calendar/WeeklyAvailabilityCalendar.vue'
-import ScheduleModal from '../../components/shared/ScheduleModal.vue'
-import Toast from '../../components/shared/Toast.vue'
-import StatCard from '../../components/doctor/StatCard.vue'
-import type { AvailabilityDisplay } from '../../types/availability'
-import { availabilitiesApi } from '../../api/availabilities'
+import { ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useAuth } from '../../composables/useAuth';
+import { PlusIcon, CalendarDaysIcon, ExclamationCircleIcon } from '@heroicons/vue/24/outline';
+import WeeklyAvailabilityCalendar from '../../components/doctor/weekly-calendar/WeeklyAvailabilityCalendar.vue';
+import ScheduleModal from '../../components/shared/ScheduleModal.vue';
+import Toast from '../../components/shared/Toast.vue';
+import StatCard from '../../components/doctor/StatCard.vue';
+import type { AvailabilityDisplay } from '../../types/availability';
+import { availabilitiesApi } from '../../api/availabilities';
 
-const { t } = useI18n()
-const { currentUser } = useAuth()
+const { t } = useI18n();
+const { currentUser } = useAuth();
 
 // State
-const availabilities = ref<AvailabilityDisplay[]>([])
+const availabilities = ref<AvailabilityDisplay[]>([]);
 const activeAvailabilities = computed(() => {
-  return availabilities.value.filter(a => a.status !== 'CANCELLED')
-})
-const isLoading = ref(false)
-const error = ref<string | null>(null)
-const currentWeekStart = ref(getMonday(new Date()))
+  return availabilities.value.filter((a) => a.status !== 'CANCELLED');
+});
+const isLoading = ref(false);
+const error = ref<string | null>(null);
+const currentWeekStart = ref(getMonday(new Date()));
 
 // Modal state
-const isModalOpen = ref(false)
-const modalMode = ref<'create' | 'edit'>('create')
-const editingAvailability = ref<AvailabilityDisplay | null>(null)
-const preselectedDate = ref<Date | null>(null)
-const preselectedHour = ref<number | null>(null)
-const modalTitle = ref('')
-const modalSubtitle = ref('')
+const isModalOpen = ref(false);
+const modalMode = ref<'create' | 'edit'>('create');
+const editingAvailability = ref<AvailabilityDisplay | null>(null);
+const preselectedDate = ref<Date | null>(null);
+const preselectedHour = ref<number | null>(null);
+const modalTitle = ref('');
+const modalSubtitle = ref('');
 
 // Toast state
-const showToast = ref(false)
-const toastMessage = ref('')
-const toastType = ref<'success' | 'error' | 'info'>('success')
+const showToast = ref(false);
+const toastMessage = ref('');
+const toastType = ref<'success' | 'error' | 'info'>('success');
 
 // Delete confirmation state
-const showDeleteConfirm = ref(false)
-const availabilityToDelete = ref<AvailabilityDisplay | null>(null)
+const showDeleteConfirm = ref(false);
+const availabilityToDelete = ref<AvailabilityDisplay | null>(null);
 
 // Get Monday of the current week
 function getMonday(date: Date): Date {
-  const d = new Date(date)
-  const day = d.getDay()
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
-  d.setDate(diff)
-  d.setHours(0, 0, 0, 0)
-  return d
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
 }
 
 // Statistics
 const stats = computed(() => {
-  const active = activeAvailabilities.value
-  const total = active.length
-  const available = active.filter(a => !a.isBooked).length
-  const booked = active.filter(a => a.isBooked).length
-  
+  const active = activeAvailabilities.value;
+  const total = active.length;
+  const available = active.filter((a) => !a.isBooked).length;
+  const booked = active.filter((a) => a.isBooked).length;
+
   // Filter past availabilities (ended before now)
-  const now = new Date()
-  const past = active.filter(a => a.endDateTime < now).length
-  
-  return { total, available, booked, past }
-})
+  const now = new Date();
+  const past = active.filter((a) => a.endDateTime < now).length;
+
+  return { total, available, booked, past };
+});
 
 // Load availabilities
 async function loadAvailabilities() {
   if (!currentUser.value?.userId) {
-    console.log('[DoctorAvailabilitiesPage] No current user ID available')
-    return
+    console.log('[DoctorAvailabilitiesPage] No current user ID available');
+    return;
   }
 
-  isLoading.value = true
-  error.value = null
-  
+  isLoading.value = true;
+  error.value = null;
+
   try {
-    const endOfWeek = new Date(currentWeekStart.value)
-    endOfWeek.setDate(endOfWeek.getDate() + 6)
-    
-    const startDate = currentWeekStart.value.toISOString().split('T')[0]
-    const endDate = endOfWeek.toISOString().split('T')[0]
-    
+    const endOfWeek = new Date(currentWeekStart.value);
+    endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+    const startDate = currentWeekStart.value.toISOString().split('T')[0];
+    const endDate = endOfWeek.toISOString().split('T')[0];
+
     const fetchedAvailabilities = await availabilitiesApi.getAvailabilitiesByDoctor(
       currentUser.value.userId,
       startDate,
       endDate
-    )
-    
-    availabilities.value = fetchedAvailabilities
+    );
+
+    availabilities.value = fetchedAvailabilities;
   } catch (err) {
-    console.error('Error loading availabilities:', err)
-    error.value = t('doctor.availabilities.errorLoading')
+    console.error('Error loading availabilities:', err);
+    error.value = t('doctor.availabilities.errorLoading');
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 // Navigation handlers
 function handlePreviousWeek() {
-  const newDate = new Date(currentWeekStart.value)
-  newDate.setDate(newDate.getDate() - 7)
-  currentWeekStart.value = newDate
-  loadAvailabilities()
+  const newDate = new Date(currentWeekStart.value);
+  newDate.setDate(newDate.getDate() - 7);
+  currentWeekStart.value = newDate;
+  loadAvailabilities();
 }
 
 function handleNextWeek() {
-  const newDate = new Date(currentWeekStart.value)
-  newDate.setDate(newDate.getDate() + 7)
-  currentWeekStart.value = newDate
-  loadAvailabilities()
+  const newDate = new Date(currentWeekStart.value);
+  newDate.setDate(newDate.getDate() + 7);
+  currentWeekStart.value = newDate;
+  loadAvailabilities();
 }
 
 function handleTodayWeek() {
-  currentWeekStart.value = getMonday(new Date())
-  loadAvailabilities()
+  currentWeekStart.value = getMonday(new Date());
+  loadAvailabilities();
 }
 
 // Modal handlers
 function openCreateModal(date?: Date, hour?: number) {
-  modalMode.value = 'create'
-  editingAvailability.value = null
-  preselectedDate.value = date || null
-  preselectedHour.value = hour ?? null
-  modalTitle.value = 'doctor.availabilities.modal.titleCreate'
-  modalSubtitle.value = 'doctor.availabilities.modal.subtitle'
-  isModalOpen.value = true
+  modalMode.value = 'create';
+  editingAvailability.value = null;
+  preselectedDate.value = date || null;
+  preselectedHour.value = hour ?? null;
+  modalTitle.value = 'doctor.availabilities.modal.titleCreate';
+  modalSubtitle.value = 'doctor.availabilities.modal.subtitle';
+  isModalOpen.value = true;
 }
 
 function openEditModal(availability: AvailabilityDisplay) {
   if (availability.isBooked) {
-    showToastMessage(t('doctor.availabilities.cannotEditBooked'), 'error')
-    return
+    showToastMessage(t('doctor.availabilities.cannotEditBooked'), 'error');
+    return;
   }
-  
-  modalMode.value = 'edit'
-  editingAvailability.value = availability
-  preselectedDate.value = null
-  preselectedHour.value = null
-  modalTitle.value = 'doctor.availabilities.modal.titleEdit'
-  modalSubtitle.value = 'doctor.availabilities.modal.subtitle'
-  isModalOpen.value = true
+
+  modalMode.value = 'edit';
+  editingAvailability.value = availability;
+  preselectedDate.value = null;
+  preselectedHour.value = null;
+  modalTitle.value = 'doctor.availabilities.modal.titleEdit';
+  modalSubtitle.value = 'doctor.availabilities.modal.subtitle';
+  isModalOpen.value = true;
 }
 
 function closeModal() {
-  isModalOpen.value = false
-  editingAvailability.value = null
-  preselectedDate.value = null
-  preselectedHour.value = null
+  isModalOpen.value = false;
+  editingAvailability.value = null;
+  preselectedDate.value = null;
+  preselectedHour.value = null;
 }
 
 // Save handler
 async function handleSave(data: {
-  facilityId: string
-  serviceTypeId: string
-  startDateTime: string
-  durationMinutes: number
+  facilityId: string;
+  serviceTypeId: string;
+  startDateTime: string;
+  durationMinutes: number;
 }) {
   try {
     if (modalMode.value === 'create') {
@@ -167,87 +163,87 @@ async function handleSave(data: {
         facilityId: data.facilityId,
         serviceTypeId: data.serviceTypeId,
         startDateTime: data.startDateTime,
-        durationMinutes: data.durationMinutes
-      })
-      showToastMessage(t('doctor.availabilities.toast.created'), 'success')
+        durationMinutes: data.durationMinutes,
+      });
+      showToastMessage(t('doctor.availabilities.toast.created'), 'success');
     } else if (editingAvailability.value) {
       await availabilitiesApi.updateAvailability(editingAvailability.value.id, {
         facilityId: data.facilityId,
         serviceTypeId: data.serviceTypeId,
         startDateTime: data.startDateTime,
-        durationMinutes: data.durationMinutes
-      })
-      showToastMessage(t('doctor.availabilities.toast.updated'), 'success')
+        durationMinutes: data.durationMinutes,
+      });
+      showToastMessage(t('doctor.availabilities.toast.updated'), 'success');
     }
-    
-    closeModal()
-    loadAvailabilities()
+
+    closeModal();
+    loadAvailabilities();
   } catch (err: any) {
-    console.error('Error saving availability:', err)
+    console.error('Error saving availability:', err);
     // Get localized error message based on error code
-    const errorCode = err?.code || 'GENERIC_ERROR'
-    const errorKey = `doctor.availabilities.errors.${errorCode}`
-    const errorMessage = t(errorKey, t('doctor.availabilities.toast.error'))
-    showToastMessage(errorMessage, 'error')
+    const errorCode = err?.code || 'GENERIC_ERROR';
+    const errorKey = `doctor.availabilities.errors.${errorCode}`;
+    const errorMessage = t(errorKey, t('doctor.availabilities.toast.error'));
+    showToastMessage(errorMessage, 'error');
   }
 }
 
 // Delete handlers
 function handleDeleteClick(availability: AvailabilityDisplay) {
   if (availability.isBooked) {
-    showToastMessage(t('doctor.availabilities.cannotDeleteBooked'), 'error')
-    return
+    showToastMessage(t('doctor.availabilities.cannotDeleteBooked'), 'error');
+    return;
   }
-  
-  availabilityToDelete.value = availability
-  showDeleteConfirm.value = true
+
+  availabilityToDelete.value = availability;
+  showDeleteConfirm.value = true;
 }
 
 async function confirmDelete() {
-  if (!availabilityToDelete.value) return
-  
+  if (!availabilityToDelete.value) return;
+
   try {
-    await availabilitiesApi.deleteAvailability(availabilityToDelete.value.id)
-    showToastMessage(t('doctor.availabilities.toast.deleted'), 'success')
-    loadAvailabilities()
+    await availabilitiesApi.deleteAvailability(availabilityToDelete.value.id);
+    showToastMessage(t('doctor.availabilities.toast.deleted'), 'success');
+    loadAvailabilities();
   } catch (err: any) {
-    console.error('Error deleting availability:', err)
+    console.error('Error deleting availability:', err);
     // Get localized error message based on error code
-    const errorCode = err?.code || 'GENERIC_ERROR'
-    const errorKey = `doctor.availabilities.errors.${errorCode}`
-    const errorMessage = t(errorKey, t('doctor.availabilities.toast.error'))
-    showToastMessage(errorMessage, 'error')
+    const errorCode = err?.code || 'GENERIC_ERROR';
+    const errorKey = `doctor.availabilities.errors.${errorCode}`;
+    const errorMessage = t(errorKey, t('doctor.availabilities.toast.error'));
+    showToastMessage(errorMessage, 'error');
   } finally {
-    showDeleteConfirm.value = false
-    availabilityToDelete.value = null
+    showDeleteConfirm.value = false;
+    availabilityToDelete.value = null;
   }
 }
 
 function cancelDelete() {
-  showDeleteConfirm.value = false
-  availabilityToDelete.value = null
+  showDeleteConfirm.value = false;
+  availabilityToDelete.value = null;
 }
 
 // Slot click handler
 function handleSlotClick(date: Date, hour: number) {
-  openCreateModal(date, hour)
+  openCreateModal(date, hour);
 }
 
 // Toast helper
 function showToastMessage(message: string, type: 'success' | 'error' | 'info' = 'success') {
-  toastMessage.value = message
-  toastType.value = type
-  showToast.value = true
+  toastMessage.value = message;
+  toastType.value = type;
+  showToast.value = true;
 }
 
 function closeToast() {
-  showToast.value = false
+  showToast.value = false;
 }
 
 // Load on mount
 onMounted(() => {
-  loadAvailabilities()
-})
+  loadAvailabilities();
+});
 </script>
 
 <template>
@@ -259,12 +255,9 @@ onMounted(() => {
           <h1 class="page-title">{{ t('doctor.availabilities.title') }}</h1>
           <p class="page-subtitle">{{ t('doctor.availabilities.subtitle') }}</p>
         </div>
-        
+
         <!-- Add Availability Button -->
-        <button 
-          class="add-availability-btn"
-          @click="openCreateModal()"
-        >
+        <button class="add-availability-btn" @click="openCreateModal()">
           <PlusIcon class="btn-icon" />
           <span>{{ t('doctor.availabilities.addAvailability') }}</span>
         </button>
@@ -280,21 +273,21 @@ onMounted(() => {
         icon-bg-color="var(--accent-primary-15)"
         icon-color="var(--accent-primary)"
       />
-      
+
       <StatCard
         :value="stats.available"
         :label="t('doctor.availabilities.stats.available')"
         indicator-bg-color="var(--success-30)"
         indicator-border-color="var(--success)"
       />
-      
+
       <StatCard
         :value="stats.booked"
         :label="t('doctor.availabilities.stats.booked')"
         indicator-bg-color="var(--accent-primary-30)"
         indicator-border-color="var(--accent-primary)"
       />
-      
+
       <StatCard
         :value="stats.past"
         :label="t('doctor.availabilities.stats.past')"
@@ -371,12 +364,7 @@ onMounted(() => {
     </Teleport>
 
     <!-- Toast Notification -->
-    <Toast 
-      :show="showToast"
-      :message="toastMessage"
-      :type="toastType"
-      @close="closeToast"
-    />
+    <Toast :show="showToast" :message="toastMessage" :type="toastType" @close="closeToast" />
   </div>
 </template>
 
@@ -388,7 +376,12 @@ onMounted(() => {
   max-width: 100vw;
   overflow-x: hidden;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
   position: relative;
 }
 
@@ -399,7 +392,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, var(--sky-0ea5e9-20) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, var(--purple-a855f7-20) 0%, transparent 50%);
   pointer-events: none;
@@ -423,7 +416,9 @@ onMounted(() => {
   backdrop-filter: blur(20px);
   border: 1px solid var(--white-60);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-8),
+    inset 0 1px 0 var(--white-80);
 }
 
 .header-text {
@@ -511,7 +506,9 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .error-icon {

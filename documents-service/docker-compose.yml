@@ -4,7 +4,7 @@ services:
       context: ..
       dockerfile: documents-service/Dockerfile
     ports:
-      - "8090:8080"
+      - '8090:8080'
     environment:
       - JAVA_OPTS=-Xms256m -Xmx512m
       - SERVER_PORT=8080
@@ -25,7 +25,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -36,7 +36,7 @@ services:
       context: ../ai-service
       dockerfile: Dockerfile
     ports:
-      - "8001:8000"
+      - '8001:8000'
     environment:
       - HTTP_PORT=8000
       - MINIO_ENDPOINT=minio:9000
@@ -54,7 +54,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -64,7 +64,7 @@ services:
     image: mongo:7.0
     container_name: documents-mongodb
     ports:
-      - "27037:27017"
+      - '27037:27017'
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=password
@@ -74,7 +74,7 @@ services:
       - mongodb_config:/data/configdb
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -84,7 +84,7 @@ services:
     image: mongo-express:1.0.2
     container_name: documents-mongo-express
     ports:
-      - "8081:8081"
+      - '8081:8081'
     environment:
       - ME_CONFIG_MONGODB_URL=mongodb://admin:password@mongodb:27017/
       - ME_CONFIG_BASICAUTH=true
@@ -99,8 +99,8 @@ services:
     image: minio/minio:latest
     container_name: documents-minio
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
@@ -109,7 +109,7 @@ services:
       - minio_data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ['CMD', 'mc', 'ready', 'local']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -128,7 +128,7 @@ services:
       /usr/bin/mc anonymous set download myminio/documents;
       exit 0;
       "
-    restart: "no"
+    restart: 'no'
 
 volumes:
   mongodb_data:

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { UserIcon } from '@heroicons/vue/24/outline'
-import type { ProfileCard } from '../../types/shared'
+import { UserIcon } from '@heroicons/vue/24/outline';
+import type { ProfileCard } from '../../types/shared';
 
-const props = defineProps<ProfileCard>()
+const props = defineProps<ProfileCard>();
 
-const emit = defineEmits<{ click: [] }>()
+const emit = defineEmits<{ click: [] }>();
 </script>
 
 <template>
@@ -32,13 +32,20 @@ const emit = defineEmits<{ click: [] }>()
   background: var(--bg-secondary-30);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 4px 16px var(--text-primary-10), inset 0 1px 0 var(--bg-secondary-70);
+  box-shadow:
+    0 4px 16px var(--text-primary-10),
+    inset 0 1px 0 var(--bg-secondary-70);
   cursor: pointer;
-  transition: box-shadow 0.3s cubic-bezier(0, 0, 0.2, 1), transform 0.3s cubic-bezier(0, 0, 0.2, 1), background 0.3s cubic-bezier(0, 0, 0.2, 1);
+  transition:
+    box-shadow 0.3s cubic-bezier(0, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0, 0, 0.2, 1),
+    background 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
 .profile-card:hover {
-  box-shadow: 0 8px 24px var(--text-primary-12), inset 0 1px 0 var(--bg-secondary-80);
+  box-shadow:
+    0 8px 24px var(--text-primary-12),
+    inset 0 1px 0 var(--bg-secondary-80);
   background: var(--bg-secondary-45);
   transform: translateY(-4px);
 }

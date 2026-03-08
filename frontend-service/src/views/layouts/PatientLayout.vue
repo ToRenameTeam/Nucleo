@@ -1,38 +1,33 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import TopBar from '../../components/shared/TopBar.vue'
-import Breadcrumbs from '../../components/shared/Breadcrumbs.vue'
-import BottomBar from '../../components/shared/BottomBar.vue'
-import Footer from '../../components/shared/Footer.vue'
-import {
-  HomeIcon,
-  DocumentTextIcon,
-  CalendarIcon,
-  Cog6ToothIcon
-} from '@heroicons/vue/24/outline'
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import TopBar from '../../components/shared/TopBar.vue';
+import Breadcrumbs from '../../components/shared/Breadcrumbs.vue';
+import BottomBar from '../../components/shared/BottomBar.vue';
+import Footer from '../../components/shared/Footer.vue';
+import { HomeIcon, DocumentTextIcon, CalendarIcon, Cog6ToothIcon } from '@heroicons/vue/24/outline';
 import {
   HomeIcon as HomeIconSolid,
   DocumentTextIcon as DocumentTextIconSolid,
   CalendarIcon as CalendarIconSolid,
-  Cog6ToothIcon as Cog6ToothIconSolid
-} from '@heroicons/vue/24/solid'
+  Cog6ToothIcon as Cog6ToothIconSolid,
+} from '@heroicons/vue/24/solid';
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const tabIcons = {
   home: { outline: HomeIcon, solid: HomeIconSolid },
   documents: { outline: DocumentTextIcon, solid: DocumentTextIconSolid },
   calendar: { outline: CalendarIcon, solid: CalendarIconSolid },
-  settings: { outline: Cog6ToothIcon, solid: Cog6ToothIconSolid }
-}
+  settings: { outline: Cog6ToothIcon, solid: Cog6ToothIconSolid },
+};
 
 const patientTabs = computed(() => [
   { id: 'patient-home', label: t('tabs.home'), icon: tabIcons.home },
   { id: 'patient-documents', label: t('tabs.documents'), icon: tabIcons.documents },
   { id: 'patient-calendar', label: t('tabs.calendar'), icon: tabIcons.calendar },
-  { id: 'patient-settings', label: t('tabs.settings'), icon: tabIcons.settings }
-])
+  { id: 'patient-settings', label: t('tabs.settings'), icon: tabIcons.settings },
+]);
 </script>
 
 <template>

@@ -1,67 +1,72 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { BaseCard } from '../../types/shared'
+import { computed } from 'vue';
+import type { BaseCard } from '../../types/shared';
 
 const props = withDefaults(defineProps<BaseCard>(), {
   selected: false,
   selectable: false,
   showActions: true,
   clickable: true,
-  actions: () => []
-})
+  actions: () => [],
+});
 
 const emit = defineEmits<{
-  click: []
-  toggleSelect: []
-}>()
+  click: [];
+  toggleSelect: [];
+}>();
 
 const handleClick = () => {
   if (props.selectable) {
-    emit('toggleSelect')
+    emit('toggleSelect');
   } else if (props.clickable) {
-    emit('click')
+    emit('click');
   }
-}
+};
 
 const handleActionClick = (event: Event, actionId: string) => {
-  event.stopPropagation()
-  const action = props.actions?.find(a => a.id === actionId)
+  event.stopPropagation();
+  const action = props.actions?.find((a) => a.id === actionId);
   if (action && props.cardId) {
-    action.onClick(props.cardId)
+    action.onClick(props.cardId);
   }
-}
+};
 
 const isCardSelected = computed(() => {
-  return props.selectable && props.selected
-})
+  return props.selectable && props.selected;
+});
 
 const hasActions = computed(() => {
-  return props.showActions && ((props.actions && props.actions.length > 0) || !!slots.actions)
-})
+  return props.showActions && ((props.actions && props.actions.length > 0) || !!slots.actions);
+});
 
 const slots = defineSlots<{
-  badges?: any
-  'title-actions'?: any
-  'status-badge'?: any
-  actions?: any
-}>()
+  badges?: any;
+  'title-actions'?: any;
+  'status-badge'?: any;
+  actions?: any;
+}>();
 </script>
 
 <template>
-  <div 
+  <div
     :id="cardId"
-    :class="['base-card-wrapper', {
-      'card-selectable': selectable,
-      'card-selected': isCardSelected
-    }]" 
+    :class="[
+      'base-card-wrapper',
+      {
+        'card-selectable': selectable,
+        'card-selected': isCardSelected,
+      },
+    ]"
     @click="handleClick"
   >
     <!-- Selection Checkbox (when selectable) -->
-    <div v-if="selectable" class="selection-checkbox" :class="{ 'checked': selected }">
+    <div v-if="selectable" class="selection-checkbox" :class="{ checked: selected }">
       <svg v-if="selected" class="checkbox-icon" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd"
+        <path
+          fill-rule="evenodd"
           d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-          clip-rule="evenodd" />
+          clip-rule="evenodd"
+        />
       </svg>
     </div>
 
@@ -156,7 +161,9 @@ const slots = defineSlots<{
 .base-card-wrapper.card-selected .base-card {
   border: 2px solid var(--text-primary-60);
   background: var(--bg-secondary-40);
-  box-shadow: 0 12px 40px var(--text-primary-18), 0 1px 2px var(--bg-secondary);
+  box-shadow:
+    0 12px 40px var(--text-primary-18),
+    0 1px 2px var(--bg-secondary);
 }
 
 .selection-checkbox {
@@ -198,7 +205,9 @@ const slots = defineSlots<{
   border-radius: 1.25rem;
   padding: 1.5rem;
   border: 1.5px solid var(--bg-secondary-70);
-  box-shadow: 0 4px 24px var(--shadow), 0 1px 2px var(--white-90);
+  box-shadow:
+    0 4px 24px var(--shadow),
+    0 1px 2px var(--white-90);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
@@ -209,7 +218,9 @@ const slots = defineSlots<{
 
 .base-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px var(--text-primary-15), 0 1px 2px var(--white-90);
+  box-shadow:
+    0 12px 40px var(--text-primary-15),
+    0 1px 2px var(--white-90);
   background: var(--bg-secondary-35);
   border-color: var(--white-90);
   z-index: 10;
@@ -218,7 +229,9 @@ const slots = defineSlots<{
 
 .base-card.card-not-clickable:hover {
   transform: none;
-  box-shadow: 0 4px 24px var(--shadow), 0 1px 2px var(--white-90);
+  box-shadow:
+    0 4px 24px var(--shadow),
+    0 1px 2px var(--white-90);
   background: var(--bg-secondary-25);
   border-color: var(--bg-secondary-70);
 }
@@ -386,19 +399,21 @@ const slots = defineSlots<{
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3),
-              0 2px 4px rgba(0, 0, 0, 0.1),
-              inset 0 1px 1px rgba(255, 255, 255, 0.25),
-              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 4px 16px rgba(14, 165, 233, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .action-primary:hover {
   background: rgba(12, 141, 199, 0.85);
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(14, 165, 233, 0.4),
-              0 3px 8px rgba(0, 0, 0, 0.15),
-              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 6px 24px rgba(14, 165, 233, 0.4),
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .action-secondary {
@@ -407,19 +422,21 @@ const slots = defineSlots<{
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.3),
-              0 2px 4px rgba(0, 0, 0, 0.1),
-              inset 0 1px 1px rgba(255, 255, 255, 0.25),
-              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 4px 16px rgba(168, 85, 247, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .action-secondary:hover {
   background: rgba(147, 51, 234, 0.85);
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(168, 85, 247, 0.4),
-              0 3px 8px rgba(0, 0, 0, 0.15),
-              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 6px 24px rgba(168, 85, 247, 0.4),
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .action-warning {
@@ -428,19 +445,21 @@ const slots = defineSlots<{
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3),
-              0 2px 4px rgba(0, 0, 0, 0.1),
-              inset 0 1px 1px rgba(255, 255, 255, 0.25),
-              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 4px 16px rgba(245, 158, 11, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .action-warning:hover {
   background: rgba(217, 119, 6, 0.85);
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(245, 158, 11, 0.4),
-              0 3px 8px rgba(0, 0, 0, 0.15),
-              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 6px 24px rgba(245, 158, 11, 0.4),
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .action-danger {
@@ -449,44 +468,50 @@ const slots = defineSlots<{
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3),
-              0 2px 4px rgba(0, 0, 0, 0.1),
-              inset 0 1px 1px rgba(255, 255, 255, 0.25),
-              inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 4px 16px rgba(239, 68, 68, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .action-danger:hover {
   background: rgba(220, 38, 38, 0.85);
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(239, 68, 68, 0.4),
-              0 3px 8px rgba(0, 0, 0, 0.15),
-              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 6px 24px rgba(239, 68, 68, 0.4),
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .action-ghost {
   background: var(--white-20);
   border-color: var(--white-40);
   color: var(--text-primary);
-  box-shadow: 0 2px 8px var(--black-5), inset 0 1px 0 var(--white-60);
+  box-shadow:
+    0 2px 8px var(--black-5),
+    inset 0 1px 0 var(--white-60);
 }
 
 .action-ghost:hover {
   background: var(--white-40);
   border-color: var(--white-60);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--black-10), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 4px 12px var(--black-10),
+    inset 0 1px 0 var(--white-80);
 }
 
 @media (max-width: 768px) {
   .card-content {
     gap: 1rem;
   }
-  
+
   .content-wrapper {
     flex-direction: column;
   }
-  
+
   .card-actions {
     width: 100%;
   }

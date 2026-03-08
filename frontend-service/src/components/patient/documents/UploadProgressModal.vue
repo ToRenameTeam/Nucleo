@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import BaseModal from '../../shared/BaseModal.vue'
-import { ArrowPathIcon } from '@heroicons/vue/24/outline'
-import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/vue/24/solid'
+import { computed } from 'vue';
+import BaseModal from '../../shared/BaseModal.vue';
+import { ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/vue/24/solid';
 
 interface Props {
-  isOpen: boolean
-  isLoading: boolean
-  error: string | null
-  filename: string
+  isOpen: boolean;
+  isLoading: boolean;
+  error: string | null;
+  filename: string;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  close: []
-}>()
+  close: [];
+}>();
 
-const isCompleted = computed(() => !props.isLoading && !props.error)
+const isCompleted = computed(() => !props.isLoading && !props.error);
 
 const title = computed(() => {
-  if (props.error) return 'upload.progress.title'
-  return isCompleted.value ? 'upload.progress.successTitle' : 'upload.progress.title'
-})
+  if (props.error) return 'upload.progress.title';
+  return isCompleted.value ? 'upload.progress.successTitle' : 'upload.progress.title';
+});
 </script>
 
 <template>
@@ -55,10 +55,7 @@ const title = computed(() => {
 
     <!-- Footer -->
     <template #footer v-if="isCompleted || error">
-      <button
-        class="modal-button close-button"
-        @click="emit('close')"
-      >
+      <button class="modal-button close-button" @click="emit('close')">
         {{ $t('common.close') }}
       </button>
     </template>
@@ -106,8 +103,12 @@ const title = computed(() => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {

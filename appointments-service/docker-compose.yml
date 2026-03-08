@@ -9,13 +9,13 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - '${POSTGRES_PORT}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
       - ./src/main/resources/db/seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U appointments_user -d appointments"]
+      test: ['CMD-SHELL', 'pg_isready -U appointments_user -d appointments']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -39,7 +39,7 @@ services:
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     ports:
-      - "${APP_PORT}:8080"
+      - '${APP_PORT}:8080'
     depends_on:
       postgres:
         condition: service_healthy

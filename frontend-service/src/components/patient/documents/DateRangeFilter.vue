@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { CalendarIcon, XMarkIcon } from '@heroicons/vue/24/outline'
-import { useI18n } from 'vue-i18n'
-import type { DateRange } from '../../../types/date-range'
-import { formatDateToISO, startOfDay, endOfDay } from '../../../utils/dateUtils'
+import { ref, computed, watch } from 'vue';
+import { CalendarIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { useI18n } from 'vue-i18n';
+import type { DateRange } from '../../../types/date-range';
+import { formatDateToISO, startOfDay, endOfDay } from '../../../utils/dateUtils';
 
 interface DateRangeFilter {
-  modelValue: DateRange
+  modelValue: DateRange;
 }
 
-const props = defineProps<DateRangeFilter>()
+const props = defineProps<DateRangeFilter>();
 const emit = defineEmits<{
-  'update:modelValue': [value: DateRange]
-}>()
+  'update:modelValue': [value: DateRange];
+}>();
 
-const { t } = useI18n()
-const showPicker = ref(false)
-const fromDate = ref('')
-const toDate = ref('')
+const { t } = useI18n();
+const showPicker = ref(false);
+const fromDate = ref('');
+const toDate = ref('');
 
 // Preset date ranges
 const presets = computed(() => [
@@ -25,115 +25,119 @@ const presets = computed(() => [
     id: 'last-month',
     label: t('documents.dateRange.lastMonth'),
     getDates: () => {
-      const to = endOfDay(new Date())
-      const from = startOfDay(new Date())
-      from.setMonth(from.getMonth() - 1)
-      return { from, to }
-    }
+      const to = endOfDay(new Date());
+      const from = startOfDay(new Date());
+      from.setMonth(from.getMonth() - 1);
+      return { from, to };
+    },
   },
   {
     id: 'last-3-months',
     label: t('documents.dateRange.last3Months'),
     getDates: () => {
-      const to = endOfDay(new Date())
-      const from = startOfDay(new Date())
-      from.setMonth(from.getMonth() - 3)
-      return { from, to }
-    }
+      const to = endOfDay(new Date());
+      const from = startOfDay(new Date());
+      from.setMonth(from.getMonth() - 3);
+      return { from, to };
+    },
   },
   {
     id: 'last-6-months',
     label: t('documents.dateRange.last6Months'),
     getDates: () => {
-      const to = endOfDay(new Date())
-      const from = startOfDay(new Date())
-      from.setMonth(from.getMonth() - 6)
-      return { from, to }
-    }
+      const to = endOfDay(new Date());
+      const from = startOfDay(new Date());
+      from.setMonth(from.getMonth() - 6);
+      return { from, to };
+    },
   },
   {
     id: 'last-year',
     label: t('documents.dateRange.lastYear'),
     getDates: () => {
-      const to = endOfDay(new Date())
-      const from = startOfDay(new Date())
-      from.setFullYear(from.getFullYear() - 1)
-      return { from, to }
-    }
-  }
-])
+      const to = endOfDay(new Date());
+      const from = startOfDay(new Date());
+      from.setFullYear(from.getFullYear() - 1);
+      return { from, to };
+    },
+  },
+]);
 
 const isActive = computed(() => {
-  return props.modelValue.from !== null || props.modelValue.to !== null
-})
+  return props.modelValue.from !== null || props.modelValue.to !== null;
+});
 
 const formattedRange = computed(() => {
   if (!props.modelValue.from && !props.modelValue.to) {
-    return t('documents.dateRange.selectRange')
+    return t('documents.dateRange.selectRange');
   }
-  
+
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('it-IT', { 
-      day: 'numeric', 
-      month: 'short', 
-      year: 'numeric' 
-    }).format(date)
-  }
-  
+    return new Intl.DateTimeFormat('it-IT', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(date);
+  };
+
   if (props.modelValue.from && props.modelValue.to) {
-    return `${formatDate(props.modelValue.from)} - ${formatDate(props.modelValue.to)}`
+    return `${formatDate(props.modelValue.from)} - ${formatDate(props.modelValue.to)}`;
   }
-  
+
   if (props.modelValue.from) {
-    return `${t('documents.dateRange.from')} ${formatDate(props.modelValue.from)}`
+    return `${t('documents.dateRange.from')} ${formatDate(props.modelValue.from)}`;
   }
-  
+
   if (props.modelValue.to) {
-    return `${t('documents.dateRange.to')} ${formatDate(props.modelValue.to)}`
+    return `${t('documents.dateRange.to')} ${formatDate(props.modelValue.to)}`;
   }
-  
-  return ''
-})
+
+  return '';
+});
 
 // Initialize input values from props
-watch(() => props.modelValue, (value) => {
-  if (value.from) {
-    fromDate.value = formatDateToISO(value.from)
-  } else {
-    fromDate.value = ''
-  }
-  
-  if (value.to) {
-    toDate.value = formatDateToISO(value.to)
-  } else {
-    toDate.value = ''
-  }
-}, { immediate: true })
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (value.from) {
+      fromDate.value = formatDateToISO(value.from);
+    } else {
+      fromDate.value = '';
+    }
 
-const applyPreset = (preset: typeof presets.value[0]) => {
-  const dates = preset.getDates()
-  emit('update:modelValue', dates)
-  showPicker.value = false
-}
+    if (value.to) {
+      toDate.value = formatDateToISO(value.to);
+    } else {
+      toDate.value = '';
+    }
+  },
+  { immediate: true }
+);
+
+const applyPreset = (preset: (typeof presets.value)[0]) => {
+  const dates = preset.getDates();
+  emit('update:modelValue', dates);
+  showPicker.value = false;
+};
 
 const applyCustomRange = () => {
   const range: DateRange = {
     from: fromDate.value ? startOfDay(new Date(fromDate.value)) : null,
-    to: toDate.value ? endOfDay(new Date(toDate.value)) : null
-  }
-  emit('update:modelValue', range)
-  showPicker.value = false
-}
+    to: toDate.value ? endOfDay(new Date(toDate.value)) : null,
+  };
+  emit('update:modelValue', range);
+  showPicker.value = false;
+};
 
 const clearRange = () => {
-  emit('update:modelValue', { from: null, to: null })
-  showPicker.value = false
-}
+  emit('update:modelValue', { from: null, to: null });
+  showPicker.value = false;
+};
 </script>
 
 <template>
   <div class="date-range-filter">
-    <button 
+    <button
       class="range-button"
       :class="{ 'range-button-active': isActive }"
       @click="showPicker = !showPicker"
@@ -141,8 +145,8 @@ const clearRange = () => {
     >
       <CalendarIcon class="icon-calendar" />
       <span class="range-label">{{ formattedRange }}</span>
-      <XMarkIcon 
-        v-if="isActive" 
+      <XMarkIcon
+        v-if="isActive"
         class="icon-clear clear-icon"
         @click.stop="clearRange"
         :aria-label="$t('documents.dateRange.clearRange')"
@@ -173,7 +177,7 @@ const clearRange = () => {
           <div class="date-inputs">
             <div class="date-input-group">
               <label class="input-label">{{ $t('documents.dateRange.from') }}</label>
-              <input 
+              <input
                 v-model="fromDate"
                 type="date"
                 class="date-input"
@@ -182,7 +186,7 @@ const clearRange = () => {
             </div>
             <div class="date-input-group">
               <label class="input-label">{{ $t('documents.dateRange.to') }}</label>
-              <input 
+              <input
                 v-model="toDate"
                 type="date"
                 class="date-input"
@@ -190,7 +194,11 @@ const clearRange = () => {
               />
             </div>
           </div>
-          <button class="apply-button" @click="applyCustomRange" :aria-label="$t('documents.dateRange.apply')">
+          <button
+            class="apply-button"
+            @click="applyCustomRange"
+            :aria-label="$t('documents.dateRange.apply')"
+          >
             {{ $t('documents.dateRange.apply') }}
           </button>
         </div>
@@ -220,7 +228,9 @@ const clearRange = () => {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
-  box-shadow: 0 2px 8px var(--shadow), inset 0 1px 0 var(--white-60);
+  box-shadow:
+    0 2px 8px var(--shadow),
+    inset 0 1px 0 var(--white-60);
   white-space: nowrap;
   position: relative;
   z-index: 201;
@@ -228,7 +238,9 @@ const clearRange = () => {
 
 .range-button:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px var(--shadow), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 4px 12px var(--shadow),
+    inset 0 1px 0 var(--white-80);
 }
 
 .range-button-active {
@@ -274,7 +286,9 @@ const clearRange = () => {
   border: 1px solid var(--text-primary-10);
   border-radius: 1rem;
   padding: 1rem;
-  box-shadow: 0 12px 40px var(--black-20), inset 0 1px 0 var(--white-90);
+  box-shadow:
+    0 12px 40px var(--black-20),
+    inset 0 1px 0 var(--white-90);
   z-index: 210;
   pointer-events: auto;
   isolation: isolate;

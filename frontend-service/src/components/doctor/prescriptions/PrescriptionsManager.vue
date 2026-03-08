@@ -1,84 +1,84 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useAuth } from '../../../composables/useAuth'
-import { PlusIcon } from '@heroicons/vue/24/outline'
-import PrescriptionsMenuModal from './PrescriptionsMenuModal.vue'
-import MedicinePrescriptionModal from './MedicinePrescriptionForm.vue'
-import ServicePrescriptionModal from './ServicePrescriptionForm.vue'
-import Toast from '../../shared/Toast.vue'
-import { userApi, type UserInfo } from '../../../api/users'
-import { doctorDocumentsApi } from '../../../api/doctorDocuments'
-import type { MedicinePrescriptionFormData } from './MedicinePrescriptionForm.vue'
-import type { ServicePrescriptionFormData } from './ServicePrescriptionForm.vue'
+import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useAuth } from '../../../composables/useAuth';
+import { PlusIcon } from '@heroicons/vue/24/outline';
+import PrescriptionsMenuModal from './PrescriptionsMenuModal.vue';
+import MedicinePrescriptionModal from './MedicinePrescriptionForm.vue';
+import ServicePrescriptionModal from './ServicePrescriptionForm.vue';
+import Toast from '../../shared/Toast.vue';
+import { userApi, type UserInfo } from '../../../api/users';
+import { doctorDocumentsApi } from '../../../api/doctorDocuments';
+import type { MedicinePrescriptionFormData } from './MedicinePrescriptionForm.vue';
+import type { ServicePrescriptionFormData } from './ServicePrescriptionForm.vue';
 
-const { t } = useI18n()
+const { t } = useI18n();
 
-const { currentUser } = useAuth()
+const { currentUser } = useAuth();
 
-const isPrescriptionsMenuOpen = ref(false)
-const isMedicinePrescriptionModalOpen = ref(false)
-const isServicePrescriptionModalOpen = ref(false)
+const isPrescriptionsMenuOpen = ref(false);
+const isMedicinePrescriptionModalOpen = ref(false);
+const isServicePrescriptionModalOpen = ref(false);
 
-const showSuccessToast = ref(false)
-const successToastMessage = ref('')
+const showSuccessToast = ref(false);
+const successToastMessage = ref('');
 
-const prescriptionSaveError = ref('')
+const prescriptionSaveError = ref('');
 
-const isSaving = ref(false)
-const isLoadingUsers = ref(false)
+const isSaving = ref(false);
+const isLoadingUsers = ref(false);
 
-const allUsers = ref<UserInfo[]>([])
+const allUsers = ref<UserInfo[]>([]);
 
 const openPrescriptionsMenu = () => {
-  isPrescriptionsMenuOpen.value = true
-}
+  isPrescriptionsMenuOpen.value = true;
+};
 
 const closePrescriptionsMenu = () => {
-  isPrescriptionsMenuOpen.value = false
-}
+  isPrescriptionsMenuOpen.value = false;
+};
 const handleMedicinePrescription = () => {
-  closePrescriptionsMenu()
-  isMedicinePrescriptionModalOpen.value = true
-}
+  closePrescriptionsMenu();
+  isMedicinePrescriptionModalOpen.value = true;
+};
 
 const closeMedicinePrescriptionModal = () => {
-  isMedicinePrescriptionModalOpen.value = false
-  prescriptionSaveError.value = ''
-}
+  isMedicinePrescriptionModalOpen.value = false;
+  prescriptionSaveError.value = '';
+};
 
 const handleBackFromMedicinePrescription = () => {
-  isMedicinePrescriptionModalOpen.value = false
-  prescriptionSaveError.value = ''
-  isPrescriptionsMenuOpen.value = true
-}
+  isMedicinePrescriptionModalOpen.value = false;
+  prescriptionSaveError.value = '';
+  isPrescriptionsMenuOpen.value = true;
+};
 const handleServicePrescription = () => {
-  closePrescriptionsMenu()
-  isServicePrescriptionModalOpen.value = true
-}
+  closePrescriptionsMenu();
+  isServicePrescriptionModalOpen.value = true;
+};
 
 const closeServicePrescriptionModal = () => {
-  isServicePrescriptionModalOpen.value = false
-  prescriptionSaveError.value = ''
-}
+  isServicePrescriptionModalOpen.value = false;
+  prescriptionSaveError.value = '';
+};
 
 const handleBackFromServicePrescription = () => {
-  isServicePrescriptionModalOpen.value = false
-  prescriptionSaveError.value = ''
-  isPrescriptionsMenuOpen.value = true
-}
+  isServicePrescriptionModalOpen.value = false;
+  prescriptionSaveError.value = '';
+  isPrescriptionsMenuOpen.value = true;
+};
 
 const handleSaveMedicinePrescription = async (prescription: MedicinePrescriptionFormData) => {
-  prescriptionSaveError.value = ''
-  isSaving.value = true
-  
+  prescriptionSaveError.value = '';
+  isSaving.value = true;
+
   try {
-    const doctorId = currentUser.value?.userId
-    
+    const doctorId = currentUser.value?.userId;
+
     if (!doctorId) {
-      throw new Error('Doctor ID not found')
+      throw new Error('Doctor ID not found');
     }
-    
+
     // Build the request with the proper format for the API
     const request = {
       _t: 'medicine_prescription' as const,
@@ -86,58 +86,59 @@ const handleSaveMedicinePrescription = async (prescription: MedicinePrescription
       title: `Prescrizione: ${prescription.medicineName}`,
       metadata: {
         summary: t('prescriptionSummary.medicine', { medicine: prescription.medicineName }),
-        tags: [t('prescriptionTags.prescription'), t('prescriptionTags.medicines')]
+        tags: [t('prescriptionTags.prescription'), t('prescriptionTags.medicines')],
       },
-      validity: prescription.validityType === 'until_execution' 
-        ? { _t: 'until_execution' as const }
-        : { 
-            _t: 'until_date' as const, 
-            date: prescription.validityDate // Already in yyyy-MM-dd format from date input
-          },
+      validity:
+        prescription.validityType === 'until_execution'
+          ? { _t: 'until_execution' as const }
+          : {
+              _t: 'until_date' as const,
+              date: prescription.validityDate, // Already in yyyy-MM-dd format from date input
+            },
       dosage: {
         medicineId: prescription.medicineId,
         dose: {
           amount: prescription.doseAmount,
-          unit: prescription.doseUnit
+          unit: prescription.doseUnit,
         },
         frequency: {
           timesPerPeriod: prescription.frequencyTimes,
-          period: prescription.frequencyPeriod
+          period: prescription.frequencyPeriod,
         },
         duration: {
           length: prescription.durationLength,
-          unit: prescription.durationUnit
-        }
-      }
-    }
-    
-    await doctorDocumentsApi.createMedicinePrescription(prescription.patientId, request)
-    
-    isMedicinePrescriptionModalOpen.value = false
-    successToastMessage.value = t('doctor.documents.prescriptions.toast.medicineSaved')
-    showSuccessToast.value = true
-    
+          unit: prescription.durationUnit,
+        },
+      },
+    };
+
+    await doctorDocumentsApi.createMedicinePrescription(prescription.patientId, request);
+
+    isMedicinePrescriptionModalOpen.value = false;
+    successToastMessage.value = t('doctor.documents.prescriptions.toast.medicineSaved');
+    showSuccessToast.value = true;
+
     // Emit event to update the list of prescriptions
-    window.dispatchEvent(new CustomEvent('prescriptions-updated'))
+    window.dispatchEvent(new CustomEvent('prescriptions-updated'));
   } catch (error) {
-    prescriptionSaveError.value = t('doctor.documents.prescriptions.errors.saveFailed')
-    console.error('Error saving medicine prescription:', error)
+    prescriptionSaveError.value = t('doctor.documents.prescriptions.errors.saveFailed');
+    console.error('Error saving medicine prescription:', error);
   } finally {
-    isSaving.value = false
+    isSaving.value = false;
   }
-}
+};
 
 const handleSaveServicePrescription = async (prescription: ServicePrescriptionFormData) => {
-  prescriptionSaveError.value = ''
-  isSaving.value = true
-  
+  prescriptionSaveError.value = '';
+  isSaving.value = true;
+
   try {
-    const doctorId = currentUser.value?.userId
-    
+    const doctorId = currentUser.value?.userId;
+
     if (!doctorId) {
-      throw new Error('Doctor ID not found')
+      throw new Error('Doctor ID not found');
     }
-    
+
     // Build the request with the proper format for the API
     const request = {
       _t: 'service_prescription' as const,
@@ -145,50 +146,51 @@ const handleSaveServicePrescription = async (prescription: ServicePrescriptionFo
       title: `Prescrizione: ${prescription.serviceName}`,
       metadata: {
         summary: t('prescriptionSummary.service', { service: prescription.serviceName }),
-        tags: [t('prescriptionTags.prescription'), t('prescriptionTags.services')]
+        tags: [t('prescriptionTags.prescription'), t('prescriptionTags.services')],
       },
-      validity: prescription.validityType === 'until_execution' 
-        ? { _t: 'until_execution' as const }
-        : { 
-            _t: 'until_date' as const, 
-            date: prescription.validityDate // Already in yyyy-MM-dd format from date input
-          },
+      validity:
+        prescription.validityType === 'until_execution'
+          ? { _t: 'until_execution' as const }
+          : {
+              _t: 'until_date' as const,
+              date: prescription.validityDate, // Already in yyyy-MM-dd format from date input
+            },
       serviceId: prescription.serviceId,
       facilityId: prescription.facilityId,
-      priority: prescription.priority
-    }
-    
-    await doctorDocumentsApi.createServicePrescription(prescription.patientId, request)
-    
-    isServicePrescriptionModalOpen.value = false
-    successToastMessage.value = t('doctor.documents.prescriptions.toast.serviceSaved')
-    showSuccessToast.value = true
-    
-    window.dispatchEvent(new CustomEvent('prescriptions-updated'))
+      priority: prescription.priority,
+    };
+
+    await doctorDocumentsApi.createServicePrescription(prescription.patientId, request);
+
+    isServicePrescriptionModalOpen.value = false;
+    successToastMessage.value = t('doctor.documents.prescriptions.toast.serviceSaved');
+    showSuccessToast.value = true;
+
+    window.dispatchEvent(new CustomEvent('prescriptions-updated'));
   } catch (error) {
-    prescriptionSaveError.value = t('doctor.documents.prescriptions.errors.saveFailed')
-    console.error('Error saving service prescription:', error)
+    prescriptionSaveError.value = t('doctor.documents.prescriptions.errors.saveFailed');
+    console.error('Error saving service prescription:', error);
   } finally {
-    isSaving.value = false
+    isSaving.value = false;
   }
-}
+};
 
 const handleCloseToast = () => {
-  showSuccessToast.value = false
-}
+  showSuccessToast.value = false;
+};
 
 // Load users on mount
 onMounted(async () => {
-  isLoadingUsers.value = true
+  isLoadingUsers.value = true;
   try {
-    allUsers.value = await userApi.getAllUsers()
-    console.log('Loaded users:', allUsers.value.length)
+    allUsers.value = await userApi.getAllUsers();
+    console.log('Loaded users:', allUsers.value.length);
   } catch (error) {
-    console.error('Error loading users:', error)
+    console.error('Error loading users:', error);
   } finally {
-    isLoadingUsers.value = false
+    isLoadingUsers.value = false;
   }
-})
+});
 </script>
 
 <template>
