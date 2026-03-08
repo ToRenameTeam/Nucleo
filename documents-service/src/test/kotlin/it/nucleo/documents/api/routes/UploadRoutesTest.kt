@@ -1,42 +1,63 @@
-package it.nucleo.api
+package it.nucleo.documents.api.routes
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldContain
+import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
-import it.nucleo.api.dto.ErrorResponse
-import it.nucleo.api.dto.UploadResponse
-import it.nucleo.api.fixtures.configuredTestApplication
-import it.nucleo.api.fixtures.loadTestPdf
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.testing.*
+import it.nucleo.documents.api.dto.ErrorResponse
+import it.nucleo.documents.api.dto.UploadResponse
+import it.nucleo.documents.application.DocumentUploadService
+import it.nucleo.documents.fixtures.FakeDocumentRepository
+import it.nucleo.documents.fixtures.FakeFileStorageRepository
+import kotlinx.serialization.json.Json
 
-class DocumentUploadApiTest :
+class UploadRoutesTest :
     DescribeSpec({
-        describe("POST /api/v1/patients/{patientId}/documents/upload") {
-            it("should upload a valid PDF document successfully") {
-                configuredTestApplication { client ->
-                    val patientId = "patient-upload-${System.currentTimeMillis()}"
-                    val pdfContent = loadTestPdf()
 
+        // minimal valid PDF header
+        val validPdfBytes = byteArrayOf(0x25, 0x50, 0x44, 0x46) + "-1.4 fake body".toByteArray()
+
+        fun configuredTestApp(
+            block: suspend (HttpClient) -> Unit,
+        ) = testApplication {
+            val fileRepo = FakeFileStorageRepository()
+            val docRepo = FakeDocumentRepository()
+            application { uploadTestModule(fileRepo, docRepo) }
+            val client = createClient { install(ContentNegotiation) { json(uploadTestJson) } }
+            block(client)
+        }
+
+        describe("POST /api/patients/{patientId}/documents/upload") {
+            it("should upload a valid PDF document successfully") {
+                configuredTestApp { client ->
                     val response =
                         client.submitFormWithBinaryData(
-                            url = "/api/v1/patients/$patientId/documents/upload",
+                            url = "/api/patients/patient-1/documents/upload",
                             formData =
                                 formData {
                                     append(
                                         "file",
-                                        pdfContent,
+                                        validPdfBytes,
                                         Headers.build {
                                             append(HttpHeaders.ContentType, "application/pdf")
                                             append(
                                                 HttpHeaders.ContentDisposition,
-                                                "filename=\"test-document.pdf\""
+                                                "filename=\"test-document.pdf\"",
                                             )
-                                        }
+                                        },
                                     )
-                                }
+                                },
                         )
 
                     response.status shouldBe HttpStatusCode.Created
@@ -47,14 +68,12 @@ class DocumentUploadApiTest :
                 }
             }
 
-            it("should reject upload without file") {
-                configuredTestApplication { client ->
-                    val patientId = "patient-upload-${System.currentTimeMillis()}"
-
+            it("should reject an upload without a file") {
+                configuredTestApp { client ->
                     val response =
                         client.submitFormWithBinaryData(
-                            url = "/api/v1/patients/$patientId/documents/upload",
-                            formData = formData {}
+                            url = "/api/patients/patient-1/documents/upload",
+                            formData = formData {},
                         )
 
                     response.status shouldBe HttpStatusCode.BadRequest
@@ -65,27 +84,24 @@ class DocumentUploadApiTest :
             }
 
             it("should reject non-PDF files") {
-                configuredTestApplication { client ->
-                    val patientId = "patient-upload-${System.currentTimeMillis()}"
-                    val textContent = "This is not a PDF".toByteArray()
-
+                configuredTestApp { client ->
                     val response =
                         client.submitFormWithBinaryData(
-                            url = "/api/v1/patients/$patientId/documents/upload",
+                            url = "/api/patients/patient-1/documents/upload",
                             formData =
                                 formData {
                                     append(
                                         "file",
-                                        textContent,
+                                        "This is not a PDF".toByteArray(),
                                         Headers.build {
                                             append(HttpHeaders.ContentType, "text/plain")
                                             append(
                                                 HttpHeaders.ContentDisposition,
-                                                "filename=\"document.txt\""
+                                                "filename=\"document.txt\"",
                                             )
-                                        }
+                                        },
                                     )
-                                }
+                                },
                         )
 
                     response.status shouldBe HttpStatusCode.BadRequest
@@ -95,28 +111,25 @@ class DocumentUploadApiTest :
                 }
             }
 
-            it("should reject files with PDF extension but invalid content") {
-                configuredTestApplication { client ->
-                    val patientId = "patient-upload-${System.currentTimeMillis()}"
-                    val fakeContent = "Not a real PDF content".toByteArray()
-
+            it("should reject files with a PDF extension but invalid content") {
+                configuredTestApp { client ->
                     val response =
                         client.submitFormWithBinaryData(
-                            url = "/api/v1/patients/$patientId/documents/upload",
+                            url = "/api/patients/patient-1/documents/upload",
                             formData =
                                 formData {
                                     append(
                                         "file",
-                                        fakeContent,
+                                        "Not a real PDF content".toByteArray(),
                                         Headers.build {
                                             append(HttpHeaders.ContentType, "application/pdf")
                                             append(
                                                 HttpHeaders.ContentDisposition,
-                                                "filename=\"fake.pdf\""
+                                                "filename=\"fake.pdf\"",
                                             )
-                                        }
+                                        },
                                     )
-                                }
+                                },
                         )
 
                     response.status shouldBe HttpStatusCode.BadRequest
@@ -127,12 +140,10 @@ class DocumentUploadApiTest :
             }
 
             it("should reject empty files") {
-                configuredTestApplication { client ->
-                    val patientId = "patient-upload-${System.currentTimeMillis()}"
-
+                configuredTestApp { client ->
                     val response =
                         client.submitFormWithBinaryData(
-                            url = "/api/v1/patients/$patientId/documents/upload",
+                            url = "/api/patients/patient-1/documents/upload",
                             formData =
                                 formData {
                                     append(
@@ -142,11 +153,11 @@ class DocumentUploadApiTest :
                                             append(HttpHeaders.ContentType, "application/pdf")
                                             append(
                                                 HttpHeaders.ContentDisposition,
-                                                "filename=\"empty.pdf\""
+                                                "filename=\"empty.pdf\"",
                                             )
-                                        }
+                                        },
                                     )
-                                }
+                                },
                         )
 
                     response.status shouldBe HttpStatusCode.BadRequest
@@ -157,3 +168,37 @@ class DocumentUploadApiTest :
             }
         }
     })
+
+private val uploadTestJson = Json {
+    prettyPrint = true
+    isLenient = true
+    ignoreUnknownKeys = true
+    encodeDefaults = true
+    classDiscriminator = "_t"
+}
+
+private fun Application.uploadTestModule(
+    fileRepo: FakeFileStorageRepository,
+    docRepo: FakeDocumentRepository,
+) {
+    install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) { json(uploadTestJson) }
+    install(StatusPages) {
+        exception<Throwable> { call, cause ->
+            call.respond(
+                HttpStatusCode.InternalServerError,
+                ErrorResponse("internal_error", "An unexpected error occurred", cause.message),
+            )
+        }
+    }
+    routing {
+        route("/api") {
+            val uploadService =
+                DocumentUploadService(
+                    fileStorageRepository = fileRepo,
+                    documentRepository = docRepo,
+                    aiServiceClient = null,
+                )
+            uploadRoutes(uploadService)
+        }
+    }
+}
