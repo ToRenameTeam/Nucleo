@@ -1,6 +1,6 @@
 package it.nucleo.documents.domain
 
-import it.nucleo.documents.domain.errors.*
+import it.nucleo.commons.errors.*
 import it.nucleo.documents.domain.report.Report
 
 interface DocumentRepository {

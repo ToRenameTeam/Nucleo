@@ -1,4 +1,4 @@
-package it.nucleo.appointments.domain.errors
+package it.nucleo.commons.errors
 
 sealed interface Either<out E : DomainError, out T> {
     data class Left<out E : DomainError>(val error: E) : Either<E, Nothing>
@@ -10,14 +10,16 @@ fun <T> success(value: T): Either<Nothing, T> = Either.Right(value)
 
 fun <E : DomainError> failure(error: E): Either<E, Nothing> = Either.Left(error)
 
-inline fun <E : DomainError, T, R> Either<E, T>.map(transform: (T) -> R): Either<E, R> =
+inline fun <E : DomainError, T, R> Either<E, T>.map(
+    transform: (T) -> R,
+): Either<E, R> =
     when (this) {
         is Either.Left -> this
         is Either.Right -> Either.Right(transform(value))
     }
 
 inline fun <E : DomainError, T, R> Either<E, T>.flatMap(
-    transform: (T) -> Either<E, R>
+    transform: (T) -> Either<E, R>,
 ): Either<E, R> =
     when (this) {
         is Either.Left -> this
@@ -25,39 +27,56 @@ inline fun <E : DomainError, T, R> Either<E, T>.flatMap(
     }
 
 inline fun <E : DomainError, T, F : DomainError> Either<E, T>.mapError(
-    transform: (E) -> F
+    transform: (E) -> F,
 ): Either<F, T> =
     when (this) {
         is Either.Left -> Either.Left(transform(error))
         is Either.Right -> this
     }
 
-inline fun <E : DomainError, T, R> Either<E, T>.fold(onLeft: (E) -> R, onRight: (T) -> R): R =
+inline fun <E : DomainError, T, R> Either<E, T>.fold(
+    onLeft: (E) -> R,
+    onRight: (T) -> R,
+): R =
     when (this) {
         is Either.Left -> onLeft(error)
         is Either.Right -> onRight(value)
     }
 
-inline fun <E : DomainError, T> Either<E, T>.getOrElse(default: (E) -> T): T =
+inline fun <E : DomainError, T> Either<E, T>.getOrElse(
+    default: (E) -> T,
+): T =
     when (this) {
         is Either.Left -> default(error)
         is Either.Right -> value
     }
 
-inline fun <E : DomainError, T> Either<E, T>.onSuccess(action: (T) -> Unit): Either<E, T> {
+inline fun <E : DomainError, T> Either<E, T>.onSuccess(
+    action: (T) -> Unit,
+): Either<E, T> {
     if (this is Either.Right) action(value)
     return this
 }
 
-inline fun <E : DomainError, T> Either<E, T>.onFailure(action: (E) -> Unit): Either<E, T> {
+inline fun <E : DomainError, T> Either<E, T>.onFailure(
+    action: (E) -> Unit,
+): Either<E, T> {
     if (this is Either.Left) action(error)
     return this
 }
 
-inline fun <T, E : DomainError> Result<T>.toEither(onError: (Throwable) -> E): Either<E, T> =
-    fold(onSuccess = { success(it) }, onFailure = { failure(onError(it)) })
+inline fun <T, E : DomainError> Result<T>.toEither(
+    onError: (Throwable) -> E,
+): Either<E, T> =
+    fold(
+        onSuccess = { success(it) },
+        onFailure = { failure(onError(it)) },
+    )
 
-inline fun <T, E : DomainError> catch(onError: (Throwable) -> E, block: () -> T): Either<E, T> =
+inline fun <T, E : DomainError> catch(
+    onError: (Throwable) -> E,
+    block: () -> T,
+): Either<E, T> =
     try {
         success(block())
     } catch (e: Throwable) {

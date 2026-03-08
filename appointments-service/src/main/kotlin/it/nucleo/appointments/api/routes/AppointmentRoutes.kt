@@ -5,14 +5,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import it.nucleo.appointments.api.dto.CreateAppointmentRequest
-import it.nucleo.appointments.api.dto.ErrorResponse
 import it.nucleo.appointments.api.dto.UpdateAppointmentRequest
 import it.nucleo.appointments.api.dto.toDetailsResponse
 import it.nucleo.appointments.api.dto.toResponse
 import it.nucleo.appointments.api.respondEither
 import it.nucleo.appointments.api.respondEitherNoContent
 import it.nucleo.appointments.application.AppointmentService
-import it.nucleo.appointments.domain.errors.map
+import it.nucleo.commons.api.ErrorResponse
+import it.nucleo.commons.errors.map
 
 /**
  * Registers all appointment-related routes under `/appointments`.
@@ -35,7 +35,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                 } catch (_: Exception) {
                     return@post call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Invalid request body", code = "INVALID_BODY")
+                        ErrorResponse(error = "INVALID_BODY", message = "Invalid request body")
                     )
                 }
 
@@ -73,7 +73,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                 call.parameters["id"]
                     ?: return@get call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Appointment ID is required", code = "MISSING_ID")
+                        ErrorResponse(error = "MISSING_ID", message = "Appointment ID is required")
                     )
 
             val result = service.getAppointmentById(id).map { it.toResponse() }
@@ -88,7 +88,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                 call.parameters["id"]
                     ?: return@get call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Appointment ID is required", code = "MISSING_ID")
+                        ErrorResponse(error = "MISSING_ID", message = "Appointment ID is required")
                     )
 
             val result = service.getAppointmentDetails(id).map { it.toDetailsResponse() }
@@ -102,7 +102,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                 call.parameters["id"]
                     ?: return@put call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Appointment ID is required", code = "MISSING_ID")
+                        ErrorResponse(error = "MISSING_ID", message = "Appointment ID is required")
                     )
 
             val request =
@@ -111,7 +111,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                 } catch (_: Exception) {
                     return@put call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Invalid request body", code = "INVALID_BODY")
+                        ErrorResponse(error = "INVALID_BODY", message = "Invalid request body")
                     )
                 }
 
@@ -133,7 +133,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                 call.parameters["id"]
                     ?: return@delete call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Appointment ID is required", code = "MISSING_ID")
+                        ErrorResponse(error = "MISSING_ID", message = "Appointment ID is required")
                     )
 
             val result = service.deleteAppointment(id)

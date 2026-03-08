@@ -15,7 +15,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
-import it.nucleo.documents.api.dto.ErrorResponse
+import it.nucleo.commons.api.ErrorResponse
 import it.nucleo.documents.api.dto.UploadResponse
 import it.nucleo.documents.application.DocumentUploadService
 import it.nucleo.documents.fixtures.FakeDocumentRepository
@@ -106,7 +106,7 @@ class UploadRoutesTest :
 
                     response.status shouldBe HttpStatusCode.BadRequest
                     val error = response.body<ErrorResponse>()
-                    error.error shouldBe "bad_request"
+                    error.error shouldBe "VALIDATION_ERROR"
                     error.message shouldContain "Only PDF files are accepted"
                 }
             }
@@ -134,7 +134,7 @@ class UploadRoutesTest :
 
                     response.status shouldBe HttpStatusCode.BadRequest
                     val error = response.body<ErrorResponse>()
-                    error.error shouldBe "bad_request"
+                    error.error shouldBe "VALIDATION_ERROR"
                     error.message shouldContain "does not appear to be a valid PDF"
                 }
             }
@@ -162,7 +162,7 @@ class UploadRoutesTest :
 
                     response.status shouldBe HttpStatusCode.BadRequest
                     val error = response.body<ErrorResponse>()
-                    error.error shouldBe "bad_request"
+                    error.error shouldBe "VALIDATION_ERROR"
                     error.message shouldContain "empty"
                 }
             }

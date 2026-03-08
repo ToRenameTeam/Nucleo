@@ -2,9 +2,7 @@ package it.nucleo.appointments.fixtures
 
 import it.nucleo.appointments.domain.*
 
-/**
- * In-memory fake implementation of [AvailabilityRepository] for unit testing.
- */
+/** In-memory fake implementation of [AvailabilityRepository] for unit testing. */
 class FakeAvailabilityRepository(
     private val availabilityExists: Boolean = true,
     private val overlapDetected: Boolean = false,
@@ -39,4 +37,3 @@ class FakeAvailabilityRepository(
         excludeId: AvailabilityId?,
     ): Boolean = overlapDetected
 }
-

@@ -3,6 +3,7 @@ package it.nucleo.documents.application
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import it.nucleo.commons.errors.*
 import it.nucleo.documents.domain.*
 import it.nucleo.documents.domain.errors.*
 import it.nucleo.documents.domain.prescription.implementation.ServicePrescription

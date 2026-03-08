@@ -1,9 +1,9 @@
 package it.nucleo.documents.infrastructure.ai
 
+import it.nucleo.commons.logging.logger
 import it.nucleo.documents.domain.FileMetadata
 import it.nucleo.documents.domain.Summary
 import it.nucleo.documents.domain.Tag
-import it.nucleo.documents.infrastructure.logging.logger
 import java.io.Closeable
 import java.net.HttpURLConnection
 import java.net.URI

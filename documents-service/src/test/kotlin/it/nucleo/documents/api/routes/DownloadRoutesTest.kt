@@ -16,7 +16,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
-import it.nucleo.documents.api.dto.ErrorResponse
+import it.nucleo.commons.api.ErrorResponse
 import it.nucleo.documents.api.dto.UploadResponse
 import it.nucleo.documents.application.DocumentDownloadService
 import it.nucleo.documents.application.DocumentUploadService

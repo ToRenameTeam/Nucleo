@@ -20,7 +20,6 @@ import kotlinx.serialization.json.Json
 
 class AvailabilityRoutesTest :
     DescribeSpec({
-
         fun configuredTestApp(
             availabilityRepo: AvailabilityRepository = FakeAvailabilityRepository(),
             block: suspend ApplicationTestBuilder.() -> Unit,
@@ -30,12 +29,13 @@ class AvailabilityRoutesTest :
         }
 
         describe("POST /availabilities") {
-
             it("should create an availability successfully") {
                 configuredTestApp {
-                    val response = client.post("/availabilities") {
-                        contentType(ContentType.Application.Json)
-                        setBody("""
+                    val response =
+                        client.post("/availabilities") {
+                            contentType(ContentType.Application.Json)
+                            setBody(
+                                """
                             {
                                 "doctorId": "${AppointmentFixtures.DOCTOR_ID}",
                                 "facilityId": "${AppointmentFixtures.FACILITY_ID}",
@@ -45,8 +45,10 @@ class AvailabilityRoutesTest :
                                     "durationMinutes": 30
                                 }
                             }
-                        """.trimIndent())
-                    }
+                        """
+                                    .trimIndent()
+                            )
+                        }
 
                     response.status shouldBe HttpStatusCode.Created
                     val body = response.bodyAsText()
@@ -60,9 +62,11 @@ class AvailabilityRoutesTest :
                 configuredTestApp(
                     availabilityRepo = FakeAvailabilityRepository(overlapDetected = true),
                 ) {
-                    val response = client.post("/availabilities") {
-                        contentType(ContentType.Application.Json)
-                        setBody("""
+                    val response =
+                        client.post("/availabilities") {
+                            contentType(ContentType.Application.Json)
+                            setBody(
+                                """
                             {
                                 "doctorId": "${AppointmentFixtures.DOCTOR_ID}",
                                 "facilityId": "${AppointmentFixtures.FACILITY_ID}",
@@ -72,8 +76,10 @@ class AvailabilityRoutesTest :
                                     "durationMinutes": 30
                                 }
                             }
-                        """.trimIndent())
-                    }
+                        """
+                                    .trimIndent()
+                            )
+                        }
 
                     response.status shouldBe HttpStatusCode.Conflict
                     response.bodyAsText() shouldContain "OVERLAP_ERROR"
@@ -82,10 +88,10 @@ class AvailabilityRoutesTest :
         }
 
         describe("GET /availabilities/{id}") {
-
             it("should return the availability by id") {
                 configuredTestApp {
-                    val response = client.get("/availabilities/${AppointmentFixtures.AVAILABILITY_ID}")
+                    val response =
+                        client.get("/availabilities/${AppointmentFixtures.AVAILABILITY_ID}")
 
                     response.status shouldBe HttpStatusCode.OK
                     val body = response.bodyAsText()
@@ -98,7 +104,8 @@ class AvailabilityRoutesTest :
                 configuredTestApp(
                     availabilityRepo = FakeAvailabilityRepository(availabilityExists = false),
                 ) {
-                    val response = client.get("/availabilities/00000000-0000-0000-0000-000000000000")
+                    val response =
+                        client.get("/availabilities/00000000-0000-0000-0000-000000000000")
 
                     response.status shouldBe HttpStatusCode.NotFound
                     response.bodyAsText() shouldContain "AVAILABILITY_NOT_FOUND"
@@ -107,7 +114,6 @@ class AvailabilityRoutesTest :
         }
 
         describe("GET /availabilities") {
-
             it("should return all availabilities") {
                 configuredTestApp {
                     val response = client.get("/availabilities")
@@ -119,7 +125,8 @@ class AvailabilityRoutesTest :
 
             it("should filter by doctorId") {
                 configuredTestApp {
-                    val response = client.get("/availabilities?doctorId=${AppointmentFixtures.DOCTOR_ID}")
+                    val response =
+                        client.get("/availabilities?doctorId=${AppointmentFixtures.DOCTOR_ID}")
 
                     response.status shouldBe HttpStatusCode.OK
                     response.bodyAsText() shouldContain AppointmentFixtures.DOCTOR_ID
@@ -137,13 +144,13 @@ class AvailabilityRoutesTest :
         }
 
         describe("PUT /availabilities/{id}") {
-
             it("should update an availability successfully") {
                 configuredTestApp {
-                    val response = client.put("/availabilities/${AppointmentFixtures.AVAILABILITY_ID}") {
-                        contentType(ContentType.Application.Json)
-                        setBody("""{ "status": "BOOKED" }""")
-                    }
+                    val response =
+                        client.put("/availabilities/${AppointmentFixtures.AVAILABILITY_ID}") {
+                            contentType(ContentType.Application.Json)
+                            setBody("""{ "status": "BOOKED" }""")
+                        }
 
                     response.status shouldBe HttpStatusCode.OK
                     response.bodyAsText() shouldContain AppointmentFixtures.AVAILABILITY_ID
@@ -154,10 +161,11 @@ class AvailabilityRoutesTest :
                 configuredTestApp(
                     availabilityRepo = FakeAvailabilityRepository(availabilityExists = false),
                 ) {
-                    val response = client.put("/availabilities/00000000-0000-0000-0000-000000000000") {
-                        contentType(ContentType.Application.Json)
-                        setBody("""{ "status": "BOOKED" }""")
-                    }
+                    val response =
+                        client.put("/availabilities/00000000-0000-0000-0000-000000000000") {
+                            contentType(ContentType.Application.Json)
+                            setBody("""{ "status": "BOOKED" }""")
+                        }
 
                     response.status shouldBe HttpStatusCode.NotFound
                     response.bodyAsText() shouldContain "AVAILABILITY_NOT_FOUND"
@@ -166,10 +174,10 @@ class AvailabilityRoutesTest :
         }
 
         describe("DELETE /availabilities/{id}") {
-
             it("should cancel an availability successfully") {
                 configuredTestApp {
-                    val response = client.delete("/availabilities/${AppointmentFixtures.AVAILABILITY_ID}")
+                    val response =
+                        client.delete("/availabilities/${AppointmentFixtures.AVAILABILITY_ID}")
 
                     response.status shouldBe HttpStatusCode.NoContent
                 }
@@ -179,7 +187,8 @@ class AvailabilityRoutesTest :
                 configuredTestApp(
                     availabilityRepo = FakeAvailabilityRepository(availabilityExists = false),
                 ) {
-                    val response = client.delete("/availabilities/00000000-0000-0000-0000-000000000000")
+                    val response =
+                        client.delete("/availabilities/00000000-0000-0000-0000-000000000000")
 
                     response.status shouldBe HttpStatusCode.NotFound
                     response.bodyAsText() shouldContain "AVAILABILITY_NOT_FOUND"

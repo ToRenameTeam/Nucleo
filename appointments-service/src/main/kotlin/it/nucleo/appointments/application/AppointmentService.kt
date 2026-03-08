@@ -2,6 +2,7 @@ package it.nucleo.appointments.application
 
 import it.nucleo.appointments.domain.*
 import it.nucleo.appointments.domain.errors.*
+import it.nucleo.commons.errors.*
 import org.slf4j.LoggerFactory
 
 class AppointmentService(

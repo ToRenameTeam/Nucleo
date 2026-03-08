@@ -4,11 +4,14 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import it.nucleo.appointments.api.dto.*
+import it.nucleo.appointments.api.dto.CreateAvailabilityRequest
+import it.nucleo.appointments.api.dto.UpdateAvailabilityRequest
+import it.nucleo.appointments.api.dto.toResponse
 import it.nucleo.appointments.api.respondEither
 import it.nucleo.appointments.api.respondEitherNoContent
 import it.nucleo.appointments.application.AvailabilityService
-import it.nucleo.appointments.domain.errors.map
+import it.nucleo.commons.api.ErrorResponse
+import it.nucleo.commons.errors.map
 
 /**
  * Registers all availability-related routes under `/availabilities`.
@@ -31,7 +34,7 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
                 } catch (_: Exception) {
                     return@post call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Invalid request body", code = "INVALID_BODY")
+                        ErrorResponse(error = "INVALID_BODY", message = "Invalid request body")
                     )
                 }
 
@@ -74,7 +77,7 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
                 call.parameters["id"]
                     ?: return@get call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Availability ID is required", code = "MISSING_ID")
+                        ErrorResponse(error = "MISSING_ID", message = "Availability ID is required")
                     )
 
             val result = service.getAvailabilityById(id).map { it.toResponse() }
@@ -88,7 +91,7 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
                 call.parameters["id"]
                     ?: return@put call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Availability ID is required", code = "MISSING_ID")
+                        ErrorResponse(error = "MISSING_ID", message = "Availability ID is required")
                     )
 
             val request =
@@ -97,7 +100,7 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
                 } catch (_: Exception) {
                     return@put call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Invalid request body", code = "INVALID_BODY")
+                        ErrorResponse(error = "INVALID_BODY", message = "Invalid request body")
                     )
                 }
 
@@ -120,7 +123,7 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
                 call.parameters["id"]
                     ?: return@delete call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(message = "Availability ID is required", code = "MISSING_ID")
+                        ErrorResponse(error = "MISSING_ID", message = "Availability ID is required")
                     )
 
             val result = service.cancelAvailability(id)

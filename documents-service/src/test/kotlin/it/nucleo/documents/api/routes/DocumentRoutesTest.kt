@@ -17,6 +17,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
+import it.nucleo.commons.api.ErrorResponse
 import it.nucleo.documents.api.dto.*
 import it.nucleo.documents.application.DocumentPdfGenerator
 import it.nucleo.documents.application.DocumentService
@@ -465,7 +466,7 @@ private fun Application.testModule(
 private suspend fun io.ktor.client.HttpClient.postDocument(
     patientId: String,
     request: CreateDocumentRequest,
-): io.ktor.client.statement.HttpResponse =
+): HttpResponse =
     post("/api/patients/$patientId/documents") {
         contentType(ContentType.Application.Json)
         setBody(request)

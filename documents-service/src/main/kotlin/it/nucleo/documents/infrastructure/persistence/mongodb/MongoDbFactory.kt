@@ -3,7 +3,7 @@ package it.nucleo.documents.infrastructure.persistence.mongodb
 import com.mongodb.MongoClientSettings
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import it.nucleo.documents.infrastructure.logging.logger
+import it.nucleo.commons.logging.logger
 import it.nucleo.documents.infrastructure.persistence.mongodb.dto.*
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic

@@ -1,7 +1,7 @@
 package it.nucleo.documents.infrastructure.persistence.minio
 
 import io.minio.MinioClient
-import it.nucleo.documents.infrastructure.logging.logger
+import it.nucleo.commons.logging.logger
 
 object MinioClientFactory {
 

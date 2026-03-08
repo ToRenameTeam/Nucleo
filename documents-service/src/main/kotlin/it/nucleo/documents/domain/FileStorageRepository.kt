@@ -1,5 +1,6 @@
 package it.nucleo.documents.domain
 
+import it.nucleo.commons.errors.*
 import it.nucleo.documents.domain.errors.*
 import java.io.InputStream
 

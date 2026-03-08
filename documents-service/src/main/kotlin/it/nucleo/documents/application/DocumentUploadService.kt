@@ -1,5 +1,7 @@
 package it.nucleo.documents.application
 
+import it.nucleo.commons.errors.*
+import it.nucleo.commons.logging.logger
 import it.nucleo.documents.domain.DocumentFactory
 import it.nucleo.documents.domain.DocumentId
 import it.nucleo.documents.domain.DocumentRepository
@@ -13,7 +15,6 @@ import it.nucleo.documents.domain.errors.*
 import it.nucleo.documents.domain.uploaded.UploadedDocumentType
 import it.nucleo.documents.infrastructure.ai.AiAnalysisResult
 import it.nucleo.documents.infrastructure.ai.AiServiceClient
-import it.nucleo.documents.infrastructure.logging.logger
 import java.util.UUID
 
 data class UploadDocumentCommand(

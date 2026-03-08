@@ -1,11 +1,11 @@
 package it.nucleo.documents.application
 
+import it.nucleo.commons.logging.logger
 import it.nucleo.documents.domain.Document
 import it.nucleo.documents.domain.prescription.Validity
 import it.nucleo.documents.domain.prescription.implementation.MedicinePrescription
 import it.nucleo.documents.domain.prescription.implementation.ServicePrescription
 import it.nucleo.documents.domain.report.Report
-import it.nucleo.documents.infrastructure.logging.logger
 import java.io.ByteArrayOutputStream
 import java.time.format.DateTimeFormatter
 import org.apache.pdfbox.pdmodel.PDDocument

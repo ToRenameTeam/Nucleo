@@ -3,7 +3,8 @@ package it.nucleo.documents.api.routes
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import it.nucleo.documents.api.dto.ErrorResponse
+import it.nucleo.commons.api.ErrorResponse
+import it.nucleo.commons.errors.*
 import it.nucleo.documents.application.DocumentDownloadService
 import it.nucleo.documents.application.DownloadDocumentQuery
 import it.nucleo.documents.domain.DocumentId

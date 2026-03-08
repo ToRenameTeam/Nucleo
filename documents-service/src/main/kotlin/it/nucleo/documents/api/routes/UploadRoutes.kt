@@ -6,13 +6,13 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
-import it.nucleo.documents.api.dto.ErrorResponse
+import it.nucleo.commons.api.ErrorResponse
+import it.nucleo.commons.errors.map
 import it.nucleo.documents.api.dto.UploadResponse
 import it.nucleo.documents.api.respondEither
 import it.nucleo.documents.application.DocumentUploadService
 import it.nucleo.documents.application.UploadDocumentCommand
 import it.nucleo.documents.domain.PatientId
-import it.nucleo.documents.domain.errors.map
 
 private const val PDF_CONTENT_TYPE = "application/pdf"
 

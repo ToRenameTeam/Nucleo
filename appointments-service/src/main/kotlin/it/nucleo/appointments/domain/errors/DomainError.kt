@@ -1,11 +1,7 @@
 package it.nucleo.appointments.domain.errors
 
 import io.ktor.http.*
-
-sealed interface DomainError {
-    val message: String
-    val errorCode: String
-}
+import it.nucleo.commons.errors.DomainError
 
 sealed interface AppointmentError : DomainError {
 
@@ -50,14 +46,6 @@ sealed interface AvailabilityError : DomainError {
     }
 }
 
-data class ValidationError(override val message: String) : DomainError {
-    override val errorCode = "VALIDATION_ERROR"
-}
-
-data class InternalError(override val message: String, val cause: Throwable? = null) : DomainError {
-    override val errorCode = "INTERNAL_ERROR"
-}
-
 fun DomainError.toHttpStatusCode(): HttpStatusCode =
     when (this) {
         is AppointmentError.NotFound -> HttpStatusCode.NotFound
@@ -67,6 +55,7 @@ fun DomainError.toHttpStatusCode(): HttpStatusCode =
         is AvailabilityError.NotAvailable -> HttpStatusCode.BadRequest
         is AvailabilityError.OverlapDetected -> HttpStatusCode.Conflict
         is AvailabilityError.InvalidRequest -> HttpStatusCode.BadRequest
-        is ValidationError -> HttpStatusCode.BadRequest
-        is InternalError -> HttpStatusCode.InternalServerError
+        is it.nucleo.commons.errors.ValidationError -> HttpStatusCode.BadRequest
+        is it.nucleo.commons.errors.InternalError -> HttpStatusCode.InternalServerError
+        else -> HttpStatusCode.InternalServerError
     }

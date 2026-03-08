@@ -4,10 +4,11 @@ import com.mongodb.client.model.Filters
 import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import it.nucleo.commons.errors.*
+import it.nucleo.commons.logging.logger
 import it.nucleo.documents.domain.*
 import it.nucleo.documents.domain.errors.*
 import it.nucleo.documents.domain.report.Report
-import it.nucleo.documents.infrastructure.logging.logger
 import it.nucleo.documents.infrastructure.persistence.mongodb.dto.DocumentDto
 import it.nucleo.documents.infrastructure.persistence.mongodb.dto.MedicalRecordDocument
 import it.nucleo.documents.infrastructure.persistence.mongodb.dto.toDomain

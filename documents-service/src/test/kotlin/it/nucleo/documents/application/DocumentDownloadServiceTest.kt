@@ -3,10 +3,10 @@ package it.nucleo.documents.application
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import it.nucleo.commons.errors.Either
 import it.nucleo.documents.domain.DocumentId
 import it.nucleo.documents.domain.PatientId
 import it.nucleo.documents.domain.StoredFile
-import it.nucleo.documents.domain.errors.Either
 import it.nucleo.documents.domain.errors.StorageError
 import it.nucleo.documents.fixtures.FakeFileStorageRepository
 

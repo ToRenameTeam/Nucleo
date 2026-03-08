@@ -1,11 +1,7 @@
 package it.nucleo.documents.domain.errors
 
 import io.ktor.http.*
-
-sealed interface DomainError {
-    val message: String
-    val errorCode: String
-}
+import it.nucleo.commons.errors.DomainError
 
 sealed interface DocumentError : DomainError {
 
@@ -46,14 +42,6 @@ sealed interface RepositoryError : DomainError {
     }
 }
 
-data class ValidationError(override val message: String) : DomainError {
-    override val errorCode = "bad_request"
-}
-
-data class InternalError(override val message: String, val cause: Throwable? = null) : DomainError {
-    override val errorCode = "internal_error"
-}
-
 fun DomainError.toHttpStatusCode(): HttpStatusCode =
     when (this) {
         is DocumentError.NotFound -> HttpStatusCode.NotFound
@@ -62,6 +50,7 @@ fun DomainError.toHttpStatusCode(): HttpStatusCode =
         is StorageError.FileNotFound -> HttpStatusCode.NotFound
         is StorageError.OperationFailed -> HttpStatusCode.InternalServerError
         is RepositoryError.OperationFailed -> HttpStatusCode.InternalServerError
-        is ValidationError -> HttpStatusCode.BadRequest
-        is InternalError -> HttpStatusCode.InternalServerError
+        is it.nucleo.commons.errors.ValidationError -> HttpStatusCode.BadRequest
+        is it.nucleo.commons.errors.InternalError -> HttpStatusCode.InternalServerError
+        else -> HttpStatusCode.InternalServerError
     }

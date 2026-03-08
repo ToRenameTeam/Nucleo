@@ -1,6 +1,7 @@
 package it.nucleo.appointments.domain
 
 import it.nucleo.appointments.domain.errors.*
+import it.nucleo.commons.errors.*
 import java.util.UUID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime

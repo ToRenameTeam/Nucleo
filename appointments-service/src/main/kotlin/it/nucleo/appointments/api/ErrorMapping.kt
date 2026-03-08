@@ -3,8 +3,10 @@ package it.nucleo.appointments.api
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import it.nucleo.appointments.api.dto.ErrorResponse
-import it.nucleo.appointments.domain.errors.*
+import it.nucleo.appointments.domain.errors.toHttpStatusCode
+import it.nucleo.commons.api.ErrorResponse
+import it.nucleo.commons.errors.DomainError
+import it.nucleo.commons.errors.Either
 import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("ErrorMapping")
@@ -22,16 +24,7 @@ suspend fun <T> RoutingCall.respondEither(
 ) {
     when (result) {
         is Either.Right -> respond(successStatus, transform(result.value))
-        is Either.Left -> {
-            val error = result.error
-            val status = error.toHttpStatusCode()
-            if (status.value >= 500) {
-                logger.error("Internal error: ${error.message}")
-            } else {
-                logger.warn("Domain error: ${error.message}")
-            }
-            respond(status, ErrorResponse(message = error.message, code = error.errorCode))
-        }
+        is Either.Left -> respondError(result.error)
     }
 }
 
@@ -39,15 +32,16 @@ suspend fun <T> RoutingCall.respondEither(
 suspend fun RoutingCall.respondEitherNoContent(result: Either<DomainError, Unit>) {
     when (result) {
         is Either.Right -> respond(HttpStatusCode.NoContent)
-        is Either.Left -> {
-            val error = result.error
-            val status = error.toHttpStatusCode()
-            if (status.value >= 500) {
-                logger.error("Internal error: ${error.message}")
-            } else {
-                logger.warn("Domain error: ${error.message}")
-            }
-            respond(status, ErrorResponse(message = error.message, code = error.errorCode))
-        }
+        is Either.Left -> respondError(result.error)
     }
+}
+
+private suspend fun RoutingCall.respondError(error: DomainError) {
+    val status = error.toHttpStatusCode()
+    if (status.value >= 500) {
+        logger.error("Internal error: ${error.message}")
+    } else {
+        logger.warn("Domain error: ${error.message}")
+    }
+    respond(status, ErrorResponse(error = error.errorCode, message = error.message))
 }

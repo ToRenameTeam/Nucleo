@@ -164,9 +164,6 @@ data class UpdateReportRequest(
     val recommendations: String? = null
 )
 
-@Serializable
-data class ErrorResponse(val error: String, val message: String, val details: String? = null)
-
 @Serializable data class DeleteResponse(val message: String)
 
 @Serializable

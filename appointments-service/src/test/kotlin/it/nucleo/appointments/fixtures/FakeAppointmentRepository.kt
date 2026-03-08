@@ -2,9 +2,7 @@ package it.nucleo.appointments.fixtures
 
 import it.nucleo.appointments.domain.*
 
-/**
- * In-memory fake implementation of [AppointmentRepository] for unit testing.
- */
+/** In-memory fake implementation of [AppointmentRepository] for unit testing. */
 class FakeAppointmentRepository(
     private val appointmentExists: Boolean = true,
 ) : AppointmentRepository {
@@ -35,4 +33,3 @@ class FakeAppointmentRepository(
         return appointment
     }
 }
-

@@ -5,6 +5,7 @@ plugins {
 val catalog: VersionCatalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
 
 dependencies {
+    implementation(project(":commons"))
     implementation(catalog.findLibrary("ktor-server-core").get())
     implementation(catalog.findLibrary("ktor-server-netty").get())
     implementation(catalog.findLibrary("ktor-server-content-negotiation").get())

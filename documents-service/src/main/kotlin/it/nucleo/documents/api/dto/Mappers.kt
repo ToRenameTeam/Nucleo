@@ -1,11 +1,11 @@
 package it.nucleo.documents.api.dto
 
+import it.nucleo.commons.errors.Either
+import it.nucleo.commons.errors.failure
+import it.nucleo.commons.errors.success
 import it.nucleo.documents.domain.*
 import it.nucleo.documents.domain.DocumentFactory
 import it.nucleo.documents.domain.errors.DocumentError
-import it.nucleo.documents.domain.errors.Either
-import it.nucleo.documents.domain.errors.failure
-import it.nucleo.documents.domain.errors.success
 import it.nucleo.documents.domain.prescription.Validity
 import it.nucleo.documents.domain.prescription.implementation.*
 import it.nucleo.documents.domain.report.*

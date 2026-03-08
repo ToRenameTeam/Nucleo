@@ -6,11 +6,12 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import it.nucleo.documents.api.dto.ErrorResponse
+import it.nucleo.commons.api.ErrorResponse
+import it.nucleo.commons.ktor.configureCors
+import it.nucleo.commons.logging.logger
 import it.nucleo.documents.api.routes.documentRoutes
 import it.nucleo.documents.api.routes.downloadRoutes
 import it.nucleo.documents.api.routes.uploadRoutes
@@ -18,10 +19,7 @@ import it.nucleo.documents.application.DocumentDownloadService
 import it.nucleo.documents.application.DocumentPdfGenerator
 import it.nucleo.documents.application.DocumentService
 import it.nucleo.documents.application.DocumentUploadService
-import it.nucleo.documents.domain.DocumentRepository
-import it.nucleo.documents.domain.FileStorageRepository
 import it.nucleo.documents.infrastructure.ai.AiServiceClient
-import it.nucleo.documents.infrastructure.logging.logger
 import it.nucleo.documents.infrastructure.persistence.minio.MinioClientFactory
 import it.nucleo.documents.infrastructure.persistence.minio.MinioFileStorageRepository
 import it.nucleo.documents.infrastructure.persistence.mongodb.MongoDbFactory
@@ -102,46 +100,6 @@ internal fun Application.configureStatusPages() {
             )
         }
     }
-}
-
-private fun Application.configureCors() {
-    install(CORS) {
-        allowMethod(HttpMethod.Options)
-        allowMethod(HttpMethod.Get)
-        allowMethod(HttpMethod.Post)
-        allowMethod(HttpMethod.Put)
-        allowMethod(HttpMethod.Delete)
-        allowMethod(HttpMethod.Patch)
-        allowHeader(HttpHeaders.Authorization)
-        allowHeader(HttpHeaders.ContentType)
-        allowHeader("X-Requested-With")
-        anyHost()
-    }
-}
-
-/** Overload accepting explicit dependencies — used by integration tests. */
-internal fun Application.configureRouting(
-    documentRepository: DocumentRepository,
-    fileStorageRepository: FileStorageRepository,
-    aiServiceClient: AiServiceClient? = null
-) {
-    val pdfGenerator = DocumentPdfGenerator()
-    val documentService =
-        DocumentService(
-            repository = documentRepository,
-            fileStorageRepository = fileStorageRepository,
-            pdfGenerator = pdfGenerator,
-            aiServiceClient = aiServiceClient
-        )
-    val uploadService =
-        DocumentUploadService(
-            fileStorageRepository = fileStorageRepository,
-            documentRepository = documentRepository,
-            aiServiceClient = aiServiceClient
-        )
-    val downloadService = DocumentDownloadService(fileStorageRepository)
-
-    installRoutes(documentService, uploadService, downloadService)
 }
 
 private fun Application.configureRouting() {

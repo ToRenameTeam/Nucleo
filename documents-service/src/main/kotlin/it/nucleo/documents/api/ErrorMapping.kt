@@ -4,7 +4,8 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import it.nucleo.documents.api.dto.ErrorResponse
+import it.nucleo.commons.api.ErrorResponse
+import it.nucleo.commons.errors.*
 import it.nucleo.documents.domain.errors.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
