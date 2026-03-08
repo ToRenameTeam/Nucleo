@@ -1,115 +1,100 @@
-import type {UUID} from 'crypto';
+import type { UUID } from 'crypto';
 import { DelegationStatus } from './DelegationStatus.js';
 
 export class Delegation {
-    private readonly _delegationId: UUID;
-    private readonly _delegatingUserId: UUID;  //PatientId - receiver of authority
-    private readonly _delegatorUserId: UUID;   //PatientId - owner of data
-    private _status: DelegationStatus;
+  private readonly _delegationId: UUID;
+  private readonly _delegatingUserId: UUID; //PatientId - receiver of authority
+  private readonly _delegatorUserId: UUID; //PatientId - owner of data
+  private _status: DelegationStatus;
 
-    private constructor(
-        delegationId: UUID,
-        delegatingUserId: UUID,
-        delegatorUserId: UUID,
-        status: DelegationStatus,
-    ) {
-        if (delegatingUserId === delegatorUserId) {
-            throw new Error('A patient cannot delegate to themselves');
-        }
-
-        this._delegationId = delegationId;
-        this._delegatingUserId = delegatingUserId;
-        this._delegatorUserId = delegatorUserId;
-        this._status = status;
+  private constructor(
+    delegationId: UUID,
+    delegatingUserId: UUID,
+    delegatorUserId: UUID,
+    status: DelegationStatus
+  ) {
+    if (delegatingUserId === delegatorUserId) {
+      throw new Error('A patient cannot delegate to themselves');
     }
 
-    static create(
-        delegationId: UUID,
-        delegatingUserId: UUID,
-        delegatorUserId: UUID
-    ): Delegation {
-        return new Delegation(
-            delegationId,
-            delegatingUserId,
-            delegatorUserId,
-            DelegationStatus.pending(),
-        );
+    this._delegationId = delegationId;
+    this._delegatingUserId = delegatingUserId;
+    this._delegatorUserId = delegatorUserId;
+    this._status = status;
+  }
+
+  static create(delegationId: UUID, delegatingUserId: UUID, delegatorUserId: UUID): Delegation {
+    return new Delegation(
+      delegationId,
+      delegatingUserId,
+      delegatorUserId,
+      DelegationStatus.pending()
+    );
+  }
+
+  static reconstitute(
+    delegationId: UUID,
+    delegatingUserId: UUID,
+    delegatorUserId: UUID,
+    status: DelegationStatus
+  ): Delegation {
+    return new Delegation(delegationId, delegatingUserId, delegatorUserId, status);
+  }
+
+  accept(): void {
+    const newStatus = DelegationStatus.active();
+
+    if (!this._status.canTransitionTo(newStatus)) {
+      throw new Error(`Cannot accept delegation: current status is ${this._status.value}`);
     }
 
-    static reconstitute(
-        delegationId: UUID,
-        delegatingUserId: UUID,
-        delegatorUserId: UUID,
-        status: DelegationStatus,
-    ): Delegation {
-        return new Delegation(
-            delegationId,
-            delegatingUserId,
-            delegatorUserId,
-            status
-        );
+    this._status = newStatus;
+  }
+
+  decline(): void {
+    const newStatus = DelegationStatus.declined();
+
+    if (!this._status.canTransitionTo(newStatus)) {
+      throw new Error(`Cannot decline delegation: current status is ${this._status.value}`);
     }
 
-    accept(): void {
-        const newStatus = DelegationStatus.active();
+    this._status = newStatus;
+  }
 
-        if (!this._status.canTransitionTo(newStatus)) {
-            throw new Error(
-                `Cannot accept delegation: current status is ${this._status.value}`
-            );
-        }
+  delete(): void {
+    const newStatus = DelegationStatus.deleted();
 
-        this._status = newStatus;
+    if (!this._status.canTransitionTo(newStatus)) {
+      throw new Error(`Cannot delete delegation: current status is ${this._status.value}`);
     }
 
-    decline(): void {
-        const newStatus = DelegationStatus.declined();
+    this._status = newStatus;
+  }
 
-        if (!this._status.canTransitionTo(newStatus)) {
-            throw new Error(
-                `Cannot decline delegation: current status is ${this._status.value}`
-            );
-        }
+  canBeAcceptedBy(userId: UUID): boolean {
+    return this._delegatingUserId === userId && this._status.isPending();
+  }
 
-        this._status = newStatus;
-    }
+  canBeDeletedBy(userId: UUID): boolean {
+    return (
+      (this._delegatingUserId === userId || this._delegatorUserId === userId) &&
+      this._status.isActive()
+    );
+  }
 
-    delete(): void {
-        const newStatus = DelegationStatus.deleted();
+  get delegationId(): string {
+    return this._delegationId;
+  }
 
-        if (!this._status.canTransitionTo(newStatus)) {
-            throw new Error(
-                `Cannot delete delegation: current status is ${this._status.value}`
-            );
-        }
+  get delegatingUserId(): string {
+    return this._delegatingUserId;
+  }
 
-        this._status = newStatus;
-    }
+  get delegatorUserId(): string {
+    return this._delegatorUserId;
+  }
 
-    canBeAcceptedBy(userId: UUID): boolean {
-        return this._delegatingUserId === userId && this._status.isPending();
-    }
-
-    canBeDeletedBy(userId: UUID): boolean {
-        return (
-            (this._delegatingUserId === userId || this._delegatorUserId === userId) &&
-            (this._status.isActive())
-        );
-    }
-
-    get delegationId(): string {
-        return this._delegationId;
-    }
-
-    get delegatingUserId(): string {
-        return this._delegatingUserId;
-    }
-
-    get delegatorUserId(): string {
-        return this._delegatorUserId;
-    }
-
-    get status(): DelegationStatus {
-        return this._status;
-    }
+  get status(): DelegationStatus {
+    return this._status;
+  }
 }

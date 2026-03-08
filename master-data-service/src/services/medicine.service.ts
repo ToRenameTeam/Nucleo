@@ -4,145 +4,149 @@ import { MedicineRepositoryImpl } from '../infrastructure/repositories/implement
 import { formatEnumLabel, isValidResourceCode } from './service.utils.js';
 
 export interface MedicineFilter {
-    category?: string;
-    active?: boolean;
-    search?: string;
+  category?: string;
+  active?: boolean;
+  search?: string;
 }
 
 export interface CreateMedicineInput {
-    code: string;
-    name: string;
-    description: string;
-    category: MedicineCategory;
-    activeIngredient: string;
-    dosageForm: string;
-    strength: string;
-    manufacturer: string;
-    isActive?: boolean;
+  code: string;
+  name: string;
+  description: string;
+  category: MedicineCategory;
+  activeIngredient: string;
+  dosageForm: string;
+  strength: string;
+  manufacturer: string;
+  isActive?: boolean;
 }
 
 export interface UpdateMedicineInput {
-    name?: string;
-    description?: string;
-    category?: MedicineCategory;
-    activeIngredient?: string;
-    dosageForm?: string;
-    strength?: string;
-    manufacturer?: string;
-    isActive?: boolean;
+  name?: string;
+  description?: string;
+  category?: MedicineCategory;
+  activeIngredient?: string;
+  dosageForm?: string;
+  strength?: string;
+  manufacturer?: string;
+  isActive?: boolean;
 }
 
 export interface MedicineCategoryInfo {
-    value: MedicineCategory;
-    label: string;
+  value: MedicineCategory;
+  label: string;
 }
 
 export class MedicineService {
-    constructor(private readonly medicineRepository: IMedicineRepository = new MedicineRepositoryImpl()) {}
+  constructor(
+    private readonly medicineRepository: IMedicineRepository = new MedicineRepositoryImpl()
+  ) {}
 
-    /**
-     * Get all medicines with optional filtering
-     */
-    async findAll(filter: MedicineFilter = {}): Promise<IMedicine[]> {
-        const query: Record<string, unknown> = {};
+  /**
+   * Get all medicines with optional filtering
+   */
+  async findAll(filter: MedicineFilter = {}): Promise<IMedicine[]> {
+    const query: Record<string, unknown> = {};
 
-        if (filter.category) {
-            query.category = filter.category;
-        }
-
-        if (filter.active !== undefined) {
-            query.isActive = filter.active;
-        }
-
-        if (filter.search) {
-            query.$text = { $search: filter.search };
-        }
-
-        return this.medicineRepository.findAll(query);
+    if (filter.category) {
+      query.category = filter.category;
     }
 
-    /**
-     * Get all available categories
-     */
-    getCategories(): MedicineCategoryInfo[] {
-        return Object.values(MedicineCategory).map(function (category) {
-            return {
-                value: category,
-                label: formatEnumLabel(category)
-            };
-        });
+    if (filter.active !== undefined) {
+      query.isActive = filter.active;
     }
 
-    /**
-     * Get a single medicine by ID
-     */
-    async findById(id: string): Promise<IMedicine | null> {
-        return this.medicineRepository.findById(id);
+    if (filter.search) {
+      query.$text = { $search: filter.search };
     }
 
-    /**
-     * Create a new medicine
-     */
-    async create(input: CreateMedicineInput): Promise<IMedicine> {
-        // Validate code format
-        if (!input.code || !isValidResourceCode(input.code, 'medicine')) {
-            throw new MedicineValidationError('Invalid code format. Must be "medicine-XXX" where XXX is a 3-digit number');
-        }
+    return this.medicineRepository.findAll(query);
+  }
 
-        // Check if code already exists
-        const existing = await this.medicineRepository.findByCode(input.code);
-        if (existing) {
-            throw new MedicineConflictError('A medicine with this code already exists');
-        }
+  /**
+   * Get all available categories
+   */
+  getCategories(): MedicineCategoryInfo[] {
+    return Object.values(MedicineCategory).map(function (category) {
+      return {
+        value: category,
+        label: formatEnumLabel(category),
+      };
+    });
+  }
 
-        return this.medicineRepository.create({
-            code: input.code,
-            name: input.name,
-            description: input.description,
-            category: input.category,
-            activeIngredient: input.activeIngredient,
-            dosageForm: input.dosageForm,
-            strength: input.strength,
-            manufacturer: input.manufacturer,
-            isActive: input.isActive ?? true
-        });
+  /**
+   * Get a single medicine by ID
+   */
+  async findById(id: string): Promise<IMedicine | null> {
+    return this.medicineRepository.findById(id);
+  }
+
+  /**
+   * Create a new medicine
+   */
+  async create(input: CreateMedicineInput): Promise<IMedicine> {
+    // Validate code format
+    if (!input.code || !isValidResourceCode(input.code, 'medicine')) {
+      throw new MedicineValidationError(
+        'Invalid code format. Must be "medicine-XXX" where XXX is a 3-digit number'
+      );
     }
 
-    /**
-     * Update a medicine
-     */
-    async update(id: string, input: UpdateMedicineInput): Promise<IMedicine | null> {
-        return this.medicineRepository.updateById(id, input);
+    // Check if code already exists
+    const existing = await this.medicineRepository.findByCode(input.code);
+    if (existing) {
+      throw new MedicineConflictError('A medicine with this code already exists');
     }
 
-    /**
-     * Soft delete a medicine (sets isActive to false)
-     */
-    async softDelete(id: string): Promise<IMedicine | null> {
-        return this.medicineRepository.softDelete(id);
-    }
+    return this.medicineRepository.create({
+      code: input.code,
+      name: input.name,
+      description: input.description,
+      category: input.category,
+      activeIngredient: input.activeIngredient,
+      dosageForm: input.dosageForm,
+      strength: input.strength,
+      manufacturer: input.manufacturer,
+      isActive: input.isActive ?? true,
+    });
+  }
 
-    /**
-     * Permanently delete a medicine
-     */
-    async permanentDelete(id: string): Promise<IMedicine | null> {
-        return this.medicineRepository.permanentDelete(id);
-    }
+  /**
+   * Update a medicine
+   */
+  async update(id: string, input: UpdateMedicineInput): Promise<IMedicine | null> {
+    return this.medicineRepository.updateById(id, input);
+  }
+
+  /**
+   * Soft delete a medicine (sets isActive to false)
+   */
+  async softDelete(id: string): Promise<IMedicine | null> {
+    return this.medicineRepository.softDelete(id);
+  }
+
+  /**
+   * Permanently delete a medicine
+   */
+  async permanentDelete(id: string): Promise<IMedicine | null> {
+    return this.medicineRepository.permanentDelete(id);
+  }
 }
 
 // Custom error classes for better error handling
 export class MedicineValidationError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'MedicineValidationError';
-    }
+  constructor(message: string) {
+    super(message);
+    this.name = 'MedicineValidationError';
+  }
 }
 
 export class MedicineConflictError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'MedicineConflictError';
-    }
+  constructor(message: string) {
+    super(message);
+    this.name = 'MedicineConflictError';
+  }
 }
 
 // Export singleton instance

@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import {
-    medicineService,
-    MedicineValidationError,
-    MedicineConflictError
+  medicineService,
+  MedicineValidationError,
+  MedicineConflictError,
 } from '../services/medicine.service.js';
 import { parseBooleanQuery, sendError, sendServerError, sendSuccess } from './route.utils.js';
 
@@ -13,20 +13,20 @@ const router = Router();
  * Get all medicines with optional filtering
  */
 router.get('/', async (req, res) => {
-    try {
-        const { category, active, search } = req.query;
+  try {
+    const { category, active, search } = req.query;
 
-        const medicines = await medicineService.findAll({
-            category: category as string | undefined,
-            active: parseBooleanQuery(active),
-            search: search as string | undefined
-        });
+    const medicines = await medicineService.findAll({
+      category: category as string | undefined,
+      active: parseBooleanQuery(active),
+      search: search as string | undefined,
+    });
 
-        sendSuccess(res, medicines, 200, { count: medicines.length });
-    } catch (error) {
-        console.error('Error fetching medicines:', error);
-        sendServerError(res, 'Failed to fetch medicines');
-    }
+    sendSuccess(res, medicines, 200, { count: medicines.length });
+  } catch (error) {
+    console.error('Error fetching medicines:', error);
+    sendServerError(res, 'Failed to fetch medicines');
+  }
 });
 
 /**
@@ -34,9 +34,9 @@ router.get('/', async (req, res) => {
  * Get all available categories
  */
 router.get('/categories', (_req, res) => {
-    const categories = medicineService.getCategories();
+  const categories = medicineService.getCategories();
 
-    sendSuccess(res, categories);
+  sendSuccess(res, categories);
 });
 
 /**
@@ -44,19 +44,19 @@ router.get('/categories', (_req, res) => {
  * Get a single medicine by ID
  */
 router.get('/:id', async (req, res) => {
-    try {
-        const medicine = await medicineService.findById(req.params.id);
+  try {
+    const medicine = await medicineService.findById(req.params.id);
 
-        if (!medicine) {
-            sendError(res, 404, 'Medicine not found');
-            return;
-        }
-
-        sendSuccess(res, medicine);
-    } catch (error) {
-        console.error('Error fetching medicine:', error);
-        sendServerError(res, 'Failed to fetch medicine');
+    if (!medicine) {
+      sendError(res, 404, 'Medicine not found');
+      return;
     }
+
+    sendSuccess(res, medicine);
+  } catch (error) {
+    console.error('Error fetching medicine:', error);
+    sendServerError(res, 'Failed to fetch medicine');
+  }
 });
 
 /**
@@ -64,24 +64,24 @@ router.get('/:id', async (req, res) => {
  * Create a new medicine
  */
 router.post('/', async (req, res) => {
-    try {
-        const medicine = await medicineService.create(req.body);
+  try {
+    const medicine = await medicineService.create(req.body);
 
-        sendSuccess(res, medicine, 201);
-    } catch (error) {
-        if (error instanceof MedicineValidationError) {
-            sendError(res, 400, error.message);
-            return;
-        }
-
-        if (error instanceof MedicineConflictError) {
-            sendError(res, 409, error.message);
-            return;
-        }
-
-        console.error('Error creating medicine:', error);
-        sendServerError(res, 'Failed to create medicine');
+    sendSuccess(res, medicine, 201);
+  } catch (error) {
+    if (error instanceof MedicineValidationError) {
+      sendError(res, 400, error.message);
+      return;
     }
+
+    if (error instanceof MedicineConflictError) {
+      sendError(res, 409, error.message);
+      return;
+    }
+
+    console.error('Error creating medicine:', error);
+    sendServerError(res, 'Failed to create medicine');
+  }
 });
 
 /**
@@ -89,19 +89,19 @@ router.post('/', async (req, res) => {
  * Update a medicine
  */
 router.put('/:id', async (req, res) => {
-    try {
-        const medicine = await medicineService.update(req.params.id, req.body);
+  try {
+    const medicine = await medicineService.update(req.params.id, req.body);
 
-        if (!medicine) {
-            sendError(res, 404, 'Medicine not found');
-            return;
-        }
-
-        sendSuccess(res, medicine);
-    } catch (error) {
-        console.error('Error updating medicine:', error);
-        sendServerError(res, 'Failed to update medicine');
+    if (!medicine) {
+      sendError(res, 404, 'Medicine not found');
+      return;
     }
+
+    sendSuccess(res, medicine);
+  } catch (error) {
+    console.error('Error updating medicine:', error);
+    sendServerError(res, 'Failed to update medicine');
+  }
 });
 
 /**
@@ -109,19 +109,19 @@ router.put('/:id', async (req, res) => {
  * Soft delete a medicine
  */
 router.delete('/:id', async (req, res) => {
-    try {
-        const medicine = await medicineService.softDelete(req.params.id);
+  try {
+    const medicine = await medicineService.softDelete(req.params.id);
 
-        if (!medicine) {
-            sendError(res, 404, 'Medicine not found');
-            return;
-        }
-
-        sendSuccess(res, medicine, 200, { message: 'Medicine deactivated successfully' });
-    } catch (error) {
-        console.error('Error deleting medicine:', error);
-        sendServerError(res, 'Failed to delete medicine');
+    if (!medicine) {
+      sendError(res, 404, 'Medicine not found');
+      return;
     }
+
+    sendSuccess(res, medicine, 200, { message: 'Medicine deactivated successfully' });
+  } catch (error) {
+    console.error('Error deleting medicine:', error);
+    sendServerError(res, 'Failed to delete medicine');
+  }
 });
 
 /**
@@ -129,19 +129,19 @@ router.delete('/:id', async (req, res) => {
  * Permanently delete a medicine
  */
 router.delete('/:id/permanent', async (req, res) => {
-    try {
-        const medicine = await medicineService.permanentDelete(req.params.id);
+  try {
+    const medicine = await medicineService.permanentDelete(req.params.id);
 
-        if (!medicine) {
-            sendError(res, 404, 'Medicine not found');
-            return;
-        }
-
-        sendSuccess(res, null, 200, { message: 'Medicine permanently deleted' });
-    } catch (error) {
-        console.error('Error permanently deleting medicine:', error);
-        sendServerError(res, 'Failed to permanently delete medicine');
+    if (!medicine) {
+      sendError(res, 404, 'Medicine not found');
+      return;
     }
+
+    sendSuccess(res, null, 200, { message: 'Medicine permanently deleted' });
+  } catch (error) {
+    console.error('Error permanently deleting medicine:', error);
+    sendServerError(res, 'Failed to permanently delete medicine');
+  }
 });
 
 export default router;

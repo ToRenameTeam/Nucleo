@@ -14,11 +14,11 @@ app.use(express.json());
 
 // Health check
 app.get('/health', (req, res) => {
-    res.json({
-        status: 'ok',
-        timestamp: new Date().toISOString(),
-        service: 'users-service'
-    });
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    service: 'users-service',
+  });
 });
 
 // Routes
@@ -30,31 +30,31 @@ startServer();
 
 // Start server
 async function startServer() {
-    await connectDB();
-    await runSeeds();
+  await connectDB();
+  await runSeeds();
 
-    app.listen(PORT, () => {
-        console.log(`🚀 Server running on port ${PORT}`);
-        console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-        console.log(`👤 Users API: http://localhost:${PORT}/api/users`);
-        console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
-        console.log(`🤝 Delegations API: http://localhost:${PORT}/api/delegations`);
-    });
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+    console.log(`👤 Users API: http://localhost:${PORT}/api/users`);
+    console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
+    console.log(`🤝 Delegations API: http://localhost:${PORT}/api/delegations`);
+  });
 }
 
 // Connect to MongoDB
 async function connectDB() {
-    try {
-        await mongoose.connect(MONGO_URI);
-        console.log('✅ Connected to MongoDB');
-    } catch (error) {
-        console.error('❌ MongoDB connection error:', error);
-        process.exit(1);
-    }
+  try {
+    await mongoose.connect(MONGO_URI);
+    console.log('✅ Connected to MongoDB');
+  } catch (error) {
+    console.error('❌ MongoDB connection error:', error);
+    process.exit(1);
+  }
 }
 
 process.on('SIGINT', async () => {
-    console.log('\n⚠️  Shutting down gracefully...');
-    await mongoose.connection.close();
-    process.exit(0);
+  console.log('\n⚠️  Shutting down gracefully...');
+  await mongoose.connection.close();
+  process.exit(0);
 });

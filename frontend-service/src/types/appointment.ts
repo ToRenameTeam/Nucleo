@@ -27,4 +27,4 @@ export interface UpcomingAppointments {
 export type AppointmentBooking = {
   isOpen: boolean;
   preselectedVisit?: string | null;
-}
+};

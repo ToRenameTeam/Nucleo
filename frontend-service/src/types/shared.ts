@@ -1,67 +1,67 @@
-import type { FunctionalComponent } from 'vue'
+import type { FunctionalComponent } from 'vue';
 
 // BaseCard Types
 export interface CardMetadata {
-  icon: FunctionalComponent
-  label: string
+  icon: FunctionalComponent;
+  label: string;
 }
 
 export interface CardAction {
-  id: string
-  label: string
-  icon: FunctionalComponent
-  variant: 'primary' | 'secondary' | 'warning' | 'danger' | 'ghost'
-  onClick: (id: string) => void
+  id: string;
+  label: string;
+  icon: FunctionalComponent;
+  variant: 'primary' | 'secondary' | 'warning' | 'danger' | 'ghost';
+  onClick: (id: string) => void;
 }
 
 export interface BaseCard {
-  title: string
-  description: string
-  icon: FunctionalComponent
-  metadata: CardMetadata[]
-  selected?: boolean
-  selectable?: boolean
-  showActions?: boolean
-  clickable?: boolean
+  title: string;
+  description: string;
+  icon: FunctionalComponent;
+  metadata: CardMetadata[];
+  selected?: boolean;
+  selectable?: boolean;
+  showActions?: boolean;
+  clickable?: boolean;
   /** Additional ID for targeting */
-  cardId?: string
+  cardId?: string;
   /** Configurable actions */
-  actions?: CardAction[]
+  actions?: CardAction[];
 }
 
 // BaseModal Types
 export interface BaseModal {
-  isOpen: boolean
-  title?: string
-  subtitle?: string
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl'
-  showFooter?: boolean
-  closeOnBackdrop?: boolean
+  isOpen: boolean;
+  title?: string;
+  subtitle?: string;
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
+  showFooter?: boolean;
+  closeOnBackdrop?: boolean;
 }
 
 // LoadingSpinner Types
 export interface LoadingSpinner {
-  size?: 'small' | 'medium' | 'large'
-  message?: string
-  inline?: boolean
+  size?: 'small' | 'medium' | 'large';
+  message?: string;
+  inline?: boolean;
 }
 
 // Toast Types
 export interface Toast {
-  message: string
-  show: boolean
-  duration?: number
-  type?: 'success' | 'error' | 'info' | 'warning'
+  message: string;
+  show: boolean;
+  duration?: number;
+  type?: 'success' | 'error' | 'info' | 'warning';
 }
 
 // ProfileCard Types
 export interface ProfileCard {
-  name?: string
-  fiscalCode?: string
+  name?: string;
+  fiscalCode?: string;
 }
 
 // Breadcrumbs Types
 export interface BreadcrumbItem {
-  name: string
-  path?: string
+  name: string;
+  path?: string;
 }
