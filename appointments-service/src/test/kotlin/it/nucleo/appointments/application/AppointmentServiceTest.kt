@@ -1,290 +1,157 @@
 package it.nucleo.appointments.application
 
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import it.nucleo.appointments.domain.*
-import it.nucleo.appointments.domain.Appointment
-import it.nucleo.appointments.domain.AppointmentRepository
-import it.nucleo.appointments.domain.AvailabilityRepository
 import it.nucleo.appointments.domain.errors.*
-import kotlinx.datetime.LocalDateTime
+import it.nucleo.appointments.fixtures.AppointmentFixtures
+import it.nucleo.appointments.fixtures.FakeAppointmentRepository
+import it.nucleo.appointments.fixtures.FakeAvailabilityRepository
 
 class AppointmentServiceTest :
-    FunSpec({
-        test(
-            "createAppointment - should create appointment successfully when availability is available"
-        ) {
-            // Given
-            val appointmentRepo = FakeAppointmentRepositoryForService()
-            val availabilityRepo = FakeAvailabilityRepositoryForService()
-            val service = AppointmentService(appointmentRepo, availabilityRepo)
+    DescribeSpec({
 
-            val command =
-                AppointmentService.CreateAppointmentCommand(
-                    patientId = "pat-001",
-                    availabilityId = "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"
+        fun createService(
+            appointmentRepo: AppointmentRepository = FakeAppointmentRepository(),
+            availabilityRepo: AvailabilityRepository = FakeAvailabilityRepository(),
+        ) = AppointmentService(appointmentRepo, availabilityRepo)
+
+        describe("createAppointment") {
+
+            it("should create an appointment when the availability is available") {
+                val service = createService()
+
+                val result = service.createAppointment(
+                    patientId = AppointmentFixtures.PATIENT_ID,
+                    availabilityId = AppointmentFixtures.AVAILABILITY_ID,
                 )
 
-            // When
-            val result = service.createAppointment(command)
+                result.shouldBeInstanceOf<Either.Right<Appointment>>()
+                result.value.patientId.value shouldBe AppointmentFixtures.PATIENT_ID
+                result.value.status shouldBe AppointmentStatus.SCHEDULED
+            }
 
-            // Then
-            result.shouldBeInstanceOf<Either.Right<Appointment>>()
-            result.value.patientId.value shouldBe "pat-001"
-            result.value.status shouldBe AppointmentStatus.SCHEDULED
-        }
-
-        test(
-            "createAppointment - should return AvailabilityError.NotFound when availability not found"
-        ) {
-            // Given
-            val appointmentRepo = FakeAppointmentRepositoryForService()
-            val availabilityRepo = FakeAvailabilityRepositoryForService(availabilityExists = false)
-            val service = AppointmentService(appointmentRepo, availabilityRepo)
-
-            val command =
-                AppointmentService.CreateAppointmentCommand(
-                    patientId = "pat-001",
-                    availabilityId = "00000000-0000-0000-0000-000000000000"
+            it("should return NotFound when the availability does not exist") {
+                val service = createService(
+                    availabilityRepo = FakeAvailabilityRepository(availabilityExists = false),
                 )
 
-            // When
-            val result = service.createAppointment(command)
-
-            // Then
-            result.shouldBeInstanceOf<Either.Left<AvailabilityError.NotFound>>()
-        }
-
-        test(
-            "createAppointment - should return AvailabilityError.NotAvailable when availability is not available"
-        ) {
-            // Given
-            val appointmentRepo = FakeAppointmentRepositoryForService()
-            val availabilityRepo =
-                FakeAvailabilityRepositoryForService(availabilityStatus = AvailabilityStatus.BOOKED)
-            val service = AppointmentService(appointmentRepo, availabilityRepo)
-
-            val command =
-                AppointmentService.CreateAppointmentCommand(
-                    patientId = "pat-001",
-                    availabilityId = "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"
+                val result = service.createAppointment(
+                    patientId = AppointmentFixtures.PATIENT_ID,
+                    availabilityId = "00000000-0000-0000-0000-000000000000",
                 )
 
-            // When
-            val result = service.createAppointment(command)
+                result.shouldBeInstanceOf<Either.Left<AvailabilityError.NotFound>>()
+            }
 
-            // Then
-            result.shouldBeInstanceOf<Either.Left<AvailabilityError.NotAvailable>>()
+            it("should return NotAvailable when the availability is already booked") {
+                val service = createService(
+                    availabilityRepo = FakeAvailabilityRepository(
+                        availabilityStatus = AvailabilityStatus.BOOKED,
+                    ),
+                )
+
+                val result = service.createAppointment(
+                    patientId = AppointmentFixtures.PATIENT_ID,
+                    availabilityId = AppointmentFixtures.AVAILABILITY_ID,
+                )
+
+                result.shouldBeInstanceOf<Either.Left<AvailabilityError.NotAvailable>>()
+            }
         }
 
-        test("getAppointmentById - should return appointment when found") {
-            // Given
-            val appointmentRepo = FakeAppointmentRepositoryForService()
-            val availabilityRepo = FakeAvailabilityRepositoryForService()
-            val service = AppointmentService(appointmentRepo, availabilityRepo)
+        describe("getAppointmentById") {
 
-            // When
-            val result = service.getAppointmentById("d4e5f6a7-b8c9-40d1-e2f3-a4b5c6d7e8f9")
+            it("should return the appointment when it exists") {
+                val service = createService()
 
-            // Then
-            result.shouldBeInstanceOf<Either.Right<Appointment>>()
-            result.value.id.value shouldBe "d4e5f6a7-b8c9-40d1-e2f3-a4b5c6d7e8f9"
+                val result = service.getAppointmentById(AppointmentFixtures.APPOINTMENT_ID)
+
+                result.shouldBeInstanceOf<Either.Right<Appointment>>()
+                result.value.id.value shouldBe AppointmentFixtures.APPOINTMENT_ID
+            }
+
+            it("should return NotFound when the appointment does not exist") {
+                val service = createService(
+                    appointmentRepo = FakeAppointmentRepository(appointmentExists = false),
+                )
+
+                val result = service.getAppointmentById("00000000-0000-0000-0000-000000000000")
+
+                result.shouldBeInstanceOf<Either.Left<AppointmentError.NotFound>>()
+            }
         }
 
-        test("getAppointmentById - should return NotFound when not found") {
-            // Given
-            val appointmentRepo = FakeAppointmentRepositoryForService(appointmentExists = false)
-            val availabilityRepo = FakeAvailabilityRepositoryForService()
-            val service = AppointmentService(appointmentRepo, availabilityRepo)
+        describe("getAppointmentsByFilters") {
 
-            // When
-            val result = service.getAppointmentById("00000000-0000-0000-0000-000000000000")
+            it("should return filtered appointments") {
+                val service = createService()
 
-            // Then
-            result.shouldBeInstanceOf<Either.Left<AppointmentError.NotFound>>()
-        }
-
-        test("getAppointmentsByFilters - should return filtered appointments") {
-            // Given
-            val appointmentRepo = FakeAppointmentRepositoryForService()
-            val availabilityRepo = FakeAvailabilityRepositoryForService()
-            val service = AppointmentService(appointmentRepo, availabilityRepo)
-
-            // When
-            val result =
-                service.getAppointmentsByFilters(
-                    patientId = "pat-001",
+                val result = service.getAppointmentsByFilters(
+                    patientId = AppointmentFixtures.PATIENT_ID,
                     doctorId = null,
-                    status = null
-                )
-
-            // Then
-            result.shouldBeInstanceOf<Either.Right<List<Appointment>>>()
-            result.value shouldHaveSize 1
-            result.value[0].patientId.value shouldBe "pat-001"
-        }
-
-        test("updateAppointment - should update appointment status successfully") {
-            // Given
-            val appointmentRepo = FakeAppointmentRepositoryForService()
-            val availabilityRepo = FakeAvailabilityRepositoryForService()
-            val service = AppointmentService(appointmentRepo, availabilityRepo)
-
-            val command =
-                AppointmentService.UpdateAppointmentCommand(
-                    id = "d4e5f6a7-b8c9-40d1-e2f3-a4b5c6d7e8f9",
-                    status = "CANCELLED",
-                    availabilityId = null
-                )
-
-            // When
-            val result = service.updateAppointment(command)
-
-            // Then
-            result.shouldBeInstanceOf<Either.Right<Appointment>>()
-            result.value.status shouldBe AppointmentStatus.CANCELLED
-        }
-
-        test("updateAppointment - should update appointment availability successfully") {
-            // Given
-            val appointmentRepo = FakeAppointmentRepositoryForService()
-            val availabilityRepo = FakeAvailabilityRepositoryForService()
-            val service = AppointmentService(appointmentRepo, availabilityRepo)
-
-            val command =
-                AppointmentService.UpdateAppointmentCommand(
-                    id = "d4e5f6a7-b8c9-40d1-e2f3-a4b5c6d7e8f9",
                     status = null,
-                    availabilityId = "b2c3d4e5-f6a7-48b9-c0d1-e2f3a4b5c6d7"
                 )
 
-            // When
-            val result = service.updateAppointment(command)
-
-            // Then
-            result.shouldBeInstanceOf<Either.Right<Appointment>>()
-            result.value.availabilityId.value shouldBe "b2c3d4e5-f6a7-48b9-c0d1-e2f3a4b5c6d7"
+                result.shouldBeInstanceOf<Either.Right<List<Appointment>>>()
+                result.value shouldHaveSize 1
+                result.value[0].patientId.value shouldBe AppointmentFixtures.PATIENT_ID
+            }
         }
 
-        test("deleteAppointment - should delete appointment successfully") {
-            // Given
-            val appointmentRepo = FakeAppointmentRepositoryForService()
-            val availabilityRepo =
-                FakeAvailabilityRepositoryForService(availabilityStatus = AvailabilityStatus.BOOKED)
-            val service = AppointmentService(appointmentRepo, availabilityRepo)
+        describe("updateAppointment") {
 
-            // When
-            val result = service.deleteAppointment("d4e5f6a7-b8c9-40d1-e2f3-a4b5c6d7e8f9")
+            it("should update the appointment status") {
+                val service = createService()
 
-            // Then
-            result.shouldBeInstanceOf<Either.Right<Unit>>()
+                val result = service.updateAppointment(
+                    id = AppointmentFixtures.APPOINTMENT_ID,
+                    status = "CANCELLED",
+                    availabilityId = null,
+                )
+
+                result.shouldBeInstanceOf<Either.Right<Appointment>>()
+                result.value.status shouldBe AppointmentStatus.CANCELLED
+            }
+
+            it("should update the appointment availability") {
+                val service = createService()
+
+                val result = service.updateAppointment(
+                    id = AppointmentFixtures.APPOINTMENT_ID,
+                    status = null,
+                    availabilityId = AppointmentFixtures.OTHER_AVAILABILITY_ID,
+                )
+
+                result.shouldBeInstanceOf<Either.Right<Appointment>>()
+                result.value.availabilityId.value shouldBe AppointmentFixtures.OTHER_AVAILABILITY_ID
+            }
         }
 
-        test("deleteAppointment - should return NotFound when appointment not found") {
-            // Given
-            val appointmentRepo = FakeAppointmentRepositoryForService(appointmentExists = false)
-            val availabilityRepo = FakeAvailabilityRepositoryForService()
-            val service = AppointmentService(appointmentRepo, availabilityRepo)
+        describe("deleteAppointment") {
 
-            // When
-            val result = service.deleteAppointment("00000000-0000-0000-0000-000000000000")
+            it("should delete an existing appointment") {
+                val service = createService(
+                    availabilityRepo = FakeAvailabilityRepository(
+                        availabilityStatus = AvailabilityStatus.BOOKED,
+                    ),
+                )
 
-            // Then
-            result.shouldBeInstanceOf<Either.Left<AppointmentError.NotFound>>()
+                val result = service.deleteAppointment(AppointmentFixtures.APPOINTMENT_ID)
+
+                result.shouldBeInstanceOf<Either.Right<Unit>>()
+            }
+
+            it("should return NotFound when the appointment does not exist") {
+                val service = createService(
+                    appointmentRepo = FakeAppointmentRepository(appointmentExists = false),
+                )
+
+                val result = service.deleteAppointment("00000000-0000-0000-0000-000000000000")
+
+                result.shouldBeInstanceOf<Either.Left<AppointmentError.NotFound>>()
+            }
         }
     })
-
-class FakeAppointmentRepositoryForService(private val appointmentExists: Boolean = true) :
-    AppointmentRepository {
-
-    private var savedAppointment: Appointment? = null
-
-    override suspend fun save(appointment: Appointment): Appointment {
-        savedAppointment = appointment
-        return appointment
-    }
-
-    override suspend fun findById(id: AppointmentId): Appointment? {
-        if (!appointmentExists) return null
-
-        return Appointment(
-            id = id,
-            patientId = PatientId.fromString("pat-001"),
-            availabilityId = AvailabilityId.fromString("a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"),
-            status = AppointmentStatus.SCHEDULED,
-            createdAt = LocalDateTime.parse("2026-01-30T10:00:00"),
-            updatedAt = LocalDateTime.parse("2026-01-30T10:00:00")
-        )
-    }
-
-    override suspend fun findByFilters(
-        patientId: PatientId?,
-        doctorId: DoctorId?,
-        status: AppointmentStatus?
-    ): List<Appointment> {
-        if (!appointmentExists) return emptyList()
-
-        val appointment =
-            Appointment(
-                id = AppointmentId.fromString("d4e5f6a7-b8c9-40d1-e2f3-a4b5c6d7e8f9"),
-                patientId = PatientId.fromString("pat-001"),
-                availabilityId = AvailabilityId.fromString("a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"),
-                status = AppointmentStatus.SCHEDULED,
-                createdAt = LocalDateTime.parse("2026-01-30T10:00:00"),
-                updatedAt = LocalDateTime.parse("2026-01-30T10:00:00")
-            )
-
-        return listOf(appointment)
-    }
-
-    override suspend fun update(appointment: Appointment): Appointment? {
-        if (!appointmentExists) return null
-        return appointment
-    }
-}
-
-class FakeAvailabilityRepositoryForService(
-    private val availabilityExists: Boolean = true,
-    private val availabilityStatus: AvailabilityStatus = AvailabilityStatus.AVAILABLE
-) : AvailabilityRepository {
-
-    override suspend fun save(
-        availability: it.nucleo.appointments.domain.Availability
-    ): it.nucleo.appointments.domain.Availability = availability
-
-    override suspend fun findById(id: AvailabilityId): it.nucleo.appointments.domain.Availability? {
-        if (!availabilityExists) return null
-
-        return it.nucleo.appointments.domain.Availability(
-            availabilityId = id,
-            doctorId = DoctorId.fromString("doc-001"),
-            facilityId = FacilityId.fromString("facility-001"),
-            serviceTypeId = ServiceTypeId.fromString("service-001"),
-            timeSlot =
-                TimeSlot(
-                    startDateTime = LocalDateTime.parse("2026-02-01T09:00:00"),
-                    durationMinutes = 30
-                ),
-            status = availabilityStatus
-        )
-    }
-
-    override suspend fun findByFilters(
-        doctorId: DoctorId?,
-        facilityId: FacilityId?,
-        serviceTypeId: ServiceTypeId?,
-        status: AvailabilityStatus?
-    ): List<it.nucleo.appointments.domain.Availability> = emptyList()
-
-    override suspend fun update(
-        availability: it.nucleo.appointments.domain.Availability
-    ): it.nucleo.appointments.domain.Availability? = availability
-
-    override suspend fun checkOverlap(
-        doctorId: DoctorId,
-        timeSlot: TimeSlot,
-        excludeId: AvailabilityId?
-    ): Boolean = false
-}
