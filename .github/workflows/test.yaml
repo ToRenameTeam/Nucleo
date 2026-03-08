@@ -1,0 +1,155 @@
+name: Test
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  lint-node:
+    name: Lint & Format (Node.js)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting (Prettier)
+        run: pnpm format:check
+
+      - name: Lint (ESLint)
+        run: pnpm lint
+
+  lint-kotlin:
+    name: Lint & Format (Kotlin)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 22
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Check formatting (ktfmt)
+        run: ./gradlew ktfmtCheck
+
+  lint-python:
+    name: Lint & Format (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install dependencies
+        working-directory: ai-service
+        run: uv sync --group dev
+
+      - name: Check formatting (Ruff)
+        working-directory: ai-service
+        run: uv run ruff format --check .
+
+      - name: Lint (Ruff)
+        working-directory: ai-service
+        run: uv run ruff check .
+
+  test-users-service:
+    name: Test – users-service
+    runs-on: ubuntu-latest
+    needs: lint-node
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm --filter @nucleo/users-service test
+
+  test-master-data-service:
+    name: Test – master-data-service
+    runs-on: ubuntu-latest
+    needs: lint-node
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm --filter @nucleo/master-data-service test
+
+  test-appointments-service:
+    name: Test – appointments-service
+    runs-on: ubuntu-latest
+    needs: lint-kotlin
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 22
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run tests
+        run: ./gradlew :appointments-service:test
+
+  test-documents-service:
+    name: Test – documents-service
+    runs-on: ubuntu-latest
+    needs: lint-kotlin
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 22
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run tests
+        run: ./gradlew :documents-service:test
