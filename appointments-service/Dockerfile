@@ -6,6 +6,7 @@ COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties ./
 COPY gradle ./gradle
 COPY build-logic ./build-logic
 
+COPY commons ./commons
 COPY appointments-service ./appointments-service
 
 RUN chmod +x gradlew && ./gradlew :appointments-service:buildFatJar --no-daemon
