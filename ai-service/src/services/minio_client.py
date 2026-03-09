@@ -3,7 +3,6 @@ MinIO client for fetching PDF documents from object storage.
 """
 
 import time
-from io import BytesIO
 
 from minio import Minio
 from minio.error import S3Error

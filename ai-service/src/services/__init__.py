@@ -1,23 +1,23 @@
 """Services package."""
 
 from src.services.ai_analyzer import (
-    AiAnalyzer,
     AiAnalysisError,
+    AiAnalyzer,
     AiConnectionError,
     AiResponseParsingError,
     DocumentMetadata,
 )
 from src.services.minio_client import (
+    DocumentNotFoundError,
     MinioClient,
     MinioClientError,
     MinioConnectionError,
-    DocumentNotFoundError,
 )
 from src.services.pdf_extractor import (
-    PdfExtractor,
-    PdfExtractionError,
-    EmptyPdfError,
     CorruptedPdfError,
+    EmptyPdfError,
+    PdfExtractionError,
+    PdfExtractor,
 )
 
 __all__ = [

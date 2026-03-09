@@ -2,8 +2,6 @@
 PDF text extraction using PyMuPDF.
 """
 
-from io import BytesIO
-
 import pymupdf
 
 from src.utils.logger import get_logger

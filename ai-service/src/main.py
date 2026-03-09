@@ -1,22 +1,24 @@
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from pydantic import BaseModel
+
 from src.config import get_settings
 from src.services import (
-    AiAnalyzer,
     AiAnalysisError,
+    AiAnalyzer,
     AiConnectionError,
     AiResponseParsingError,
+    CorruptedPdfError,
+    DocumentNotFoundError,
+    EmptyPdfError,
     MinioClient,
     MinioClientError,
     MinioConnectionError,
-    DocumentNotFoundError,
-    PdfExtractor,
     PdfExtractionError,
-    EmptyPdfError,
-    CorruptedPdfError,
+    PdfExtractor,
 )
-from src.utils.logger import setup_logging, get_logger
+from src.utils.logger import get_logger, setup_logging
 
 setup_logging()
 logger = get_logger(__name__)

@@ -7,8 +7,7 @@ import json
 import time
 from dataclasses import dataclass
 
-from groq import Groq
-from groq import APIConnectionError, APIStatusError, RateLimitError
+from groq import APIConnectionError, APIStatusError, Groq, RateLimitError
 
 from src.config import Settings, get_settings
 from src.utils.logger import get_logger
