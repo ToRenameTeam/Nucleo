@@ -16,16 +16,19 @@ logger = get_logger(__name__)
 
 class MinioClientError(Exception):
     """Base exception for MinIO client errors."""
+
     pass
 
 
 class DocumentNotFoundError(MinioClientError):
     """Raised when a document is not found in MinIO."""
+
     pass
 
 
 class MinioConnectionError(MinioClientError):
     """Raised when unable to connect to MinIO."""
+
     pass
 
 
@@ -84,7 +87,7 @@ class MinioClient:
                 raise
             except MinioConnectionError as e:
                 if attempt < self._settings.max_retries - 1:
-                    delay = self._settings.retry_delay_seconds * (2 ** attempt)
+                    delay = self._settings.retry_delay_seconds * (2**attempt)
                     logger.warning(
                         f"MinIO connection failed, retrying in {delay}s "
                         f"(attempt {attempt + 1}/{self._settings.max_retries})"
@@ -101,10 +104,12 @@ class MinioClient:
     def _fetch_with_prefix(self, prefix: str, document_id: str) -> bytes:
         try:
             # List objects to find the PDF file
-            objects = list(self._client.list_objects(
-                bucket_name=self._settings.minio_bucket_name,
-                prefix=prefix,
-            ))
+            objects = list(
+                self._client.list_objects(
+                    bucket_name=self._settings.minio_bucket_name,
+                    prefix=prefix,
+                )
+            )
 
             if not objects:
                 logger.warning(f"Document not found: {document_id}")
@@ -122,10 +127,7 @@ class MinioClient:
 
             try:
                 content = response.read()
-                logger.info(
-                    f"Successfully fetched document {document_id} "
-                    f"({len(content)} bytes)"
-                )
+                logger.info(f"Successfully fetched document {document_id} ({len(content)} bytes)")
                 return content
             finally:
                 response.close()

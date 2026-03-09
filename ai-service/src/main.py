@@ -65,14 +65,17 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
 class AnalyzeRequest(BaseModel):
     """Request model for document analysis."""
+
     document_id: str
     patient_id: str
 
 
 class AnalyzeResponse(BaseModel):
     """Response model for document analysis."""
+
     success: bool
     summary: str = ""
     tags: list[str] = []
@@ -82,6 +85,7 @@ class AnalyzeResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     """Response model for health check."""
+
     status: str
     service: str
 

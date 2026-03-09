@@ -13,16 +13,19 @@ logger = get_logger(__name__)
 
 class PdfExtractionError(Exception):
     """Base exception for PDF extraction errors."""
+
     pass
 
 
 class EmptyPdfError(PdfExtractionError):
     """Raised when the PDF contains no extractable text."""
+
     pass
 
 
 class CorruptedPdfError(PdfExtractionError):
     """Raised when the PDF is corrupted or unreadable."""
+
     pass
 
 
@@ -100,13 +103,10 @@ class PdfExtractor:
             full_text = self._clean_text(full_text)
 
             if len(full_text.strip()) < self.MIN_TEXT_LENGTH:
-                raise EmptyPdfError(
-                    "PDF contains no extractable text or only minimal content"
-                )
+                raise EmptyPdfError("PDF contains no extractable text or only minimal content")
 
             logger.info(
-                f"Successfully extracted {len(full_text)} characters "
-                f"from {doc.page_count} page(s)"
+                f"Successfully extracted {len(full_text)} characters from {doc.page_count} page(s)"
             )
 
             return full_text
@@ -126,13 +126,14 @@ class PdfExtractor:
         """
         # Replace multiple newlines with double newlines
         import re
-        text = re.sub(r'\n{3,}', '\n\n', text)
+
+        text = re.sub(r"\n{3,}", "\n\n", text)
 
         # Replace multiple spaces with single space
-        text = re.sub(r' {2,}', ' ', text)
+        text = re.sub(r" {2,}", " ", text)
 
         # Strip leading/trailing whitespace from each line
-        lines = [line.strip() for line in text.split('\n')]
-        text = '\n'.join(lines)
+        lines = [line.strip() for line in text.split("\n")]
+        text = "\n".join(lines)
 
         return text.strip()

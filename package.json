@@ -5,7 +5,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint users-service/src master-data-service/src frontend-service/src",
+    "lint:fix": "eslint users-service/src master-data-service/src frontend-service/src --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "dev:users": "pnpm --filter @nucleo/users-service dev",

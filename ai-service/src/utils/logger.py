@@ -10,9 +10,7 @@ def setup_logging() -> None:
     logging.basicConfig(
         level=getattr(logging, settings.log_level.upper()),
         format=settings.log_format,
-        handlers=[
-            logging.StreamHandler(sys.stdout)
-        ]
+        handlers=[logging.StreamHandler(sys.stdout)],
     )
 
     logging.getLogger("minio").setLevel(logging.WARNING)

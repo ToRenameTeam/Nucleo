@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 interface UserSeed {
   userId: string;
   fiscalCode: string;

@@ -18,16 +18,19 @@ logger = get_logger(__name__)
 
 class AiAnalysisError(Exception):
     """Base exception for AI analysis errors."""
+
     pass
 
 
 class AiConnectionError(AiAnalysisError):
     """Raised when unable to connect to the AI service."""
+
     pass
 
 
 class AiResponseParsingError(AiAnalysisError):
     """Raised when the AI response cannot be parsed."""
+
     pass
 
 
@@ -40,6 +43,7 @@ class DocumentMetadata:
         summary: A concise summary of the document (2-3 sentences).
         tags: A set of relevant medical tags/keywords.
     """
+
     summary: str
     tags: list[str]
 
@@ -149,7 +153,7 @@ class AiAnalyzer:
                 return self._call_ai(document_text)
             except AiConnectionError as e:
                 if attempt < self._settings.max_retries - 1:
-                    delay = self._settings.retry_delay_seconds * (2 ** attempt)
+                    delay = self._settings.retry_delay_seconds * (2**attempt)
                     logger.warning(
                         f"AI connection failed, retrying in {delay}s "
                         f"(attempt {attempt + 1}/{self._settings.max_retries})"
@@ -159,7 +163,7 @@ class AiAnalyzer:
                     raise e
             except RateLimitError as e:
                 if attempt < self._settings.max_retries - 1:
-                    delay = self._settings.retry_delay_seconds * (2 ** attempt) * 2
+                    delay = self._settings.retry_delay_seconds * (2**attempt) * 2
                     logger.warning(
                         f"Rate limit hit, retrying in {delay}s "
                         f"(attempt {attempt + 1}/{self._settings.max_retries})"
@@ -233,10 +237,7 @@ class AiAnalyzer:
             if content.startswith("```"):
                 # Remove markdown code blocks
                 lines = content.split("\n")
-                content = "\n".join(
-                    line for line in lines
-                    if not line.startswith("```")
-                )
+                content = "\n".join(line for line in lines if not line.startswith("```"))
 
             data = json.loads(content)
 
@@ -284,14 +285,10 @@ class AiAnalyzer:
 
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse AI response as JSON: {content[:500]}")
-            raise AiResponseParsingError(
-                f"Invalid JSON in AI response: {e}"
-            ) from e
+            raise AiResponseParsingError(f"Invalid JSON in AI response: {e}") from e
         except KeyError as e:
             logger.error(f"Missing required field in AI response: {e}")
-            raise AiResponseParsingError(
-                f"Missing field in AI response: {e}"
-            ) from e
+            raise AiResponseParsingError(f"Missing field in AI response: {e}") from e
 
     def health_check(self) -> bool:
         """
