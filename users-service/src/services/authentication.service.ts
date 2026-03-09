@@ -1,15 +1,15 @@
-import type { IUserRepository, UserData } from '../domain/repositories/index.js';
-import type { IPatientRepository } from '../domain/repositories/index.js';
-import type { IDoctorRepository } from '../domain/repositories/index.js';
+import type { UserRepository, UserData } from '../domain/repositories/index.js';
+import type { PatientRepository } from '../domain/repositories/index.js';
+import type { DoctorRepository } from '../domain/repositories/index.js';
 import { Patient, Doctor, FiscalCode, User, Credentials, ProfileInfo } from '../domain/index.js';
 import { AuthenticatedUserFactory, IAuthenticatedUser } from './authenticated-user.factory.js';
 import { toUUID } from '../utils/uuid.js';
 
 export class AuthenticationService {
   constructor(
-    private readonly userRepository: IUserRepository,
-    private readonly patientRepository: IPatientRepository,
-    private readonly doctorRepository: IDoctorRepository
+    private readonly userRepository: UserRepository,
+    private readonly patientRepository: PatientRepository,
+    private readonly doctorRepository: DoctorRepository
   ) {}
 
   async login(fiscalCodeValue: string, password: string): Promise<IAuthenticatedUser> {

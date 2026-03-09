@@ -1,7 +1,6 @@
 import mongoose, { Schema, type Document } from 'mongoose';
 import { Medicine, MedicineCategory } from '../../../domain/medicine/index.js';
 
-/** Internal mongoose document interface — infrastructure only */
 type MedicineDocument = Document<string, object, Omit<Medicine, 'id'>> &
   Omit<Medicine, 'id'> & { _id: string };
 

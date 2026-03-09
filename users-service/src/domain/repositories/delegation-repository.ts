@@ -7,7 +7,7 @@ export interface DelegationData {
   status: string;
 }
 
-export interface IDelegationRepository {
+export interface DelegationRepository {
   findDelegationById(delegationId: string): Promise<DelegationData | null>;
   findAll(status?: string): Promise<DelegationData[]>;
   findByDelegatingUserId(userId: string, status?: string): Promise<DelegationData[]>;

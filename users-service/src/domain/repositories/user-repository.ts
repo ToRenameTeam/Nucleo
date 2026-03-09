@@ -9,7 +9,7 @@ export interface UserData {
   dateOfBirth: Date;
 }
 
-export interface IUserRepository {
+export interface UserRepository {
   findByFiscalCode(fiscalCode: string): Promise<UserData | null>;
   findUserById(userId: string): Promise<UserData | null>;
   findAll(): Promise<{ users: UserData[] }>;

@@ -1,17 +1,17 @@
 import { UserService } from '../../src/services/user.service.js';
-import { IUserRepository, UserData } from '../../src/domain/repositories/user-repository.js';
+import { UserRepository, UserData } from '../../src/domain/repositories/user-repository.js';
 import {
-  IPatientRepository,
+  PatientRepository,
   PatientData,
 } from '../../src/domain/repositories/patient-repository.js';
-import { IDoctorRepository, DoctorData } from '../../src/domain/repositories/doctor-repository.js';
+import { DoctorRepository, DoctorData } from '../../src/domain/repositories/doctor-repository.js';
 import { randomUUID } from 'crypto';
 
 describe('UserService', () => {
   let userService: UserService;
-  let mockUserRepository: jest.Mocked<IUserRepository>;
-  let mockPatientRepository: jest.Mocked<IPatientRepository>;
-  let mockDoctorRepository: jest.Mocked<IDoctorRepository>;
+  let mockUserRepository: jest.Mocked<UserRepository>;
+  let mockPatientRepository: jest.Mocked<PatientRepository>;
+  let mockDoctorRepository: jest.Mocked<DoctorRepository>;
 
   const validUserData = {
     fiscalCode: 'RSSMRA80A01H501U',

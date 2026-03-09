@@ -1,14 +1,14 @@
 import crypto from 'crypto';
 import type { UUID } from 'crypto';
 import { Delegation, DelegationStatus } from '../domain/index.js';
-import type { IDelegationRepository } from '../domain/repositories/index.js';
-import type { IPatientRepository } from '../domain/repositories/index.js';
+import type { DelegationRepository } from '../domain/repositories/index.js';
+import type { PatientRepository } from '../domain/repositories/index.js';
 import { toUUID } from '../utils/uuid.js';
 
 export class DelegationService {
   constructor(
-    private readonly delegationRepository: IDelegationRepository,
-    private readonly patientRepository: IPatientRepository
+    private readonly delegationRepository: DelegationRepository,
+    private readonly patientRepository: PatientRepository
   ) {}
 
   async createDelegation(data: { delegatingUserId: string; delegatorUserId: string }) {

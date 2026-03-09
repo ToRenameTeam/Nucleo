@@ -1,9 +1,9 @@
 import { DoctorModel } from '../../database/models/index.js';
 import type { IDoctorDocument } from '../../database/models/index.js';
-import type { IDoctorRepository, DoctorData } from '../../../domain/repositories/index.js';
+import type { DoctorRepository, DoctorData } from '../../../domain/repositories/index.js';
 import type { Doctor } from '../../../domain/index.js';
 
-export class DoctorRepositoryImpl implements IDoctorRepository {
+export class DoctorRepositoryImpl implements DoctorRepository {
   async findByUserId(userId: string): Promise<DoctorData | null> {
     const doctor = await DoctorModel.findOne({ userId });
 

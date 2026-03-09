@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import { User, Patient, Doctor, FiscalCode, Credentials, ProfileInfo } from '../domain/index.js';
-import type { IUserRepository } from '../domain/repositories/index.js';
-import type { IPatientRepository } from '../domain/repositories/index.js';
-import type { IDoctorRepository } from '../domain/repositories/index.js';
+import type { UserRepository } from '../domain/repositories/index.js';
+import type { PatientRepository } from '../domain/repositories/index.js';
+import type { DoctorRepository } from '../domain/repositories/index.js';
 
 interface CreateUserData {
   fiscalCode: string;
@@ -18,9 +18,9 @@ interface CreateUserData {
 
 export class UserService {
   constructor(
-    private readonly userRepository: IUserRepository,
-    private readonly patientRepository: IPatientRepository,
-    private readonly doctorRepository: IDoctorRepository
+    private readonly userRepository: UserRepository,
+    private readonly patientRepository: PatientRepository,
+    private readonly doctorRepository: DoctorRepository
   ) {}
 
   async createUser(data: CreateUserData) {
@@ -94,7 +94,7 @@ export class UserService {
   }
 
   private async buildUserWithProfiles(
-    userData: Awaited<ReturnType<IUserRepository['findByFiscalCode']>>
+    userData: Awaited<ReturnType<UserRepository['findByFiscalCode']>>
   ) {
     if (!userData) {
       throw new Error('User not found');

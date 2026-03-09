@@ -1,12 +1,12 @@
 import { DelegationService } from '../../src/services/delegation.service.js';
-import { IDelegationRepository } from '../../src/domain/repositories/delegation-repository.js';
-import { IPatientRepository } from '../../src/domain/repositories/patient-repository.js';
+import { DelegationRepository } from '../../src/domain/repositories/delegation-repository.js';
+import { PatientRepository } from '../../src/domain/repositories/patient-repository.js';
 import { randomUUID } from 'crypto';
 
 describe('DelegationService', () => {
   let service: DelegationService;
-  let mockDelegationRepo: jest.Mocked<IDelegationRepository>;
-  let mockPatientRepo: jest.Mocked<IPatientRepository>;
+  let mockDelegationRepo: jest.Mocked<DelegationRepository>;
+  let mockPatientRepo: jest.Mocked<PatientRepository>;
 
   beforeEach(() => {
     mockDelegationRepo = {

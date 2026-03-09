@@ -1,9 +1,9 @@
 import { UserModel } from '../../database/models/index.js';
 import type { IUserDocument } from '../../database/models/index.js';
 import type { User } from '../../../domain/index.js';
-import type { IUserRepository, UserData } from '../../../domain/repositories/index.js';
+import type { UserRepository, UserData } from '../../../domain/repositories/index.js';
 
-export class UserRepositoryImpl implements IUserRepository {
+export class UserRepositoryImpl implements UserRepository {
   async findUserById(userId: string): Promise<UserData | null> {
     const user = await UserModel.findOne({ userId });
 

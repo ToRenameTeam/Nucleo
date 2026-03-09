@@ -6,7 +6,7 @@ export interface DoctorData {
   specializations: string[];
 }
 
-export interface IDoctorRepository {
+export interface DoctorRepository {
   findByUserId(userId: string): Promise<DoctorData | null>;
   findByLicenseNumber(licenseNumber: string): Promise<DoctorData | null>;
   save(doctor: Doctor): Promise<void>;

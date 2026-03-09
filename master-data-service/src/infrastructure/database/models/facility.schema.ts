@@ -1,7 +1,6 @@
 import mongoose, { Schema, type Document } from 'mongoose';
 import type { Facility } from '../../../domain/facility/index.js';
 
-/** Internal mongoose document interface — infrastructure only */
 type FacilityDocument = Document<string, object, Omit<Facility, 'id'>> &
   Omit<Facility, 'id'> & { _id: string };
 

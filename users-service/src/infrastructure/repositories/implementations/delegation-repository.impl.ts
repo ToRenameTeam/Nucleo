@@ -1,9 +1,9 @@
 import { DelegationModel } from '../../database/models/index.js';
 import type { IDelegationDocument } from '../../database/models/index.js';
-import type { IDelegationRepository, DelegationData } from '../../../domain/repositories/index.js';
+import type { DelegationRepository, DelegationData } from '../../../domain/repositories/index.js';
 import type { Delegation } from '../../../domain/index.js';
 
-export class DelegationRepositoryImpl implements IDelegationRepository {
+export class DelegationRepositoryImpl implements DelegationRepository {
   async findDelegationById(delegationId: string): Promise<DelegationData | null> {
     const delegation = await DelegationModel.findOne({ delegationId });
 
