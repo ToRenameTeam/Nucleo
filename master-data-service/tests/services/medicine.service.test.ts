@@ -5,7 +5,7 @@ import {
   MedicineConflictError,
   type CreateMedicineInput,
 } from '../../src/services/medicine.service.js';
-import { MedicineCategory } from '../../src/domains/medicine/index.js';
+import { MedicineCategory } from '../../src/domain/medicine/index.js';
 
 describe('MedicineService', () => {
   let service: MedicineService;
@@ -196,10 +196,10 @@ describe('MedicineService', () => {
         manufacturer: 'Merck',
       });
 
-      const found = await service.findById(created._id);
+      const found = await service.findById(created.id);
 
       expect(found).toBeDefined();
-      expect(found?._id).toBe(created._id);
+      expect(found?.id).toBe(created.id);
       expect(found?.name).toBe(created.name);
     });
 
@@ -222,7 +222,7 @@ describe('MedicineService', () => {
         manufacturer: 'Produttore',
       });
 
-      const updated = await service.update(created._id, {
+      const updated = await service.update(created.id, {
         name: 'Nome Aggiornato',
         description: 'Descrizione Aggiornata',
         strength: 'Nuovo Dosaggio',
@@ -247,7 +247,7 @@ describe('MedicineService', () => {
         manufacturer: 'Test',
       });
 
-      const updated = await service.update(created._id, {
+      const updated = await service.update(created.id, {
         name: 'Nome Aggiornato',
       });
 
@@ -276,7 +276,7 @@ describe('MedicineService', () => {
         manufacturer: 'Test',
       });
 
-      const deleted = await service.softDelete(created._id);
+      const deleted = await service.softDelete(created.id);
 
       expect(deleted).toBeDefined();
       expect(deleted?.isActive).toBe(false);
@@ -301,10 +301,10 @@ describe('MedicineService', () => {
         manufacturer: 'Test',
       });
 
-      const deleted = await service.permanentDelete(created._id);
+      const deleted = await service.permanentDelete(created.id);
       expect(deleted).toBeDefined();
 
-      const found = await service.findById(created._id);
+      const found = await service.findById(created.id);
       expect(found).toBeNull();
     });
 

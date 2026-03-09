@@ -157,10 +157,10 @@ describe('FacilityService', () => {
         city: 'Bologna',
       });
 
-      const found = await service.findById(created._id);
+      const found = await service.findById(created.id);
 
       expect(found).toBeDefined();
-      expect(found?._id).toBe(created._id);
+      expect(found?.id).toBe(created.id);
       expect(found?.name).toBe(created.name);
     });
 
@@ -179,7 +179,7 @@ describe('FacilityService', () => {
         city: 'Città Originale',
       });
 
-      const updated = await service.update(created._id, {
+      const updated = await service.update(created.id, {
         name: 'Nome Aggiornato',
         address: 'Indirizzo Aggiornato',
       });
@@ -198,7 +198,7 @@ describe('FacilityService', () => {
         city: 'Test City',
       });
 
-      const updated = await service.update(created._id, {
+      const updated = await service.update(created.id, {
         name: 'Nome Aggiornato',
       });
 
@@ -224,7 +224,7 @@ describe('FacilityService', () => {
         city: 'City',
       });
 
-      const deleted = await service.softDelete(created._id);
+      const deleted = await service.softDelete(created.id);
 
       expect(deleted).toBeDefined();
       expect(deleted?.isActive).toBe(false);
@@ -245,10 +245,10 @@ describe('FacilityService', () => {
         city: 'City',
       });
 
-      const deleted = await service.permanentDelete(created._id);
+      const deleted = await service.permanentDelete(created.id);
       expect(deleted).toBeDefined();
 
-      const found = await service.findById(created._id);
+      const found = await service.findById(created.id);
       expect(found).toBeNull();
     });
 
@@ -306,7 +306,7 @@ describe('FacilityService', () => {
       // Disable all facilities
       const all = await service.findAll({ active: true });
       for (const facility of all) {
-        await service.softDelete(facility._id);
+        await service.softDelete(facility.id);
       }
 
       const cities = await service.getCities();

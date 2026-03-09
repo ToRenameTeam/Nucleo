@@ -1,5 +1,6 @@
-import { MedicineCategory, type IMedicine } from '../domains/medicine/index.js';
-import type { IMedicineRepository } from '../infrastructure/repositories/IMedicineRepository.js';
+import type { Medicine } from '../domain/index.js';
+import { MedicineCategory } from '../domain/index.js';
+import type { MedicineRepository } from '../domain/index.js';
 import { MedicineRepositoryImpl } from '../infrastructure/repositories/implementations/index.js';
 import { formatEnumLabel, isValidResourceCode } from './service.utils.js';
 
@@ -39,13 +40,13 @@ export interface MedicineCategoryInfo {
 
 export class MedicineService {
   constructor(
-    private readonly medicineRepository: IMedicineRepository = new MedicineRepositoryImpl()
+    private readonly medicineRepository: MedicineRepository = new MedicineRepositoryImpl()
   ) {}
 
   /**
    * Get all medicines with optional filtering
    */
-  async findAll(filter: MedicineFilter = {}): Promise<IMedicine[]> {
+  async findAll(filter: MedicineFilter = {}): Promise<Medicine[]> {
     const query: Record<string, unknown> = {};
 
     if (filter.category) {
@@ -78,14 +79,14 @@ export class MedicineService {
   /**
    * Get a single medicine by ID
    */
-  async findById(id: string): Promise<IMedicine | null> {
+  async findById(id: string): Promise<Medicine | null> {
     return this.medicineRepository.findById(id);
   }
 
   /**
    * Create a new medicine
    */
-  async create(input: CreateMedicineInput): Promise<IMedicine> {
+  async create(input: CreateMedicineInput): Promise<Medicine> {
     // Validate code format
     if (!input.code || !isValidResourceCode(input.code, 'medicine')) {
       throw new MedicineValidationError(
@@ -115,21 +116,21 @@ export class MedicineService {
   /**
    * Update a medicine
    */
-  async update(id: string, input: UpdateMedicineInput): Promise<IMedicine | null> {
+  async update(id: string, input: UpdateMedicineInput): Promise<Medicine | null> {
     return this.medicineRepository.updateById(id, input);
   }
 
   /**
    * Soft delete a medicine (sets isActive to false)
    */
-  async softDelete(id: string): Promise<IMedicine | null> {
+  async softDelete(id: string): Promise<Medicine | null> {
     return this.medicineRepository.softDelete(id);
   }
 
   /**
    * Permanently delete a medicine
    */
-  async permanentDelete(id: string): Promise<IMedicine | null> {
+  async permanentDelete(id: string): Promise<Medicine | null> {
     return this.medicineRepository.permanentDelete(id);
   }
 }

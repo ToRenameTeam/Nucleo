@@ -1,6 +1,4 @@
-import { ServiceTypeModel } from '../../domains/service-catalog/index.js';
-import { FacilityModel } from '../../domains/facility/index.js';
-import { MedicineModel } from '../../domains/medicine/index.js';
+import { ServiceTypeModel, FacilityModel, MedicineModel } from './models/index.js';
 import { serviceTypeSeeds, facilitySeeds, medicineSeeds } from './seeds/index.js';
 
 export async function runSeeds(): Promise<void> {

@@ -1,5 +1,5 @@
-import type { IFacility } from '../domains/facility/index.js';
-import type { IFacilityRepository } from '../infrastructure/repositories/IFacilityRepository.js';
+import type { Facility } from '../domain/index.js';
+import type { FacilityRepository } from '../domain/index.js';
 import { FacilityRepositoryImpl } from '../infrastructure/repositories/implementations/index.js';
 import { isValidResourceCode } from './service.utils.js';
 
@@ -26,13 +26,10 @@ export interface UpdateFacilityInput {
 
 export class FacilityService {
   constructor(
-    private readonly facilityRepository: IFacilityRepository = new FacilityRepositoryImpl()
+    private readonly facilityRepository: FacilityRepository = new FacilityRepositoryImpl()
   ) {}
 
-  /**
-   * Get all facilities with optional filtering
-   */
-  async findAll(filter: FacilityFilter = {}): Promise<IFacility[]> {
+  async findAll(filter: FacilityFilter = {}): Promise<Facility[]> {
     const query: Record<string, unknown> = {};
 
     if (filter.city) {
@@ -50,32 +47,21 @@ export class FacilityService {
     return this.facilityRepository.findAll(query);
   }
 
-  /**
-   * Get all distinct cities
-   */
   async getCities(): Promise<string[]> {
     return this.facilityRepository.findActiveCities();
   }
 
-  /**
-   * Get a single facility by ID
-   */
-  async findById(id: string): Promise<IFacility | null> {
+  async findById(id: string): Promise<Facility | null> {
     return this.facilityRepository.findById(id);
   }
 
-  /**
-   * Create a new facility
-   */
-  async create(input: CreateFacilityInput): Promise<IFacility> {
-    // Validate code format
+  async create(input: CreateFacilityInput): Promise<Facility> {
     if (!input.code || !isValidResourceCode(input.code, 'facility')) {
       throw new FacilityValidationError(
         'Invalid code format. Must be "facility-XXX" where XXX is a 3-digit number'
       );
     }
 
-    // Check if code already exists
     const existing = await this.facilityRepository.findByCode(input.code);
     if (existing) {
       throw new FacilityConflictError('A facility with this code already exists');
@@ -90,24 +76,15 @@ export class FacilityService {
     });
   }
 
-  /**
-   * Update a facility
-   */
-  async update(id: string, input: UpdateFacilityInput): Promise<IFacility | null> {
+  async update(id: string, input: UpdateFacilityInput): Promise<Facility | null> {
     return this.facilityRepository.updateById(id, input);
   }
 
-  /**
-   * Soft delete a facility (sets isActive to false)
-   */
-  async softDelete(id: string): Promise<IFacility | null> {
+  async softDelete(id: string): Promise<Facility | null> {
     return this.facilityRepository.softDelete(id);
   }
 
-  /**
-   * Permanently delete a facility
-   */
-  async permanentDelete(id: string): Promise<IFacility | null> {
+  async permanentDelete(id: string): Promise<Facility | null> {
     return this.facilityRepository.permanentDelete(id);
   }
 }

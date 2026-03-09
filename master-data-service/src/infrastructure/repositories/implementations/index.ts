@@ -1,3 +1,3 @@
-export * from './FacilityRepositoryImpl.js';
-export * from './MedicineRepositoryImpl.js';
-export * from './ServiceTypeRepositoryImpl.js';
+export * from './facility-repository.impl.js';
+export * from './medicine-repository.impl.js';
+export * from './service-type-repository.impl.js';

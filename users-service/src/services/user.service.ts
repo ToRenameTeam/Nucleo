@@ -1,8 +1,8 @@
 import crypto from 'crypto';
-import { User, Patient, Doctor, FiscalCode, Credentials, ProfileInfo } from '../domains/index.js';
-import type { IUserRepository } from '../infrastructure/repositories/IUserRepository.js';
-import type { IPatientRepository } from '../infrastructure/repositories/IPatientRepository.js';
-import type { IDoctorRepository } from '../infrastructure/repositories/IDoctorRepository.js';
+import { User, Patient, Doctor, FiscalCode, Credentials, ProfileInfo } from '../domain/index.js';
+import type { IUserRepository } from '../domain/repositories/index.js';
+import type { IPatientRepository } from '../domain/repositories/index.js';
+import type { IDoctorRepository } from '../domain/repositories/index.js';
 
 interface CreateUserData {
   fiscalCode: string;

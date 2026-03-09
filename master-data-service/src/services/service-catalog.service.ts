@@ -1,5 +1,6 @@
-import { ServiceCategory, type IServiceType } from '../domains/service-catalog/index.js';
-import type { IServiceTypeRepository } from '../infrastructure/repositories/IServiceTypeRepository.js';
+import type { ServiceType } from '../domain/index.js';
+import { ServiceCategory } from '../domain/index.js';
+import type { ServiceTypeRepository } from '../domain/index.js';
 import { ServiceTypeRepositoryImpl } from '../infrastructure/repositories/implementations/index.js';
 import { formatEnumLabel, isValidResourceCode } from './service.utils.js';
 
@@ -31,13 +32,13 @@ export interface CategoryInfo {
 
 export class ServiceCatalogService {
   constructor(
-    private readonly serviceTypeRepository: IServiceTypeRepository = new ServiceTypeRepositoryImpl()
+    private readonly serviceTypeRepository: ServiceTypeRepository = new ServiceTypeRepositoryImpl()
   ) {}
 
   /**
    * Get all service types with optional filtering
    */
-  async findAll(filter: ServiceTypeFilter = {}): Promise<IServiceType[]> {
+  async findAll(filter: ServiceTypeFilter = {}): Promise<ServiceType[]> {
     const query: Record<string, unknown> = {};
 
     if (filter.category) {
@@ -71,14 +72,14 @@ export class ServiceCatalogService {
   /**
    * Get a single service type by ID
    */
-  async findById(id: string): Promise<IServiceType | null> {
+  async findById(id: string): Promise<ServiceType | null> {
     return this.serviceTypeRepository.findById(id);
   }
 
   /**
    * Create a new service type
    */
-  async create(input: CreateServiceTypeInput): Promise<IServiceType> {
+  async create(input: CreateServiceTypeInput): Promise<ServiceType> {
     // Validate code format
     if (!input.code || !isValidResourceCode(input.code, 'service')) {
       throw new ServiceCatalogValidationError(
@@ -104,21 +105,21 @@ export class ServiceCatalogService {
   /**
    * Update a service type
    */
-  async update(id: string, input: UpdateServiceTypeInput): Promise<IServiceType | null> {
+  async update(id: string, input: UpdateServiceTypeInput): Promise<ServiceType | null> {
     return this.serviceTypeRepository.updateById(id, input);
   }
 
   /**
    * Soft delete a service type (sets isActive to false)
    */
-  async softDelete(id: string): Promise<IServiceType | null> {
+  async softDelete(id: string): Promise<ServiceType | null> {
     return this.serviceTypeRepository.softDelete(id);
   }
 
   /**
    * Permanently delete a service type
    */
-  async permanentDelete(id: string): Promise<IServiceType | null> {
+  async permanentDelete(id: string): Promise<ServiceType | null> {
     return this.serviceTypeRepository.permanentDelete(id);
   }
 }

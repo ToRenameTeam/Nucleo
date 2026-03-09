@@ -1,6 +1,7 @@
-import { ServiceCategory, IServiceType } from '../../../domains/service-catalog/index.js';
+import { ServiceCategory } from '../../../domain/service-catalog/index.js';
+import type { ServiceType } from '../../../domain/service-catalog/index.js';
 
-type ServiceTypeSeed = Omit<IServiceType, 'createdAt' | 'updatedAt'>;
+type ServiceTypeSeed = Omit<ServiceType, 'id' | 'createdAt' | 'updatedAt'> & { _id: string };
 
 export const serviceTypeSeeds: ServiceTypeSeed[] = [
   // Visite Specialistiche

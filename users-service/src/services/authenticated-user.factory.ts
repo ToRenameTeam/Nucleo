@@ -1,4 +1,4 @@
-import type { User, Patient, Doctor } from '../domains/index.js';
+import type { User, Patient, Doctor } from '../domain/index.js';
 
 export type ActiveProfile = 'PATIENT' | 'DOCTOR';
 

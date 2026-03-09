@@ -5,7 +5,7 @@ import {
   ServiceCatalogConflictError,
   type CreateServiceTypeInput,
 } from '../../src/services/service-catalog.service.js';
-import { ServiceCategory } from '../../src/domains/service-catalog/index.js';
+import { ServiceCategory } from '../../src/domain/service-catalog/index.js';
 
 describe('ServiceCatalogService', () => {
   let service: ServiceCatalogService;
@@ -156,10 +156,10 @@ describe('ServiceCatalogService', () => {
         category: [ServiceCategory.DIAGNOSTICA_IMMAGINI],
       });
 
-      const found = await service.findById(created._id);
+      const found = await service.findById(created.id);
 
       expect(found).toBeDefined();
-      expect(found?._id).toBe(created._id);
+      expect(found?.id).toBe(created.id);
       expect(found?.name).toBe(created.name);
     });
 
@@ -178,7 +178,7 @@ describe('ServiceCatalogService', () => {
         category: [ServiceCategory.ALTRO],
       });
 
-      const updated = await service.update(created._id, {
+      const updated = await service.update(created.id, {
         name: 'Visita Prima Visita Aggiornata',
         description: 'Descrizione aggiornata',
       });
@@ -196,7 +196,7 @@ describe('ServiceCatalogService', () => {
         category: [ServiceCategory.ALTRO],
       });
 
-      const updated = await service.update(created._id, {
+      const updated = await service.update(created.id, {
         name: 'Nome Aggiornato',
       });
 
@@ -221,7 +221,7 @@ describe('ServiceCatalogService', () => {
         category: [ServiceCategory.ALTRO],
       });
 
-      const deleted = await service.softDelete(created._id);
+      const deleted = await service.softDelete(created.id);
 
       expect(deleted).toBeDefined();
       expect(deleted?.isActive).toBe(false);
@@ -242,10 +242,10 @@ describe('ServiceCatalogService', () => {
         category: [ServiceCategory.ALTRO],
       });
 
-      const deleted = await service.permanentDelete(created._id);
+      const deleted = await service.permanentDelete(created.id);
       expect(deleted).toBeDefined();
 
-      const found = await service.findById(created._id);
+      const found = await service.findById(created.id);
       expect(found).toBeNull();
     });
 

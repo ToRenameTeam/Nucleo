@@ -1,6 +1,6 @@
-import type { IFacility } from '../../../domains/facility/index.js';
+import type { Facility } from '../../../domain/facility/index.js';
 
-type FacilitySeed = Omit<IFacility, 'createdAt' | 'updatedAt'>;
+type FacilitySeed = Omit<Facility, 'id' | 'createdAt' | 'updatedAt'> & { _id: string };
 
 export const facilitySeeds: FacilitySeed[] = [
   // Milano

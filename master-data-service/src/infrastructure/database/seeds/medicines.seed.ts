@@ -1,7 +1,7 @@
-import type { IMedicine } from '../../../domains/medicine/index.js';
-import { MedicineCategory } from '../../../domains/medicine/index.js';
+import type { Medicine } from '../../../domain/medicine/index.js';
+import { MedicineCategory } from '../../../domain/medicine/index.js';
 
-type MedicineSeed = Omit<IMedicine, 'createdAt' | 'updatedAt'>;
+type MedicineSeed = Omit<Medicine, 'id' | 'createdAt' | 'updatedAt'> & { _id: string };
 
 export const medicineSeeds: MedicineSeed[] = [
   // Analgesici
