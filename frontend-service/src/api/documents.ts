@@ -1,4 +1,6 @@
 import { DOCUMENTS_API_URL } from './config';
+import { z } from 'zod';
+import { idSchema, nonEmptyTrimmedStringSchema, parseWithSchema } from './validation';
 import type {
   Document,
   MedicinePrescription,
@@ -130,6 +132,129 @@ export interface UploadResponse {
   documentId?: string;
 }
 
+const fileMetadataSchema = z.object({
+  summary: nonEmptyTrimmedStringSchema,
+  tags: z.array(nonEmptyTrimmedStringSchema),
+});
+
+const validitySchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('until_date'),
+    date: nonEmptyTrimmedStringSchema,
+  }),
+  z.object({
+    type: z.literal('until_execution'),
+  }),
+]);
+
+const dosageSchema = z.object({
+  medicineId: idSchema,
+  dose: z.object({
+    amount: z.number().positive(),
+    unit: nonEmptyTrimmedStringSchema,
+  }),
+  frequency: z.object({
+    timesPerPeriod: z.number().positive(),
+    period: nonEmptyTrimmedStringSchema,
+  }),
+  duration: z.object({
+    length: z.number().positive(),
+    unit: nonEmptyTrimmedStringSchema,
+  }),
+});
+
+const createMedicinePrescriptionRequestSchema = z.object({
+  type: z.literal('medicine_prescription'),
+  doctorId: idSchema,
+  metadata: fileMetadataSchema,
+  validity: validitySchema,
+  dosage: dosageSchema,
+});
+
+const createServicePrescriptionRequestSchema = z.object({
+  type: z.literal('service_prescription'),
+  doctorId: idSchema,
+  metadata: fileMetadataSchema,
+  validity: validitySchema,
+  serviceId: idSchema,
+  facilityId: idSchema,
+  priority: z.enum(['ROUTINE', 'URGENT', 'EMERGENCY']),
+});
+
+const createReportRequestSchema = z.object({
+  type: z.literal('report'),
+  doctorId: idSchema,
+  metadata: fileMetadataSchema,
+  servicePrescriptionId: idSchema,
+  executionDate: nonEmptyTrimmedStringSchema,
+  findings: nonEmptyTrimmedStringSchema,
+  clinicalQuestion: nonEmptyTrimmedStringSchema.optional(),
+  conclusion: nonEmptyTrimmedStringSchema.optional(),
+  recommendations: nonEmptyTrimmedStringSchema.optional(),
+});
+
+const createDocumentRequestSchema = z.discriminatedUnion('type', [
+  createMedicinePrescriptionRequestSchema,
+  createServicePrescriptionRequestSchema,
+  createReportRequestSchema,
+]);
+
+const documentResponseSchema = z
+  .object({
+    id: idSchema,
+    doctorId: idSchema,
+    patientId: idSchema,
+    issueDate: nonEmptyTrimmedStringSchema,
+    title: nonEmptyTrimmedStringSchema,
+    metadata: fileMetadataSchema,
+  })
+  .passthrough();
+
+const medicinePrescriptionResponseSchema = documentResponseSchema.extend({
+  _t: z.literal('medicine_prescription'),
+  validity: validitySchema,
+  dosage: dosageSchema,
+});
+
+const servicePrescriptionResponseSchema = documentResponseSchema.extend({
+  _t: z.literal('service_prescription'),
+  validity: validitySchema,
+  serviceId: idSchema,
+  facilityId: idSchema,
+  priority: nonEmptyTrimmedStringSchema,
+});
+
+const reportResponseSchema = documentResponseSchema.extend({
+  _t: z.literal('report'),
+  servicePrescription: servicePrescriptionResponseSchema,
+  executionDate: nonEmptyTrimmedStringSchema,
+  clinicalQuestion: nonEmptyTrimmedStringSchema.optional(),
+  findings: nonEmptyTrimmedStringSchema,
+  conclusion: nonEmptyTrimmedStringSchema.optional(),
+  recommendations: nonEmptyTrimmedStringSchema.optional(),
+});
+
+const uploadedDocumentResponseSchema = documentResponseSchema.extend({
+  _t: z.literal('uploaded_document'),
+  filename: nonEmptyTrimmedStringSchema,
+  documentType: nonEmptyTrimmedStringSchema,
+});
+
+const documentApiResponseSchema = z.discriminatedUnion('_t', [
+  medicinePrescriptionResponseSchema,
+  servicePrescriptionResponseSchema,
+  reportResponseSchema,
+  uploadedDocumentResponseSchema,
+]);
+
+const uploadResponseSchema = z
+  .object({
+    success: z.boolean(),
+    message: nonEmptyTrimmedStringSchema,
+    documentId: idSchema.optional(),
+  })
+  .passthrough();
+
 // Helper functions
 function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {
   console.log('[Documents API] Mapping document response:', {
@@ -234,26 +359,37 @@ export const documentsApiService = {
     patientId: string,
     request: CreateDocumentRequest
   ): Promise<DocumentResponse> {
+    const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'create document patientId');
+    const sanitizedRequest = parseWithSchema(
+      createDocumentRequestSchema,
+      request,
+      'create document request'
+    );
+
     const payload = {
-      '@type': request.type,
-      doctorId: request.doctorId,
-      metadata: request.metadata,
-      ...('validity' in request && { validity: request.validity }),
-      ...('dosage' in request && { dosage: request.dosage }),
-      ...('serviceId' in request && { serviceId: request.serviceId }),
-      ...('facilityId' in request && { facilityId: request.facilityId }),
-      ...('priority' in request && { priority: request.priority }),
-      ...('servicePrescriptionId' in request && {
-        servicePrescriptionId: request.servicePrescriptionId,
+      '@type': sanitizedRequest.type,
+      doctorId: sanitizedRequest.doctorId,
+      metadata: sanitizedRequest.metadata,
+      ...('validity' in sanitizedRequest && { validity: sanitizedRequest.validity }),
+      ...('dosage' in sanitizedRequest && { dosage: sanitizedRequest.dosage }),
+      ...('serviceId' in sanitizedRequest && { serviceId: sanitizedRequest.serviceId }),
+      ...('facilityId' in sanitizedRequest && { facilityId: sanitizedRequest.facilityId }),
+      ...('priority' in sanitizedRequest && { priority: sanitizedRequest.priority }),
+      ...('servicePrescriptionId' in sanitizedRequest && {
+        servicePrescriptionId: sanitizedRequest.servicePrescriptionId,
       }),
-      ...('executionDate' in request && { executionDate: request.executionDate }),
-      ...('findings' in request && { findings: request.findings }),
-      ...('clinicalQuestion' in request && { clinicalQuestion: request.clinicalQuestion }),
-      ...('conclusion' in request && { conclusion: request.conclusion }),
-      ...('recommendations' in request && { recommendations: request.recommendations }),
+      ...('executionDate' in sanitizedRequest && { executionDate: sanitizedRequest.executionDate }),
+      ...('findings' in sanitizedRequest && { findings: sanitizedRequest.findings }),
+      ...('clinicalQuestion' in sanitizedRequest && {
+        clinicalQuestion: sanitizedRequest.clinicalQuestion,
+      }),
+      ...('conclusion' in sanitizedRequest && { conclusion: sanitizedRequest.conclusion }),
+      ...('recommendations' in sanitizedRequest && {
+        recommendations: sanitizedRequest.recommendations,
+      }),
     };
 
-    const response = await fetch(`${BASE_URL}/api/patients/${patientId}/documents`, {
+    const response = await fetch(`${BASE_URL}/api/patients/${sanitizedPatientId}/documents`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -265,20 +401,25 @@ export const documentsApiService = {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const rawData = await response.json();
+    return parseWithSchema(documentResponseSchema, rawData, 'create document response');
   },
 
   /**
    * Upload a document file (PDF)
    */
   async uploadDocument(patientId: string, file: File): Promise<UploadResponse> {
+    const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'upload document patientId');
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${BASE_URL}/api/patients/${patientId}/documents/upload`, {
-      method: 'POST',
-      body: formData,
-    });
+    const response = await fetch(
+      `${BASE_URL}/api/patients/${sanitizedPatientId}/documents/upload`,
+      {
+        method: 'POST',
+        body: formData,
+      }
+    );
 
     if (!response.ok) {
       // Try to get error details from response
@@ -295,7 +436,8 @@ export const documentsApiService = {
       throw error;
     }
 
-    return await response.json();
+    const rawData = await response.json();
+    return parseWithSchema(uploadResponseSchema, rawData, 'upload document response');
   },
 
   /**
@@ -303,14 +445,21 @@ export const documentsApiService = {
    */
   async getDocumentsByPatient(patientId: string): Promise<AnyDocument[]> {
     try {
-      const response = await fetch(`${BASE_URL}/api/patients/${patientId}/documents`, {
+      const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'get documents by patientId');
+
+      const response = await fetch(`${BASE_URL}/api/patients/${sanitizedPatientId}/documents`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
 
-      const documents = await handleResponse<DocumentApiResponse[]>(response);
+      const documentsRaw = await handleResponse<unknown>(response);
+      const documents = parseWithSchema(
+        z.array(documentApiResponseSchema),
+        documentsRaw,
+        'documents by patient response'
+      );
       return documents.map((doc) => mapDocumentResponse(doc));
     } catch (error) {
       console.error('[Documents API] Error fetching documents by patient:', error);
@@ -323,8 +472,15 @@ export const documentsApiService = {
    */
   async downloadDocument(patientId: string, documentId: string): Promise<void> {
     try {
+      const sanitizedPatientId = parseWithSchema(
+        idSchema,
+        patientId,
+        'download document patientId'
+      );
+      const sanitizedDocumentId = parseWithSchema(idSchema, documentId, 'download documentId');
+
       const response = await fetch(
-        `${BASE_URL}/api/patients/${patientId}/documents/${documentId}/pdf`,
+        `${BASE_URL}/api/patients/${sanitizedPatientId}/documents/${sanitizedDocumentId}/pdf`,
         {
           method: 'GET',
         }
@@ -386,8 +542,11 @@ export const documentsApiService = {
    */
   async getDocumentById(patientId: string, documentId: string): Promise<AnyDocument> {
     try {
+      const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'get document patientId');
+      const sanitizedDocumentId = parseWithSchema(idSchema, documentId, 'get document documentId');
+
       const response = await fetch(
-        `${BASE_URL}/api/patients/${patientId}/documents/${documentId}`,
+        `${BASE_URL}/api/patients/${sanitizedPatientId}/documents/${sanitizedDocumentId}`,
         {
           method: 'GET',
           headers: {
@@ -396,7 +555,12 @@ export const documentsApiService = {
         }
       );
 
-      const document = await handleResponse<DocumentApiResponse>(response);
+      const documentRaw = await handleResponse<unknown>(response);
+      const document = parseWithSchema(
+        documentApiResponseSchema,
+        documentRaw,
+        'get document by id response'
+      );
       return mapDocumentResponse(document);
     } catch (error) {
       console.error('[Documents API] Error fetching document by ID:', error);
@@ -408,8 +572,9 @@ export const documentsApiService = {
    * Get all documents issued by a specific doctor
    */
   async getDocumentsByDoctor(doctorId: string): Promise<AnyDocument[]> {
+    const sanitizedDoctorId = parseWithSchema(idSchema, doctorId, 'get documents by doctorId');
     const queryParams = new URLSearchParams();
-    queryParams.append('doctorId', doctorId);
+    queryParams.append('doctorId', sanitizedDoctorId);
     const url = `${BASE_URL}/api/documents?${queryParams.toString()}`;
 
     try {
@@ -420,7 +585,12 @@ export const documentsApiService = {
         },
       });
 
-      const documents = await handleResponse<DocumentApiResponse[]>(response);
+      const documentsRaw = await handleResponse<unknown>(response);
+      const documents = parseWithSchema(
+        z.array(documentApiResponseSchema),
+        documentsRaw,
+        'documents by doctor response'
+      );
       return documents.map((doc) => mapDocumentResponse(doc));
     } catch (error) {
       console.error('[Documents API] Error fetching documents by doctor:', error);
@@ -432,7 +602,8 @@ export const documentsApiService = {
    * Delete a document
    */
   async deleteDocument(documentId: string): Promise<boolean> {
-    const url = `${BASE_URL}/documents/${documentId}`;
+    const sanitizedDocumentId = parseWithSchema(idSchema, documentId, 'delete document documentId');
+    const url = `${BASE_URL}/documents/${sanitizedDocumentId}`;
 
     try {
       const response = await fetch(url, {
@@ -456,7 +627,17 @@ export const documentsApiService = {
     patientId: string,
     request: CreateMedicinePrescriptionRequest
   ): Promise<MedicinePrescription> {
-    const url = `${BASE_URL}/api/patients/${patientId}/documents`;
+    const sanitizedPatientId = parseWithSchema(
+      idSchema,
+      patientId,
+      'create medicine prescription patientId'
+    );
+    const sanitizedRequest = parseWithSchema(
+      createMedicinePrescriptionRequestSchema,
+      request,
+      'create medicine prescription request'
+    );
+    const url = `${BASE_URL}/api/patients/${sanitizedPatientId}/documents`;
 
     try {
       const response = await fetch(url, {
@@ -464,7 +645,7 @@ export const documentsApiService = {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify(sanitizedRequest),
       });
 
       if (!response.ok) {
@@ -472,7 +653,12 @@ export const documentsApiService = {
         throw new Error(errorData.message || `Request failed with status ${response.status}`);
       }
 
-      const document = await response.json();
+      const documentRaw = await response.json();
+      const document = parseWithSchema(
+        documentApiResponseSchema,
+        documentRaw,
+        'create medicine prescription response'
+      );
       return mapDocumentResponse(document) as MedicinePrescription;
     } catch (error) {
       console.error('[Documents API] Error creating medicine prescription:', error);
@@ -487,7 +673,17 @@ export const documentsApiService = {
     patientId: string,
     request: CreateServicePrescriptionRequest
   ): Promise<ServicePrescription> {
-    const url = `${BASE_URL}/api/patients/${patientId}/documents`;
+    const sanitizedPatientId = parseWithSchema(
+      idSchema,
+      patientId,
+      'create service prescription patientId'
+    );
+    const sanitizedRequest = parseWithSchema(
+      createServicePrescriptionRequestSchema,
+      request,
+      'create service prescription request'
+    );
+    const url = `${BASE_URL}/api/patients/${sanitizedPatientId}/documents`;
 
     try {
       const response = await fetch(url, {
@@ -495,7 +691,7 @@ export const documentsApiService = {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify(sanitizedRequest),
       });
 
       if (!response.ok) {
@@ -503,7 +699,12 @@ export const documentsApiService = {
         throw new Error(errorData.message || `Request failed with status ${response.status}`);
       }
 
-      const document = await response.json();
+      const documentRaw = await response.json();
+      const document = parseWithSchema(
+        documentApiResponseSchema,
+        documentRaw,
+        'create service prescription response'
+      );
       return mapDocumentResponse(document) as ServicePrescription;
     } catch (error) {
       console.error('[Documents API] Error creating service prescription:', error);

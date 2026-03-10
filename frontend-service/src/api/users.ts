@@ -4,13 +4,14 @@ import type {
   SelectPatientProfileRequest,
   SearchUserByFiscalCodeResponse,
 } from '../types/auth';
+import { z } from 'zod';
+import { USERS_API_URL, DELEGATIONS_API_URL, API_ENDPOINTS, ApiError } from './config';
 import {
-  USERS_API_URL,
-  DELEGATIONS_API_URL,
-  API_ENDPOINTS,
-  handleApiResponse,
-  ApiError,
-} from './config';
+  idSchema,
+  nonEmptyTrimmedStringSchema,
+  parseApiResponse,
+  parseWithSchema,
+} from './validation';
 
 // User data type for fetching user info
 export interface UserInfo {
@@ -34,55 +35,132 @@ const AUTH_BASE_URL = `${USERS_API_URL}${API_ENDPOINTS.AUTH}`;
 const USERS_BASE_URL = `${USERS_API_URL}${API_ENDPOINTS.USERS}`;
 const DELEGATIONS_BASE_URL = `${DELEGATIONS_API_URL}${API_ENDPOINTS.DELEGATIONS}`;
 
+const patientProfileSchema = z
+  .object({
+    userId: idSchema,
+    activeDelegationIds: z.array(idSchema).default([]),
+  })
+  .passthrough();
+
+const doctorProfileSchema = z
+  .object({
+    userId: idSchema,
+    medicalLicenseNumber: nonEmptyTrimmedStringSchema,
+    specializations: z.array(nonEmptyTrimmedStringSchema),
+  })
+  .passthrough();
+
+const userInfoSchema = z
+  .object({
+    userId: idSchema,
+    fiscalCode: nonEmptyTrimmedStringSchema,
+    name: nonEmptyTrimmedStringSchema,
+    lastName: nonEmptyTrimmedStringSchema,
+    dateOfBirth: nonEmptyTrimmedStringSchema,
+    patient: patientProfileSchema.optional(),
+    doctor: doctorProfileSchema.optional(),
+  })
+  .passthrough();
+
+const loginRequestSchema = z.object({
+  fiscalCode: nonEmptyTrimmedStringSchema,
+  password: nonEmptyTrimmedStringSchema,
+});
+
+const selectPatientProfileRequestSchema = z.object({
+  userId: idSchema,
+  selectedProfile: z.enum(['PATIENT', 'DOCTOR']),
+});
+
+const loginResponseSchema = userInfoSchema
+  .extend({
+    activeProfile: z.enum(['PATIENT', 'DOCTOR']).optional(),
+    requiresProfileSelection: z.boolean().optional(),
+  })
+  .passthrough();
+
+const searchUserByFiscalCodeResponseSchema = z
+  .object({
+    userId: idSchema,
+    fiscalCode: nonEmptyTrimmedStringSchema,
+    name: nonEmptyTrimmedStringSchema,
+    lastName: nonEmptyTrimmedStringSchema,
+    dateOfBirth: nonEmptyTrimmedStringSchema,
+  })
+  .passthrough();
+
+const usersCollectionSchema = z
+  .object({
+    users: z.array(userInfoSchema),
+  })
+  .passthrough();
+
 export const authApi = {
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     console.log('[Auth API] login called');
+    const sanitizedCredentials = parseWithSchema(
+      loginRequestSchema,
+      credentials,
+      'auth login request'
+    );
+
     const response = await fetch(`${AUTH_BASE_URL}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(credentials),
+      body: JSON.stringify(sanitizedCredentials),
     });
 
-    return handleApiResponse<LoginResponse>(response);
+    return parseApiResponse(response, loginResponseSchema, 'auth login response');
   },
 
   async selectPatientProfile(request: SelectPatientProfileRequest): Promise<LoginResponse> {
     console.log('[Auth API] selectPatientProfile called');
+    const sanitizedRequest = parseWithSchema(
+      selectPatientProfileRequestSchema,
+      request,
+      'select patient profile request'
+    );
+
     const response = await fetch(`${AUTH_BASE_URL}/select-profile`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(request),
+      body: JSON.stringify(sanitizedRequest),
     });
 
-    return handleApiResponse<LoginResponse>(response);
+    return parseApiResponse(response, loginResponseSchema, 'select patient profile response');
   },
 
   async getActiveDelegations(userId: string) {
-    console.log('[Auth API] getActiveDelegations called for userId:', userId);
-    const response = await fetch(`${DELEGATIONS_BASE_URL}/active-for-user?userId=${userId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const sanitizedUserId = parseWithSchema(idSchema, userId, 'active delegations userId');
+    console.log('[Auth API] getActiveDelegations called for userId:', sanitizedUserId);
+    const response = await fetch(
+      `${DELEGATIONS_BASE_URL}/active-for-user?userId=${encodeURIComponent(sanitizedUserId)}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
-    return handleApiResponse(response);
+    return parseApiResponse(response, z.unknown(), 'active delegations response');
   },
 
   async getUserById(userId: string): Promise<LoginResponse> {
-    console.log('[Auth API] getUserById called for userId:', userId);
-    const response = await fetch(`${USERS_BASE_URL}/${userId}`, {
+    const sanitizedUserId = parseWithSchema(idSchema, userId, 'auth get user by id');
+    console.log('[Auth API] getUserById called for userId:', sanitizedUserId);
+    const response = await fetch(`${USERS_BASE_URL}/${sanitizedUserId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
-    return handleApiResponse<LoginResponse>(response);
+    return parseApiResponse(response, loginResponseSchema, 'auth get user by id response');
   },
 };
 
@@ -91,8 +169,14 @@ export const userApi = {
    * Search user by fiscal code
    */
   async searchUserByFiscalCode(fiscalCode: string): Promise<SearchUserByFiscalCodeResponse> {
-    console.log('[User API] searchUserByFiscalCode called for:', fiscalCode);
-    const params = new URLSearchParams({ fiscalCode });
+    const sanitizedFiscalCode = parseWithSchema(
+      nonEmptyTrimmedStringSchema,
+      fiscalCode,
+      'search user by fiscal code'
+    );
+
+    console.log('[User API] searchUserByFiscalCode called for:', sanitizedFiscalCode);
+    const params = new URLSearchParams({ fiscalCode: sanitizedFiscalCode });
 
     const response = await fetch(`${USERS_BASE_URL}/search?${params}`, {
       method: 'GET',
@@ -101,15 +185,20 @@ export const userApi = {
       },
     });
 
-    return handleApiResponse<SearchUserByFiscalCodeResponse>(response);
+    return parseApiResponse(
+      response,
+      searchUserByFiscalCodeResponseSchema,
+      'search user by fiscal code response'
+    );
   },
 
   /**
    * Get user by ID
    */
   async getUserById(userId: string): Promise<UserInfo | null> {
-    console.log('[User API] getUserById called for userId:', userId);
-    const url = `${USERS_BASE_URL}/${userId}`;
+    const sanitizedUserId = parseWithSchema(idSchema, userId, 'user id');
+    console.log('[User API] getUserById called for userId:', sanitizedUserId);
+    const url = `${USERS_BASE_URL}/${sanitizedUserId}`;
     console.log('[User API] Fetching from:', url);
 
     try {
@@ -126,7 +215,7 @@ export const userApi = {
       }
 
       console.log('[User API] Response status:', response.status, response.statusText);
-      const data = await handleApiResponse<UserInfo>(response);
+      const data = await parseApiResponse(response, userInfoSchema, 'get user by id response');
       console.log('[User API] User received:', data.name, data.lastName);
       return data;
     } catch (error) {
@@ -163,7 +252,11 @@ export const userApi = {
       });
 
       console.log('[User API] Response status:', response.status, response.statusText);
-      const data = await handleApiResponse<{ users: UserInfo[] }>(response);
+      const data = await parseApiResponse(
+        response,
+        usersCollectionSchema,
+        'get all users response'
+      );
       console.log('[User API] Users received:', data.users.length);
       return data.users;
     } catch (error) {

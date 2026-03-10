@@ -8,6 +8,8 @@ import type {
   Dosage,
 } from '../types/document';
 import { DOCUMENTS_API_URL } from './config';
+import { z } from 'zod';
+import { idSchema, nonEmptyTrimmedStringSchema, parseWithSchema } from './validation';
 
 const BASE_URL = DOCUMENTS_API_URL;
 const DOCUMENTS_BASE_URL = `${DOCUMENTS_API_URL}/api/documents`;
@@ -90,6 +92,95 @@ interface ReportResponse extends BaseDocumentResponse {
 }
 
 type DocumentResponse = MedicinePrescriptionResponse | ServicePrescriptionResponse | ReportResponse;
+
+const fileMetadataSchema = z.object({
+  summary: nonEmptyTrimmedStringSchema,
+  tags: z.array(nonEmptyTrimmedStringSchema),
+});
+
+const validityRequestSchema = z.discriminatedUnion('_t', [
+  z.object({ _t: z.literal('until_date'), date: nonEmptyTrimmedStringSchema }),
+  z.object({ _t: z.literal('until_execution') }),
+]);
+
+const dosageSchema = z.object({
+  medicineId: idSchema,
+  dose: z.object({
+    amount: z.number().positive(),
+    unit: nonEmptyTrimmedStringSchema,
+  }),
+  frequency: z.object({
+    timesPerPeriod: z.number().positive(),
+    period: nonEmptyTrimmedStringSchema,
+  }),
+  duration: z.object({
+    length: z.number().positive(),
+    unit: nonEmptyTrimmedStringSchema,
+  }),
+});
+
+const createMedicinePrescriptionRequestSchema = z.object({
+  _t: z.literal('medicine_prescription'),
+  doctorId: idSchema,
+  title: nonEmptyTrimmedStringSchema.optional(),
+  metadata: fileMetadataSchema,
+  validity: validityRequestSchema,
+  dosage: dosageSchema,
+});
+
+const createServicePrescriptionRequestSchema = z.object({
+  _t: z.literal('service_prescription'),
+  doctorId: idSchema,
+  title: nonEmptyTrimmedStringSchema.optional(),
+  metadata: fileMetadataSchema,
+  validity: validityRequestSchema,
+  serviceId: idSchema,
+  facilityId: idSchema,
+  priority: nonEmptyTrimmedStringSchema,
+});
+
+const validityResponseSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('until_date'), date: nonEmptyTrimmedStringSchema }),
+  z.object({ type: z.literal('until_execution') }),
+]);
+
+const baseDocumentResponseSchema = z.object({
+  id: idSchema,
+  doctorId: idSchema,
+  patientId: idSchema,
+  issueDate: nonEmptyTrimmedStringSchema,
+  metadata: fileMetadataSchema,
+});
+
+const medicinePrescriptionResponseSchema = baseDocumentResponseSchema.extend({
+  type: z.literal('medicine_prescription'),
+  validity: validityResponseSchema,
+  dosage: dosageSchema,
+});
+
+const servicePrescriptionResponseSchema = baseDocumentResponseSchema.extend({
+  type: z.literal('service_prescription'),
+  validity: validityResponseSchema,
+  serviceId: idSchema,
+  facilityId: idSchema,
+  priority: nonEmptyTrimmedStringSchema,
+});
+
+const reportResponseSchema = baseDocumentResponseSchema.extend({
+  type: z.literal('report'),
+  servicePrescription: servicePrescriptionResponseSchema,
+  executionDate: nonEmptyTrimmedStringSchema,
+  clinicalQuestion: nonEmptyTrimmedStringSchema.optional(),
+  findings: nonEmptyTrimmedStringSchema,
+  conclusion: nonEmptyTrimmedStringSchema.optional(),
+  recommendations: nonEmptyTrimmedStringSchema.optional(),
+});
+
+const documentResponseSchema = z.discriminatedUnion('type', [
+  medicinePrescriptionResponseSchema,
+  servicePrescriptionResponseSchema,
+  reportResponseSchema,
+]);
 
 function mapDocumentResponse(response: DocumentResponse): AnyDocument {
   const baseDocument: Document = {
@@ -175,10 +266,11 @@ export const doctorDocumentsApi = {
    * Get all documents issued by a specific doctor
    */
   async getDocumentsByDoctor(doctorId: string): Promise<AnyDocument[]> {
-    console.log('[Doctor Documents API] Get documents by doctor:', doctorId);
+    const sanitizedDoctorId = parseWithSchema(idSchema, doctorId, 'doctor documents doctorId');
+    console.log('[Doctor Documents API] Get documents by doctor:', sanitizedDoctorId);
 
     const queryParams = new URLSearchParams();
-    queryParams.append('doctorId', doctorId);
+    queryParams.append('doctorId', sanitizedDoctorId);
     const url = `${DOCUMENTS_BASE_URL}?${queryParams.toString()}`;
     console.log('[Doctor Documents API] Fetch call to:', url);
 
@@ -192,7 +284,12 @@ export const doctorDocumentsApi = {
 
       console.log('[Doctor Documents API] Response status:', response.status, response.statusText);
 
-      const documents = await handleResponse<DocumentResponse[]>(response);
+      const documentsRaw = await handleResponse<unknown>(response);
+      const documents = parseWithSchema(
+        z.array(documentResponseSchema),
+        documentsRaw,
+        'doctor documents response'
+      );
       console.log('[Doctor Documents API] Data received:', documents.length, 'documents');
 
       const mappedDocuments = documents.map((doc) => mapDocumentResponse(doc));
@@ -209,9 +306,10 @@ export const doctorDocumentsApi = {
    * Delete a document
    */
   async deleteDocument(documentId: string): Promise<boolean> {
-    console.log('[Doctor Documents API] Delete document:', documentId);
+    const sanitizedDocumentId = parseWithSchema(idSchema, documentId, 'doctor delete documentId');
+    console.log('[Doctor Documents API] Delete document:', sanitizedDocumentId);
 
-    const url = `${BASE_URL}/documents/${documentId}`;
+    const url = `${BASE_URL}/documents/${sanitizedDocumentId}`;
     console.log('[Doctor Documents API] Delete call to:', url);
 
     try {
@@ -238,9 +336,23 @@ export const doctorDocumentsApi = {
     patientId: string,
     request: CreateMedicinePrescriptionRequest
   ): Promise<MedicinePrescription> {
-    console.log('[Doctor Documents API] Create medicine prescription for patient:', patientId);
+    const sanitizedPatientId = parseWithSchema(
+      idSchema,
+      patientId,
+      'doctor create medicine prescription patientId'
+    );
+    const sanitizedRequest = parseWithSchema(
+      createMedicinePrescriptionRequestSchema,
+      request,
+      'doctor create medicine prescription request'
+    );
 
-    const url = `${BASE_URL}/api/patients/${patientId}/documents`;
+    console.log(
+      '[Doctor Documents API] Create medicine prescription for patient:',
+      sanitizedPatientId
+    );
+
+    const url = `${BASE_URL}/api/patients/${sanitizedPatientId}/documents`;
     console.log('[Doctor Documents API] POST call to:', url);
 
     try {
@@ -249,7 +361,7 @@ export const doctorDocumentsApi = {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify(sanitizedRequest),
       });
 
       console.log('[Doctor Documents API] Response status:', response.status, response.statusText);
@@ -259,7 +371,12 @@ export const doctorDocumentsApi = {
         throw new Error(errorData.message || `Request failed with status ${response.status}`);
       }
 
-      const document = await response.json();
+      const documentRaw = await response.json();
+      const document = parseWithSchema(
+        documentResponseSchema,
+        documentRaw,
+        'doctor create medicine prescription response'
+      );
       console.log('[Doctor Documents API] Medicine prescription created:', document.id);
 
       return mapDocumentResponse(document) as MedicinePrescription;
@@ -276,9 +393,23 @@ export const doctorDocumentsApi = {
     patientId: string,
     request: CreateServicePrescriptionRequest
   ): Promise<ServicePrescription> {
-    console.log('[Doctor Documents API] Create service prescription for patient:', patientId);
+    const sanitizedPatientId = parseWithSchema(
+      idSchema,
+      patientId,
+      'doctor create service prescription patientId'
+    );
+    const sanitizedRequest = parseWithSchema(
+      createServicePrescriptionRequestSchema,
+      request,
+      'doctor create service prescription request'
+    );
 
-    const url = `${BASE_URL}/api/patients/${patientId}/documents`;
+    console.log(
+      '[Doctor Documents API] Create service prescription for patient:',
+      sanitizedPatientId
+    );
+
+    const url = `${BASE_URL}/api/patients/${sanitizedPatientId}/documents`;
     console.log('[Doctor Documents API] POST call to:', url);
 
     try {
@@ -287,7 +418,7 @@ export const doctorDocumentsApi = {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify(sanitizedRequest),
       });
 
       console.log('[Doctor Documents API] Response status:', response.status, response.statusText);
@@ -297,7 +428,12 @@ export const doctorDocumentsApi = {
         throw new Error(errorData.message || `Request failed with status ${response.status}`);
       }
 
-      const document = await response.json();
+      const documentRaw = await response.json();
+      const document = parseWithSchema(
+        documentResponseSchema,
+        documentRaw,
+        'doctor create service prescription response'
+      );
       console.log('[Doctor Documents API] Service prescription created:', document.id);
 
       return mapDocumentResponse(document) as ServicePrescription;

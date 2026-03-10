@@ -81,6 +81,9 @@ catalogs:
     vue-tsc:
       specifier: ^3.1.4
       version: 3.2.4
+    zod:
+      specifier: ^4.1.12
+      version: 4.3.6
 
 importers:
   .:
@@ -157,6 +160,9 @@ importers:
       vue-router:
         specifier: 'catalog:'
         version: 4.6.4(vue@3.5.27(typescript@5.9.3))
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -5719,6 +5725,12 @@ packages:
       }
     engines: { node: '>=10' }
 
+  zod@4.3.6:
+    resolution:
+      {
+        integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==,
+      }
+
   zwitch@2.0.4:
     resolution:
       {
@@ -9260,5 +9272,7 @@ snapshots:
       pend: 1.2.0
 
   yocto-queue@0.1.0: {}
+
+  zod@4.3.6: {}
 
   zwitch@2.0.4: {}
