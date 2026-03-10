@@ -112,6 +112,7 @@ export class UserService {
       patient: patientData,
       doctor: doctorData
         ? {
+            userId: doctorData.userId,
             medicalLicenseNumber: doctorData.medicalLicenseNumber,
             specializations: doctorData.specializations,
           }
