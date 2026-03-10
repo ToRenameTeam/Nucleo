@@ -291,9 +291,9 @@ onMounted(() => {
         <div v-else class="options-list">
           <button
             v-for="serviceType in filteredServiceTypes"
-            :key="serviceType._id"
+            :key="serviceType.id"
             class="option-card"
-            :class="{ selected: selectedServiceType?._id === serviceType._id }"
+            :class="{ selected: selectedServiceType?.id === serviceType.id }"
             @click="selectServiceType(serviceType)"
           >
             <div class="option-content">

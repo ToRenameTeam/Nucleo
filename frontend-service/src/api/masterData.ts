@@ -4,7 +4,7 @@ import { idSchema, nonEmptyTrimmedStringSchema, parseWithSchema } from './valida
 
 // Service Catalog Types
 export interface ServiceType {
-  _id: string;
+  id: string;
   code: string;
   name: string;
   description?: string;
@@ -13,7 +13,7 @@ export interface ServiceType {
 
 // Facility Types
 export interface Facility {
-  _id: string;
+  id: string;
   name: string;
   address?: string;
   city?: string;
@@ -23,7 +23,7 @@ export interface Facility {
 
 // Medicine Types
 export interface Medicine {
-  _id: string;
+  id: string;
   code: string;
   name: string;
   description: string;
@@ -42,7 +42,7 @@ export interface MedicineCategory {
 
 const serviceTypeSchema = z
   .object({
-    _id: idSchema,
+    id: idSchema,
     code: nonEmptyTrimmedStringSchema,
     name: nonEmptyTrimmedStringSchema,
     description: nonEmptyTrimmedStringSchema.optional(),
@@ -52,7 +52,7 @@ const serviceTypeSchema = z
 
 const facilitySchema = z
   .object({
-    _id: idSchema,
+    id: idSchema,
     name: nonEmptyTrimmedStringSchema,
     address: nonEmptyTrimmedStringSchema.optional(),
     city: nonEmptyTrimmedStringSchema.optional(),
@@ -63,7 +63,7 @@ const facilitySchema = z
 
 const medicineSchema = z
   .object({
-    _id: idSchema,
+    id: idSchema,
     code: nonEmptyTrimmedStringSchema,
     name: nonEmptyTrimmedStringSchema,
     description: nonEmptyTrimmedStringSchema,

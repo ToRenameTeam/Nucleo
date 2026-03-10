@@ -201,7 +201,7 @@ const handleServiceInput = (event: Event) => {
 
 const selectService = (service: ServiceType) => {
   selectedService.value = service;
-  formData.value.serviceId = service._id;
+  formData.value.serviceId = service.id;
   formData.value.serviceName = service.name;
   serviceSearchQuery.value = service.name;
   showServiceSuggestions.value = false;
@@ -230,7 +230,7 @@ const handleFacilityInput = (event: Event) => {
 
 const selectFacility = (facility: Facility) => {
   selectedFacility.value = facility;
-  formData.value.facilityId = facility._id;
+  formData.value.facilityId = facility.id;
   formData.value.facilityName = facility.name;
   facilitySearchQuery.value = facility.name;
   showFacilitySuggestions.value = false;
@@ -461,7 +461,7 @@ onUnmounted(() => {
             >
               <button
                 v-for="service in filteredServices"
-                :key="service._id"
+                :key="service.id"
                 type="button"
                 class="suggestion-item"
                 @mousedown.prevent="selectService(service)"
@@ -534,7 +534,7 @@ onUnmounted(() => {
             >
               <button
                 v-for="facility in filteredFacilities"
-                :key="facility._id"
+                :key="facility.id"
                 type="button"
                 class="suggestion-item"
                 @mousedown.prevent="selectFacility(facility)"

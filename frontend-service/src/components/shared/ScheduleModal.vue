@@ -310,7 +310,7 @@ onMounted(() => {
             <option value="" disabled>
               {{ t('doctor.availabilities.modal.selectFacility') }}
             </option>
-            <option v-for="facility in facilities" :key="facility._id" :value="facility._id">
+            <option v-for="facility in facilities" :key="facility.id" :value="facility.id">
               {{ facility.name }}
             </option>
           </select>
@@ -328,8 +328,8 @@ onMounted(() => {
             </option>
             <option
               v-for="serviceType in serviceTypes"
-              :key="serviceType._id"
-              :value="serviceType._id"
+              :key="serviceType.id"
+              :value="serviceType.id"
             >
               {{ serviceType.name }}
             </option>

@@ -110,7 +110,7 @@ async function loadDocuments() {
 
 // Get service type name from serviceId
 function getServiceTypeName(serviceId: string): string | null {
-  const service = serviceTypes.value.find((st) => st._id === serviceId);
+  const service = serviceTypes.value.find((st) => st.id === serviceId);
   return service?.name || null;
 }
 
