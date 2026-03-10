@@ -17,7 +17,8 @@
     "dotenv": "^17.2.3",
     "express": "catalog:",
     "express-session": "catalog:",
-    "mongoose": "catalog:"
+    "mongoose": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/cors": "catalog:",

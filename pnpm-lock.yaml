@@ -200,6 +200,9 @@ importers:
       mongoose:
         specifier: 'catalog:'
         version: 9.1.5
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
     devDependencies:
       '@types/cors':
         specifier: 'catalog:'

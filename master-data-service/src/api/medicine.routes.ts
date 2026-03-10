@@ -1,12 +1,51 @@
 import { Router } from 'express';
+import { z } from 'zod';
 import {
   medicineService,
   MedicineValidationError,
   MedicineConflictError,
 } from '../services/medicine.service.js';
+import { MedicineCategory } from '../domain/index.js';
 import { parseBooleanQuery, sendError, sendServerError, sendSuccess } from './route.utils.js';
+import {
+  ApiValidationError,
+  booleanQueryValueSchema,
+  idParamSchema,
+  nonEmptyTrimmedStringSchema,
+  optionalTrimmedStringSchema,
+  validateWithSchema,
+} from './validation.js';
 
 const router = Router();
+
+const medicineListQuerySchema = z.object({
+  category: z.nativeEnum(MedicineCategory).optional(),
+  active: booleanQueryValueSchema.optional(),
+  search: optionalTrimmedStringSchema,
+});
+
+const createMedicineBodySchema = z.object({
+  code: nonEmptyTrimmedStringSchema,
+  name: nonEmptyTrimmedStringSchema,
+  description: nonEmptyTrimmedStringSchema,
+  category: z.nativeEnum(MedicineCategory),
+  activeIngredient: nonEmptyTrimmedStringSchema,
+  dosageForm: nonEmptyTrimmedStringSchema,
+  strength: nonEmptyTrimmedStringSchema,
+  manufacturer: nonEmptyTrimmedStringSchema,
+  isActive: z.boolean().optional(),
+});
+
+const updateMedicineBodySchema = z.object({
+  name: optionalTrimmedStringSchema,
+  description: optionalTrimmedStringSchema,
+  category: z.nativeEnum(MedicineCategory).optional(),
+  activeIngredient: optionalTrimmedStringSchema,
+  dosageForm: optionalTrimmedStringSchema,
+  strength: optionalTrimmedStringSchema,
+  manufacturer: optionalTrimmedStringSchema,
+  isActive: z.boolean().optional(),
+});
 
 /**
  * GET /api/medicines
@@ -14,12 +53,12 @@ const router = Router();
  */
 router.get('/', async (req, res) => {
   try {
-    const { category, active, search } = req.query;
+    const query = validateWithSchema(medicineListQuerySchema, req.query, 'medicine query');
 
     const medicines = await medicineService.findAll({
-      category: category as string | undefined,
-      active: parseBooleanQuery(active),
-      search: search as string | undefined,
+      category: query.category,
+      active: parseBooleanQuery(query.active),
+      search: query.search,
     });
 
     sendSuccess(res, medicines, 200, { count: medicines.length });
@@ -45,7 +84,8 @@ router.get('/categories', (_req, res) => {
  */
 router.get('/:id', async (req, res) => {
   try {
-    const medicine = await medicineService.findById(req.params.id);
+    const params = validateWithSchema(idParamSchema, req.params, 'medicine id parameter');
+    const medicine = await medicineService.findById(params.id);
 
     if (!medicine) {
       sendError(res, 404, 'Medicine not found');
@@ -65,10 +105,16 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    const medicine = await medicineService.create(req.body);
+    const body = validateWithSchema(createMedicineBodySchema, req.body, 'create medicine body');
+    const medicine = await medicineService.create(body);
 
     sendSuccess(res, medicine, 201);
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      sendError(res, 400, error.message);
+      return;
+    }
+
     if (error instanceof MedicineValidationError) {
       sendError(res, 400, error.message);
       return;
@@ -90,7 +136,9 @@ router.post('/', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   try {
-    const medicine = await medicineService.update(req.params.id, req.body);
+    const params = validateWithSchema(idParamSchema, req.params, 'medicine id parameter');
+    const body = validateWithSchema(updateMedicineBodySchema, req.body, 'update medicine body');
+    const medicine = await medicineService.update(params.id, body);
 
     if (!medicine) {
       sendError(res, 404, 'Medicine not found');
@@ -99,6 +147,11 @@ router.put('/:id', async (req, res) => {
 
     sendSuccess(res, medicine);
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      sendError(res, 400, error.message);
+      return;
+    }
+
     console.error('Error updating medicine:', error);
     sendServerError(res, 'Failed to update medicine');
   }
@@ -110,7 +163,8 @@ router.put('/:id', async (req, res) => {
  */
 router.delete('/:id', async (req, res) => {
   try {
-    const medicine = await medicineService.softDelete(req.params.id);
+    const params = validateWithSchema(idParamSchema, req.params, 'medicine id parameter');
+    const medicine = await medicineService.softDelete(params.id);
 
     if (!medicine) {
       sendError(res, 404, 'Medicine not found');
@@ -119,6 +173,11 @@ router.delete('/:id', async (req, res) => {
 
     sendSuccess(res, medicine, 200, { message: 'Medicine deactivated successfully' });
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      sendError(res, 400, error.message);
+      return;
+    }
+
     console.error('Error deleting medicine:', error);
     sendServerError(res, 'Failed to delete medicine');
   }
@@ -130,7 +189,8 @@ router.delete('/:id', async (req, res) => {
  */
 router.delete('/:id/permanent', async (req, res) => {
   try {
-    const medicine = await medicineService.permanentDelete(req.params.id);
+    const params = validateWithSchema(idParamSchema, req.params, 'medicine id parameter');
+    const medicine = await medicineService.permanentDelete(params.id);
 
     if (!medicine) {
       sendError(res, 404, 'Medicine not found');
@@ -139,6 +199,11 @@ router.delete('/:id/permanent', async (req, res) => {
 
     sendSuccess(res, null, 200, { message: 'Medicine permanently deleted' });
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      sendError(res, 400, error.message);
+      return;
+    }
+
     console.error('Error permanently deleting medicine:', error);
     sendServerError(res, 'Failed to permanently delete medicine');
   }
