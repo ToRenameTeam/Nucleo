@@ -16,7 +16,8 @@
     "cors": "catalog:",
     "express": "catalog:",
     "express-session": "catalog:",
-    "mongoose": "catalog:"
+    "mongoose": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/cors": "catalog:",

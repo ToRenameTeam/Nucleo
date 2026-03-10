@@ -1,7 +1,9 @@
 import { Router, Request, Response } from 'express';
+import { z } from 'zod';
 import { userService } from '../services/index.js';
-import { success, error } from './utils/response.js';
-import { handleRouteError, hasRequiredFields, isNonEmptyString } from './utils/http-helpers.js';
+import { success } from './utils/response.js';
+import { handleRouteError } from './utils/http-helpers.js';
+import { nonEmptyTrimmedStringSchema, validateWithSchema } from './validation.js';
 
 const router = Router();
 
@@ -11,26 +13,36 @@ const USER_ERROR_RULES = [
   { statusCode: 400, messageIncludes: 'Invalid' },
 ];
 
+const createDoctorSchema = z.object({
+  medicalLicenseNumber: nonEmptyTrimmedStringSchema,
+  specializations: z.array(nonEmptyTrimmedStringSchema),
+});
+
+const createUserBodySchema = z.object({
+  fiscalCode: nonEmptyTrimmedStringSchema,
+  password: nonEmptyTrimmedStringSchema,
+  name: nonEmptyTrimmedStringSchema,
+  lastName: nonEmptyTrimmedStringSchema,
+  dateOfBirth: nonEmptyTrimmedStringSchema,
+  doctor: createDoctorSchema.optional(),
+});
+
+const searchUserQuerySchema = z.object({
+  fiscalCode: nonEmptyTrimmedStringSchema,
+});
+
+const userIdParamsSchema = z.object({
+  userId: nonEmptyTrimmedStringSchema,
+});
+
 // Create a new user
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { fiscalCode, password, name, lastName, dateOfBirth, doctor } = req.body;
-
-    if (
-      !hasRequiredFields(req.body as Record<string, unknown>, [
-        'fiscalCode',
-        'password',
-        'name',
-        'lastName',
-        'dateOfBirth',
-      ])
-    ) {
-      return error(
-        res,
-        'Missing required fields: fiscalCode, password, name, lastName, dateOfBirth',
-        400
-      );
-    }
+    const { fiscalCode, password, name, lastName, dateOfBirth, doctor } = validateWithSchema(
+      createUserBodySchema,
+      req.body,
+      'create user body'
+    );
 
     const user = await userService.createUser({
       fiscalCode,
@@ -50,11 +62,7 @@ router.post('/', async (req: Request, res: Response) => {
 // Search user by fiscal code - DEVE STARE PRIMA DI /:userId
 router.get('/search', async (req: Request, res: Response) => {
   try {
-    const { fiscalCode } = req.query;
-
-    if (!isNonEmptyString(fiscalCode)) {
-      return error(res, 'Missing or invalid fiscal code', 400);
-    }
+    const { fiscalCode } = validateWithSchema(searchUserQuerySchema, req.query, 'search query');
 
     const user = await userService.getUserByFiscalCode(fiscalCode);
     return success(res, user);
@@ -76,11 +84,7 @@ router.get('/', async (req: Request, res: Response) => {
 // Get user by ID - DEVE STARE DOPO /search
 router.get('/:userId', async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
-
-    if (!isNonEmptyString(userId)) {
-      return error(res, 'Invalid user ID', 400);
-    }
+    const { userId } = validateWithSchema(userIdParamsSchema, req.params, 'user params');
 
     const user = await userService.getUserById(userId);
     return success(res, user);

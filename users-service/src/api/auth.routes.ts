@@ -1,12 +1,9 @@
 import { Router, Request, Response } from 'express';
+import { z } from 'zod';
 import { authenticationService } from '../services/index.js';
-import { success, error } from './utils/response.js';
-import {
-  handleRouteError,
-  hasRequiredFields,
-  isOneOf,
-  isNonEmptyString,
-} from './utils/http-helpers.js';
+import { success } from './utils/response.js';
+import { handleRouteError } from './utils/http-helpers.js';
+import { nonEmptyTrimmedStringSchema, validateWithSchema } from './validation.js';
 
 const router = Router();
 
@@ -14,15 +11,22 @@ const AUTH_ERROR_RULES = [
   { statusCode: 401, messageIncludes: 'Invalid credentials' },
   { statusCode: 404, messageIncludes: 'not found' },
   { statusCode: 400, messageIncludes: 'does not have' },
+  { statusCode: 400, messageIncludes: 'Invalid' },
 ];
+
+const loginBodySchema = z.object({
+  fiscalCode: nonEmptyTrimmedStringSchema,
+  password: nonEmptyTrimmedStringSchema,
+});
+
+const selectProfileBodySchema = z.object({
+  userId: nonEmptyTrimmedStringSchema,
+  selectedProfile: z.enum(['PATIENT', 'DOCTOR']),
+});
 
 router.post('/login', async (req: Request, res: Response) => {
   try {
-    const { fiscalCode, password } = req.body;
-
-    if (!hasRequiredFields(req.body as Record<string, unknown>, ['fiscalCode', 'password'])) {
-      return error(res, 'Fiscal code and password are required', 400);
-    }
+    const { fiscalCode, password } = validateWithSchema(loginBodySchema, req.body, 'login body');
 
     const authenticatedUser = await authenticationService.login(fiscalCode, password);
 
@@ -57,15 +61,11 @@ router.post('/login', async (req: Request, res: Response) => {
 
 router.post('/select-profile', async (req: Request, res: Response) => {
   try {
-    const { userId, selectedProfile } = req.body;
-
-    if (!isNonEmptyString(userId)) {
-      return error(res, 'User ID is required', 400);
-    }
-
-    if (!isOneOf(selectedProfile, ['PATIENT', 'DOCTOR'])) {
-      return error(res, 'Invalid profile type. Must be PATIENT or DOCTOR', 400);
-    }
+    const { userId, selectedProfile } = validateWithSchema(
+      selectProfileBodySchema,
+      req.body,
+      'select profile body'
+    );
 
     const profileData = await authenticationService.getProfileData(userId, selectedProfile);
     return success(res, profileData);
