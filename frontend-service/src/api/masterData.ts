@@ -48,19 +48,15 @@ export const masterDataApi = {
   async getServiceTypes(): Promise<ServiceType[]> {
     const url = `${MASTER_DATA_API_URL}${API_ENDPOINTS.SERVICE_CATALOG}`;
 
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-      const data = await handleApiResponse<ServiceType[]>(response);
-      return data;
-    } catch (error) {
-      throw error;
-    }
+    const data = await handleApiResponse<ServiceType[]>(response);
+    return data;
   },
 
   /**
@@ -83,7 +79,7 @@ export const masterDataApi = {
 
       const data = await handleApiResponse<ServiceType>(response);
       return data;
-    } catch (error) {
+    } catch {
       return null;
     }
   },
@@ -94,19 +90,15 @@ export const masterDataApi = {
   async getFacilities(): Promise<Facility[]> {
     const url = `${MASTER_DATA_API_URL}${API_ENDPOINTS.FACILITIES}`;
 
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-      const data = await handleApiResponse<Facility[]>(response);
-      return data;
-    } catch (error) {
-      throw error;
-    }
+    const data = await handleApiResponse<Facility[]>(response);
+    return data;
   },
 
   /**
@@ -129,7 +121,7 @@ export const masterDataApi = {
 
       const data = await handleApiResponse<Facility>(response);
       return data;
-    } catch (error) {
+    } catch {
       return null;
     }
   },

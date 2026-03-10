@@ -282,10 +282,16 @@ export const documentsApiService = {
 
     if (!response.ok) {
       // Try to get error details from response
-      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-      const error = new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      const errorData: { message?: string; code?: string } = await response
+        .json()
+        .catch(() => ({ message: 'Unknown error' }));
+      const error = new Error(
+        errorData.message || `HTTP error! status: ${response.status}`
+      ) as Error & {
+        code?: string;
+      };
       // Attach the error code if available
-      (error as any).code = errorData.code;
+      error.code = errorData.code;
       throw error;
     }
 

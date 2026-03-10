@@ -38,12 +38,20 @@ export const API_ENDPOINTS = {
 /**
  * Helper function to handle API responses
  */
+interface ApiErrorPayload {
+  message?: string;
+  code?: string;
+  [key: string]: unknown;
+}
+
 export async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+    const errorData: ApiErrorPayload = await response
+      .json()
+      .catch(() => ({ message: 'Unknown error' }));
     const error = new Error(errorData.message || 'Request failed') as Error & {
       code?: string;
-      details?: any;
+      details?: ApiErrorPayload;
     };
     error.code = errorData.code;
     error.details = errorData;
