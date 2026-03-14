@@ -3,9 +3,9 @@ import {
   ServiceCatalogValidationError,
   ServiceCatalogConflictError,
   type CreateServiceTypeInput,
-} from '../../src/services/service-catalog.service.js';
-import { ServiceCategory } from '../../src/domain/service-catalog/index.js';
-import type { ServiceTypeRepository } from '../../src/domain/repositories/service-type-repository.js';
+} from '../../src/services/index.js';
+import { ServiceCategory } from '../../src/domain/index.js';
+import type { ServiceTypeRepository } from '../../src/domain/index.js';
 
 describe('ServiceCatalogService', () => {
   let service: ServiceCatalogService;

@@ -4,7 +4,7 @@ import {
   facilityService,
   FacilityValidationError,
   FacilityConflictError,
-} from '../services/facility.service.js';
+} from '../services/index.js';
 import { parseBooleanQuery, sendError, sendServerError, sendSuccess } from './route.utils.js';
 import {
   ApiValidationError,

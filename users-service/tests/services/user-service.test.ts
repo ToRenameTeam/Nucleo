@@ -1,10 +1,7 @@
-import { UserService } from '../../src/services/user.service.js';
-import { UserRepository, UserData } from '../../src/domain/repositories/user-repository.js';
-import {
-  PatientRepository,
-  PatientData,
-} from '../../src/domain/repositories/patient-repository.js';
-import { DoctorRepository, DoctorData } from '../../src/domain/repositories/doctor-repository.js';
+import { UserService } from '../../src/services/index.js';
+import { UserRepository, UserData } from '../../src/domain/repositories/index.js';
+import { PatientRepository, PatientData } from '../../src/domain/repositories/index.js';
+import { DoctorRepository, DoctorData } from '../../src/domain/repositories/index.js';
 import { randomUUID } from 'crypto';
 
 describe('UserService', () => {

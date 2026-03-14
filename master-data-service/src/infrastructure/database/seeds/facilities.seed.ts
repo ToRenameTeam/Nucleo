@@ -1,4 +1,4 @@
-import type { Facility } from '../../../domain/facility/index.js';
+import type { Facility } from '../../../domain/index.js';
 
 type FacilitySeed = Omit<Facility, 'id' | 'createdAt' | 'updatedAt'> & { _id: string };
 

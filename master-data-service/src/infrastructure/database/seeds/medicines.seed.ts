@@ -1,5 +1,5 @@
-import type { Medicine } from '../../../domain/medicine/index.js';
-import { MedicineCategory } from '../../../domain/medicine/index.js';
+import type { Medicine } from '../../../domain/index.js';
+import { MedicineCategory } from '../../../domain/index.js';
 
 type MedicineSeed = Omit<Medicine, 'id' | 'createdAt' | 'updatedAt'> & { _id: string };
 

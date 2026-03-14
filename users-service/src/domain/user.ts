@@ -6,8 +6,8 @@ import type { UUID } from 'crypto';
 export class User {
   private readonly _userId: UUID;
   private readonly _fiscalCode: FiscalCode;
-  private _credentials: Credentials;
-  private _profileInfo: ProfileInfo;
+  private readonly _credentials: Credentials;
+  private readonly _profileInfo: ProfileInfo;
 
   private constructor(
     userId: UUID,

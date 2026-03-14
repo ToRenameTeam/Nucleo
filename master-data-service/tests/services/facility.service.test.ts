@@ -3,8 +3,8 @@ import {
   FacilityValidationError,
   FacilityConflictError,
   type CreateFacilityInput,
-} from '../../src/services/facility.service.js';
-import type { FacilityRepository } from '../../src/domain/repositories/facility-repository.js';
+} from '../../src/services/index.js';
+import type { FacilityRepository } from '../../src/domain/index.js';
 
 describe('FacilityService', () => {
   let service: FacilityService;

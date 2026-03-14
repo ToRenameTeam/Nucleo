@@ -1,5 +1,5 @@
-import { PatientModel } from '../../database/models/index.js';
-import type { IPatientDocument } from '../../database/models/index.js';
+import { PatientModel } from '../../database/index.js';
+import type { IPatientDocument } from '../../database/index.js';
 import type { PatientRepository, PatientData } from '../../../domain/repositories/index.js';
 import type { Patient } from '../../../domain/index.js';
 

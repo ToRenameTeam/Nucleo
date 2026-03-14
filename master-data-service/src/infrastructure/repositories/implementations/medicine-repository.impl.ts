@@ -1,4 +1,4 @@
-import { MedicineModel } from '../../database/models/index.js';
+import { MedicineModel } from '../../database/index.js';
 import type {
   Medicine,
   MedicineRepository,

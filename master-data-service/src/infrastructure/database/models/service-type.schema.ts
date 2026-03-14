@@ -1,5 +1,5 @@
 import mongoose, { Schema, type Document } from 'mongoose';
-import { ServiceType, ServiceCategory } from '../../../domain/service-catalog/index.js';
+import { ServiceType, ServiceCategory } from '../../../domain/index.js';
 
 type ServiceTypeDocument = Document<string, object, Omit<ServiceType, 'id'>> &
   Omit<ServiceType, 'id'> & { _id: string };

@@ -1,5 +1,5 @@
-import { DelegationModel } from '../../database/models/index.js';
-import type { IDelegationDocument } from '../../database/models/index.js';
+import { DelegationModel } from '../../database/index.js';
+import type { IDelegationDocument } from '../../database/index.js';
 import type { DelegationRepository, DelegationData } from '../../../domain/repositories/index.js';
 import type { Delegation } from '../../../domain/index.js';
 

@@ -1,6 +1,6 @@
-import { DelegationService } from '../../src/services/delegation.service.js';
-import { DelegationRepository } from '../../src/domain/repositories/delegation-repository.js';
-import { PatientRepository } from '../../src/domain/repositories/patient-repository.js';
+import { DelegationService } from '../../src/services/index.js';
+import { DelegationRepository } from '../../src/domain/repositories/index.js';
+import { PatientRepository } from '../../src/domain/repositories/index.js';
 import { randomUUID } from 'crypto';
 
 describe('DelegationService', () => {

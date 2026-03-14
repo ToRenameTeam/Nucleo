@@ -4,7 +4,7 @@ import {
   medicineService,
   MedicineValidationError,
   MedicineConflictError,
-} from '../services/medicine.service.js';
+} from '../services/index.js';
 import { MedicineCategory } from '../domain/index.js';
 import { parseBooleanQuery, sendError, sendServerError, sendSuccess } from './route.utils.js';
 import {

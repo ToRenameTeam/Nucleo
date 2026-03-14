@@ -1,5 +1,5 @@
-import { DoctorModel } from '../../database/models/index.js';
-import type { IDoctorDocument } from '../../database/models/index.js';
+import { DoctorModel } from '../../database/index.js';
+import type { IDoctorDocument } from '../../database/index.js';
 import type { DoctorRepository, DoctorData } from '../../../domain/repositories/index.js';
 import type { Doctor } from '../../../domain/index.js';
 

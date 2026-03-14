@@ -1,4 +1,4 @@
-import { FiscalCode } from '../../../src/domain/fiscal-code.js';
+import { FiscalCode } from '../../../src/domain/index.js';
 
 describe('FiscalCode', () => {
   describe('create', () => {
