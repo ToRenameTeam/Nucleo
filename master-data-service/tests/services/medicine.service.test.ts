@@ -3,9 +3,9 @@ import {
   MedicineValidationError,
   MedicineConflictError,
   type CreateMedicineInput,
-} from '../../src/services/medicine.service.js';
-import { MedicineCategory } from '../../src/domain/medicine/index.js';
-import type { MedicineRepository } from '../../src/domain/repositories/medicine-repository.js';
+} from '../../src/services/index.js';
+import { MedicineCategory } from '../../src/domain/index.js';
+import type { MedicineRepository } from '../../src/domain/index.js';
 
 describe('MedicineService', () => {
   let service: MedicineService;
@@ -76,7 +76,15 @@ describe('MedicineService', () => {
       mockRepository.findByCode.mockResolvedValue(null);
       mockRepository.create.mockResolvedValue({
         id: 'medicine-id-2',
-        ...inactiveInput,
+        code: inactiveInput.code,
+        name: inactiveInput.name,
+        description: inactiveInput.description,
+        category: inactiveInput.category,
+        activeIngredient: inactiveInput.activeIngredient,
+        dosageForm: inactiveInput.dosageForm,
+        strength: inactiveInput.strength,
+        manufacturer: inactiveInput.manufacturer,
+        isActive: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
