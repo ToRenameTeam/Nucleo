@@ -1,5 +1,10 @@
 package it.nucleo.documents.domain.prescription.implementation
 
+import it.nucleo.commons.errors.DomainError
+import it.nucleo.commons.errors.Either
+import it.nucleo.commons.errors.ValidationError
+import it.nucleo.commons.errors.failure
+import it.nucleo.commons.errors.success
 import it.nucleo.documents.domain.DoctorId
 import it.nucleo.documents.domain.Document
 import it.nucleo.documents.domain.DocumentId
@@ -23,20 +28,65 @@ data class MedicinePrescription(
     override fun withMetadata(newMetadata: FileMetadata): Document = copy(metadata = newMetadata)
 }
 
-data class Dosage(
+@ConsistentCopyVisibility
+data class Dosage
+private constructor(
     val medicine: MedicineId,
     val dose: Dose,
     val frequency: Frequency,
     val duration: Duration
-)
+) {
+    companion object {
+        operator fun invoke(
+            medicine: MedicineId,
+            dose: Dose,
+            frequency: Frequency,
+            duration: Duration,
+        ): Either<DomainError, Dosage> = success(Dosage(medicine, dose, frequency, duration))
+    }
+}
 
-@JvmInline value class MedicineId(val id: String)
+@JvmInline
+value class MedicineId private constructor(val id: String) {
+    companion object {
+        operator fun invoke(id: String): Either<DomainError, MedicineId> {
+            if (id.isBlank()) return failure(ValidationError("MedicineId cannot be blank"))
+            return success(MedicineId(id))
+        }
+    }
+}
 
-data class Dose(val amount: Int, val unit: DoseUnit)
+@ConsistentCopyVisibility
+data class Dose private constructor(val amount: Int, val unit: DoseUnit) {
+    companion object {
+        operator fun invoke(amount: Int, unit: DoseUnit): Either<DomainError, Dose> {
+            if (amount <= 0) return failure(ValidationError("Dose amount must be positive"))
+            return success(Dose(amount, unit))
+        }
+    }
+}
 
-data class Frequency(val timesPerPeriod: Int, val period: Period)
+@ConsistentCopyVisibility
+data class Frequency private constructor(val timesPerPeriod: Int, val period: Period) {
+    companion object {
+        operator fun invoke(timesPerPeriod: Int, period: Period): Either<DomainError, Frequency> {
+            if (timesPerPeriod <= 0) {
+                return failure(ValidationError("Frequency timesPerPeriod must be positive"))
+            }
+            return success(Frequency(timesPerPeriod, period))
+        }
+    }
+}
 
-data class Duration(val length: Int, val unit: Period)
+@ConsistentCopyVisibility
+data class Duration private constructor(val length: Int, val unit: Period) {
+    companion object {
+        operator fun invoke(length: Int, unit: Period): Either<DomainError, Duration> {
+            if (length <= 0) return failure(ValidationError("Duration length must be positive"))
+            return success(Duration(length, unit))
+        }
+    }
+}
 
 enum class DoseUnit(val symbol: String) {
     GRAM("g"),

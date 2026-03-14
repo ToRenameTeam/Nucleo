@@ -17,9 +17,18 @@ class AvailabilityService(private val repository: AvailabilityRepository) {
     ): Either<DomainError, Availability> {
         logger.info("Creating availability for doctor: $doctorId")
 
-        val doctorId = DoctorId.fromString(doctorId)
-        val facilityId = FacilityId.fromString(facilityId)
-        val serviceTypeId = ServiceTypeId.fromString(serviceTypeId)
+        val doctorId =
+            DoctorId(doctorId).getOrElse {
+                return failure(it)
+            }
+        val facilityId =
+            FacilityId(facilityId).getOrElse {
+                return failure(it)
+            }
+        val serviceTypeId =
+            ServiceTypeId(serviceTypeId).getOrElse {
+                return failure(it)
+            }
 
         val hasOverlap = repository.checkOverlap(doctorId, timeSlot)
 
@@ -49,7 +58,11 @@ class AvailabilityService(private val repository: AvailabilityRepository) {
     suspend fun getAvailabilityById(id: String): Either<DomainError, Availability> {
         logger.info("Fetching availability by ID: $id")
 
-        val availability = repository.findById(AvailabilityId.fromString(id))
+        val availabilityId =
+            AvailabilityId(id).getOrElse {
+                return failure(it)
+            }
+        val availability = repository.findById(availabilityId)
 
         if (availability == null) {
             logger.warn("Availability not found with ID: $id")
@@ -66,9 +79,24 @@ class AvailabilityService(private val repository: AvailabilityRepository) {
         serviceTypeId: String?,
         status: String?
     ): Either<DomainError, List<Availability>> {
-        val doctorIdValue = doctorId?.let { DoctorId.fromString(it) }
-        val facilityIdValue = facilityId?.let { FacilityId.fromString(it) }
-        val serviceTypeIdValue = serviceTypeId?.let { ServiceTypeId.fromString(it) }
+        val doctorIdValue =
+            doctorId?.let {
+                DoctorId(it).getOrElse { error ->
+                    return failure(error)
+                }
+            }
+        val facilityIdValue =
+            facilityId?.let {
+                FacilityId(it).getOrElse { error ->
+                    return failure(error)
+                }
+            }
+        val serviceTypeIdValue =
+            serviceTypeId?.let {
+                ServiceTypeId(it).getOrElse { error ->
+                    return failure(error)
+                }
+            }
         val statusValue = status?.let { AvailabilityStatus.valueOf(it) }
 
         logger.info(
@@ -99,9 +127,12 @@ class AvailabilityService(private val repository: AvailabilityRepository) {
     ): Either<DomainError, Availability> {
         logger.info("Updating availability with ID: $id")
 
+        val availabilityId =
+            AvailabilityId(id).getOrElse {
+                return failure(it)
+            }
         val availability =
-            repository.findById(AvailabilityId.fromString(id))
-                ?: return failure(AvailabilityError.NotFound(id))
+            repository.findById(availabilityId) ?: return failure(AvailabilityError.NotFound(id))
 
         // Check for overlaps if time slot is being changed
         if (timeSlot != null) {
@@ -128,8 +159,18 @@ class AvailabilityService(private val repository: AvailabilityRepository) {
         val updated =
             availability
                 .update(
-                    facilityId = facilityId?.let { FacilityId.fromString(it) },
-                    serviceTypeId = serviceTypeId?.let { ServiceTypeId.fromString(it) },
+                    facilityId =
+                        facilityId?.let {
+                            FacilityId(it).getOrElse { err ->
+                                return failure(err)
+                            }
+                        },
+                    serviceTypeId =
+                        serviceTypeId?.let {
+                            ServiceTypeId(it).getOrElse { err ->
+                                return failure(err)
+                            }
+                        },
                     timeSlot = timeSlot
                 )
                 .getOrElse {
@@ -150,9 +191,12 @@ class AvailabilityService(private val repository: AvailabilityRepository) {
     suspend fun cancelAvailability(id: String): Either<DomainError, Unit> {
         logger.info("Cancelling availability with ID: $id")
 
+        val availabilityId =
+            AvailabilityId(id).getOrElse {
+                return failure(it)
+            }
         val availability =
-            repository.findById(AvailabilityId.fromString(id))
-                ?: return failure(AvailabilityError.NotFound(id))
+            repository.findById(availabilityId) ?: return failure(AvailabilityError.NotFound(id))
 
         val cancelled =
             availability.cancel().getOrElse {

@@ -14,6 +14,7 @@ import it.nucleo.documents.api.respondEitherStatus
 import it.nucleo.documents.application.DocumentService
 import it.nucleo.documents.application.UpdateReportCommand
 import it.nucleo.documents.domain.*
+import it.nucleo.documents.domain.errors.DocumentError
 import it.nucleo.documents.domain.report.ClinicalQuestion
 import it.nucleo.documents.domain.report.Conclusion
 import it.nucleo.documents.domain.report.Findings
@@ -48,8 +49,16 @@ fun Route.documentRoutes(documentService: DocumentService) {
                         ErrorResponse("bad_request", "Patient ID is required")
                     )
 
+            val patientIdDomain =
+                PatientId(patientId).getOrElse {
+                    return@get call.respondEitherJson(
+                        failure(DocumentError.InvalidRequest(it.message)),
+                        ListSerializer(DocumentResponse.serializer())
+                    )
+                }
+
             val result =
-                documentService.getAllDocumentsByPatient(PatientId(patientId)).map { documents ->
+                documentService.getAllDocumentsByPatient(patientIdDomain).map { documents ->
                     documents.map { it.toResponse() }
                 }
 
@@ -77,8 +86,20 @@ fun Route.documentRoutes(documentService: DocumentService) {
                     )
                 }
 
-            val patientIdDomain = PatientId(patientId)
-            val documentId = DocumentId(UUID.randomUUID().toString())
+            val patientIdDomain =
+                PatientId(patientId).getOrElse {
+                    return@post call.respondEitherJson(
+                        failure(DocumentError.InvalidRequest(it.message)),
+                        DocumentResponse.serializer()
+                    )
+                }
+            val documentId =
+                DocumentId(UUID.randomUUID().toString()).getOrElse {
+                    return@post call.respondEitherJson(
+                        failure(DocumentError.InvalidRequest(it.message)),
+                        DocumentResponse.serializer()
+                    )
+                }
 
             val document =
                 request
@@ -118,8 +139,23 @@ fun Route.documentRoutes(documentService: DocumentService) {
                         ErrorResponse("bad_request", "Document ID is required")
                     )
 
+            val patientIdDomain =
+                PatientId(patientId).getOrElse {
+                    return@get call.respondEitherJson(
+                        failure(DocumentError.InvalidRequest(it.message)),
+                        DocumentResponse.serializer()
+                    )
+                }
+            val documentIdDomain =
+                DocumentId(documentId).getOrElse {
+                    return@get call.respondEitherJson(
+                        failure(DocumentError.InvalidRequest(it.message)),
+                        DocumentResponse.serializer()
+                    )
+                }
+
             val result =
-                documentService.getDocumentById(PatientId(patientId), DocumentId(documentId)).map {
+                documentService.getDocumentById(patientIdDomain, documentIdDomain).map {
                     it.toResponse()
                 }
 
@@ -157,16 +193,63 @@ fun Route.documentRoutes(documentService: DocumentService) {
 
             val command =
                 UpdateReportCommand(
-                    findings = request.findings?.let { Findings(it) },
-                    clinicalQuestion = request.clinicalQuestion?.let { ClinicalQuestion(it) },
-                    conclusion = request.conclusion?.let { Conclusion(it) },
-                    recommendations = request.recommendations?.let { Recommendations(it) },
+                    findings =
+                        request.findings?.let {
+                            Findings(it).getOrElse { err ->
+                                return@put call.respondEitherJson(
+                                    failure(DocumentError.InvalidRequest(err.message)),
+                                    DocumentResponse.serializer()
+                                )
+                            }
+                        },
+                    clinicalQuestion =
+                        request.clinicalQuestion?.let {
+                            ClinicalQuestion(it).getOrElse { err ->
+                                return@put call.respondEitherJson(
+                                    failure(DocumentError.InvalidRequest(err.message)),
+                                    DocumentResponse.serializer()
+                                )
+                            }
+                        },
+                    conclusion =
+                        request.conclusion?.let {
+                            Conclusion(it).getOrElse { err ->
+                                return@put call.respondEitherJson(
+                                    failure(DocumentError.InvalidRequest(err.message)),
+                                    DocumentResponse.serializer()
+                                )
+                            }
+                        },
+                    recommendations =
+                        request.recommendations?.let {
+                            Recommendations(it).getOrElse { err ->
+                                return@put call.respondEitherJson(
+                                    failure(DocumentError.InvalidRequest(err.message)),
+                                    DocumentResponse.serializer()
+                                )
+                            }
+                        },
                 )
 
+            val patientIdDomain =
+                PatientId(patientId).getOrElse {
+                    return@put call.respondEitherJson(
+                        failure(DocumentError.InvalidRequest(it.message)),
+                        DocumentResponse.serializer()
+                    )
+                }
+            val documentIdDomain =
+                DocumentId(documentId).getOrElse {
+                    return@put call.respondEitherJson(
+                        failure(DocumentError.InvalidRequest(it.message)),
+                        DocumentResponse.serializer()
+                    )
+                }
+
             val result =
-                documentService
-                    .updateReport(PatientId(patientId), DocumentId(documentId), command)
-                    .map { it.toResponse() }
+                documentService.updateReport(patientIdDomain, documentIdDomain, command).map {
+                    it.toResponse()
+                }
 
             call.respondEitherJson(result, DocumentResponse.serializer())
         }
@@ -188,8 +271,24 @@ fun Route.documentRoutes(documentService: DocumentService) {
                         ErrorResponse("bad_request", "Document ID is required")
                     )
 
-            val result =
-                documentService.deleteDocument(PatientId(patientId), DocumentId(documentId))
+            val patientIdDomain =
+                PatientId(patientId).getOrElse {
+                    return@delete call.respondEitherStatus(
+                        failure(DocumentError.InvalidRequest(it.message)),
+                        HttpStatusCode.OK,
+                        DeleteResponse("Document deleted successfully")
+                    )
+                }
+            val documentIdDomain =
+                DocumentId(documentId).getOrElse {
+                    return@delete call.respondEitherStatus(
+                        failure(DocumentError.InvalidRequest(it.message)),
+                        HttpStatusCode.OK,
+                        DeleteResponse("Document deleted successfully")
+                    )
+                }
+
+            val result = documentService.deleteDocument(patientIdDomain, documentIdDomain)
 
             call.respondEitherStatus(
                 result,
@@ -211,8 +310,16 @@ fun Route.documentRoutes(documentService: DocumentService) {
                         ErrorResponse("bad_request", "Doctor ID is required")
                     )
 
+            val doctorIdDomain =
+                DoctorId(doctorId).getOrElse {
+                    return@get call.respondEitherJson(
+                        failure(DocumentError.InvalidRequest(it.message)),
+                        ListSerializer(DocumentResponse.serializer())
+                    )
+                }
+
             val result =
-                documentService.getAllDocumentsByDoctor(DoctorId(doctorId)).map { documents ->
+                documentService.getAllDocumentsByDoctor(doctorIdDomain).map { documents ->
                     documents.map { it.toResponse() }
                 }
 

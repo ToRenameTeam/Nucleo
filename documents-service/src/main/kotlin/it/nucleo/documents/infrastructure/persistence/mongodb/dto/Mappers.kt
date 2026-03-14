@@ -1,5 +1,6 @@
 package it.nucleo.documents.infrastructure.persistence.mongodb.dto
 
+import it.nucleo.commons.errors.getOrElse
 import it.nucleo.documents.domain.DoctorId
 import it.nucleo.documents.domain.Document
 import it.nucleo.documents.domain.DocumentId
@@ -113,55 +114,226 @@ fun DocumentDto.toDomain(): Document =
     when (this) {
         is MedicinePrescriptionDto ->
             MedicinePrescription(
-                id = DocumentId(id),
-                doctorId = DoctorId(doctorId),
-                patientId = PatientId(patientId),
-                issueDate = IssueDate(LocalDate.parse(issueDate)),
-                title = Title(title),
+                id =
+                    DocumentId(id).getOrElse {
+                        throw IllegalStateException("Invalid stored document id: ${it.message}")
+                    },
+                doctorId =
+                    DoctorId(doctorId).getOrElse {
+                        throw IllegalStateException("Invalid stored doctor id: ${it.message}")
+                    },
+                patientId =
+                    PatientId(patientId).getOrElse {
+                        throw IllegalStateException("Invalid stored patient id: ${it.message}")
+                    },
+                issueDate =
+                    IssueDate(LocalDate.parse(issueDate)).getOrElse {
+                        throw IllegalStateException("Invalid stored issue date: ${it.message}")
+                    },
+                title =
+                    Title(title).getOrElse {
+                        throw IllegalStateException("Invalid stored title: ${it.message}")
+                    },
                 metadata =
-                    FileMetadata(summary = Summary(summary), tags = tags.map { Tag(it) }.toSet()),
+                    FileMetadata(
+                            summary =
+                                Summary(summary).getOrElse {
+                                    throw IllegalStateException(
+                                        "Invalid stored summary: ${it.message}"
+                                    )
+                                },
+                            tags =
+                                tags
+                                    .map { rawTag ->
+                                        Tag(rawTag).getOrElse { error ->
+                                            throw IllegalStateException(
+                                                "Invalid stored tag '$rawTag': ${error.message}"
+                                            )
+                                        }
+                                    }
+                                    .toSet(),
+                        )
+                        .getOrElse {
+                            throw IllegalStateException("Invalid stored metadata: ${it.message}")
+                        },
                 validity = validity.toDomain(),
                 dosage = dosage.toDomain()
             )
         is ServicePrescriptionDto ->
             ServicePrescription(
-                id = DocumentId(id),
-                doctorId = DoctorId(doctorId),
-                patientId = PatientId(patientId),
-                issueDate = IssueDate(LocalDate.parse(issueDate)),
-                title = Title(title),
+                id =
+                    DocumentId(id).getOrElse {
+                        throw IllegalStateException("Invalid stored document id: ${it.message}")
+                    },
+                doctorId =
+                    DoctorId(doctorId).getOrElse {
+                        throw IllegalStateException("Invalid stored doctor id: ${it.message}")
+                    },
+                patientId =
+                    PatientId(patientId).getOrElse {
+                        throw IllegalStateException("Invalid stored patient id: ${it.message}")
+                    },
+                issueDate =
+                    IssueDate(LocalDate.parse(issueDate)).getOrElse {
+                        throw IllegalStateException("Invalid stored issue date: ${it.message}")
+                    },
+                title =
+                    Title(title).getOrElse {
+                        throw IllegalStateException("Invalid stored title: ${it.message}")
+                    },
                 metadata =
-                    FileMetadata(summary = Summary(summary), tags = tags.map { Tag(it) }.toSet()),
+                    FileMetadata(
+                            summary =
+                                Summary(summary).getOrElse {
+                                    throw IllegalStateException(
+                                        "Invalid stored summary: ${it.message}"
+                                    )
+                                },
+                            tags =
+                                tags
+                                    .map { rawTag ->
+                                        Tag(rawTag).getOrElse { error ->
+                                            throw IllegalStateException(
+                                                "Invalid stored tag '$rawTag': ${error.message}"
+                                            )
+                                        }
+                                    }
+                                    .toSet(),
+                        )
+                        .getOrElse {
+                            throw IllegalStateException("Invalid stored metadata: ${it.message}")
+                        },
                 validity = validity.toDomain(),
-                serviceId = ServiceId(serviceId),
-                facilityId = FacilityId(facilityId),
+                serviceId =
+                    ServiceId(serviceId).getOrElse {
+                        throw IllegalStateException("Invalid stored service id: ${it.message}")
+                    },
+                facilityId =
+                    FacilityId(facilityId).getOrElse {
+                        throw IllegalStateException("Invalid stored facility id: ${it.message}")
+                    },
                 priority = Priority.valueOf(priority)
             )
         is ReportDto ->
             DefaultReport(
-                id = DocumentId(id),
-                doctorId = DoctorId(doctorId),
-                patientId = PatientId(patientId),
-                issueDate = IssueDate(LocalDate.parse(issueDate)),
-                title = Title(title),
+                id =
+                    DocumentId(id).getOrElse {
+                        throw IllegalStateException("Invalid stored document id: ${it.message}")
+                    },
+                doctorId =
+                    DoctorId(doctorId).getOrElse {
+                        throw IllegalStateException("Invalid stored doctor id: ${it.message}")
+                    },
+                patientId =
+                    PatientId(patientId).getOrElse {
+                        throw IllegalStateException("Invalid stored patient id: ${it.message}")
+                    },
+                issueDate =
+                    IssueDate(LocalDate.parse(issueDate)).getOrElse {
+                        throw IllegalStateException("Invalid stored issue date: ${it.message}")
+                    },
+                title =
+                    Title(title).getOrElse {
+                        throw IllegalStateException("Invalid stored title: ${it.message}")
+                    },
                 metadata =
-                    FileMetadata(summary = Summary(summary), tags = tags.map { Tag(it) }.toSet()),
+                    FileMetadata(
+                            summary =
+                                Summary(summary).getOrElse {
+                                    throw IllegalStateException(
+                                        "Invalid stored summary: ${it.message}"
+                                    )
+                                },
+                            tags =
+                                tags
+                                    .map { rawTag ->
+                                        Tag(rawTag).getOrElse { error ->
+                                            throw IllegalStateException(
+                                                "Invalid stored tag '$rawTag': ${error.message}"
+                                            )
+                                        }
+                                    }
+                                    .toSet(),
+                        )
+                        .getOrElse {
+                            throw IllegalStateException("Invalid stored metadata: ${it.message}")
+                        },
                 servicePrescription = servicePrescription.toDomain() as ServicePrescription,
-                executionDate = ExecutionDate(LocalDate.parse(executionDate)),
-                clinicalQuestion = clinicalQuestion?.let { ClinicalQuestion(it) },
-                findings = Findings(findings),
-                conclusion = conclusion?.let { Conclusion(it) },
-                recommendations = recommendations?.let { Recommendations(it) }
+                executionDate =
+                    ExecutionDate(LocalDate.parse(executionDate)).getOrElse {
+                        throw IllegalStateException("Invalid stored execution date: ${it.message}")
+                    },
+                clinicalQuestion =
+                    clinicalQuestion?.let {
+                        ClinicalQuestion(it).getOrElse { err ->
+                            throw IllegalStateException(
+                                "Invalid stored clinical question: ${err.message}"
+                            )
+                        }
+                    },
+                findings =
+                    Findings(findings).getOrElse {
+                        throw IllegalStateException("Invalid stored findings: ${it.message}")
+                    },
+                conclusion =
+                    conclusion?.let {
+                        Conclusion(it).getOrElse { err ->
+                            throw IllegalStateException("Invalid stored conclusion: ${err.message}")
+                        }
+                    },
+                recommendations =
+                    recommendations?.let {
+                        Recommendations(it).getOrElse { err ->
+                            throw IllegalStateException(
+                                "Invalid stored recommendations: ${err.message}"
+                            )
+                        }
+                    }
             )
         is UploadedDocumentDto ->
             UploadedDocument(
-                id = DocumentId(id),
-                doctorId = DoctorId(doctorId),
-                patientId = PatientId(patientId),
-                issueDate = IssueDate(LocalDate.parse(issueDate)),
-                title = Title(title),
+                id =
+                    DocumentId(id).getOrElse {
+                        throw IllegalStateException("Invalid stored document id: ${it.message}")
+                    },
+                doctorId =
+                    DoctorId(doctorId).getOrElse {
+                        throw IllegalStateException("Invalid stored doctor id: ${it.message}")
+                    },
+                patientId =
+                    PatientId(patientId).getOrElse {
+                        throw IllegalStateException("Invalid stored patient id: ${it.message}")
+                    },
+                issueDate =
+                    IssueDate(LocalDate.parse(issueDate)).getOrElse {
+                        throw IllegalStateException("Invalid stored issue date: ${it.message}")
+                    },
+                title =
+                    Title(title).getOrElse {
+                        throw IllegalStateException("Invalid stored title: ${it.message}")
+                    },
                 metadata =
-                    FileMetadata(summary = Summary(summary), tags = tags.map { Tag(it) }.toSet()),
+                    FileMetadata(
+                            summary =
+                                Summary(summary).getOrElse {
+                                    throw IllegalStateException(
+                                        "Invalid stored summary: ${it.message}"
+                                    )
+                                },
+                            tags =
+                                tags
+                                    .map { rawTag ->
+                                        Tag(rawTag).getOrElse { error ->
+                                            throw IllegalStateException(
+                                                "Invalid stored tag '$rawTag': ${error.message}"
+                                            )
+                                        }
+                                    }
+                                    .toSet(),
+                        )
+                        .getOrElse {
+                            throw IllegalStateException("Invalid stored metadata: ${it.message}")
+                        },
                 filename = filename,
                 documentType = UploadedDocumentType.valueOf(documentType)
             )
@@ -173,10 +345,24 @@ fun ValidityDto.toDomain(): Validity =
         is ValidityDto.UntilExecution -> Validity.UntilExecution
     }
 
-fun DosageDto.toDomain(): Dosage =
-    Dosage(
-        medicine = MedicineId(medicineId),
-        dose = Dose(doseAmount, DoseUnit.valueOf(doseUnit)),
-        frequency = Frequency(frequencyTimesPerPeriod, Period.valueOf(frequencyPeriod)),
-        duration = Duration(durationLength, Period.valueOf(durationUnit))
-    )
+fun DosageDto.toDomain(): Dosage {
+    val medicine =
+        MedicineId(medicineId).getOrElse {
+            throw IllegalStateException("Invalid stored medicine id: ${it.message}")
+        }
+    val dose =
+        Dose(doseAmount, DoseUnit.valueOf(doseUnit)).getOrElse {
+            throw IllegalStateException("Invalid stored dose: ${it.message}")
+        }
+    val frequency =
+        Frequency(frequencyTimesPerPeriod, Period.valueOf(frequencyPeriod)).getOrElse {
+            throw IllegalStateException("Invalid stored frequency: ${it.message}")
+        }
+    val duration =
+        Duration(durationLength, Period.valueOf(durationUnit)).getOrElse {
+            throw IllegalStateException("Invalid stored duration: ${it.message}")
+        }
+
+    return Dosage(medicine = medicine, dose = dose, frequency = frequency, duration = duration)
+        .getOrElse { throw IllegalStateException("Invalid stored dosage: ${it.message}") }
+}

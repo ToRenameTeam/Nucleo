@@ -3,9 +3,10 @@ package it.nucleo.documents.application
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import it.nucleo.commons.errors.*
+import it.nucleo.commons.errors.DomainError
+import it.nucleo.commons.errors.Either
 import it.nucleo.documents.domain.*
-import it.nucleo.documents.domain.errors.*
+import it.nucleo.documents.domain.errors.DocumentError
 import it.nucleo.documents.domain.prescription.implementation.ServicePrescription
 import it.nucleo.documents.domain.report.Conclusion
 import it.nucleo.documents.domain.report.Findings
@@ -17,6 +18,16 @@ import it.nucleo.documents.fixtures.FakeFileStorageRepository
 
 class DocumentServiceTest :
     DescribeSpec({
+        fun <T> v(either: Either<DomainError, T>): T =
+            when (either) {
+                is Either.Right -> either.value
+                is Either.Left -> error("Invalid test value: ${either.error.message}")
+            }
+
+        fun p(value: String): PatientId = v(PatientId(value))
+
+        fun d(value: String): DocumentId = v(DocumentId(value))
+
         fun createService(
             documentRepo: DocumentRepository = FakeDocumentRepository(),
             fileStorageRepo: FileStorageRepository = FakeFileStorageRepository(),
@@ -32,7 +43,7 @@ class DocumentServiceTest :
             it("should return an empty list when the patient has no documents") {
                 val service = createService()
 
-                val result = service.getAllDocumentsByPatient(PatientId("unknown"))
+                val result = service.getAllDocumentsByPatient(p("unknown"))
 
                 result.shouldBeInstanceOf<Either.Right<List<Document>>>()
                 result.value shouldBe emptyList()
@@ -42,10 +53,9 @@ class DocumentServiceTest :
                 val repo = FakeDocumentRepository()
                 val service = createService(documentRepo = repo)
                 val prescription = DocumentFixtures.medicinePrescription()
-                repo.addDocument(PatientId(DocumentFixtures.PATIENT_ID), prescription)
+                repo.addDocument(p(DocumentFixtures.PATIENT_ID), prescription)
 
-                val result =
-                    service.getAllDocumentsByPatient(PatientId(DocumentFixtures.PATIENT_ID))
+                val result = service.getAllDocumentsByPatient(p(DocumentFixtures.PATIENT_ID))
 
                 result.shouldBeInstanceOf<Either.Right<List<Document>>>()
                 result.value.size shouldBe 1
@@ -58,12 +68,12 @@ class DocumentServiceTest :
                 val repo = FakeDocumentRepository()
                 val service = createService(documentRepo = repo)
                 val prescription = DocumentFixtures.medicinePrescription()
-                repo.addDocument(PatientId(DocumentFixtures.PATIENT_ID), prescription)
+                repo.addDocument(p(DocumentFixtures.PATIENT_ID), prescription)
 
                 val result =
                     service.getDocumentById(
-                        PatientId(DocumentFixtures.PATIENT_ID),
-                        DocumentId(DocumentFixtures.DOCUMENT_ID),
+                        p(DocumentFixtures.PATIENT_ID),
+                        d(DocumentFixtures.DOCUMENT_ID),
                     )
 
                 result.shouldBeInstanceOf<Either.Right<Document>>()
@@ -73,11 +83,7 @@ class DocumentServiceTest :
             it("should return NotFound when the document does not exist") {
                 val service = createService()
 
-                val result =
-                    service.getDocumentById(
-                        PatientId("unknown-patient"),
-                        DocumentId("unknown-doc"),
-                    )
+                val result = service.getDocumentById(p("unknown-patient"), d("unknown-doc"))
 
                 result.shouldBeInstanceOf<Either.Left<DocumentError.NotFound>>()
             }
@@ -88,12 +94,12 @@ class DocumentServiceTest :
                 val repo = FakeDocumentRepository()
                 val service = createService(documentRepo = repo)
                 val sp = DocumentFixtures.servicePrescription()
-                repo.addDocument(PatientId(DocumentFixtures.PATIENT_ID), sp)
+                repo.addDocument(p(DocumentFixtures.PATIENT_ID), sp)
 
                 val result =
                     service.getServicePrescription(
-                        PatientId(DocumentFixtures.PATIENT_ID),
-                        DocumentId(DocumentFixtures.SERVICE_PRESCRIPTION_ID),
+                        p(DocumentFixtures.PATIENT_ID),
+                        d(DocumentFixtures.SERVICE_PRESCRIPTION_ID),
                     )
 
                 result.shouldBeInstanceOf<Either.Right<ServicePrescription>>()
@@ -103,11 +109,7 @@ class DocumentServiceTest :
             it("should return NotFound when the document does not exist") {
                 val service = createService()
 
-                val result =
-                    service.getServicePrescription(
-                        PatientId("unknown"),
-                        DocumentId("unknown"),
-                    )
+                val result = service.getServicePrescription(p("unknown"), d("unknown"))
 
                 result.shouldBeInstanceOf<Either.Left<DocumentError>>()
             }
@@ -116,12 +118,12 @@ class DocumentServiceTest :
                 val repo = FakeDocumentRepository()
                 val service = createService(documentRepo = repo)
                 val mp = DocumentFixtures.medicinePrescription()
-                repo.addDocument(PatientId(DocumentFixtures.PATIENT_ID), mp)
+                repo.addDocument(p(DocumentFixtures.PATIENT_ID), mp)
 
                 val result =
                     service.getServicePrescription(
-                        PatientId(DocumentFixtures.PATIENT_ID),
-                        DocumentId(DocumentFixtures.DOCUMENT_ID),
+                        p(DocumentFixtures.PATIENT_ID),
+                        d(DocumentFixtures.DOCUMENT_ID),
                     )
 
                 result.shouldBeInstanceOf<Either.Left<DocumentError.InvalidType>>()
@@ -140,19 +142,17 @@ class DocumentServiceTest :
                 result.shouldBeInstanceOf<Either.Right<Document>>()
                 result.value.id.id shouldBe DocumentFixtures.DOCUMENT_ID
 
-                // Verify the document was persisted
                 val stored =
                     docRepo.findDocumentById(
-                        PatientId(DocumentFixtures.PATIENT_ID),
-                        DocumentId(DocumentFixtures.DOCUMENT_ID),
+                        p(DocumentFixtures.PATIENT_ID),
+                        d(DocumentFixtures.DOCUMENT_ID),
                     )
                 stored.shouldBeInstanceOf<Either.Right<Document>>()
 
-                // Verify the PDF was stored
                 val pdf =
                     fileRepo.retrieve(
-                        PatientId(DocumentFixtures.PATIENT_ID),
-                        DocumentId(DocumentFixtures.DOCUMENT_ID),
+                        p(DocumentFixtures.PATIENT_ID),
+                        d(DocumentFixtures.DOCUMENT_ID),
                     )
                 pdf.shouldBeInstanceOf<Either.Right<StoredFile>>()
             }
@@ -163,7 +163,7 @@ class DocumentServiceTest :
                 val service = createService(documentRepo = docRepo, fileStorageRepo = fileRepo)
 
                 val sp = DocumentFixtures.servicePrescription()
-                docRepo.addDocument(PatientId(DocumentFixtures.PATIENT_ID), sp)
+                docRepo.addDocument(p(DocumentFixtures.PATIENT_ID), sp)
 
                 val report = DocumentFixtures.report(servicePrescription = sp)
                 val result = service.createDocument(report)
@@ -179,21 +179,20 @@ class DocumentServiceTest :
                 val repo = FakeDocumentRepository()
                 val service = createService(documentRepo = repo)
                 val prescription = DocumentFixtures.medicinePrescription()
-                repo.addDocument(PatientId(DocumentFixtures.PATIENT_ID), prescription)
+                repo.addDocument(p(DocumentFixtures.PATIENT_ID), prescription)
 
                 val result =
                     service.deleteDocument(
-                        PatientId(DocumentFixtures.PATIENT_ID),
-                        DocumentId(DocumentFixtures.DOCUMENT_ID),
+                        p(DocumentFixtures.PATIENT_ID),
+                        d(DocumentFixtures.DOCUMENT_ID),
                     )
 
                 result.shouldBeInstanceOf<Either.Right<Unit>>()
 
-                // Verify it is gone
                 val lookup =
                     repo.findDocumentById(
-                        PatientId(DocumentFixtures.PATIENT_ID),
-                        DocumentId(DocumentFixtures.DOCUMENT_ID),
+                        p(DocumentFixtures.PATIENT_ID),
+                        d(DocumentFixtures.DOCUMENT_ID),
                     )
                 lookup.shouldBeInstanceOf<Either.Left<DocumentError.NotFound>>()
             }
@@ -201,11 +200,7 @@ class DocumentServiceTest :
             it("should return NotFound when the document does not exist") {
                 val service = createService()
 
-                val result =
-                    service.deleteDocument(
-                        PatientId("unknown"),
-                        DocumentId("unknown"),
-                    )
+                val result = service.deleteDocument(p("unknown"), d("unknown"))
 
                 result.shouldBeInstanceOf<Either.Left<DocumentError.NotFound>>()
             }
@@ -219,13 +214,12 @@ class DocumentServiceTest :
 
                 val sp = DocumentFixtures.servicePrescription()
                 val report = DocumentFixtures.report(servicePrescription = sp)
-                docRepo.addDocument(PatientId(DocumentFixtures.PATIENT_ID), sp)
-                docRepo.addDocument(PatientId(DocumentFixtures.PATIENT_ID), report)
+                docRepo.addDocument(p(DocumentFixtures.PATIENT_ID), sp)
+                docRepo.addDocument(p(DocumentFixtures.PATIENT_ID), report)
 
-                // Also store a fake PDF so regeneration succeeds
                 fileRepo.store(
-                    PatientId(DocumentFixtures.PATIENT_ID),
-                    DocumentId(DocumentFixtures.REPORT_ID),
+                    p(DocumentFixtures.PATIENT_ID),
+                    d(DocumentFixtures.REPORT_ID),
                     "report.pdf",
                     ByteArray(0).inputStream(),
                     0,
@@ -234,34 +228,28 @@ class DocumentServiceTest :
 
                 val command =
                     UpdateReportCommand(
-                        findings = Findings("Updated findings"),
-                        conclusion = Conclusion("New conclusion"),
+                        findings = v(Findings("Updated findings")),
+                        conclusion = v(Conclusion("New conclusion")),
                     )
 
                 val result =
                     service.updateReport(
-                        PatientId(DocumentFixtures.PATIENT_ID),
-                        DocumentId(DocumentFixtures.REPORT_ID),
+                        p(DocumentFixtures.PATIENT_ID),
+                        d(DocumentFixtures.REPORT_ID),
                         command,
                     )
 
                 result.shouldBeInstanceOf<Either.Right<Report>>()
                 result.value.findings.text shouldBe "Updated findings"
                 result.value.conclusion?.text shouldBe "New conclusion"
-                // Unchanged field
                 result.value.recommendations?.text shouldBe "Repeat in 12 months"
             }
 
             it("should return NotFound when the document does not exist") {
                 val service = createService()
 
-                val command = UpdateReportCommand(findings = Findings("New findings"))
-                val result =
-                    service.updateReport(
-                        PatientId("unknown"),
-                        DocumentId("unknown"),
-                        command,
-                    )
+                val command = UpdateReportCommand(findings = v(Findings("New findings")))
+                val result = service.updateReport(p("unknown"), d("unknown"), command)
 
                 result.shouldBeInstanceOf<Either.Left<DomainError>>()
             }
@@ -272,13 +260,13 @@ class DocumentServiceTest :
                 val service = createService(documentRepo = docRepo, fileStorageRepo = fileRepo)
 
                 val prescription = DocumentFixtures.medicinePrescription()
-                docRepo.addDocument(PatientId(DocumentFixtures.PATIENT_ID), prescription)
+                docRepo.addDocument(p(DocumentFixtures.PATIENT_ID), prescription)
 
-                val command = UpdateReportCommand(findings = Findings("New findings"))
+                val command = UpdateReportCommand(findings = v(Findings("New findings")))
                 val result =
                     service.updateReport(
-                        PatientId(DocumentFixtures.PATIENT_ID),
-                        DocumentId(DocumentFixtures.DOCUMENT_ID),
+                        p(DocumentFixtures.PATIENT_ID),
+                        d(DocumentFixtures.DOCUMENT_ID),
                         command,
                     )
 
@@ -292,18 +280,18 @@ class DocumentServiceTest :
 
                 val sp = DocumentFixtures.servicePrescription()
                 val report = DocumentFixtures.report(servicePrescription = sp)
-                docRepo.addDocument(PatientId(DocumentFixtures.PATIENT_ID), sp)
-                docRepo.addDocument(PatientId(DocumentFixtures.PATIENT_ID), report)
+                docRepo.addDocument(p(DocumentFixtures.PATIENT_ID), sp)
+                docRepo.addDocument(p(DocumentFixtures.PATIENT_ID), report)
 
                 val command =
                     UpdateReportCommand(
-                        recommendations = Recommendations("Updated recommendations only"),
+                        recommendations = v(Recommendations("Updated recommendations only")),
                     )
 
                 val result =
                     service.updateReport(
-                        PatientId(DocumentFixtures.PATIENT_ID),
-                        DocumentId(DocumentFixtures.REPORT_ID),
+                        p(DocumentFixtures.PATIENT_ID),
+                        d(DocumentFixtures.REPORT_ID),
                         command,
                     )
 

@@ -36,11 +36,23 @@ fun Route.downloadRoutes(downloadService: DocumentDownloadService) {
                         ErrorResponse("bad_request", "Document ID is required")
                     )
 
+            val patientIdDomain =
+                PatientId(patientId).getOrElse {
+                    return@get call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse("bad_request", it.message)
+                    )
+                }
+            val documentIdDomain =
+                DocumentId(documentId).getOrElse {
+                    return@get call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse("bad_request", it.message)
+                    )
+                }
+
             val query =
-                DownloadDocumentQuery(
-                    patientId = PatientId(patientId),
-                    documentId = DocumentId(documentId)
-                )
+                DownloadDocumentQuery(patientId = patientIdDomain, documentId = documentIdDomain)
 
             when (val result = downloadService.download(query)) {
                 is Either.Right -> {

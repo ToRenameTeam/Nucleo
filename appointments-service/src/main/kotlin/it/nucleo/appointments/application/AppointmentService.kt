@@ -20,8 +20,14 @@ class AppointmentService(
     ): Either<DomainError, Appointment> {
         logger.info("Creating appointment for patient: $patientId")
 
-        val patientId = PatientId.fromString(patientId)
-        val availabilityId = AvailabilityId.fromString(availabilityId)
+        val patientId =
+            PatientId(patientId).getOrElse {
+                return failure(it)
+            }
+        val availabilityId =
+            AvailabilityId(availabilityId).getOrElse {
+                return failure(it)
+            }
 
         val availability =
             availabilityRepository.findById(availabilityId)
@@ -49,7 +55,11 @@ class AppointmentService(
     suspend fun getAppointmentById(id: String): Either<DomainError, Appointment> {
         logger.info("Fetching appointment by ID: $id")
 
-        val appointment = appointmentRepository.findById(AppointmentId.fromString(id))
+        val appointmentId =
+            AppointmentId(id).getOrElse {
+                return failure(it)
+            }
+        val appointment = appointmentRepository.findById(appointmentId)
 
         if (appointment == null) {
             logger.warn("Appointment not found with ID: $id")
@@ -63,8 +73,12 @@ class AppointmentService(
     suspend fun getAppointmentDetails(id: String): Either<DomainError, AppointmentDetails> {
         logger.info("Fetching appointment details by ID: $id")
 
+        val appointmentId =
+            AppointmentId(id).getOrElse {
+                return failure(it)
+            }
         val appointment =
-            appointmentRepository.findById(AppointmentId.fromString(id))
+            appointmentRepository.findById(appointmentId)
                 ?: run {
                     logger.warn("Appointment not found with ID: $id")
                     return failure(AppointmentError.NotFound(id))
@@ -88,8 +102,18 @@ class AppointmentService(
         doctorId: String?,
         status: String?
     ): Either<DomainError, List<Appointment>> {
-        val patientIdValue = patientId?.let { PatientId.fromString(it) }
-        val doctorIdValue = doctorId?.let { DoctorId.fromString(it) }
+        val patientIdValue =
+            patientId?.let {
+                PatientId(it).getOrElse { error ->
+                    return failure(error)
+                }
+            }
+        val doctorIdValue =
+            doctorId?.let {
+                DoctorId(it).getOrElse { error ->
+                    return failure(error)
+                }
+            }
         val statusValue = status?.let { AppointmentStatus.valueOf(it) }
 
         logger.info(
@@ -110,8 +134,12 @@ class AppointmentService(
     ): Either<DomainError, Appointment> {
         logger.info("Updating appointment with ID: $id")
 
+        val appointmentId =
+            AppointmentId(id).getOrElse {
+                return failure(it)
+            }
         val appointment =
-            appointmentRepository.findById(AppointmentId.fromString(id))
+            appointmentRepository.findById(appointmentId)
                 ?: return failure(AppointmentError.NotFound(id))
 
         val updated =
@@ -133,7 +161,10 @@ class AppointmentService(
                     }
                 }
                 availabilityId != null -> {
-                    val newAvailabilityId = AvailabilityId.fromString(availabilityId)
+                    val newAvailabilityId =
+                        AvailabilityId(availabilityId).getOrElse {
+                            return failure(it)
+                        }
 
                     val newAvailability =
                         availabilityRepository.findById(newAvailabilityId)
@@ -186,7 +217,10 @@ class AppointmentService(
     suspend fun deleteAppointment(id: String): Either<DomainError, Unit> {
         logger.info("Deleting appointment with ID: $id")
 
-        val appointmentId = AppointmentId.fromString(id)
+        val appointmentId =
+            AppointmentId(id).getOrElse {
+                return failure(it)
+            }
         val appointment =
             appointmentRepository.findById(appointmentId)
                 ?: run {

@@ -12,13 +12,25 @@ import it.nucleo.documents.fixtures.FakeFileStorageRepository
 
 class DocumentDownloadServiceTest :
     DescribeSpec({
+        fun patientId(value: String): PatientId =
+            when (val result = PatientId(value)) {
+                is Either.Right -> result.value
+                is Either.Left -> error("Invalid test patientId: ${result.error.message}")
+            }
+
+        fun documentId(value: String): DocumentId =
+            when (val result = DocumentId(value)) {
+                is Either.Right -> result.value
+                is Either.Left -> error("Invalid test documentId: ${result.error.message}")
+            }
+
         describe("download") {
             it("should return the stored file when it exists") {
                 val fileRepo = FakeFileStorageRepository()
                 val service = DocumentDownloadService(fileRepo)
 
-                val patientId = PatientId("patient-001")
-                val documentId = DocumentId("doc-001")
+                val patientId = patientId("patient-001")
+                val documentId = documentId("doc-001")
                 val content = "PDF content".toByteArray()
 
                 fileRepo.store(
@@ -48,8 +60,8 @@ class DocumentDownloadServiceTest :
                 val result =
                     service.download(
                         DownloadDocumentQuery(
-                            PatientId("unknown"),
-                            DocumentId("unknown"),
+                            patientId("unknown"),
+                            documentId("unknown"),
                         ),
                     )
 
@@ -60,8 +72,8 @@ class DocumentDownloadServiceTest :
                 val fileRepo = FakeFileStorageRepository()
                 val service = DocumentDownloadService(fileRepo)
 
-                val patientA = PatientId("patient-a")
-                val documentId = DocumentId("doc-001")
+                val patientA = patientId("patient-a")
+                val documentId = documentId("doc-001")
                 val content = "secret".toByteArray()
 
                 fileRepo.store(
@@ -75,7 +87,7 @@ class DocumentDownloadServiceTest :
 
                 val result =
                     service.download(
-                        DownloadDocumentQuery(PatientId("patient-b"), documentId),
+                        DownloadDocumentQuery(patientId("patient-b"), documentId),
                     )
 
                 result.shouldBeInstanceOf<Either.Left<StorageError.FileNotFound>>()

@@ -7,12 +7,15 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import it.nucleo.commons.api.ErrorResponse
+import it.nucleo.commons.errors.failure
+import it.nucleo.commons.errors.getOrElse
 import it.nucleo.commons.errors.map
 import it.nucleo.documents.api.dto.UploadResponse
 import it.nucleo.documents.api.respondEither
 import it.nucleo.documents.application.DocumentUploadService
 import it.nucleo.documents.application.UploadDocumentCommand
 import it.nucleo.documents.domain.PatientId
+import it.nucleo.documents.domain.errors.DocumentError
 
 private const val PDF_CONTENT_TYPE = "application/pdf"
 
@@ -33,6 +36,14 @@ fun Route.uploadRoutes(uploadService: DocumentUploadService) {
                         HttpStatusCode.BadRequest,
                         ErrorResponse("bad_request", "Patient ID is required")
                     )
+
+            val patientIdDomain =
+                PatientId(patientId).getOrElse {
+                    return@post call.respondEither(
+                        failure(DocumentError.InvalidRequest(it.message)),
+                        HttpStatusCode.BadRequest
+                    )
+                }
 
             val multipart =
                 try {
@@ -63,7 +74,7 @@ fun Route.uploadRoutes(uploadService: DocumentUploadService) {
                             } else {
                                 val command =
                                     UploadDocumentCommand(
-                                        patientId = PatientId(patientId),
+                                        patientId = patientIdDomain,
                                         filename = filename,
                                         content = bytes,
                                         contentType = contentType

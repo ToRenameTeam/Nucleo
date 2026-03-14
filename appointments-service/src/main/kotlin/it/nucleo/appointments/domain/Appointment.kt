@@ -70,11 +70,16 @@ data class Appointment(
 }
 
 @JvmInline
-value class AppointmentId(val value: String) {
+value class AppointmentId private constructor(val value: String) {
     companion object {
         fun generate(): AppointmentId = AppointmentId(UUID.randomUUID().toString())
 
-        fun fromString(value: String): AppointmentId = AppointmentId(value)
+        operator fun invoke(value: String): Either<DomainError, AppointmentId> {
+            if (value.isBlank()) {
+                return failure(ValidationError("AppointmentId cannot be blank"))
+            }
+            return success(AppointmentId(value))
+        }
     }
 
     override fun toString(): String = value
@@ -97,9 +102,17 @@ enum class AppointmentStatus {
 }
 
 @JvmInline
-value class PatientId(val value: String) {
+value class PatientId private constructor(val value: String) {
     companion object {
-        fun fromString(value: String): PatientId = PatientId(value)
+        operator fun invoke(value: String): Either<DomainError, PatientId> {
+            if (value.isBlank()) {
+                return failure(ValidationError("PatientId cannot be blank"))
+            }
+            if (value.length > 50) {
+                return failure(ValidationError("PatientId cannot exceed 50 characters"))
+            }
+            return success(PatientId(value))
+        }
     }
 
     override fun toString(): String = value
