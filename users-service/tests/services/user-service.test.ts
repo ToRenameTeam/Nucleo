@@ -1,7 +1,7 @@
 import { UserService } from '../../src/services/index.js';
-import { UserRepository, UserData } from '../../src/domain/repositories/index.js';
-import { PatientRepository, PatientData } from '../../src/domain/repositories/index.js';
-import { DoctorRepository, DoctorData } from '../../src/domain/repositories/index.js';
+import { UserRepository } from '../../src/domain/repositories/index.js';
+import { PatientRepository } from '../../src/domain/repositories/index.js';
+import { DoctorRepository } from '../../src/domain/repositories/index.js';
 import { randomUUID } from 'crypto';
 
 describe('UserService', () => {
@@ -289,7 +289,8 @@ describe('UserService', () => {
 
       expect(result.users).toHaveLength(2);
       expect(result.users[0]?.fiscalCode).toBe('RSSMRA80A01H501U');
-      expect(result.users[1]?.doctor).toEqual({
+      expect(result.users[1]?.doctor).toMatchObject({
+        userId: user2Id,
         medicalLicenseNumber: 'ML123456',
         specializations: ['Cardiologia'],
       });

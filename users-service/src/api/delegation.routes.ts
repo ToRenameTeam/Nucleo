@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { delegationService } from '../services/index.js';
-import { success, error } from './utils/response.js';
+import { success } from './utils/response.js';
 import { handleRouteError } from './utils/http-helpers.js';
 import {
   delegationStatusSchema,
