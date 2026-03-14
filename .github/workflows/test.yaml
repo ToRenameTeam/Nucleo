@@ -95,6 +95,12 @@ jobs:
       - name: Run tests
         run: pnpm --filter @nucleo/users-service test
 
+      - name: Verify Docker availability
+        run: docker info
+
+      - name: Run integration tests
+        run: pnpm --filter @nucleo/users-service test:integration
+
   test-master-data-service:
     name: Test – master-data-service
     runs-on: ubuntu-latest
