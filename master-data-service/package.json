@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
-    "test": "jest"
+    "test": "jest",
+    "test:integration": "jest --runInBand --testTimeout=120000 tests/integration"
   },
   "author": "",
   "license": "ISC",
@@ -27,6 +28,7 @@
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
     "jest": "catalog:",
+    "testcontainers": "^11.8.1",
     "ts-jest": "catalog:"
   }
 }

@@ -1,61 +1,41 @@
 import 'dotenv/config';
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import { serviceCatalogRoutes, facilityRoutes, medicineRoutes } from './api/index.js';
-import { runSeeds } from './infrastructure/database/index.js';
+import { type Server } from 'node:http';
+import { DEFAULT_PORT, disconnectDB, startServer } from './app.js';
 
-const app = express();
-const PORT = process.env.PORT || 3040;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/master_data_db';
+const port = Number(process.env.PORT) || DEFAULT_PORT;
+let server: Server | null = null;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    service: 'master-data-service',
-  });
+bootstrap().catch(function (error) {
+  console.error('Failed to start master-data-service:', error);
+  process.exit(1);
 });
 
-// Routes
-app.use('/api/service-catalog', serviceCatalogRoutes);
-app.use('/api/facilities', facilityRoutes);
-app.use('/api/medicines', medicineRoutes);
+async function bootstrap() {
+  server = await startServer({ port });
 
-startServer();
-
-// Start server
-async function startServer() {
-  await connectDB();
-  await runSeeds();
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Health check: http://localhost:${PORT}/health`);
-    console.log(`Service Catalog API: http://localhost:${PORT}/api/service-catalog`);
-    console.log(`Facilities API: http://localhost:${PORT}/api/facilities`);
-    console.log(`Medicines API: http://localhost:${PORT}/api/medicines`);
-  });
+  console.log(`Server running on port ${port}`);
+  console.log(`Health check: http://localhost:${port}/health`);
+  console.log(`Service Catalog API: http://localhost:${port}/api/service-catalog`);
+  console.log(`Facilities API: http://localhost:${port}/api/facilities`);
+  console.log(`Medicines API: http://localhost:${port}/api/medicines`);
 }
 
-// Connect to MongoDB
-async function connectDB() {
-  try {
-    await mongoose.connect(MONGO_URI);
-    console.log('Connected to MongoDB');
-  } catch (error) {
-    console.error('MongoDB connection error:', error);
-    process.exit(1);
-  }
-}
-
-process.on('SIGINT', async () => {
+process.on('SIGINT', async function () {
   console.log('\nShutting down gracefully...');
-  await mongoose.connection.close();
+
+  if (server) {
+    await new Promise<void>(function (resolve, reject) {
+      server?.close(function (error) {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+
+  await disconnectDB();
   process.exit(0);
 });
