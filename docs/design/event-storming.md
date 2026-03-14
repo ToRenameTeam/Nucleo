@@ -30,7 +30,7 @@ We identified **Pivotal Points**, which are significant events marking a transit
 
 ## Commands (+ People & Systems)
 
-For every event, we identified the **Command** that triggered it. We specified the *actors* (Patient or Doctor) initiating the action and noted whenever an *external system* was required to complete the operation.
+For every event, we identified the **Command** that triggered it. We specified the _actors_ (Patient or Doctor) initiating the action and noted whenever an _external system_ was required to complete the operation.
 
 ![Commands People Systems](../figures/event_storming/2a_commands-people-systems.svg)
 
