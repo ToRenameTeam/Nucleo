@@ -1,12 +1,43 @@
 import { Router } from 'express';
+import { z } from 'zod';
 import {
   serviceCatalogService,
   ServiceCatalogValidationError,
   ServiceCatalogConflictError,
 } from '../services/index.js';
+import { ServiceCategory } from '../domain/index.js';
 import { parseBooleanQuery, sendError, sendServerError, sendSuccess } from './route.utils.js';
+import {
+  ApiValidationError,
+  booleanQueryValueSchema,
+  idParamSchema,
+  nonEmptyTrimmedStringSchema,
+  optionalTrimmedStringSchema,
+  validateWithSchema,
+} from './validation.js';
 
 const router = Router();
+
+const serviceCatalogListQuerySchema = z.object({
+  category: z.nativeEnum(ServiceCategory).optional(),
+  active: booleanQueryValueSchema.optional(),
+  search: optionalTrimmedStringSchema,
+});
+
+const createServiceTypeBodySchema = z.object({
+  code: nonEmptyTrimmedStringSchema,
+  name: nonEmptyTrimmedStringSchema,
+  description: optionalTrimmedStringSchema,
+  category: z.array(z.nativeEnum(ServiceCategory)).min(1),
+  isActive: z.boolean().optional(),
+});
+
+const updateServiceTypeBodySchema = z.object({
+  name: optionalTrimmedStringSchema,
+  description: optionalTrimmedStringSchema,
+  category: z.array(z.nativeEnum(ServiceCategory)).min(1).optional(),
+  isActive: z.boolean().optional(),
+});
 
 /**
  * GET /api/service-catalog
@@ -14,12 +45,16 @@ const router = Router();
  */
 router.get('/', async (req, res) => {
   try {
-    const { category, active, search } = req.query;
+    const query = validateWithSchema(
+      serviceCatalogListQuerySchema,
+      req.query,
+      'service catalog query'
+    );
 
     const serviceTypes = await serviceCatalogService.findAll({
-      category: category as string | undefined,
-      active: parseBooleanQuery(active),
-      search: search as string | undefined,
+      category: query.category,
+      active: parseBooleanQuery(query.active),
+      search: query.search,
     });
 
     sendSuccess(res, serviceTypes, 200, { count: serviceTypes.length });
@@ -45,7 +80,8 @@ router.get('/categories', (_req, res) => {
  */
 router.get('/:id', async (req, res) => {
   try {
-    const serviceType = await serviceCatalogService.findById(req.params.id);
+    const params = validateWithSchema(idParamSchema, req.params, 'service type id parameter');
+    const serviceType = await serviceCatalogService.findById(params.id);
 
     if (!serviceType) {
       sendError(res, 404, 'Service type not found');
@@ -65,18 +101,27 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    const { code, name, description, category, isActive } = req.body;
+    const body = validateWithSchema(
+      createServiceTypeBodySchema,
+      req.body,
+      'create service type body'
+    );
 
     const serviceType = await serviceCatalogService.create({
-      code,
-      name,
-      description,
-      category,
-      isActive,
+      code: body.code,
+      name: body.name,
+      description: body.description,
+      category: body.category,
+      isActive: body.isActive,
     });
 
     sendSuccess(res, serviceType, 201);
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      sendError(res, 400, error.message);
+      return;
+    }
+
     if (error instanceof ServiceCatalogValidationError) {
       sendError(res, 400, error.message);
       return;
@@ -98,13 +143,18 @@ router.post('/', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   try {
-    const { name, description, category, isActive } = req.body;
+    const params = validateWithSchema(idParamSchema, req.params, 'service type id parameter');
+    const body = validateWithSchema(
+      updateServiceTypeBodySchema,
+      req.body,
+      'update service type body'
+    );
 
-    const serviceType = await serviceCatalogService.update(req.params.id, {
-      name,
-      description,
-      category,
-      isActive,
+    const serviceType = await serviceCatalogService.update(params.id, {
+      name: body.name,
+      description: body.description,
+      category: body.category,
+      isActive: body.isActive,
     });
 
     if (!serviceType) {
@@ -114,6 +164,11 @@ router.put('/:id', async (req, res) => {
 
     sendSuccess(res, serviceType);
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      sendError(res, 400, error.message);
+      return;
+    }
+
     console.error('Error updating service type:', error);
     sendServerError(res, 'Failed to update service type');
   }
@@ -125,7 +180,8 @@ router.put('/:id', async (req, res) => {
  */
 router.delete('/:id', async (req, res) => {
   try {
-    const serviceType = await serviceCatalogService.softDelete(req.params.id);
+    const params = validateWithSchema(idParamSchema, req.params, 'service type id parameter');
+    const serviceType = await serviceCatalogService.softDelete(params.id);
 
     if (!serviceType) {
       sendError(res, 404, 'Service type not found');
@@ -134,6 +190,11 @@ router.delete('/:id', async (req, res) => {
 
     sendSuccess(res, serviceType, 200, { message: 'Service type deactivated successfully' });
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      sendError(res, 400, error.message);
+      return;
+    }
+
     console.error('Error deleting service type:', error);
     sendServerError(res, 'Failed to delete service type');
   }
@@ -145,7 +206,8 @@ router.delete('/:id', async (req, res) => {
  */
 router.delete('/:id/permanent', async (req, res) => {
   try {
-    const serviceType = await serviceCatalogService.permanentDelete(req.params.id);
+    const params = validateWithSchema(idParamSchema, req.params, 'service type id parameter');
+    const serviceType = await serviceCatalogService.permanentDelete(params.id);
 
     if (!serviceType) {
       sendError(res, 404, 'Service type not found');
@@ -154,6 +216,11 @@ router.delete('/:id/permanent', async (req, res) => {
 
     sendSuccess(res, null, 200, { message: 'Service type permanently deleted' });
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      sendError(res, 400, error.message);
+      return;
+    }
+
     console.error('Error permanently deleting service type:', error);
     sendServerError(res, 'Failed to permanently delete service type');
   }

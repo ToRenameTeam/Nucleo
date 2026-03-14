@@ -1,4 +1,4 @@
-import { FacilityModel } from '../../database/models/index.js';
+import { FacilityModel } from '../../database/index.js';
 import type { Facility } from '../../../domain/index.js';
 import type {
   FacilityRepository,

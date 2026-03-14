@@ -89,16 +89,19 @@ data class Availability(
 
 @Serializable
 @JvmInline
-value class AvailabilityId(val value: String) {
-    init {
-        require(value.isNotBlank()) { "AvailabilityId cannot be blank" }
-        require(isValidUUID(value)) { "AvailabilityId must be a valid UUID" }
-    }
-
+value class AvailabilityId private constructor(val value: String) {
     companion object {
         fun generate(): AvailabilityId = AvailabilityId(UUID.randomUUID().toString())
 
-        fun fromString(value: String): AvailabilityId = AvailabilityId(value)
+        operator fun invoke(value: String): Either<DomainError, AvailabilityId> {
+            if (value.isBlank()) {
+                return failure(ValidationError("AvailabilityId cannot be blank"))
+            }
+            if (!isValidUUID(value)) {
+                return failure(ValidationError("AvailabilityId must be a valid UUID"))
+            }
+            return success(AvailabilityId(value))
+        }
 
         private fun isValidUUID(value: String): Boolean {
             return try {
@@ -122,14 +125,17 @@ enum class AvailabilityStatus {
 
 @Serializable
 @JvmInline
-value class DoctorId(val value: String) {
-    init {
-        require(value.isNotBlank()) { "DoctorId cannot be blank" }
-        require(value.length <= 50) { "DoctorId cannot exceed 50 characters" }
-    }
-
+value class DoctorId private constructor(val value: String) {
     companion object {
-        fun fromString(value: String): DoctorId = DoctorId(value)
+        operator fun invoke(value: String): Either<DomainError, DoctorId> {
+            if (value.isBlank()) {
+                return failure(ValidationError("DoctorId cannot be blank"))
+            }
+            if (value.length > 50) {
+                return failure(ValidationError("DoctorId cannot exceed 50 characters"))
+            }
+            return success(DoctorId(value))
+        }
     }
 
     override fun toString(): String = value
@@ -137,14 +143,17 @@ value class DoctorId(val value: String) {
 
 @Serializable
 @JvmInline
-value class FacilityId(val value: String) {
-    init {
-        require(value.isNotBlank()) { "FacilityId cannot be blank" }
-        require(value.length <= 50) { "FacilityId cannot exceed 50 characters" }
-    }
-
+value class FacilityId private constructor(val value: String) {
     companion object {
-        fun fromString(value: String): FacilityId = FacilityId(value)
+        operator fun invoke(value: String): Either<DomainError, FacilityId> {
+            if (value.isBlank()) {
+                return failure(ValidationError("FacilityId cannot be blank"))
+            }
+            if (value.length > 50) {
+                return failure(ValidationError("FacilityId cannot exceed 50 characters"))
+            }
+            return success(FacilityId(value))
+        }
     }
 
     override fun toString(): String = value
@@ -152,24 +161,39 @@ value class FacilityId(val value: String) {
 
 @Serializable
 @JvmInline
-value class ServiceTypeId(val value: String) {
-    init {
-        require(value.isNotBlank()) { "ServiceTypeId cannot be blank" }
-        require(value.length <= 50) { "ServiceTypeId cannot exceed 50 characters" }
-    }
-
+value class ServiceTypeId private constructor(val value: String) {
     companion object {
-        fun fromString(value: String): ServiceTypeId = ServiceTypeId(value)
+        operator fun invoke(value: String): Either<DomainError, ServiceTypeId> {
+            if (value.isBlank()) {
+                return failure(ValidationError("ServiceTypeId cannot be blank"))
+            }
+            if (value.length > 50) {
+                return failure(ValidationError("ServiceTypeId cannot exceed 50 characters"))
+            }
+            return success(ServiceTypeId(value))
+        }
     }
 
     override fun toString(): String = value
 }
 
 @Serializable
-data class TimeSlot(val startDateTime: LocalDateTime, val durationMinutes: Int) {
-    init {
-        require(durationMinutes > 0) { "Duration must be positive" }
-        require(durationMinutes <= 1440) { "Duration cannot exceed 24 hours (1440 minutes)" }
+@ConsistentCopyVisibility
+data class TimeSlot
+private constructor(val startDateTime: LocalDateTime, val durationMinutes: Int) {
+    companion object {
+        operator fun invoke(
+            startDateTime: LocalDateTime,
+            durationMinutes: Int,
+        ): Either<DomainError, TimeSlot> {
+            if (durationMinutes <= 0) {
+                return failure(ValidationError("Duration must be positive"))
+            }
+            if (durationMinutes > 1440) {
+                return failure(ValidationError("Duration cannot exceed 24 hours (1440 minutes)"))
+            }
+            return success(TimeSlot(startDateTime, durationMinutes))
+        }
     }
 
     val endDateTime: LocalDateTime

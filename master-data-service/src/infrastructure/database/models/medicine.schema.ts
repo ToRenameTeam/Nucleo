@@ -1,5 +1,5 @@
 import mongoose, { Schema, type Document } from 'mongoose';
-import { Medicine, MedicineCategory } from '../../../domain/medicine/index.js';
+import { Medicine, MedicineCategory } from '../../../domain/index.js';
 
 type MedicineDocument = Document<string, object, Omit<Medicine, 'id'>> &
   Omit<Medicine, 'id'> & { _id: string };

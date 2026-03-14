@@ -1,8 +1,10 @@
 import { MASTER_DATA_API_URL, API_ENDPOINTS, handleApiResponse } from './config';
+import { z } from 'zod';
+import { idSchema, nonEmptyTrimmedStringSchema, parseWithSchema } from './validation';
 
 // Service Catalog Types
 export interface ServiceType {
-  _id: string;
+  id: string;
   code: string;
   name: string;
   description?: string;
@@ -11,7 +13,7 @@ export interface ServiceType {
 
 // Facility Types
 export interface Facility {
-  _id: string;
+  id: string;
   name: string;
   address?: string;
   city?: string;
@@ -21,7 +23,7 @@ export interface Facility {
 
 // Medicine Types
 export interface Medicine {
-  _id: string;
+  id: string;
   code: string;
   name: string;
   description: string;
@@ -36,6 +38,59 @@ export interface Medicine {
 export interface MedicineCategory {
   value: string;
   label: string;
+}
+
+const serviceTypeSchema = z
+  .object({
+    id: idSchema,
+    code: nonEmptyTrimmedStringSchema,
+    name: nonEmptyTrimmedStringSchema,
+    description: nonEmptyTrimmedStringSchema.optional(),
+    category: z.array(nonEmptyTrimmedStringSchema).optional(),
+  })
+  .passthrough();
+
+const facilitySchema = z
+  .object({
+    id: idSchema,
+    name: nonEmptyTrimmedStringSchema,
+    address: nonEmptyTrimmedStringSchema.optional(),
+    city: nonEmptyTrimmedStringSchema.optional(),
+    phone: nonEmptyTrimmedStringSchema.optional(),
+    email: nonEmptyTrimmedStringSchema.optional(),
+  })
+  .passthrough();
+
+const medicineSchema = z
+  .object({
+    id: idSchema,
+    code: nonEmptyTrimmedStringSchema,
+    name: nonEmptyTrimmedStringSchema,
+    description: nonEmptyTrimmedStringSchema,
+    category: nonEmptyTrimmedStringSchema,
+    activeIngredient: nonEmptyTrimmedStringSchema,
+    dosageForm: nonEmptyTrimmedStringSchema,
+    strength: nonEmptyTrimmedStringSchema,
+    manufacturer: nonEmptyTrimmedStringSchema,
+    isActive: z.boolean(),
+  })
+  .passthrough();
+
+const medicineCategorySchema = z
+  .object({
+    value: nonEmptyTrimmedStringSchema,
+    label: nonEmptyTrimmedStringSchema,
+  })
+  .passthrough();
+
+const medicineFilterSchema = z.object({
+  category: nonEmptyTrimmedStringSchema.optional(),
+  search: nonEmptyTrimmedStringSchema.optional(),
+  active: z.boolean().optional(),
+});
+
+function parseMasterDataResponse<T>(schema: z.ZodType<T>, payload: unknown, context: string): T {
+  return parseWithSchema(schema, payload, context);
 }
 
 /**
@@ -55,15 +110,16 @@ export const masterDataApi = {
       },
     });
 
-    const data = await handleApiResponse<ServiceType[]>(response);
-    return data;
+    const data = await handleApiResponse<unknown>(response);
+    return parseMasterDataResponse(z.array(serviceTypeSchema), data, 'service types response');
   },
 
   /**
    * Get service type by ID
    */
   async getServiceTypeById(id: string): Promise<ServiceType | null> {
-    const url = `${MASTER_DATA_API_URL}${API_ENDPOINTS.SERVICE_CATALOG}/${id}`;
+    const sanitizedId = parseWithSchema(idSchema, id, 'service type id');
+    const url = `${MASTER_DATA_API_URL}${API_ENDPOINTS.SERVICE_CATALOG}/${sanitizedId}`;
 
     try {
       const response = await fetch(url, {
@@ -77,8 +133,8 @@ export const masterDataApi = {
         return null;
       }
 
-      const data = await handleApiResponse<ServiceType>(response);
-      return data;
+      const data = await handleApiResponse<unknown>(response);
+      return parseMasterDataResponse(serviceTypeSchema, data, 'service type response');
     } catch {
       return null;
     }
@@ -97,15 +153,16 @@ export const masterDataApi = {
       },
     });
 
-    const data = await handleApiResponse<Facility[]>(response);
-    return data;
+    const data = await handleApiResponse<unknown>(response);
+    return parseMasterDataResponse(z.array(facilitySchema), data, 'facilities response');
   },
 
   /**
    * Get facility by ID
    */
   async getFacilityById(id: string): Promise<Facility | null> {
-    const url = `${MASTER_DATA_API_URL}${API_ENDPOINTS.FACILITIES}/${id}`;
+    const sanitizedId = parseWithSchema(idSchema, id, 'facility id');
+    const url = `${MASTER_DATA_API_URL}${API_ENDPOINTS.FACILITIES}/${sanitizedId}`;
 
     try {
       const response = await fetch(url, {
@@ -119,8 +176,8 @@ export const masterDataApi = {
         return null;
       }
 
-      const data = await handleApiResponse<Facility>(response);
-      return data;
+      const data = await handleApiResponse<unknown>(response);
+      return parseMasterDataResponse(facilitySchema, data, 'facility response');
     } catch {
       return null;
     }
@@ -134,16 +191,17 @@ export const masterDataApi = {
     search?: string;
     active?: boolean;
   }): Promise<Medicine[]> {
+    const sanitizedFilter = parseWithSchema(medicineFilterSchema, filter ?? {}, 'medicines filter');
     const params = new URLSearchParams();
 
-    if (filter?.category) {
-      params.append('category', filter.category);
+    if (sanitizedFilter.category) {
+      params.append('category', sanitizedFilter.category);
     }
-    if (filter?.search) {
-      params.append('search', filter.search);
+    if (sanitizedFilter.search) {
+      params.append('search', sanitizedFilter.search);
     }
-    if (filter?.active !== undefined) {
-      params.append('active', String(filter.active));
+    if (sanitizedFilter.active !== undefined) {
+      params.append('active', String(sanitizedFilter.active));
     }
 
     const queryString = params.toString();
@@ -157,8 +215,8 @@ export const masterDataApi = {
         },
       });
 
-      const data = await handleApiResponse<Medicine[]>(response);
-      return data;
+      const data = await handleApiResponse<unknown>(response);
+      return parseMasterDataResponse(z.array(medicineSchema), data, 'medicines response');
     } catch (error) {
       console.error('[Master Data API] Error fetching medicines:', error);
       throw error;
@@ -169,7 +227,8 @@ export const masterDataApi = {
    * Get medicine by ID
    */
   async getMedicineById(id: string): Promise<Medicine | null> {
-    const url = `${MASTER_DATA_API_URL}/api/medicines/${id}`;
+    const sanitizedId = parseWithSchema(idSchema, id, 'medicine id');
+    const url = `${MASTER_DATA_API_URL}/api/medicines/${sanitizedId}`;
 
     try {
       const response = await fetch(url, {
@@ -183,8 +242,8 @@ export const masterDataApi = {
         return null;
       }
 
-      const data = await handleApiResponse<Medicine>(response);
-      return data;
+      const data = await handleApiResponse<unknown>(response);
+      return parseMasterDataResponse(medicineSchema, data, 'medicine response');
     } catch (error) {
       console.error('[Master Data API] Error fetching medicine:', error);
       return null;
@@ -205,8 +264,12 @@ export const masterDataApi = {
         },
       });
 
-      const data = await handleApiResponse<MedicineCategory[]>(response);
-      return data;
+      const data = await handleApiResponse<unknown>(response);
+      return parseMasterDataResponse(
+        z.array(medicineCategorySchema),
+        data,
+        'medicine categories response'
+      );
     } catch (error) {
       console.error('[Master Data API] Error fetching medicine categories:', error);
       throw error;

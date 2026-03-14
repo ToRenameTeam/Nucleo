@@ -1,14 +1,8 @@
-import { AuthenticationService } from '../../src/services/authentication.service.js';
-import { UserRepository, UserData } from '../../src/domain/repositories/user-repository.js';
-import {
-  PatientRepository,
-  PatientData,
-} from '../../src/domain/repositories/patient-repository.js';
-import { DoctorRepository, DoctorData } from '../../src/domain/repositories/doctor-repository.js';
-import {
-  PatientOnlyUser,
-  DoctorPatientUser,
-} from '../../src/services/authenticated-user.factory.js';
+import { AuthenticationService } from '../../src/services/index.js';
+import { UserRepository, UserData } from '../../src/domain/repositories/index.js';
+import { PatientRepository, PatientData } from '../../src/domain/repositories/index.js';
+import { DoctorRepository, DoctorData } from '../../src/domain/repositories/index.js';
+import { PatientOnlyUser, DoctorPatientUser } from '../../src/services/index.js';
 import { randomUUID } from 'crypto';
 
 describe('AuthenticationService', () => {

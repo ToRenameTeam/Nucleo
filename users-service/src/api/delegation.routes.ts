@@ -1,11 +1,14 @@
 import { Router, Request, Response } from 'express';
+import { z } from 'zod';
 import { delegationService } from '../services/index.js';
-import { success, error } from './utils/response.js';
+import { success } from './utils/response.js';
+import { handleRouteError } from './utils/http-helpers.js';
 import {
-  getRequiredQueryString,
-  handleRouteError,
-  isNonEmptyString,
-} from './utils/http-helpers.js';
+  delegationStatusSchema,
+  nonEmptyTrimmedStringSchema,
+  optionalNonEmptyTrimmedStringSchema,
+  validateWithSchema,
+} from './validation.js';
 
 const router = Router();
 
@@ -15,19 +18,53 @@ const DELEGATION_ERROR_RULES = [
   { statusCode: 409, messageIncludes: 'already exists' },
   { statusCode: 403, messageIncludes: 'not authorized' },
   { statusCode: 400, messageIncludes: 'Cannot' },
+  { statusCode: 400, messageIncludes: 'Invalid' },
 ];
+
+const createDelegationBodySchema = z
+  .object({
+    delegatingUserId: nonEmptyTrimmedStringSchema,
+    delegatorUserId: nonEmptyTrimmedStringSchema,
+  })
+  .refine(
+    function (data) {
+      return data.delegatingUserId !== data.delegatorUserId;
+    },
+    {
+      message: 'delegatingUserId and delegatorUserId must be different',
+      path: ['delegatorUserId'],
+    }
+  );
+
+const delegationIdParamsSchema = z.object({
+  delegationId: nonEmptyTrimmedStringSchema,
+});
+
+const statusQuerySchema = z.object({
+  status: delegationStatusSchema.optional(),
+});
+
+const userIdRequiredQuerySchema = z.object({
+  userId: nonEmptyTrimmedStringSchema,
+});
+
+const userIdBodySchema = z.object({
+  userId: nonEmptyTrimmedStringSchema,
+});
+
+const userDelegationQuerySchema = z.object({
+  userId: nonEmptyTrimmedStringSchema,
+  status: optionalNonEmptyTrimmedStringSchema,
+});
 
 // Create a new delegation
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { delegatingUserId, delegatorUserId } = req.body;
-
-    if (!delegatingUserId || !delegatorUserId) {
-      return error(res, 'delegatingUserId and delegatorUserId are required', 400);
-    }
-    if (delegatingUserId === delegatorUserId) {
-      return error(res, 'cannot delegate to yourself', 400);
-    }
+    const { delegatingUserId, delegatorUserId } = validateWithSchema(
+      createDelegationBodySchema,
+      req.body,
+      'create delegation body'
+    );
 
     const delegation = await delegationService.createDelegation({
       delegatingUserId,
@@ -43,7 +80,7 @@ router.post('/', async (req: Request, res: Response) => {
 // Get all delegations
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const status = req.query.status as string;
+    const { status } = validateWithSchema(statusQuerySchema, req.query, 'delegation query');
 
     const result = await delegationService.getAllDelegations(status);
     return success(res, result);
@@ -55,17 +92,11 @@ router.get('/', async (req: Request, res: Response) => {
 // Get delegations received by user (where user must accept/decline)
 router.get('/received', async (req: Request, res: Response) => {
   try {
-    const userId = getRequiredQueryString(
-      req,
-      res,
-      'userId',
-      'userId is required as query parameter'
+    const { userId, status } = validateWithSchema(
+      userDelegationQuerySchema,
+      req.query,
+      'received delegations query'
     );
-    if (!userId) {
-      return;
-    }
-
-    const status = req.query.status as string | undefined;
 
     const result = await delegationService.getDelegationsForUser(userId, 'delegating', status);
     return success(res, result);
@@ -77,17 +108,11 @@ router.get('/received', async (req: Request, res: Response) => {
 // Get delegations sent by user (where user is the data owner)
 router.get('/sent', async (req: Request, res: Response) => {
   try {
-    const userId = getRequiredQueryString(
-      req,
-      res,
-      'userId',
-      'userId is required as query parameter'
+    const { userId, status } = validateWithSchema(
+      userDelegationQuerySchema,
+      req.query,
+      'sent delegations query'
     );
-    if (!userId) {
-      return;
-    }
-
-    const status = req.query.status as string | undefined;
 
     const result = await delegationService.getDelegationsForUser(userId, 'delegator', status);
     return success(res, result);
@@ -99,15 +124,11 @@ router.get('/sent', async (req: Request, res: Response) => {
 // Get active delegations where user can operate for others
 router.get('/active-for-user', async (req: Request, res: Response) => {
   try {
-    const userId = getRequiredQueryString(
-      req,
-      res,
-      'userId',
-      'userId is required as query parameter'
+    const { userId } = validateWithSchema(
+      userIdRequiredQuerySchema,
+      req.query,
+      'active delegations query'
     );
-    if (!userId) {
-      return;
-    }
 
     const result = await delegationService.getActiveDelegationsForDelegatingUser(userId);
     return success(res, result);
@@ -119,11 +140,11 @@ router.get('/active-for-user', async (req: Request, res: Response) => {
 // Get delegation by ID
 router.get('/:delegationId', async (req: Request, res: Response) => {
   try {
-    const { delegationId } = req.params;
-
-    if (!isNonEmptyString(delegationId)) {
-      return error(res, 'Invalid delegation ID', 400);
-    }
+    const { delegationId } = validateWithSchema(
+      delegationIdParamsSchema,
+      req.params,
+      'delegation params'
+    );
 
     const delegation = await delegationService.getDelegationById(delegationId);
     return success(res, delegation);
@@ -135,16 +156,12 @@ router.get('/:delegationId', async (req: Request, res: Response) => {
 // Accept a delegation
 router.put('/:delegationId/accept', async (req: Request, res: Response) => {
   try {
-    const { delegationId } = req.params;
-    const { userId } = req.body;
-
-    if (!isNonEmptyString(delegationId)) {
-      return error(res, 'Invalid delegation ID', 400);
-    }
-
-    if (!isNonEmptyString(userId)) {
-      return error(res, 'userId is required in request body', 400);
-    }
+    const { delegationId } = validateWithSchema(
+      delegationIdParamsSchema,
+      req.params,
+      'accept delegation params'
+    );
+    const { userId } = validateWithSchema(userIdBodySchema, req.body, 'accept delegation body');
 
     const result = await delegationService.acceptDelegation(delegationId, userId);
     return success(res, result);
@@ -156,16 +173,12 @@ router.put('/:delegationId/accept', async (req: Request, res: Response) => {
 // Decline a delegation
 router.put('/:delegationId/decline', async (req: Request, res: Response) => {
   try {
-    const { delegationId } = req.params;
-    const { userId } = req.body;
-
-    if (!isNonEmptyString(delegationId)) {
-      return error(res, 'Invalid delegation ID', 400);
-    }
-
-    if (!isNonEmptyString(userId)) {
-      return error(res, 'userId is required in request body', 400);
-    }
+    const { delegationId } = validateWithSchema(
+      delegationIdParamsSchema,
+      req.params,
+      'decline delegation params'
+    );
+    const { userId } = validateWithSchema(userIdBodySchema, req.body, 'decline delegation body');
 
     const result = await delegationService.declineDelegation(delegationId, userId);
     return success(res, result);
@@ -177,21 +190,16 @@ router.put('/:delegationId/decline', async (req: Request, res: Response) => {
 // Delete a delegation
 router.delete('/:delegationId', async (req: Request, res: Response) => {
   try {
-    const { delegationId } = req.params;
-    const userId = getRequiredQueryString(
-      req,
-      res,
-      'userId',
-      'userId is required as query parameter'
+    const { delegationId } = validateWithSchema(
+      delegationIdParamsSchema,
+      req.params,
+      'delete delegation params'
     );
-
-    if (!isNonEmptyString(delegationId)) {
-      return error(res, 'Invalid delegation ID', 400);
-    }
-
-    if (!userId) {
-      return;
-    }
+    const { userId } = validateWithSchema(
+      userIdRequiredQuerySchema,
+      req.query,
+      'delete delegation query'
+    );
 
     const result = await delegationService.deleteDelegation(delegationId, userId);
     return success(res, result);

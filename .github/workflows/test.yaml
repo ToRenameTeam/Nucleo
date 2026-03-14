@@ -113,8 +113,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run tests
+      - name: Run unit tests
         run: pnpm --filter @nucleo/master-data-service test
+
+      - name: Verify Docker availability
+        run: docker info
+
+      - name: Run integration tests
+        run: pnpm --filter @nucleo/master-data-service test:integration
 
   test-appointments-service:
     name: Test – appointments-service

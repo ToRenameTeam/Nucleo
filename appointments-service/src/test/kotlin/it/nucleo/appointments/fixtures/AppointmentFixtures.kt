@@ -1,6 +1,7 @@
 package it.nucleo.appointments.fixtures
 
 import it.nucleo.appointments.domain.*
+import it.nucleo.commons.errors.getOrElse
 import kotlinx.datetime.LocalDateTime
 
 /**
@@ -19,9 +20,10 @@ object AppointmentFixtures {
 
     val DEFAULT_TIME_SLOT =
         TimeSlot(
-            startDateTime = LocalDateTime.parse("2026-02-01T09:00:00"),
-            durationMinutes = 30,
-        )
+                startDateTime = LocalDateTime.parse("2026-02-01T09:00:00"),
+                durationMinutes = 30,
+            )
+            .getOrElse { error("Invalid default time slot fixture: ${it.message}") }
 
     val DEFAULT_TIMESTAMP: LocalDateTime = LocalDateTime.parse("2026-01-30T10:00:00")
 
@@ -32,9 +34,18 @@ object AppointmentFixtures {
         status: AppointmentStatus = AppointmentStatus.SCHEDULED,
     ) =
         Appointment(
-            id = AppointmentId.fromString(id),
-            patientId = PatientId.fromString(patientId),
-            availabilityId = AvailabilityId.fromString(availabilityId),
+            id =
+                AppointmentId(id).getOrElse {
+                    error("Invalid appointment fixture id: ${it.message}")
+                },
+            patientId =
+                PatientId(patientId).getOrElse {
+                    error("Invalid appointment fixture patientId: ${it.message}")
+                },
+            availabilityId =
+                AvailabilityId(availabilityId).getOrElse {
+                    error("Invalid appointment fixture availabilityId: ${it.message}")
+                },
             status = status,
             createdAt = DEFAULT_TIMESTAMP,
             updatedAt = DEFAULT_TIMESTAMP,
@@ -49,10 +60,22 @@ object AppointmentFixtures {
         status: AvailabilityStatus = AvailabilityStatus.AVAILABLE,
     ) =
         Availability(
-            availabilityId = AvailabilityId.fromString(id),
-            doctorId = DoctorId.fromString(doctorId),
-            facilityId = FacilityId.fromString(facilityId),
-            serviceTypeId = ServiceTypeId.fromString(serviceTypeId),
+            availabilityId =
+                AvailabilityId(id).getOrElse {
+                    error("Invalid availability fixture id: ${it.message}")
+                },
+            doctorId =
+                DoctorId(doctorId).getOrElse {
+                    error("Invalid availability fixture doctorId: ${it.message}")
+                },
+            facilityId =
+                FacilityId(facilityId).getOrElse {
+                    error("Invalid availability fixture facilityId: ${it.message}")
+                },
+            serviceTypeId =
+                ServiceTypeId(serviceTypeId).getOrElse {
+                    error("Invalid availability fixture serviceTypeId: ${it.message}")
+                },
             timeSlot = timeSlot,
             status = status,
         )

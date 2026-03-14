@@ -69,7 +69,10 @@ class DocumentUploadService(
             return failure(it)
         }
 
-        val documentId = DocumentId(UUID.randomUUID().toString())
+        val documentId =
+            DocumentId(UUID.randomUUID().toString()).getOrElse {
+                return failure(it)
+            }
 
         // Step 1: Store PDF file in MinIO
         fileStorageRepository
@@ -109,15 +112,22 @@ class DocumentUploadService(
         }
 
         // Step 3: Create document entity with AI-generated metadata and default values
+        val title =
+            Title(command.filename.removeSuffix(".pdf")).getOrElse {
+                return failure(it)
+            }
         val document =
             DocumentFactory.createUploadedDocument(
-                id = documentId,
-                patientId = command.patientId,
-                title = Title(command.filename.removeSuffix(".pdf")),
-                filename = command.filename,
-                metadata = metadata,
-                documentType = inferDocumentType(metadata)
-            )
+                    id = documentId,
+                    patientId = command.patientId,
+                    title = title,
+                    filename = command.filename,
+                    metadata = metadata,
+                    documentType = inferDocumentType(metadata)
+                )
+                .getOrElse {
+                    return failure(it)
+                }
 
         // Step 4: Save document entity to MongoDB
         documentRepository.addDocument(command.patientId, document).getOrElse {
@@ -172,10 +182,23 @@ class DocumentUploadService(
     }
 
     private fun createDefaultMetadata(): FileMetadata {
-        return FileMetadata(
-            summary = Summary(DEFAULT_SUMMARY),
-            tags = DEFAULT_TAGS.map { Tag(it) }.toSet()
-        )
+        val summary =
+            Summary(DEFAULT_SUMMARY).getOrElse {
+                throw IllegalStateException("Invalid default summary metadata: ${it.message}")
+            }
+        val tags =
+            DEFAULT_TAGS.map {
+                    Tag(it).getOrElse { error ->
+                        throw IllegalStateException(
+                            "Invalid default tag metadata: ${error.message}"
+                        )
+                    }
+                }
+                .toSet()
+
+        return FileMetadata(summary = summary, tags = tags).getOrElse {
+            throw IllegalStateException("Invalid default metadata: ${it.message}")
+        }
     }
 
     private fun inferDocumentType(metadata: FileMetadata): UploadedDocumentType {

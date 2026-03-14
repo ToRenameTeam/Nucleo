@@ -1,0 +1,762 @@
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg width="974.5px" height="907.82px"
+		style="transform-origin: 0px 0px 0px;" version="1.1"
+		xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><style xmlns="http://www.w3.org/2000/svg" type="text/css"><![CDATA[
+		* {
+			text-rendering: geometricprecision !important;
+		}
+		]]><![CDATA[@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Noto Sans'), local('NotoSans'), url("https://mirostatic.com/app/static/a73798e3d459e1bc.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Noto Sans Italic'), local('NotoSans-Italic'), url("https://mirostatic.com/app/static/a8edd710f88715d4.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 500;
+  src: local('Noto Sans Medium'), local('NotoSans-Medium'), url("https://mirostatic.com/app/static/006d7e33e60b9e12.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: italic;
+  font-weight: 500;
+  src: local('Noto Sans Medium Italic'), local('NotoSans-MediumItalic'), url("https://mirostatic.com/app/static/31387059566a3171.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Noto Sans SemiBold'), local('NotoSans-SemiBold'), url("https://mirostatic.com/app/static/526dd53b40975c37.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: italic;
+  font-weight: 600;
+  src: local('Noto Sans SemiBold Italic'), local('NotoSans-SemiBoldItalic'), url("https://mirostatic.com/app/static/e73d4fdd87d7e319.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Noto Sans Bold'), local('NotoSans-Bold'), url("https://mirostatic.com/app/static/9f11d6779c14d2bc.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: italic;
+  font-weight: 700;
+  src: local('Noto Sans Bold Italic'), local('NotoSans-BoldItalic'), url("https://mirostatic.com/app/static/888e13e017cedc15.woff2") format('woff2');
+}
+]]><![CDATA[@font-face {
+  font-family: 'OpenSans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("https://mirostatic.com/app/static/800985e1502d12bf.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'OpenSans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("https://mirostatic.com/app/static/d8a7ca42a20caea5.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'OpenSans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("https://mirostatic.com/app/static/3cc74c1d3919bd5c.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'OpenSans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("https://mirostatic.com/app/static/f0481285dc248cf0.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'OpenSans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("https://mirostatic.com/app/static/2f5e8dcf6e47bf00.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'OpenSans';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url("https://mirostatic.com/app/static/0e625f45b71a26f1.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'OpenSans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("https://mirostatic.com/app/static/645c27eb7d93eca8.woff2") format('woff2');
+}
+]]><![CDATA[@font-face {
+  font-family: 'Noto Sans Hebrew';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Noto Sans Hebrew Regular'), local('Noto Sans Hebrew-Regular'), url("https://mirostatic.com/app/static/7ebe1dcf0343326c.woff2") format('woff2'), url("https://mirostatic.com/app/static/6c11f037d6968262.woff") format('woff');
+}
+@font-face {
+  font-family: 'Noto Sans Hebrew';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Noto Sans Hebrew Bold'), local('Noto Sans Hebrew-Bold'), url("https://mirostatic.com/app/static/d2883e2f177d0dad.woff2") format('woff2'), url("https://mirostatic.com/app/static/8546991909eadbc9.woff") format('woff');
+}
+]]><![CDATA[@font-face {
+  font-family: 'Noto Sans JP';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Noto Sans Japanese Regular'), local('Noto Sans Japanese-Regular'), url("https://mirostatic.com/app/static/9320b3c07ab79383.woff2") format('woff2'), url("https://mirostatic.com/app/static/a43be2cbcfc0b250.woff") format('woff');
+}
+@font-face {
+  font-family: 'Noto Sans JP';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Noto Sans Japanese Bold'), local('Noto Sans Japanese-Bold'), url("https://mirostatic.com/app/static/7ab032c73212439f.woff2") format('woff2'), url("https://mirostatic.com/app/static/29f177f4466bd7a1.woff") format('woff');
+}
+]]><![CDATA[@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 400;
+  src: local(''), url("https://mirostatic.com/app/static/7a5b625774730d22.woff2") format('woff2'), url("https://mirostatic.com/app/static/2d84dc606f1fb88e.woff") format('woff');
+}
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 700;
+  src: local(''), url("https://mirostatic.com/app/static/fa5a3d9073cdd58f.woff2") format('woff2'), url("https://mirostatic.com/app/static/7ded243557c83342.woff") format('woff');
+}
+]]></style><filter x="-50%" y="-50%" width="200%" height="200%" id="StickerShadowFilter">
+				<feOffset result="offOut" in="SourceGraphic" dx="1" dy="3" />
+      			<feGaussianBlur result="blurOut" in="offOut" stdDeviation="3" />
+			</filter><path id="StickerType1Path" d="M0 1.006C0 .45.445 0 .994 0h412.012c.55 0 .997.454 1 .998l2.987 400.004c.004.55-.44 1-.994 1.005L1 404.993c-.552.004-1-.45-1-1V1.007z"/><g id="StickerType1" fill-rule="evenodd">
+					<image xlink:href="data:image/png;base64,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" width="431px" height="419px" transform="translate(-6, -4)" />
+					<g><use fill="inherit" xlink:href="#StickerType1Path"/></g>
+				</g><path id="StickerType2Path" d="M.01 1C.004.45.444.005 1.01.01l410.98 3.98c.558.006 1.015.46 1.02 1.017l3.98 396.986c.005.556-.434 1.007-1 1.007H5.01c-.558 0-1.015-.455-1.02-1L.01 1z"/><g id="StickerType2" fill-rule="evenodd">
+					<image xlink:href="data:image/png;base64,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" width="431px" height="417px" transform="translate(-3, 2)" />
+					<g><use fill="inherit" xlink:href="#StickerType2Path"/></g>
+				</g></defs><rect id="svg-board-background-color" width="100%" height="100%" fill="#f2f2f2"></rect><image href="data:image/svg+xml;utf8,%3Csvg%0A%09width%3D%22974.495148982695%22%0A%09height%3D%22907.8219703688492%22%0A%09shape-border-width%3D%22shape-background%22%0A%09style%3D%22width%3A974.495148982695px%3B%20height%3A%20907.8219703688492px%3B%22%0A%09class%3D%22shape-background%22%0A%09preserveAspectRatio%3D%22none%22%0A%09version%3D%221.1%22%0A%09xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%0A%3E%0A%09%3CclipPath%20id%3D%221182502085767%22%3E%0A%09%09%3Crect%0A%09%09%09x%3D%220%22%0A%09%09%09y%3D%220%22%0A%09%09%09width%3D%22974.495148982695%22%0A%09%09%09height%3D%22907.8219703688492%22%0A%09%09%09rx%3D%220%22%0A%09%09%09ry%3D%220%22%0A%09%09%3E%3C%2Frect%3E%0A%09%3C%2FclipPath%3E%0A%09%3Cg%20id%3D%22Page-1%22%20stroke%3D%22none%22%20stroke-width%3D%220%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%0A%09%09%3Crect%0A%09%09%09class%3D%22shape-element%20shape-element-rect%22%0A%09%09%09stroke%3D%22%23000000%22%0A%09%09%09stroke-width%3D%220%22%0A%09%09%09stroke-dasharray%3D%22%22%0A%09%09%09stroke-opacity%3D%22%22%0A%09%09%09fill%3D%22%23ffffff%22%0A%09%09%09fill-opacity%3D%22%22%0A%09%09%09x%3D%220%22%0A%09%09%09y%3D%220%22%0A%09%09%09width%3D%22974.495148982695%22%0A%09%09%09height%3D%22907.8219703688492%22%0A%09%09%09rx%3D%220%22%0A%09%09%09ry%3D%220%22%0A%09%09%09clip-path%3D%22url(%231182502085767)%22%0A%09%09%3E%3C%2Frect%3E%0A%09%3C%2Fg%3E%0A%3C%2Fsvg%3E%0A" width="974.5px" height="907.82px" data-frame="true" preserveAspectRatio="none" data-frame-id="3458764663661688710" transform="translate(-0.46, -0.1) scale(1) rotate(0, 487.25, 453.91)" /><g width="54.69px" height="179.3px"  transform="translate(98.56, 229.75) scale(1) rotate(0, 27.345, 89.65)"><svg
+	width="54.69010362214405"
+	height="179.29626148162794"
+	shape-border-width="shape-background"
+	style="width:54.69010362214405px; height: 179.29626148162794px;"
+	class="shape-background"
+	preserveAspectRatio="none"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<clipPath id="1304565006137">
+		<rect
+			x="0"
+			y="0"
+			width="54.69010362214405"
+			height="179.29626148162794"
+			rx="10.93802072442881"
+			ry="10.93802072442881"
+		></rect>
+	</clipPath>
+	<g id="Page-1" stroke="none" stroke-width="0" fill="none" fill-rule="evenodd">
+		<rect
+			class="shape-element shape-element-rect"
+			stroke="transparent"
+			stroke-width="0"
+			stroke-dasharray=""
+			stroke-opacity="1"
+			fill="#f5d128"
+			fill-opacity="1"
+			x="0"
+			y="0"
+			width="54.69010362214405"
+			height="179.29626148162794"
+			rx="10.93802072442881"
+			ry="10.93802072442881"
+			clip-path="url(#1304565006137)"
+		></rect>
+	</g>
+</svg>
+</g><g width="54.69px" height="179.3px"  transform="translate(98.56, 229.75) rotate(0, 27.345, 89.65)"><g transform="translate(2.7345051811072025, 2.7345051811072025)"><text xml:space="preserve" x="4.688671629964823" y="89.41362555970676" width="39.84375" textLength="39.84375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Availability</text></g></g><g width="54.69px" height="287.08px"  transform="translate(98.62, 462.79) scale(1) rotate(0, 27.345, 143.54)"><svg
+	width="54.69010362214411"
+	height="287.08167101484696"
+	shape-border-width="shape-background"
+	style="width:54.69010362214411px; height: 287.08167101484696px;"
+	class="shape-background"
+	preserveAspectRatio="none"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<clipPath id="51685790892">
+		<rect
+			x="0"
+			y="0"
+			width="54.69010362214411"
+			height="287.08167101484696"
+			rx="10.938020724428823"
+			ry="10.938020724428823"
+		></rect>
+	</clipPath>
+	<g id="Page-1" stroke="none" stroke-width="0" fill="none" fill-rule="evenodd">
+		<rect
+			class="shape-element shape-element-rect"
+			stroke="transparent"
+			stroke-width="0"
+			stroke-dasharray=""
+			stroke-opacity="1"
+			fill="#f5d128"
+			fill-opacity="1"
+			x="0"
+			y="0"
+			width="54.69010362214411"
+			height="287.08167101484696"
+			rx="10.938020724428823"
+			ry="10.938020724428823"
+			clip-path="url(#51685790892)"
+		></rect>
+	</g>
+</svg>
+</g><g width="54.69px" height="287.08px"  transform="translate(98.62, 462.79) rotate(0, 27.345, 143.54)"><g transform="translate(2.7345051811072056, 2.7345051811072056)"><text xml:space="preserve" x="0.049999754964847654" y="143.30633032631627" width="49.12109375" textLength="49.12109375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Appointment</text></g></g><g width="40.21px" height="85.88px"  transform="translate(287.89, 57.06) scale(1) rotate(0, 20.105, 42.94)"><svg
+	width="40.20890543976382"
+	height="85.88065896734662"
+	shape-border-width="shape-background"
+	style="width:40.20890543976382px; height: 85.88065896734662px;"
+	class="shape-background"
+	preserveAspectRatio="none"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<clipPath id="521214468700">
+		<rect
+			x="0"
+			y="0"
+			width="40.20890543976382"
+			height="85.88065896734662"
+			rx="8.041781087952764"
+			ry="8.041781087952764"
+		></rect>
+	</clipPath>
+	<g id="Page-1" stroke="none" stroke-width="0" fill="none" fill-rule="evenodd">
+		<rect
+			class="shape-element shape-element-rect"
+			stroke="transparent"
+			stroke-width="0"
+			stroke-dasharray=""
+			stroke-opacity="1"
+			fill="#f5d128"
+			fill-opacity="1"
+			x="0"
+			y="0"
+			width="40.20890543976382"
+			height="85.88065896734662"
+			rx="8.041781087952764"
+			ry="8.041781087952764"
+			clip-path="url(#521214468700)"
+		></rect>
+	</g>
+</svg>
+</g><g width="40.21px" height="85.88px"  transform="translate(287.89, 57.06) rotate(0, 20.105, 42.94)"><g transform="translate(2.010445271988191, 2.010445271988191)"><text xml:space="preserve" x="4.857679322893716" y="37.92988421168512" width="28.55078125" textLength="28.55078125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Service </text><text xml:space="preserve" x="9.170179322893716" y="48.92988421168512" width="17.84765625" textLength="17.84765625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Type</text></g></g><g width="55.81px" height="225.57px"  transform="translate(795.92, 604.49) scale(1) rotate(0, 27.905, 112.785)"><svg
+	width="55.8097782977404"
+	height="225.57407324598609"
+	shape-border-width="shape-background"
+	style="width:55.8097782977404px; height: 225.57407324598609px;"
+	class="shape-background"
+	preserveAspectRatio="none"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<clipPath id="1070568466759">
+		<rect
+			x="0"
+			y="0"
+			width="55.8097782977404"
+			height="225.57407324598609"
+			rx="11.16195565954808"
+			ry="11.16195565954808"
+		></rect>
+	</clipPath>
+	<g id="Page-1" stroke="none" stroke-width="0" fill="none" fill-rule="evenodd">
+		<rect
+			class="shape-element shape-element-rect"
+			stroke="transparent"
+			stroke-width="0"
+			stroke-dasharray=""
+			stroke-opacity="1"
+			fill="#f5d128"
+			fill-opacity="1"
+			x="0"
+			y="0"
+			width="55.8097782977404"
+			height="225.57407324598609"
+			rx="11.16195565954808"
+			ry="11.16195565954808"
+			clip-path="url(#1070568466759)"
+		></rect>
+	</g>
+</svg>
+</g><g width="55.81px" height="225.57px"  transform="translate(795.92, 604.49) rotate(0, 27.905, 112.785)"><g transform="translate(2.79048891488702, 2.79048891488702)"><text xml:space="preserve" x="5.590962733983179" y="112.49654770810602" width="39.046875" textLength="39.046875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Document</text></g></g><g width="45.33px" height="86.4px"  transform="translate(468.1, 57.06) scale(1) rotate(0, 22.665, 43.2)"><svg
+	width="45.32850560774197"
+	height="86.39559340414816"
+	shape-border-width="shape-background"
+	style="width:45.32850560774197px; height: 86.39559340414816px;"
+	class="shape-background"
+	preserveAspectRatio="none"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<clipPath id="1365483760121">
+		<rect
+			x="0"
+			y="0"
+			width="45.32850560774197"
+			height="86.39559340414816"
+			rx="9.065701121548393"
+			ry="9.065701121548393"
+		></rect>
+	</clipPath>
+	<g id="Page-1" stroke="none" stroke-width="0" fill="none" fill-rule="evenodd">
+		<rect
+			class="shape-element shape-element-rect"
+			stroke="transparent"
+			stroke-width="0"
+			stroke-dasharray=""
+			stroke-opacity="1"
+			fill="#f5d128"
+			fill-opacity="1"
+			x="0"
+			y="0"
+			width="45.32850560774197"
+			height="86.39559340414816"
+			rx="9.065701121548393"
+			ry="9.065701121548393"
+			clip-path="url(#1365483760121)"
+		></rect>
+	</g>
+</svg>
+</g><g width="45.33px" height="86.4px"  transform="translate(468.1, 57.06) rotate(0, 22.665, 43.2)"><g transform="translate(2.2664252803870983, 2.2664252803870983)"><text xml:space="preserve" x="1.5560306484838833" y="43.43137142168698" width="37.68359375" textLength="37.68359375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Medicines</text></g></g><g width="55.81px" height="145.87px"  transform="translate(793.92, 218.65) scale(1) rotate(0, 27.905, 72.935)"><svg
+	width="55.8097782977404"
+	height="145.87121100905705"
+	shape-border-width="shape-background"
+	style="width:55.8097782977404px; height: 145.87121100905705px;"
+	class="shape-background"
+	preserveAspectRatio="none"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<clipPath id="1084709523454">
+		<rect
+			x="0"
+			y="0"
+			width="55.8097782977404"
+			height="145.87121100905705"
+			rx="11.16195565954808"
+			ry="11.16195565954808"
+		></rect>
+	</clipPath>
+	<g id="Page-1" stroke="none" stroke-width="0" fill="none" fill-rule="evenodd">
+		<rect
+			class="shape-element shape-element-rect"
+			stroke="transparent"
+			stroke-width="0"
+			stroke-dasharray=""
+			stroke-opacity="1"
+			fill="#f5d128"
+			fill-opacity="1"
+			x="0"
+			y="0"
+			width="55.8097782977404"
+			height="145.87121100905705"
+			rx="11.16195565954808"
+			ry="11.16195565954808"
+			clip-path="url(#1084709523454)"
+		></rect>
+	</g>
+</svg>
+</g><g width="55.81px" height="145.87px"  transform="translate(793.92, 218.65) rotate(0, 27.905, 72.935)"><g transform="translate(2.79048891488702, 2.79048891488702)"><text xml:space="preserve" x="8.18080648398318" y="67.1451165896415" width="35.9453125" textLength="35.9453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Medicine </text><text xml:space="preserve" x="2.6261189839831793" y="78.1451165896415" width="44.9765625" textLength="44.9765625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Prescription</text></g></g><g width="55.81px" height="133.9px"  transform="translate(795.92, 420.68) scale(1) rotate(0, 27.905, 66.95)"><svg
+	width="55.8097782977404"
+	height="133.90055476193368"
+	shape-border-width="shape-background"
+	style="width:55.8097782977404px; height: 133.90055476193368px;"
+	class="shape-background"
+	preserveAspectRatio="none"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<clipPath id="1635825361966">
+		<rect
+			x="0"
+			y="0"
+			width="55.8097782977404"
+			height="133.90055476193368"
+			rx="11.16195565954808"
+			ry="11.16195565954808"
+		></rect>
+	</clipPath>
+	<g id="Page-1" stroke="none" stroke-width="0" fill="none" fill-rule="evenodd">
+		<rect
+			class="shape-element shape-element-rect"
+			stroke="transparent"
+			stroke-width="0"
+			stroke-dasharray=""
+			stroke-opacity="1"
+			fill="#f5d128"
+			fill-opacity="1"
+			x="0"
+			y="0"
+			width="55.8097782977404"
+			height="133.90055476193368"
+			rx="11.16195565954808"
+			ry="11.16195565954808"
+			clip-path="url(#1635825361966)"
+		></rect>
+	</g>
+</svg>
+</g><g width="55.81px" height="133.9px"  transform="translate(795.92, 420.68) rotate(0, 27.905, 66.95)"><g transform="translate(2.79048891488702, 2.79048891488702)"><text xml:space="preserve" x="14.84877523398318" y="61.15978846607982" width="22.609375" textLength="22.609375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Exam </text><text xml:space="preserve" x="2.6261189839831793" y="72.15978846607982" width="44.9765625" textLength="44.9765625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Prescription</text></g></g><g width="43.5px" height="85.88px"  transform="translate(104.22, 57.06) scale(1) rotate(0, 21.75, 42.94)"><svg
+	width="43.49665995621585"
+	height="85.8806589673473"
+	shape-border-width="shape-background"
+	style="width:43.49665995621585px; height: 85.8806589673473px;"
+	class="shape-background"
+	preserveAspectRatio="none"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<clipPath id="881753733227">
+		<rect
+			x="0"
+			y="0"
+			width="43.49665995621585"
+			height="85.8806589673473"
+			rx="8.69933199124317"
+			ry="8.69933199124317"
+		></rect>
+	</clipPath>
+	<g id="Page-1" stroke="none" stroke-width="0" fill="none" fill-rule="evenodd">
+		<rect
+			class="shape-element shape-element-rect"
+			stroke="transparent"
+			stroke-width="0"
+			stroke-dasharray=""
+			stroke-opacity="1"
+			fill="#f5d128"
+			fill-opacity="1"
+			x="0"
+			y="0"
+			width="43.49665995621585"
+			height="85.8806589673473"
+			rx="8.69933199124317"
+			ry="8.69933199124317"
+			clip-path="url(#881753733227)"
+		></rect>
+	</g>
+</svg>
+</g><g width="43.5px" height="85.88px"  transform="translate(104.22, 57.06) rotate(0, 21.75, 42.94)"><g transform="translate(2.1748329978107925, 2.1748329978107925)"><text xml:space="preserve" x="3.768809480297133" y="43.265496485862855" width="31.609375" textLength="31.609375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Facilities</text></g></g><g width="45.33px" height="258.07px"  transform="translate(468.61, 215.88) scale(1) rotate(0, 22.665, 129.035)"><svg
+	width="45.328505607742215"
+	height="258.0663343490096"
+	shape-border-width="shape-background"
+	style="width:45.328505607742215px; height: 258.0663343490096px;"
+	class="shape-background"
+	preserveAspectRatio="none"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<clipPath id="234928295236">
+		<rect
+			x="0"
+			y="0"
+			width="45.328505607742215"
+			height="258.0663343490096"
+			rx="9.065701121548443"
+			ry="9.065701121548443"
+		></rect>
+	</clipPath>
+	<g id="Page-1" stroke="none" stroke-width="0" fill="none" fill-rule="evenodd">
+		<rect
+			class="shape-element shape-element-rect"
+			stroke="transparent"
+			stroke-width="0"
+			stroke-dasharray=""
+			stroke-opacity="1"
+			fill="#f5d128"
+			fill-opacity="1"
+			x="0"
+			y="0"
+			width="45.328505607742215"
+			height="258.0663343490096"
+			rx="9.065701121548443"
+			ry="9.065701121548443"
+			clip-path="url(#234928295236)"
+		></rect>
+	</g>
+</svg>
+</g><g width="45.33px" height="258.07px"  transform="translate(468.61, 215.88) rotate(0, 22.665, 129.035)"><g transform="translate(2.2664252803871108, 2.2664252803871108)"><text xml:space="preserve" x="11.700561898483997" y="129.26674189411767" width="17.39453125" textLength="17.39453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >User</text></g></g><g width="45.33px" height="340.92px"  transform="translate(468.61, 508.85) scale(1) rotate(0, 22.665, 170.46)"><svg
+	width="45.328505607742215"
+	height="340.921660496802"
+	shape-border-width="shape-background"
+	style="width:45.328505607742215px; height: 340.921660496802px;"
+	class="shape-background"
+	preserveAspectRatio="none"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<clipPath id="910793159546">
+		<rect
+			x="0"
+			y="0"
+			width="45.328505607742215"
+			height="340.921660496802"
+			rx="9.065701121548443"
+			ry="9.065701121548443"
+		></rect>
+	</clipPath>
+	<g id="Page-1" stroke="none" stroke-width="0" fill="none" fill-rule="evenodd">
+		<rect
+			class="shape-element shape-element-rect"
+			stroke="transparent"
+			stroke-width="0"
+			stroke-dasharray=""
+			stroke-opacity="1"
+			fill="#f5d128"
+			fill-opacity="1"
+			x="0"
+			y="0"
+			width="45.328505607742215"
+			height="340.921660496802"
+			rx="9.065701121548443"
+			ry="9.065701121548443"
+			clip-path="url(#910793159546)"
+		></rect>
+	</g>
+</svg>
+</g><g width="45.33px" height="340.92px"  transform="translate(468.61, 508.85) rotate(0, 22.665, 170.46)"><g transform="translate(2.2664252803871108, 2.2664252803871108)"><text xml:space="preserve" x="0.27087439848399697" y="170.69440496801388" width="40.25390625" textLength="40.25390625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Delegation</text></g></g><g width="55.81px" height="86.4px"  transform="translate(793.92, 57.06) scale(1) rotate(0, 27.905, 43.2)"><svg
+	width="55.80977829773927"
+	height="86.39559340414768"
+	shape-border-width="shape-background"
+	style="width:55.80977829773927px; height: 86.39559340414768px;"
+	class="shape-background"
+	preserveAspectRatio="none"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<clipPath id="568496866349">
+		<rect
+			x="0"
+			y="0"
+			width="55.80977829773927"
+			height="86.39559340414768"
+			rx="11.161955659547855"
+			ry="11.161955659547855"
+		></rect>
+	</clipPath>
+	<g id="Page-1" stroke="none" stroke-width="0" fill="none" fill-rule="evenodd">
+		<rect
+			class="shape-element shape-element-rect"
+			stroke="transparent"
+			stroke-width="0"
+			stroke-dasharray=""
+			stroke-opacity="1"
+			fill="#f5d128"
+			fill-opacity="1"
+			x="0"
+			y="0"
+			width="55.80977829773927"
+			height="86.39559340414768"
+			rx="11.161955659547855"
+			ry="11.161955659547855"
+			clip-path="url(#568496866349)"
+		></rect>
+	</g>
+</svg>
+</g><g width="55.81px" height="86.4px"  transform="translate(793.92, 57.06) rotate(0, 27.905, 43.2)"><g transform="translate(2.790488914886964, 2.790488914886964)"><text xml:space="preserve" x="1.5597127339826713" y="42.90730778718687" width="47.109375" textLength="47.109375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="8" 
+				fill="#1a1a1a" direction="ltr" >Notifications</text></g></g><use xlink:href="#StickerType1" transform="translate(525.41, 323.08) scale(0.2020548012048316) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(523.18, 321.27) scale(0.2020548012048316) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="34.18798828125" y="38" width="92.4951171875" textLength="92.4951171875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >User </text><text xml:space="preserve" x="16.09716796875" y="90" width="128.6767578125" textLength="128.6767578125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >logged </text><text xml:space="preserve" x="45.65478515625" y="142" width="59.6904296875" textLength="59.6904296875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >out</text></g></g><use xlink:href="#StickerType1" transform="translate(525.41, 220.98) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(523.18, 219.16) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="34.18798828125" y="38" width="92.4951171875" textLength="92.4951171875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >User </text><text xml:space="preserve" x="17.2568359375" y="90" width="126.357421875" textLength="126.357421875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >signed </text><text xml:space="preserve" x="52.1953125" y="142" width="46.609375" textLength="46.609375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >up</text></g></g><use xlink:href="#StickerType2" transform="translate(525.41, 272.01) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(523.18, 270.19) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="34.18798828125" y="38" width="92.4951171875" textLength="92.4951171875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >User </text><text xml:space="preserve" x="16.09716796875" y="90" width="128.6767578125" textLength="128.6767578125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >logged </text><text xml:space="preserve" x="59.03271484375" y="142" width="32.9345703125" textLength="32.9345703125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >in</text></g></g><use xlink:href="#StickerType2" transform="translate(526.16, 567.23) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(523.94, 565.41) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="15.099609375" y="63" width="131.19140625" textLength="131.19140625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="40" 
+				fill="#1a1a1a" direction="ltr" >Profile </text><text xml:space="preserve" x="3.390625" y="118" width="144.21875" textLength="144.21875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="40" 
+				fill="#1a1a1a" direction="ltr" >chosen </text></g></g><use xlink:href="#StickerType1" transform="translate(420.35, 220.98) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(418.13, 219.16) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="1.4650497436523438" y="86" width="148.0699005126953" textLength="148.0699005126953" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Registration</text></g></g><use xlink:href="#StickerType1" transform="translate(420.35, 272.01) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(418.13, 270.19) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="2.1400146484375" y="95.5" width="146.719970703125" textLength="146.719970703125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="56" 
+				fill="#1a1a1a" direction="ltr" >Login</text></g></g><use xlink:href="#StickerType2" transform="translate(420.87, 566.13) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(418.65, 564.31) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="8.876029968261719" y="60" width="145.72793579101562" textLength="145.72793579101562" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="48" 
+				fill="#1a1a1a" direction="ltr" >Select </text><text xml:space="preserve" x="2.612030029296875" y="126" width="145.77593994140625" textLength="145.77593994140625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="48" 
+				fill="#1a1a1a" direction="ltr" >profile</text></g></g><use xlink:href="#StickerType1" transform="translate(420.87, 520.06) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(418.65, 518.24) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="20.92401885986328" y="44" width="117.47195434570312" textLength="117.47195434570312" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >Display </text><text xml:space="preserve" x="9.196022033691406" y="88" width="140.92794799804688" textLength="140.92794799804688" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >available </text><text xml:space="preserve" x="1.0520401000976562" y="132" width="148.8959197998047" textLength="148.8959197998047" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >profile list</text></g></g><use xlink:href="#StickerType2" transform="translate(420.35, 323.08) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(418.13, 321.27) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="2.2840194702148438" y="92" width="146.4319610595703" textLength="146.4319610595703" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="44" 
+				fill="#1a1a1a" direction="ltr" >Logout</text></g></g><use xlink:href="#StickerType1" transform="translate(526.16, 664.99) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(523.94, 663.17) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="0.02392578125" y="67" width="150.9521484375" textLength="150.9521484375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Delegation</text><text xml:space="preserve" x="22.5751953125" y="108" width="105.849609375" textLength="105.849609375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >created</text></g></g><use xlink:href="#StickerType1" transform="translate(420.63, 664.99) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(418.4, 663.17) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="29.375022888183594" y="67" width="100.04994201660156" textLength="100.04994201660156" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Create </text><text xml:space="preserve" x="0.21503448486328125" y="108" width="150.56993103027344" textLength="150.56993103027344" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >delegation</text></g></g><use xlink:href="#StickerType2" transform="translate(745.56, 79.04) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(743.34, 77.22) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="45.00202178955078" y="68" width="67.75595092773438" textLength="67.75595092773438" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Send </text><text xml:space="preserve" x="4.403038024902344" y="104" width="142.1939239501953" textLength="142.1939239501953" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Notification</text></g></g><use xlink:href="#StickerType1" transform="translate(861.96, 79.04) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(859.73, 77.22) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="5.14892578125" y="68" width="147.4560546875" textLength="147.4560546875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Notification </text><text xml:space="preserve" x="48.50341796875" y="104" width="53.9931640625" textLength="53.9931640625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Sent</text></g></g><use xlink:href="#StickerType2" transform="translate(420.35, 376.43) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(418.13, 374.61) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="2.6540298461914062" y="64" width="145.6919403076172" textLength="145.6919403076172" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >Retrieve</text><text xml:space="preserve" x="2.9770355224609375" y="116" width="145.04592895507812" textLength="145.04592895507812" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >patients</text></g></g><use xlink:href="#StickerType2" transform="translate(420.35, 429.7) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(418.13, 427.88) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="5.4400177001953125" y="63" width="150.51995849609375" textLength="150.51995849609375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="40" 
+				fill="#1a1a1a" direction="ltr" >Choose </text><text xml:space="preserve" x="3.5400390625" y="118" width="143.919921875" textLength="143.919921875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="40" 
+				fill="#1a1a1a" direction="ltr" >patient </text></g></g><use xlink:href="#StickerType1" transform="translate(243.06, 78.78) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(240.84, 76.96) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="2.6540298461914062" y="38" width="145.6919403076172" textLength="145.6919403076172" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >Retrieve</text><text xml:space="preserve" x="13.446022033691406" y="90" width="133.98794555664062" textLength="133.98794555664062" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >service </text><text xml:space="preserve" x="27.449020385742188" y="142" width="96.10195922851562" textLength="96.10195922851562" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >types</text></g></g><use xlink:href="#StickerType2" transform="translate(525.41, 429.7) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(523.18, 427.88) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="3.076171875" y="62" width="144.84765625" textLength="144.84765625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="44" 
+				fill="#1a1a1a" direction="ltr" >Patient</text><text xml:space="preserve" x="1.89453125" y="122" width="147.2109375" textLength="147.2109375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="44" 
+				fill="#1a1a1a" direction="ltr" >chosen</text></g></g><use xlink:href="#StickerType2" transform="translate(861.96, 422.5) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(859.73, 420.68) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="37.00390625" y="67" width="84.78515625" textLength="84.78515625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Exam </text><text xml:space="preserve" x="0.75634765625" y="108" width="149.4873046875" textLength="149.4873046875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >prescribed</text></g></g><use xlink:href="#StickerType1" transform="translate(161.47, 231.57) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(159.25, 229.75) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="0.79296875" y="67" width="149.4140625" textLength="149.4140625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Availability</text><text xml:space="preserve" x="20.4365234375" y="108" width="110.126953125" textLength="110.126953125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >entered</text></g></g><use xlink:href="#StickerType2" transform="translate(54.7, 231.57) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(52.48, 229.75) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="37.82001495361328" y="67" width="83.15995788574219" textLength="83.15995788574219" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Enter </text><text xml:space="preserve" x="0.9950637817382812" y="108" width="149.00987243652344" textLength="149.00987243652344" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >availability</text></g></g><use xlink:href="#StickerType1" transform="translate(745.56, 225.43) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(743.34, 223.61) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="7.651031494140625" y="38" width="145.5779266357422" textLength="145.5779266357422" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >Consult </text><text xml:space="preserve" x="5.751029968261719" y="90" width="149.3779296875" textLength="149.3779296875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >medical </text><text xml:space="preserve" x="8.449012756347656" y="142" width="134.1019744873047" textLength="134.1019744873047" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >records</text></g></g><use xlink:href="#StickerType1" transform="translate(749.94, 468.56) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(747.71, 466.75) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="7.651031494140625" y="38" width="145.5779266357422" textLength="145.5779266357422" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >Consult </text><text xml:space="preserve" x="5.751029968261719" y="90" width="149.3779296875" textLength="149.3779296875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >medical </text><text xml:space="preserve" x="8.449012756347656" y="142" width="134.1019744873047" textLength="134.1019744873047" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >records</text></g></g><use xlink:href="#StickerType2" transform="translate(861.96, 468.56) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(859.73, 466.75) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="17.6640625" y="44" width="123.984375" textLength="123.984375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >Medical </text><text xml:space="preserve" x="18.7421875" y="88" width="121.828125" textLength="121.828125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >records </text><text xml:space="preserve" x="2.46875" y="132" width="146.0625" textLength="146.0625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >consulted</text></g></g><use xlink:href="#StickerType2" transform="translate(861.96, 225.43) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(859.73, 223.61) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="17.6640625" y="44" width="123.984375" textLength="123.984375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >Medical </text><text xml:space="preserve" x="18.7421875" y="88" width="121.828125" textLength="121.828125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >records </text><text xml:space="preserve" x="2.46875" y="132" width="146.0625" textLength="146.0625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >consulted</text></g></g><use xlink:href="#StickerType1" transform="translate(424.11, 79.04) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(421.89, 77.22) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="17.990028381347656" y="67" width="122.81993103027344" textLength="122.81993103027344" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Retrieve </text><text xml:space="preserve" x="3.935028076171875" y="108" width="143.12994384765625" textLength="143.12994384765625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >medicines</text></g></g><use xlink:href="#StickerType1" transform="translate(745.56, 320.27) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(743.34, 318.45) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="1.1930313110351562" y="65" width="148.6139373779297" textLength="148.6139373779297" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="34" 
+				fill="#1a1a1a" direction="ltr" >Prescribe</text><text xml:space="preserve" x="2.5360336303710938" y="112" width="145.9279327392578" textLength="145.9279327392578" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="34" 
+				fill="#1a1a1a" direction="ltr" >medicine</text></g></g><use xlink:href="#StickerType1" transform="translate(861.96, 323.08) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(859.73, 321.27) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="4.84326171875" y="67" width="149.1064453125" textLength="149.1064453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Medicines </text><text xml:space="preserve" x="0.75634765625" y="108" width="149.4873046875" textLength="149.4873046875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >prescribed</text></g></g><use xlink:href="#StickerType1" transform="translate(862.17, 602.81) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(859.95, 600.99) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="2.287109375" y="67" width="146.42578125" textLength="146.42578125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Document</text><text xml:space="preserve" x="9.10595703125" y="108" width="132.7880859375" textLength="132.7880859375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >uploaded</text></g></g><use xlink:href="#StickerType1" transform="translate(750.94, 602.81) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(748.71, 600.99) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="24.725021362304688" y="67" width="109.34994506835938" textLength="109.34994506835938" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Upload </text><text xml:space="preserve" x="3.560028076171875" y="108" width="143.87994384765625" textLength="143.87994384765625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >document</text></g></g><use xlink:href="#StickerType2" transform="translate(526.16, 760.66) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(523.94, 758.84) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="0.02392578125" y="67" width="150.9521484375" textLength="150.9521484375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Delegation</text><text xml:space="preserve" x="12.365234375" y="108" width="126.26953125" textLength="126.26953125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >accepted</text></g></g><use xlink:href="#StickerType1" transform="translate(420.63, 760.66) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(418.4, 758.84) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="28.415016174316406" y="67" width="101.96995544433594" textLength="101.96995544433594" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Accept </text><text xml:space="preserve" x="0.21503448486328125" y="108" width="150.56993103027344" textLength="150.56993103027344" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >delegation</text></g></g><use xlink:href="#StickerType2" transform="translate(526.16, 711.06) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(523.94, 709.24) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="0.02392578125" y="67" width="150.9521484375" textLength="150.9521484375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Delegation</text><text xml:space="preserve" x="16.349609375" y="108" width="118.30078125" textLength="118.30078125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >declined</text></g></g><use xlink:href="#StickerType2" transform="translate(420.63, 711.06) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(418.4, 709.24) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="23.420021057128906" y="67" width="111.95994567871094" textLength="111.95994567871094" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Decline </text><text xml:space="preserve" x="0.21503448486328125" y="108" width="150.56993103027344" textLength="150.56993103027344" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >delegation</text></g></g><use xlink:href="#StickerType1" transform="translate(526.16, 614.89) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(523.94, 613.07) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="21.1396484375" y="65" width="118.072265625" textLength="118.072265625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="36" 
+				fill="#1a1a1a" direction="ltr" >Profile </text><text xml:space="preserve" x="3.833984375" y="114" width="143.33203125" textLength="143.33203125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="36" 
+				fill="#1a1a1a" direction="ltr" >changed</text></g></g><use xlink:href="#StickerType1" transform="translate(420.87, 614.89) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(418.65, 613.07) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="3.34002685546875" y="63" width="144.3199462890625" textLength="144.3199462890625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="40" 
+				fill="#1a1a1a" direction="ltr" >Change</text><text xml:space="preserve" x="14.760025024414062" y="118" width="121.47994995117188" textLength="121.47994995117188" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="40" 
+				fill="#1a1a1a" direction="ltr" >profile</text></g></g><use xlink:href="#StickerType2" transform="translate(526.16, 806.73) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(523.94, 804.91) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="0.02392578125" y="67" width="150.9521484375" textLength="150.9521484375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Delegation</text><text xml:space="preserve" x="22.7802734375" y="108" width="105.439453125" textLength="105.439453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >deleted</text></g></g><use xlink:href="#StickerType2" transform="translate(420.63, 806.73) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(418.4, 804.91) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="29.88501739501953" y="67" width="99.02995300292969" textLength="99.02995300292969" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Delete </text><text xml:space="preserve" x="0.21503448486328125" y="108" width="150.56993103027344" textLength="150.56993103027344" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >delegation</text></g></g><use xlink:href="#StickerType1" transform="translate(861.96, 514.63) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(859.73, 512.81) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="42.13671875" y="50" width="73.48046875" textLength="73.48046875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Exam </text><text xml:space="preserve" x="2.2734375" y="86" width="146.453125" textLength="146.453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >prescription</text><text xml:space="preserve" x="24.05859375" y="122" width="102.8828125" textLength="102.8828125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >founded</text></g></g><use xlink:href="#StickerType1" transform="translate(749.94, 514.63) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(747.71, 512.81) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="13.269035339355469" y="50" width="131.221923828125" textLength="131.221923828125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Search for </text><text xml:space="preserve" x="19.70403289794922" y="86" width="111.59193420410156" textLength="111.59193420410156" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >medicine</text><text xml:space="preserve" x="1.9330520629882812" y="122" width="147.13389587402344" textLength="147.13389587402344" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >prescription</text></g></g><use xlink:href="#StickerType2" transform="translate(749.94, 648.88) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(747.71, 647.06) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="13.646026611328125" y="68" width="130.4679412841797" textLength="130.4679412841797" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Download </text><text xml:space="preserve" x="1.9330520629882812" y="104" width="147.13389587402344" textLength="147.13389587402344" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >prescription</text></g></g><use xlink:href="#StickerType1" transform="translate(54.7, 277.63) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(52.48, 275.82) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="25.658042907714844" y="50" width="106.44390869140625" textLength="106.44390869140625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Retrieve </text><text xml:space="preserve" x="35.4730224609375" y="86" width="86.81394958496094" textLength="86.81394958496094" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >doctor </text><text xml:space="preserve" x="0.6460494995117188" y="122" width="149.70790100097656" textLength="149.70790100097656" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >availabilities</text></g></g><use xlink:href="#StickerType2" transform="translate(54.7, 464.6) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(52.48, 462.79) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="24.30803680419922" y="52.5" width="108.62391662597656" textLength="108.62391662597656" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >Schedule </text><text xml:space="preserve" x="31.448036193847656" y="85.5" width="94.34391784667969" textLength="94.34391784667969" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >medical </text><text xml:space="preserve" x="2.168060302734375" y="118.5" width="146.66387939453125" textLength="146.66387939453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >appointment</text></g></g><use xlink:href="#StickerType2" transform="translate(161.47, 464.6) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(159.25, 462.79) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="1.818359375" y="69" width="147.36328125" textLength="147.36328125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >Appointment</text><text xml:space="preserve" x="18.125" y="102" width="114.75" textLength="114.75" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >scheduled</text></g></g><use xlink:href="#StickerType1" transform="translate(54.7, 323.7) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(52.48, 321.88) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="23.795021057128906" y="67" width="111.20994567871094" textLength="111.20994567871094" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Update </text><text xml:space="preserve" x="0.9950637817382812" y="108" width="149.00987243652344" textLength="149.00987243652344" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >availability</text></g></g><use xlink:href="#StickerType1" transform="translate(861.96, 271.5) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(859.73, 269.68) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="20.4658203125" y="50" width="116.822265625" textLength="116.822265625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Medicine </text><text xml:space="preserve" x="2.2734375" y="86" width="146.453125" textLength="146.453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >prescription</text><text xml:space="preserve" x="24.05859375" y="122" width="102.8828125" textLength="102.8828125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >founded</text></g></g><use xlink:href="#StickerType2" transform="translate(861.96, 648.88) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(859.73, 647.06) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="8.03515625" y="69" width="141.1640625" textLength="141.1640625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >Prescription </text><text xml:space="preserve" x="5.802734375" y="102" width="139.39453125" textLength="139.39453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >downloaded</text></g></g><use xlink:href="#StickerType2" transform="translate(745.56, 271.5) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(743.34, 269.68) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="13.269035339355469" y="50" width="131.221923828125" textLength="131.221923828125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Search for </text><text xml:space="preserve" x="19.70403289794922" y="86" width="118.3519287109375" textLength="118.3519287109375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >medicine </text><text xml:space="preserve" x="1.9330520629882812" y="122" width="147.13389587402344" textLength="147.13389587402344" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >prescription</text></g></g><use xlink:href="#StickerType1" transform="translate(161.47, 323.7) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(159.25, 321.88) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="0.79296875" y="67" width="149.4140625" textLength="149.4140625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Availability</text><text xml:space="preserve" x="16.66455078125" y="108" width="117.6708984375" textLength="117.6708984375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >updated</text></g></g><use xlink:href="#StickerType2" transform="translate(161.47, 369.77) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(159.25, 367.95) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="0.79296875" y="67" width="149.4140625" textLength="149.4140625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Availability</text><text xml:space="preserve" x="22.7802734375" y="108" width="105.439453125" textLength="105.439453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >deleted</text></g></g><use xlink:href="#StickerType1" transform="translate(54.7, 369.77) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(52.48, 367.95) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="29.88501739501953" y="67" width="99.02995300292969" textLength="99.02995300292969" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Delete </text><text xml:space="preserve" x="0.9950637817382812" y="108" width="149.00987243652344" textLength="149.00987243652344" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >availability</text></g></g><use xlink:href="#StickerType2" transform="translate(861.96, 693.82) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(859.73, 692) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="2.287109375" y="67" width="146.42578125" textLength="146.42578125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Document</text><text xml:space="preserve" x="13.63232421875" y="108" width="123.7353515625" textLength="123.7353515625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >analyzed</text></g></g><use xlink:href="#StickerType2" transform="translate(749.94, 694.95) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(747.71, 693.13) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="21.200027465820312" y="67" width="116.39993286132812" textLength="116.39993286132812" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Analyze </text><text xml:space="preserve" x="3.560028076171875" y="108" width="143.87994384765625" textLength="143.87994384765625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >document</text></g></g><use xlink:href="#StickerType2" transform="translate(861.96, 787.08) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(859.73, 785.26) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="2.287109375" y="67" width="146.42578125" textLength="146.42578125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Document</text><text xml:space="preserve" x="22.7802734375" y="108" width="105.439453125" textLength="105.439453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >deleted</text></g></g><use xlink:href="#StickerType2" transform="translate(861.96, 741.01) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(859.73, 739.2) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="2.9716796875" y="50" width="145.056640625" textLength="145.056640625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Document&#39;s</text><text xml:space="preserve" x="17.279296875" y="86" width="123.1953125" textLength="123.1953125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >metadata </text><text xml:space="preserve" x="24.50927734375" y="122" width="101.9814453125" textLength="101.9814453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >updated</text></g></g><use xlink:href="#StickerType1" transform="translate(750.25, 741.01) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(748.02, 739.2) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="30.68902587890625" y="50" width="96.38194274902344" textLength="96.38194274902344" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Update </text><text xml:space="preserve" x="4.130035400390625" y="86" width="149.4999237060547" textLength="149.4999237060547" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >document&#39;s </text><text xml:space="preserve" x="16.753028869628906" y="122" width="117.49394226074219" textLength="117.49394226074219" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >metadata</text></g></g><use xlink:href="#StickerType2" transform="translate(749.94, 787.08) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(747.71, 785.26) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="29.88501739501953" y="67" width="99.02995300292969" textLength="99.02995300292969" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Delete </text><text xml:space="preserve" x="3.560028076171875" y="108" width="143.87994384765625" textLength="143.87994384765625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >document</text></g></g><use xlink:href="#StickerType1" transform="translate(54.7, 510.67) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(52.48, 508.85) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="7.415046691894531" y="46.5" width="143.9698944091797" textLength="143.9698944091797" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >Mark visit </text><text xml:space="preserve" x="59.90000915527344" y="87.5" width="38.999969482421875" textLength="38.999969482421875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >as </text><text xml:space="preserve" x="0.5450286865234375" y="128.5" width="149.90994262695312" textLength="149.90994262695312" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="30" 
+				fill="#1a1a1a" direction="ltr" >completed</text></g></g><use xlink:href="#StickerType2" transform="translate(54.7, 556.74) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(52.48, 554.92) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="16.49303436279297" y="32" width="124.77392578125" textLength="124.77392578125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Mark visit </text><text xml:space="preserve" x="3.40203857421875" y="68" width="150.95591735839844" textLength="150.95591735839844" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >as not done </text><text xml:space="preserve" x="9.057044982910156" y="104" width="139.64590454101562" textLength="139.64590454101562" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >(Patient no </text><text xml:space="preserve" x="39.516021728515625" y="140" width="71.96795654296875" textLength="71.96795654296875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >show)</text></g></g><use xlink:href="#StickerType1" transform="translate(161.54, 510.67) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(159.31, 508.85) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="21.427734375" y="57" width="122.69140625" textLength="122.69140625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="56" 
+				fill="#1a1a1a" direction="ltr" >Visit </text><text xml:space="preserve" x="8.53515625" y="134" width="133.9296875" textLength="133.9296875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="56" 
+				fill="#1a1a1a" direction="ltr" >done</text></g></g><use xlink:href="#StickerType1" transform="translate(161.54, 556.74) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(159.31, 554.92) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="0.265625" y="63" width="150.46875" textLength="150.46875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="40" 
+				fill="#1a1a1a" direction="ltr" >Visit not</text><text xml:space="preserve" x="27.66796875" y="118" width="95.6640625" textLength="95.6640625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="40" 
+				fill="#1a1a1a" direction="ltr" >done</text></g></g><use xlink:href="#StickerType1" transform="translate(54.7, 602.81) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(52.48, 600.99) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="44.732017517089844" y="52.5" width="67.77595520019531" textLength="67.77595520019531" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >Move </text><text xml:space="preserve" x="2.168060302734375" y="85.5" width="146.66387939453125" textLength="146.66387939453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >appointment</text><text xml:space="preserve" x="11.108078002929688" y="118.5" width="128.78384399414062" textLength="128.78384399414062" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >to past visit</text></g></g><use xlink:href="#StickerType2" transform="translate(161.54, 648.88) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(159.31, 647.06) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="1.818359375" y="69" width="147.36328125" textLength="147.36328125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >Appointment</text><text xml:space="preserve" x="33.32421875" y="102" width="84.3515625" textLength="84.3515625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >deleted</text></g></g><use xlink:href="#StickerType1" transform="translate(54.7, 648.88) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(52.48, 647.06) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="39.008026123046875" y="69" width="79.22393798828125" textLength="79.22393798828125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >Delete </text><text xml:space="preserve" x="2.168060302734375" y="102" width="146.66387939453125" textLength="146.66387939453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >appointment</text></g></g><use xlink:href="#StickerType2" transform="translate(54.7, 698.17) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(52.48, 696.35) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="10.916046142578125" y="69" width="135.40789794921875" textLength="135.40789794921875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >Reschedule </text><text xml:space="preserve" x="2.168060302734375" y="102" width="146.66387939453125" textLength="146.66387939453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >appointment</text></g></g><use xlink:href="#StickerType1" transform="translate(161.54, 698.17) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(159.31, 696.35) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="1.818359375" y="69" width="147.36328125" textLength="147.36328125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >Appointment</text><text xml:space="preserve" x="6.494140625" y="102" width="138.01171875" textLength="138.01171875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >rescheduled</text></g></g><use xlink:href="#StickerType1" transform="translate(161.47, 277.63) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(159.25, 275.82) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="17.92041015625" y="50" width="121.9130859375" textLength="121.9130859375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >Retrieved </text><text xml:space="preserve" x="29.54296875" y="86" width="98.66796875" textLength="98.66796875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >doctors </text><text xml:space="preserve" x="1.51806640625" y="122" width="147.9638671875" textLength="147.9638671875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="26" 
+				fill="#1a1a1a" direction="ltr" >availabilities</text></g></g><use xlink:href="#StickerType2" transform="translate(526.16, 520.06) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(523.94, 518.24) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="8.640625" y="44" width="142.03125" textLength="142.03125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >Available </text><text xml:space="preserve" x="1.4765625" y="88" width="148.046875" textLength="148.046875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >profile list</text><text xml:space="preserve" x="4.421875" y="132" width="142.15625" textLength="142.15625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >displayed</text></g></g><use xlink:href="#StickerType1" transform="translate(749.94, 422.5) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(747.71, 420.68) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="1.1930313110351562" y="65" width="148.6139373779297" textLength="148.6139373779297" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="34" 
+				fill="#1a1a1a" direction="ltr" >Prescribe</text><text xml:space="preserve" x="31.827011108398438" y="112" width="87.34597778320312" textLength="87.34597778320312" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="34" 
+				fill="#1a1a1a" direction="ltr" >exam</text></g></g><use xlink:href="#StickerType2" transform="translate(525.41, 376.43) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(523.18, 374.61) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="11.42626953125" y="65" width="136.9794921875" textLength="136.9794921875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="34" 
+				fill="#1a1a1a" direction="ltr" >Patients </text><text xml:space="preserve" x="3.77294921875" y="112" width="143.4541015625" textLength="143.4541015625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="34" 
+				fill="#1a1a1a" direction="ltr" >retrieved</text></g></g><use xlink:href="#StickerType1" transform="translate(60.23, 78.78) scale(0.20205480120484198) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#b2d0fe"/><g width="199px" height="228px"  transform="translate(58.01, 76.96) scale(0.20205480120484198) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="2.6540298461914062" y="64" width="145.6919403076172" textLength="145.6919403076172" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >Retrieve</text><text xml:space="preserve" x="2.9010543823242188" y="116" width="145.19789123535156" textLength="145.19789123535156" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"Noto Sans", Helvetica, OpenSans, Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >facilities</text></g></g><use xlink:href="#StickerType1" transform="translate(155.94, 78.78) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(153.72, 76.96) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="0.427734375" y="64" width="150.14453125" textLength="150.14453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >Facilities</text><text xml:space="preserve" x="5.994140625" y="116" width="139.01171875" textLength="139.01171875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="38" 
+				fill="#1a1a1a" direction="ltr" >retrived</text></g></g><use xlink:href="#StickerType2" transform="translate(521.65, 79.04) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(519.43, 77.22) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="0.1328125" y="66" width="150.734375" textLength="150.734375" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >Medicines</text><text xml:space="preserve" x="7.9921875" y="110" width="135.015625" textLength="135.015625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="32" 
+				fill="#1a1a1a" direction="ltr" >retrieved</text></g></g><use xlink:href="#StickerType2" transform="translate(337.32, 78.78) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(335.1, 76.96) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="19.24560546875" y="41.5" width="121.3408203125" textLength="121.3408203125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="34" 
+				fill="#1a1a1a" direction="ltr" >Service </text><text xml:space="preserve" x="32.8671875" y="88.5" width="94.09765625" textLength="94.09765625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="34" 
+				fill="#1a1a1a" direction="ltr" >types </text><text xml:space="preserve" x="3.77294921875" y="135.5" width="143.4541015625" textLength="143.4541015625" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="34" 
+				fill="#1a1a1a" direction="ltr" >retrieved</text></g></g><use xlink:href="#StickerType2" transform="translate(161.54, 602.81) scale(0.202054801204834) rotate(0, 99.5, 114) scale(0.44, 0.46)" fill="#ffb575"/><g width="199px" height="228px"  transform="translate(159.31, 600.99) scale(0.202054801204834) rotate(0, 99.5, 114)"><g transform="translate(24, 22)"><text xml:space="preserve" x="1.818359375" y="52.5" width="147.36328125" textLength="147.36328125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >Appointment</text><text xml:space="preserve" x="22.390625" y="85.5" width="112.453125" textLength="112.453125" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >moved to </text><text xml:space="preserve" x="26.3515625" y="118.5" width="98.296875" textLength="98.296875" lengthAdjust="spacingAndGlyphs" letter-spacing="0" font-family='"OpenSans", Arial, sans-serif, Noto Sans Hebrew, Noto Sans, Noto Sans JP, Noto Sans KR' font-size="24" 
+				fill="#1a1a1a" direction="ltr" >past visit</text></g></g></svg>

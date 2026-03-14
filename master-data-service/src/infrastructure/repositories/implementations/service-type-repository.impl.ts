@@ -1,4 +1,4 @@
-import { ServiceTypeModel } from '../../database/models/index.js';
+import { ServiceTypeModel } from '../../database/index.js';
 import type {
   ServiceType,
   ServiceTypeRepository,

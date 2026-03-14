@@ -1,5 +1,6 @@
 package it.nucleo.documents.infrastructure.ai
 
+import it.nucleo.commons.errors.getOrElse
 import it.nucleo.commons.logging.logger
 import it.nucleo.documents.domain.FileMetadata
 import it.nucleo.documents.domain.Summary
@@ -108,11 +109,24 @@ class AiServiceClient(host: String, port: Int, private val timeoutMs: Int = 120_
             val response = json.decodeFromString<AiAnalysisResponse>(responseBody)
 
             if (response.success) {
+                val summary =
+                    Summary(response.summary).getOrElse {
+                        throw IllegalArgumentException("Invalid AI summary: ${it.message}")
+                    }
+                val tags =
+                    response.tags
+                        .map { rawTag ->
+                            Tag(rawTag).getOrElse { error ->
+                                throw IllegalArgumentException(
+                                    "Invalid AI tag '$rawTag': ${error.message}"
+                                )
+                            }
+                        }
+                        .toSet()
                 val metadata =
-                    FileMetadata(
-                        summary = Summary(response.summary),
-                        tags = response.tags.map { Tag(it) }.toSet()
-                    )
+                    FileMetadata(summary = summary, tags = tags).getOrElse {
+                        throw IllegalArgumentException("Invalid AI metadata: ${it.message}")
+                    }
                 logger.info(
                     "AI analysis successful for document $documentId: " +
                         "summary_length=${response.summary.length}, tags_count=${response.tags.size}"

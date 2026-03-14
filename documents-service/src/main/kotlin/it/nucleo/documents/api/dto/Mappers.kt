@@ -1,7 +1,10 @@
 package it.nucleo.documents.api.dto
 
+import it.nucleo.commons.errors.DomainError
 import it.nucleo.commons.errors.Either
 import it.nucleo.commons.errors.failure
+import it.nucleo.commons.errors.getOrElse
+import it.nucleo.commons.errors.mapError
 import it.nucleo.commons.errors.success
 import it.nucleo.documents.domain.*
 import it.nucleo.documents.domain.DocumentFactory
@@ -11,6 +14,9 @@ import it.nucleo.documents.domain.prescription.implementation.*
 import it.nucleo.documents.domain.report.*
 import it.nucleo.documents.domain.uploaded.UploadedDocument
 import java.time.LocalDate
+
+private fun DomainError.toDocumentError(): DocumentError =
+    this as? DocumentError ?: DocumentError.InvalidRequest(message)
 
 fun Document.toResponse(): DocumentResponse =
     when (this) {
@@ -85,22 +91,55 @@ fun Dosage.toResponse(): DosageResponse =
         duration = DurationDto(duration.length, duration.unit.name)
     )
 
-fun ValidityRequest.toDomain(): Validity =
+fun ValidityRequest.toDomain(): Either<DocumentError, Validity> =
     when (this) {
-        is ValidityRequest.UntilDate -> Validity.UntilDate(LocalDate.parse(date))
-        is ValidityRequest.UntilExecution -> Validity.UntilExecution
+        is ValidityRequest.UntilDate -> success(Validity.UntilDate(LocalDate.parse(date)))
+        is ValidityRequest.UntilExecution -> success(Validity.UntilExecution)
     }
 
-fun DosageRequest.toDomain(): Dosage =
-    Dosage(
-        medicine = MedicineId(medicineId),
-        dose = Dose(dose.amount, DoseUnit.valueOf(dose.unit)),
-        frequency = Frequency(frequency.timesPerPeriod, Period.valueOf(frequency.period)),
-        duration = Duration(duration.length, Period.valueOf(duration.unit))
-    )
+fun DosageRequest.toDomain(): Either<DocumentError, Dosage> {
+    val medicine =
+        MedicineId(medicineId).getOrElse {
+            return failure(it.toDocumentError())
+        }
+    val domainDose =
+        Dose(dose.amount, DoseUnit.valueOf(dose.unit)).getOrElse {
+            return failure(it.toDocumentError())
+        }
+    val domainFrequency =
+        Frequency(frequency.timesPerPeriod, Period.valueOf(frequency.period)).getOrElse {
+            return failure(it.toDocumentError())
+        }
+    val domainDuration =
+        Duration(duration.length, Period.valueOf(duration.unit)).getOrElse {
+            return failure(it.toDocumentError())
+        }
 
-fun FileMetadataDto.toDomain(): FileMetadata =
-    FileMetadata(summary = Summary(summary), tags = tags.map { Tag(it) }.toSet())
+    return Dosage(
+            medicine = medicine,
+            dose = domainDose,
+            frequency = domainFrequency,
+            duration = domainDuration
+        )
+        .mapError { it.toDocumentError() }
+}
+
+fun FileMetadataDto.toDomain(): Either<DocumentError, FileMetadata> {
+    val summary =
+        Summary(summary).getOrElse {
+            return failure(it.toDocumentError())
+        }
+    val tags =
+        tags
+            .map {
+                Tag(it).getOrElse { error ->
+                    return failure(error.toDocumentError())
+                }
+            }
+            .toSet()
+
+    return FileMetadata(summary = summary, tags = tags).mapError { it.toDocumentError() }
+}
 
 suspend fun CreateDocumentRequest.toDomain(
     patientId: PatientId,
@@ -109,39 +148,73 @@ suspend fun CreateDocumentRequest.toDomain(
         (suspend (DocumentId) -> Either<DocumentError, ServicePrescription>)? =
         null,
 ): Either<DocumentError, Document> {
-    val doctorId = DoctorId(this.doctorId)
-    val title = Title(this.title)
-    val metadata = this.metadata.toDomain()
+    val doctorId =
+        DoctorId(this.doctorId).getOrElse {
+            return failure(it.toDocumentError())
+        }
+    val title =
+        Title(this.title).getOrElse {
+            return failure(it.toDocumentError())
+        }
+    val metadata =
+        this.metadata.toDomain().getOrElse {
+            return failure(it)
+        }
 
     return when (this) {
-        is CreateMedicinePrescriptionRequest ->
-            success(
-                DocumentFactory.createMedicinePrescription(
+        is CreateMedicinePrescriptionRequest -> {
+            val validity =
+                validity.toDomain().getOrElse {
+                    return failure(it)
+                }
+            val dosage =
+                dosage.toDomain().getOrElse {
+                    return failure(it)
+                }
+
+            DocumentFactory.createMedicinePrescription(
                     id = documentId,
                     doctorId = doctorId,
                     patientId = patientId,
                     title = title,
                     metadata = metadata,
-                    validity = validity.toDomain(),
-                    dosage = dosage.toDomain()
+                    validity = validity,
+                    dosage = dosage
                 )
-            )
-        is CreateServicePrescriptionRequest ->
-            success(
-                DocumentFactory.createServicePrescription(
+                .mapError { it.toDocumentError() }
+        }
+        is CreateServicePrescriptionRequest -> {
+            val validity =
+                validity.toDomain().getOrElse {
+                    return failure(it)
+                }
+            val serviceId =
+                ServiceId(serviceId).getOrElse {
+                    return failure(it.toDocumentError())
+                }
+            val facilityId =
+                FacilityId(facilityId).getOrElse {
+                    return failure(it.toDocumentError())
+                }
+
+            DocumentFactory.createServicePrescription(
                     id = documentId,
                     doctorId = doctorId,
                     patientId = patientId,
                     title = title,
                     metadata = metadata,
-                    validity = validity.toDomain(),
-                    serviceId = ServiceId(serviceId),
-                    facilityId = FacilityId(facilityId),
+                    validity = validity,
+                    serviceId = serviceId,
+                    facilityId = facilityId,
                     priority = Priority.valueOf(priority)
                 )
-            )
+                .mapError { it.toDocumentError() }
+        }
         is CreateReportRequest -> {
-            val prescriptionId = DocumentId(servicePrescriptionId)
+            val prescriptionId =
+                DocumentId(servicePrescriptionId).getOrElse {
+                    return failure(it.toDocumentError())
+                }
             val servicePrescription =
                 resolveServicePrescription?.invoke(prescriptionId)
                     ?: return failure(
@@ -150,22 +223,49 @@ suspend fun CreateDocumentRequest.toDomain(
 
             when (servicePrescription) {
                 is Either.Left -> failure(servicePrescription.error)
-                is Either.Right ->
-                    success(
-                        DocumentFactory.createReport(
+                is Either.Right -> {
+                    val executionDate =
+                        ExecutionDate(LocalDate.parse(executionDate)).getOrElse {
+                            return failure(it.toDocumentError())
+                        }
+                    val findings =
+                        Findings(findings).getOrElse {
+                            return failure(it.toDocumentError())
+                        }
+                    val clinicalQuestion =
+                        clinicalQuestion?.let {
+                            ClinicalQuestion(it).getOrElse { err ->
+                                return failure(err.toDocumentError())
+                            }
+                        }
+                    val conclusion =
+                        conclusion?.let {
+                            Conclusion(it).getOrElse { err ->
+                                return failure(err.toDocumentError())
+                            }
+                        }
+                    val recommendations =
+                        recommendations?.let {
+                            Recommendations(it).getOrElse { err ->
+                                return failure(err.toDocumentError())
+                            }
+                        }
+
+                    DocumentFactory.createReport(
                             id = documentId,
                             doctorId = doctorId,
                             patientId = patientId,
                             title = title,
                             metadata = metadata,
                             servicePrescription = servicePrescription.value,
-                            executionDate = ExecutionDate(LocalDate.parse(executionDate)),
-                            findings = Findings(findings),
-                            clinicalQuestion = clinicalQuestion?.let { ClinicalQuestion(it) },
-                            conclusion = conclusion?.let { Conclusion(it) },
-                            recommendations = recommendations?.let { Recommendations(it) }
+                            executionDate = executionDate,
+                            findings = findings,
+                            clinicalQuestion = clinicalQuestion,
+                            conclusion = conclusion,
+                            recommendations = recommendations
                         )
-                    )
+                        .mapError { it.toDocumentError() }
+                }
             }
         }
     }

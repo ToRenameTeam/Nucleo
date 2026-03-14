@@ -1,5 +1,5 @@
-import { UserModel } from '../../database/models/index.js';
-import type { IUserDocument } from '../../database/models/index.js';
+import { UserModel } from '../../database/index.js';
+import type { IUserDocument } from '../../database/index.js';
 import type { User } from '../../../domain/index.js';
 import type { UserRepository, UserData } from '../../../domain/repositories/index.js';
 

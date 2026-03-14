@@ -12,6 +12,11 @@ import it.nucleo.documents.fixtures.FakeFileStorageRepository
 
 class DocumentUploadServiceTest :
     DescribeSpec({
+        fun patientId(value: String): PatientId =
+            when (val result = PatientId(value)) {
+                is Either.Right -> result.value
+                is Either.Left -> error("Invalid test patientId: ${result.error.message}")
+            }
 
         // minimal valid PDF header (%PDF-1.4) followed by enough bytes
         val validPdfBytes = byteArrayOf(0x25, 0x50, 0x44, 0x46) + "−1.4 fake body".toByteArray()
@@ -35,7 +40,7 @@ class DocumentUploadServiceTest :
 
                     val command =
                         UploadDocumentCommand(
-                            patientId = PatientId("patient-001"),
+                            patientId = patientId("patient-001"),
                             filename = "blood-test.pdf",
                             content = validPdfBytes,
                             contentType = "application/pdf",
@@ -54,7 +59,7 @@ class DocumentUploadServiceTest :
 
                     val command =
                         UploadDocumentCommand(
-                            patientId = PatientId("patient-001"),
+                            patientId = patientId("patient-001"),
                             filename = "document.txt",
                             content = "text".toByteArray(),
                             contentType = "application/pdf",
@@ -71,7 +76,7 @@ class DocumentUploadServiceTest :
 
                     val command =
                         UploadDocumentCommand(
-                            patientId = PatientId("patient-001"),
+                            patientId = patientId("patient-001"),
                             filename = "document.pdf",
                             content = validPdfBytes,
                             contentType = "text/plain",
@@ -87,7 +92,7 @@ class DocumentUploadServiceTest :
 
                     val command =
                         UploadDocumentCommand(
-                            patientId = PatientId("patient-001"),
+                            patientId = patientId("patient-001"),
                             filename = "empty.pdf",
                             content = byteArrayOf(),
                             contentType = "application/pdf",
@@ -104,7 +109,7 @@ class DocumentUploadServiceTest :
 
                     val command =
                         UploadDocumentCommand(
-                            patientId = PatientId("patient-001"),
+                            patientId = patientId("patient-001"),
                             filename = "fake.pdf",
                             content = "Not a real PDF content".toByteArray(),
                             contentType = "application/pdf",

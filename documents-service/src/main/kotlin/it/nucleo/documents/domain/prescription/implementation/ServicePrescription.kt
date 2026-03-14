@@ -1,5 +1,10 @@
 package it.nucleo.documents.domain.prescription.implementation
 
+import it.nucleo.commons.errors.DomainError
+import it.nucleo.commons.errors.Either
+import it.nucleo.commons.errors.ValidationError
+import it.nucleo.commons.errors.failure
+import it.nucleo.commons.errors.success
 import it.nucleo.documents.domain.DoctorId
 import it.nucleo.documents.domain.Document
 import it.nucleo.documents.domain.DocumentId
@@ -25,9 +30,25 @@ data class ServicePrescription(
     override fun withMetadata(newMetadata: FileMetadata): Document = copy(metadata = newMetadata)
 }
 
-@JvmInline value class ServiceId(val id: String)
+@JvmInline
+value class ServiceId private constructor(val id: String) {
+    companion object {
+        operator fun invoke(id: String): Either<DomainError, ServiceId> {
+            if (id.isBlank()) return failure(ValidationError("ServiceId cannot be blank"))
+            return success(ServiceId(id))
+        }
+    }
+}
 
-@JvmInline value class FacilityId(val id: String)
+@JvmInline
+value class FacilityId private constructor(val id: String) {
+    companion object {
+        operator fun invoke(id: String): Either<DomainError, FacilityId> {
+            if (id.isBlank()) return failure(ValidationError("FacilityId cannot be blank"))
+            return success(FacilityId(id))
+        }
+    }
+}
 
 enum class Priority {
     ROUTINE,

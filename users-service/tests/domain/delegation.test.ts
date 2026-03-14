@@ -1,5 +1,5 @@
-import { Delegation } from '../../src/domain/delegation.js';
-import { DelegationStatus } from '../../src/domain/delegation-status.js';
+import { Delegation } from '../../src/domain/index.js';
+import { DelegationStatus } from '../../src/domain/index.js';
 import { randomUUID } from 'crypto';
 
 describe('Delegation', () => {

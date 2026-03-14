@@ -1,5 +1,10 @@
 package it.nucleo.documents.domain
 
+import it.nucleo.commons.errors.DomainError
+import it.nucleo.commons.errors.Either
+import it.nucleo.commons.errors.failure
+import it.nucleo.commons.errors.getOrElse
+import it.nucleo.commons.errors.success
 import it.nucleo.documents.domain.prescription.Prescription
 import it.nucleo.documents.domain.prescription.Validity
 import it.nucleo.documents.domain.prescription.implementation.Dosage
@@ -21,7 +26,10 @@ import java.util.UUID
 
 object DocumentFactory {
 
-    private val UNKNOWN_DOCTOR_ID = DoctorId("UNKNOWN")
+    private val UNKNOWN_DOCTOR_ID =
+        DoctorId("UNKNOWN").getOrElse {
+            throw IllegalStateException("Invalid static UNKNOWN_DOCTOR_ID: ${it.message}")
+        }
 
     fun createMedicinePrescription(
         id: DocumentId = generateDocumentId(),
@@ -31,17 +39,19 @@ object DocumentFactory {
         metadata: FileMetadata,
         validity: Validity,
         dosage: Dosage,
-        issueDate: IssueDate = IssueDate()
-    ): Prescription =
-        MedicinePrescription(
-            id = id,
-            doctorId = doctorId,
-            patientId = patientId,
-            issueDate = issueDate,
-            title = title,
-            metadata = metadata,
-            validity = validity,
-            dosage = dosage
+        issueDate: IssueDate = IssueDate.now()
+    ): Either<DomainError, Prescription> =
+        success(
+            MedicinePrescription(
+                id = id,
+                doctorId = doctorId,
+                patientId = patientId,
+                issueDate = issueDate,
+                title = title,
+                metadata = metadata,
+                validity = validity,
+                dosage = dosage
+            )
         )
 
     fun createServicePrescription(
@@ -54,19 +64,21 @@ object DocumentFactory {
         serviceId: ServiceId,
         facilityId: FacilityId,
         priority: Priority = Priority.ROUTINE,
-        issueDate: IssueDate = IssueDate()
-    ): Prescription =
-        ServicePrescription(
-            id = id,
-            doctorId = doctorId,
-            patientId = patientId,
-            issueDate = issueDate,
-            title = title,
-            metadata = metadata,
-            validity = validity,
-            serviceId = serviceId,
-            facilityId = facilityId,
-            priority = priority
+        issueDate: IssueDate = IssueDate.now()
+    ): Either<DomainError, Prescription> =
+        success(
+            ServicePrescription(
+                id = id,
+                doctorId = doctorId,
+                patientId = patientId,
+                issueDate = issueDate,
+                title = title,
+                metadata = metadata,
+                validity = validity,
+                serviceId = serviceId,
+                facilityId = facilityId,
+                priority = priority
+            )
         )
 
     fun createReport(
@@ -81,21 +93,23 @@ object DocumentFactory {
         clinicalQuestion: ClinicalQuestion? = null,
         conclusion: Conclusion? = null,
         recommendations: Recommendations? = null,
-        issueDate: IssueDate = IssueDate()
-    ): Report =
-        DefaultReport(
-            id = id,
-            doctorId = doctorId,
-            patientId = patientId,
-            issueDate = issueDate,
-            title = title,
-            metadata = metadata,
-            servicePrescription = servicePrescription,
-            executionDate = executionDate,
-            clinicalQuestion = clinicalQuestion,
-            findings = findings,
-            conclusion = conclusion,
-            recommendations = recommendations
+        issueDate: IssueDate = IssueDate.now()
+    ): Either<DomainError, Report> =
+        success(
+            DefaultReport(
+                id = id,
+                doctorId = doctorId,
+                patientId = patientId,
+                issueDate = issueDate,
+                title = title,
+                metadata = metadata,
+                servicePrescription = servicePrescription,
+                executionDate = executionDate,
+                clinicalQuestion = clinicalQuestion,
+                findings = findings,
+                conclusion = conclusion,
+                recommendations = recommendations
+            )
         )
 
     fun createUploadedDocument(
@@ -105,18 +119,28 @@ object DocumentFactory {
         filename: String,
         metadata: FileMetadata,
         documentType: UploadedDocumentType = UploadedDocumentType.OTHER,
-        issueDate: IssueDate = IssueDate()
-    ): UploadedDocument =
-        UploadedDocument(
-            id = id,
-            doctorId = UNKNOWN_DOCTOR_ID,
-            patientId = patientId,
-            issueDate = issueDate,
-            title = title,
-            metadata = metadata,
-            filename = filename,
-            documentType = documentType
-        )
+        issueDate: IssueDate = IssueDate.now()
+    ): Either<DomainError, UploadedDocument> {
+        if (filename.isBlank()) {
+            return failure(it.nucleo.commons.errors.ValidationError("Filename cannot be blank"))
+        }
 
-    private fun generateDocumentId(): DocumentId = DocumentId(UUID.randomUUID().toString())
+        return success(
+            UploadedDocument(
+                id = id,
+                doctorId = UNKNOWN_DOCTOR_ID,
+                patientId = patientId,
+                issueDate = issueDate,
+                title = title,
+                metadata = metadata,
+                filename = filename,
+                documentType = documentType
+            )
+        )
+    }
+
+    private fun generateDocumentId(): DocumentId =
+        DocumentId(UUID.randomUUID().toString()).getOrElse {
+            throw IllegalStateException("Failed to generate DocumentId: ${it.message}")
+        }
 }

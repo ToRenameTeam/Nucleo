@@ -1,9 +1,11 @@
 import type { Appointment } from '../types/appointment';
 import type { Availability, AvailabilityStatus } from '../types/availability';
 import { APPOINTMENTS_API_URL, API_ENDPOINTS } from './config';
+import { z } from 'zod';
 import { masterDataApi } from './masterData';
 import { getAvailabilityByIdRaw } from './availabilities';
 import { userApi } from './users';
+import { idSchema, nonEmptyTrimmedStringSchema, parseWithSchema } from './validation';
 
 const BASE_URL = `${APPOINTMENTS_API_URL}${API_ENDPOINTS.APPOINTMENTS}`;
 
@@ -33,6 +35,36 @@ interface AppointmentResponse {
   };
   availabilityStatus?: string;
 }
+
+const appointmentTimeSlotSchema = z.object({
+  startDateTime: nonEmptyTrimmedStringSchema,
+  durationMinutes: z.number().int().positive(),
+});
+
+const appointmentResponseSchema = z
+  .object({
+    appointmentId: idSchema,
+    patientId: idSchema,
+    availabilityId: idSchema,
+    status: nonEmptyTrimmedStringSchema,
+    createdAt: nonEmptyTrimmedStringSchema,
+    updatedAt: nonEmptyTrimmedStringSchema,
+    doctorId: idSchema.optional(),
+    facilityId: idSchema.optional(),
+    serviceTypeId: idSchema.optional(),
+    timeSlot: appointmentTimeSlotSchema.optional(),
+    availabilityStatus: nonEmptyTrimmedStringSchema.optional(),
+  })
+  .passthrough();
+
+const getAppointmentsFiltersSchema = z.object({
+  patientId: idSchema.optional(),
+  doctorId: idSchema.optional(),
+  facilityId: idSchema.optional(),
+  status: nonEmptyTrimmedStringSchema.optional(),
+  startDate: nonEmptyTrimmedStringSchema.optional(),
+  endDate: nonEmptyTrimmedStringSchema.optional(),
+});
 
 async function mapAppointmentResponse(response: AppointmentResponse): Promise<Appointment> {
   // Get availability details from response or fetch from API
@@ -155,15 +187,23 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 export const appointmentsApi = {
   async getAppointments(filters: GetAppointmentsFilters = {}): Promise<Appointment[]> {
-    console.log('[Appointments API] Get appointments called with filters:', filters);
+    const sanitizedFilters = parseWithSchema(
+      getAppointmentsFiltersSchema,
+      filters,
+      'get appointments filters'
+    );
+
+    console.log('[Appointments API] Get appointments called with filters:', sanitizedFilters);
     const queryParams = new URLSearchParams();
 
-    if (filters.patientId) queryParams.append('patientId', filters.patientId);
-    if (filters.doctorId) queryParams.append('doctorId', filters.doctorId);
-    if (filters.facilityId) queryParams.append('facilityId', filters.facilityId);
-    if (filters.status) queryParams.append('status', filters.status);
-    if (filters.startDate) queryParams.append('startDate', filters.startDate);
-    if (filters.endDate) queryParams.append('endDate', filters.endDate);
+    if (sanitizedFilters.patientId) queryParams.append('patientId', sanitizedFilters.patientId);
+    if (sanitizedFilters.doctorId) queryParams.append('doctorId', sanitizedFilters.doctorId);
+    if (sanitizedFilters.facilityId) {
+      queryParams.append('facilityId', sanitizedFilters.facilityId);
+    }
+    if (sanitizedFilters.status) queryParams.append('status', sanitizedFilters.status);
+    if (sanitizedFilters.startDate) queryParams.append('startDate', sanitizedFilters.startDate);
+    if (sanitizedFilters.endDate) queryParams.append('endDate', sanitizedFilters.endDate);
 
     const url = `${BASE_URL}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     console.log('[Appointments API] Fetch call to:', url);
@@ -178,7 +218,12 @@ export const appointmentsApi = {
     console.log('[Appointments API] Response status:', response.status, response.statusText);
 
     try {
-      const appointments = await handleResponse<AppointmentResponse[]>(response);
+      const appointmentsRaw = await handleResponse<unknown>(response);
+      const appointments = parseWithSchema(
+        z.array(appointmentResponseSchema),
+        appointmentsRaw,
+        'get appointments response'
+      );
       console.log('[Appointments API] Data received:', appointments.length, 'raw appointments');
 
       // Map appointments with all related data
@@ -198,19 +243,22 @@ export const appointmentsApi = {
     doctorId: string,
     filters: Omit<GetAppointmentsFilters, 'doctorId'> = {}
   ): Promise<Appointment[]> {
-    console.log('[Appointments API] getAppointmentsByDoctor called by doctor:', doctorId);
-    return this.getAppointments({ ...filters, doctorId });
+    const sanitizedDoctorId = parseWithSchema(idSchema, doctorId, 'appointments doctorId');
+    console.log('[Appointments API] getAppointmentsByDoctor called by doctor:', sanitizedDoctorId);
+    return this.getAppointments({ ...filters, doctorId: sanitizedDoctorId });
   },
 
   async getAppointmentsByPatient(
     patientId: string,
     filters: Omit<GetAppointmentsFilters, 'patientId'> = {}
   ): Promise<Appointment[]> {
-    return this.getAppointments({ ...filters, patientId });
+    const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'appointments patientId');
+    return this.getAppointments({ ...filters, patientId: sanitizedPatientId });
   },
 
   async getAppointmentById(id: string): Promise<Appointment | null> {
-    const response = await fetch(`${BASE_URL}/${id}/details`, {
+    const sanitizedId = parseWithSchema(idSchema, id, 'appointment id');
+    const response = await fetch(`${BASE_URL}/${sanitizedId}/details`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -221,20 +269,40 @@ export const appointmentsApi = {
       return null;
     }
 
-    const appointment = await handleResponse<AppointmentResponse>(response);
+    const appointmentRaw = await handleResponse<unknown>(response);
+    const appointment = parseWithSchema(
+      appointmentResponseSchema,
+      appointmentRaw,
+      'get appointment by id response'
+    );
     return mapAppointmentResponse(appointment);
   },
 
   async createAppointment(patientId: string, availabilityId: string): Promise<Appointment> {
+    const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'create appointment patientId');
+    const sanitizedAvailabilityId = parseWithSchema(
+      idSchema,
+      availabilityId,
+      'create appointment availabilityId'
+    );
+
     const response = await fetch(`${BASE_URL}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ patientId, availabilityId }),
+      body: JSON.stringify({
+        patientId: sanitizedPatientId,
+        availabilityId: sanitizedAvailabilityId,
+      }),
     });
 
-    const appointment = await handleResponse<AppointmentResponse>(response);
+    const appointmentRaw = await handleResponse<unknown>(response);
+    const appointment = parseWithSchema(
+      appointmentResponseSchema,
+      appointmentRaw,
+      'create appointment response'
+    );
     return mapAppointmentResponse(appointment);
   },
 
@@ -243,20 +311,34 @@ export const appointmentsApi = {
     status?: string,
     availabilityId?: string
   ): Promise<Appointment> {
-    const response = await fetch(`${BASE_URL}/${id}`, {
+    const sanitizedId = parseWithSchema(idSchema, id, 'update appointment id');
+    const sanitizedStatus = status
+      ? parseWithSchema(nonEmptyTrimmedStringSchema, status, 'update appointment status')
+      : undefined;
+    const sanitizedAvailabilityId = availabilityId
+      ? parseWithSchema(idSchema, availabilityId, 'update appointment availabilityId')
+      : undefined;
+
+    const response = await fetch(`${BASE_URL}/${sanitizedId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ status, availabilityId }),
+      body: JSON.stringify({ status: sanitizedStatus, availabilityId: sanitizedAvailabilityId }),
     });
 
-    const appointment = await handleResponse<AppointmentResponse>(response);
+    const appointmentRaw = await handleResponse<unknown>(response);
+    const appointment = parseWithSchema(
+      appointmentResponseSchema,
+      appointmentRaw,
+      'update appointment response'
+    );
     return mapAppointmentResponse(appointment);
   },
 
   async deleteAppointment(id: string): Promise<boolean> {
-    const response = await fetch(`${BASE_URL}/${id}`, {
+    const sanitizedId = parseWithSchema(idSchema, id, 'delete appointment id');
+    const response = await fetch(`${BASE_URL}/${sanitizedId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

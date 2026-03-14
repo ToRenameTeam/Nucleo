@@ -201,7 +201,7 @@ const handleMedicineInput = (event: Event) => {
 
 const selectMedicine = (medicine: Medicine) => {
   selectedMedicine.value = medicine;
-  formData.value.medicineId = medicine._id;
+  formData.value.medicineId = medicine.id;
   formData.value.medicineName = medicine.name;
   medicineSearchQuery.value = `${medicine.name} (${medicine.strength})`;
   showMedicineSuggestions.value = false;
@@ -422,7 +422,7 @@ onUnmounted(() => {
             >
               <button
                 v-for="medicine in filteredMedicines"
-                :key="medicine._id"
+                :key="medicine.id"
                 type="button"
                 class="suggestion-item"
                 @mousedown.prevent="selectMedicine(medicine)"

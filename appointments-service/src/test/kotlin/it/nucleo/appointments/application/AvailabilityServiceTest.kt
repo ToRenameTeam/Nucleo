@@ -28,9 +28,10 @@ class AvailabilityServiceTest :
                         serviceTypeId = AppointmentFixtures.SERVICE_TYPE_ID,
                         timeSlot =
                             TimeSlot(
-                                startDateTime = LocalDateTime.parse("2026-02-15T09:00:00"),
-                                durationMinutes = 30,
-                            ),
+                                    startDateTime = LocalDateTime.parse("2026-02-15T09:00:00"),
+                                    durationMinutes = 30,
+                                )
+                                .getOrElse { error("Invalid test time slot: ${it.message}") },
                     )
 
                 result.shouldBeInstanceOf<Either.Right<Availability>>()
@@ -51,9 +52,10 @@ class AvailabilityServiceTest :
                         serviceTypeId = AppointmentFixtures.SERVICE_TYPE_ID,
                         timeSlot =
                             TimeSlot(
-                                startDateTime = LocalDateTime.parse("2026-02-15T09:00:00"),
-                                durationMinutes = 30,
-                            ),
+                                    startDateTime = LocalDateTime.parse("2026-02-15T09:00:00"),
+                                    durationMinutes = 30,
+                                )
+                                .getOrElse { error("Invalid test time slot: ${it.message}") },
                     )
 
                 result.shouldBeInstanceOf<Either.Left<AvailabilityError.OverlapDetected>>()

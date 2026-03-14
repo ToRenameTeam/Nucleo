@@ -6,7 +6,7 @@ import {
   AuthenticatedUserFactory,
   PatientOnlyUser,
   DoctorPatientUser,
-} from '../../src/services/authenticated-user.factory.js';
+} from '../../src/services/index.js';
 
 describe('AuthenticatedUserFactory', () => {
   let mockUser: User;

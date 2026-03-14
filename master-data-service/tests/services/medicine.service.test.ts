@@ -1,22 +1,59 @@
-import '../setup.js';
 import {
   MedicineService,
   MedicineValidationError,
   MedicineConflictError,
   type CreateMedicineInput,
-} from '../../src/services/medicine.service.js';
-import { MedicineCategory } from '../../src/domain/medicine/index.js';
+} from '../../src/services/index.js';
+import { MedicineCategory } from '../../src/domain/index.js';
+import type { MedicineRepository } from '../../src/domain/index.js';
 
 describe('MedicineService', () => {
   let service: MedicineService;
+  let mockRepository: jest.Mocked<MedicineRepository>;
 
   beforeEach(() => {
-    service = new MedicineService();
+    mockRepository = {
+      findAll: jest.fn(),
+      findById: jest.fn(),
+      findByCode: jest.fn(),
+      create: jest.fn(),
+      updateById: jest.fn(),
+      softDelete: jest.fn(),
+      permanentDelete: jest.fn(),
+    };
+
+    service = new MedicineService(mockRepository);
   });
 
   describe('create', () => {
-    it('should create a new medicine successfully', async () => {
-      const input: CreateMedicineInput = {
+    const input: CreateMedicineInput = {
+      code: 'medicine-001',
+      name: 'Aspirina',
+      description: 'Acido acetilsalicilico per dolori e febbre',
+      category: MedicineCategory.ANALGESICO,
+      activeIngredient: 'Acido acetilsalicilico',
+      dosageForm: 'Compresse',
+      strength: '500mg',
+      manufacturer: 'Bayer',
+    };
+
+    it('should create medicine with isActive defaulted to true', async () => {
+      const created = {
+        id: 'medicine-id',
+        ...input,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockRepository.findByCode.mockResolvedValue(null);
+      mockRepository.create.mockResolvedValue(created);
+
+      const result = await service.create(input);
+
+      expect(result).toEqual(created);
+      expect(mockRepository.findByCode).toHaveBeenCalledWith('medicine-001');
+      expect(mockRepository.create).toHaveBeenCalledWith({
         code: 'medicine-001',
         name: 'Aspirina',
         description: 'Acido acetilsalicilico per dolori e febbre',
@@ -26,317 +63,184 @@ describe('MedicineService', () => {
         strength: '500mg',
         manufacturer: 'Bayer',
         isActive: true,
-      };
-
-      const result = await service.create(input);
-
-      expect(result).toBeDefined();
-      expect(result.code).toBe(input.code);
-      expect(result.name).toBe(input.name);
-      expect(result.description).toBe(input.description);
-      expect(result.category).toBe(input.category);
-      expect(result.activeIngredient).toBe(input.activeIngredient);
-      expect(result.dosageForm).toBe(input.dosageForm);
-      expect(result.strength).toBe(input.strength);
-      expect(result.manufacturer).toBe(input.manufacturer);
-      expect(result.isActive).toBe(true);
+      });
     });
 
-    it('should set isActive to true by default', async () => {
-      const input: CreateMedicineInput = {
+    it('should keep provided isActive value', async () => {
+      const inactiveInput: CreateMedicineInput = {
+        ...input,
         code: 'medicine-002',
-        name: 'Amoxicillina',
-        description: 'Antibiotico ad ampio spettro',
-        category: MedicineCategory.ANTIBIOTICO,
-        activeIngredient: 'Amoxicillina',
-        dosageForm: 'Capsule',
-        strength: '250mg',
-        manufacturer: 'Pfizer',
+        isActive: false,
       };
 
-      const result = await service.create(input);
+      mockRepository.findByCode.mockResolvedValue(null);
+      mockRepository.create.mockResolvedValue({
+        id: 'medicine-id-2',
+        code: inactiveInput.code,
+        name: inactiveInput.name,
+        description: inactiveInput.description,
+        category: inactiveInput.category,
+        activeIngredient: inactiveInput.activeIngredient,
+        dosageForm: inactiveInput.dosageForm,
+        strength: inactiveInput.strength,
+        manufacturer: inactiveInput.manufacturer,
+        isActive: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
-      expect(result.isActive).toBe(true);
+      await service.create(inactiveInput);
+
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          code: 'medicine-002',
+          isActive: false,
+        })
+      );
     });
 
-    it('should throw MedicineValidationError for invalid code', async () => {
-      const input: CreateMedicineInput = {
-        code: 'invalid-code',
-        name: 'Test Medicine',
-        description: 'Test Description',
-        category: MedicineCategory.ALTRO,
-        activeIngredient: 'Test',
-        dosageForm: 'Test',
-        strength: 'Test',
-        manufacturer: 'Test',
-      };
+    it('should throw MedicineValidationError for invalid code format', async () => {
+      await expect(
+        service.create({
+          ...input,
+          code: 'invalid-code',
+        })
+      ).rejects.toThrow(MedicineValidationError);
 
-      await expect(service.create(input)).rejects.toThrow(MedicineValidationError);
-      await expect(service.create(input)).rejects.toThrow('Invalid code format');
+      expect(mockRepository.findByCode).not.toHaveBeenCalled();
+      expect(mockRepository.create).not.toHaveBeenCalled();
     });
 
-    it('should throw MedicineValidationError for empty code', async () => {
-      const input: CreateMedicineInput = {
-        code: '',
-        name: 'Test Medicine',
-        description: 'Test Description',
-        category: MedicineCategory.ALTRO,
-        activeIngredient: 'Test',
-        dosageForm: 'Test',
-        strength: 'Test',
-        manufacturer: 'Test',
-      };
+    it('should throw MedicineConflictError when code already exists', async () => {
+      mockRepository.findByCode.mockResolvedValue({
+        id: 'existing-id',
+        ...input,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
-      await expect(service.create(input)).rejects.toThrow(MedicineValidationError);
-    });
-
-    it('should throw MedicineConflictError for duplicate code', async () => {
-      const input: CreateMedicineInput = {
-        code: 'medicine-003',
-        name: 'Ibuprofene',
-        description: 'Antinfiammatorio non steroideo',
-        category: MedicineCategory.ANTINFIAMMATORIO,
-        activeIngredient: 'Ibuprofene',
-        dosageForm: 'Compresse',
-        strength: '400mg',
-        manufacturer: 'Abbott',
-      };
-
-      await service.create(input);
       await expect(service.create(input)).rejects.toThrow(MedicineConflictError);
-      await expect(service.create(input)).rejects.toThrow('already exists');
+      expect(mockRepository.create).not.toHaveBeenCalled();
     });
   });
 
   describe('findAll', () => {
-    beforeEach(async () => {
-      // Create some test medicines
-      await service.create({
-        code: 'medicine-101',
-        name: 'Paracetamolo',
-        description: 'Analgesico e antipiretico',
+    it('should call repository with empty query when no filter is provided', async () => {
+      mockRepository.findAll.mockResolvedValue([]);
+
+      await service.findAll();
+
+      expect(mockRepository.findAll).toHaveBeenCalledWith({});
+    });
+
+    it('should build query with category, active and search filters', async () => {
+      mockRepository.findAll.mockResolvedValue([]);
+
+      await service.findAll({
         category: MedicineCategory.ANALGESICO,
-        activeIngredient: 'Paracetamolo',
-        dosageForm: 'Compresse',
-        strength: '1000mg',
-        manufacturer: 'Sanofi',
-        isActive: true,
+        active: true,
+        search: 'Aspirina',
       });
 
-      await service.create({
-        code: 'medicine-102',
-        name: 'Claritromicina',
-        description: 'Antibiotico macrolide',
-        category: MedicineCategory.ANTIBIOTICO,
-        activeIngredient: 'Claritromicina',
-        dosageForm: 'Compresse',
-        strength: '500mg',
-        manufacturer: 'Abbott',
-        isActive: true,
-      });
-
-      await service.create({
-        code: 'medicine-103',
-        name: 'Ketoprofene',
-        description: 'Antinfiammatorio FANS',
-        category: MedicineCategory.ANTINFIAMMATORIO,
-        activeIngredient: 'Ketoprofene',
-        dosageForm: 'Gel',
-        strength: '2.5%',
-        manufacturer: 'Menarini',
-        isActive: false,
-      });
-    });
-
-    it('should return all medicines', async () => {
-      const results = await service.findAll();
-      expect(results).toHaveLength(3);
-    });
-
-    it('should filter by category', async () => {
-      const results = await service.findAll({
+      expect(mockRepository.findAll).toHaveBeenCalledWith({
         category: MedicineCategory.ANALGESICO,
+        isActive: true,
+        $text: { $search: 'Aspirina' },
       });
-
-      expect(results).toHaveLength(1);
-      expect(results[0]!.category).toBe(MedicineCategory.ANALGESICO);
-    });
-
-    it('should filter by isActive', async () => {
-      const activeResults = await service.findAll({ active: true });
-      expect(activeResults).toHaveLength(2);
-
-      const inactiveResults = await service.findAll({ active: false });
-      expect(inactiveResults).toHaveLength(1);
-    });
-
-    it('should filter by search text', async () => {
-      const results = await service.findAll({ search: 'Paracetamolo' });
-      expect(results.length).toBeGreaterThanOrEqual(1);
-    });
-
-    it('should return empty array if no results', async () => {
-      const results = await service.findAll({
-        category: MedicineCategory.ONCOLOGICO,
-      });
-      expect(results).toHaveLength(0);
     });
   });
 
-  describe('findById', () => {
-    it('should find a medicine by id', async () => {
-      const created = await service.create({
-        code: 'medicine-201',
-        name: 'Metformina',
-        description: 'Antidiabetico orale',
-        category: MedicineCategory.ALTRO,
-        activeIngredient: 'Metformina',
-        dosageForm: 'Compresse',
-        strength: '850mg',
-        manufacturer: 'Merck',
-      });
+  it('should find medicine by id', async () => {
+    const medicine = {
+      id: 'medicine-id',
+      code: 'medicine-101',
+      name: 'Paracetamolo',
+      description: 'Analgesico e antipiretico',
+      category: MedicineCategory.ANALGESICO,
+      activeIngredient: 'Paracetamolo',
+      dosageForm: 'Compresse',
+      strength: '1000mg',
+      manufacturer: 'Sanofi',
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-      const found = await service.findById(created.id);
+    mockRepository.findById.mockResolvedValue(medicine);
 
-      expect(found).toBeDefined();
-      expect(found?.id).toBe(created.id);
-      expect(found?.name).toBe(created.name);
+    const result = await service.findById('medicine-id');
+
+    expect(result).toEqual(medicine);
+    expect(mockRepository.findById).toHaveBeenCalledWith('medicine-id');
+  });
+
+  it('should update medicine by id', async () => {
+    const updated = {
+      id: 'medicine-id',
+      code: 'medicine-201',
+      name: 'Nome Aggiornato',
+      description: 'Descrizione aggiornata',
+      category: MedicineCategory.ALTRO,
+      activeIngredient: 'Principio Attivo',
+      dosageForm: 'Compresse',
+      strength: '750mg',
+      manufacturer: 'Produttore',
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockRepository.updateById.mockResolvedValue(updated);
+
+    const result = await service.update('medicine-id', {
+      name: 'Nome Aggiornato',
+      strength: '750mg',
     });
 
-    it('should return null for non-existent id', async () => {
-      const found = await service.findById('medicine-999');
-      expect(found).toBeNull();
+    expect(result).toEqual(updated);
+    expect(mockRepository.updateById).toHaveBeenCalledWith('medicine-id', {
+      name: 'Nome Aggiornato',
+      strength: '750mg',
     });
   });
 
-  describe('update', () => {
-    it('should update a medicine', async () => {
-      const created = await service.create({
-        code: 'medicine-301',
-        name: 'Nome Originale',
-        description: 'Descrizione Originale',
-        category: MedicineCategory.ALTRO,
-        activeIngredient: 'Principio Attivo',
-        dosageForm: 'Forma',
-        strength: 'Dosaggio',
-        manufacturer: 'Produttore',
-      });
+  it('should soft delete medicine by id', async () => {
+    mockRepository.softDelete.mockResolvedValue(null);
 
-      const updated = await service.update(created.id, {
-        name: 'Nome Aggiornato',
-        description: 'Descrizione Aggiornata',
-        strength: 'Nuovo Dosaggio',
-      });
+    await service.softDelete('medicine-id');
 
-      expect(updated).toBeDefined();
-      expect(updated?.name).toBe('Nome Aggiornato');
-      expect(updated?.description).toBe('Descrizione Aggiornata');
-      expect(updated?.strength).toBe('Nuovo Dosaggio');
-      expect(updated?.manufacturer).toBe('Produttore');
-    });
-
-    it('should update only provided fields', async () => {
-      const created = await service.create({
-        code: 'medicine-302',
-        name: 'Test Medicine',
-        description: 'Test Description',
-        category: MedicineCategory.ALTRO,
-        activeIngredient: 'Test',
-        dosageForm: 'Test',
-        strength: 'Test',
-        manufacturer: 'Test',
-      });
-
-      const updated = await service.update(created.id, {
-        name: 'Nome Aggiornato',
-      });
-
-      expect(updated?.name).toBe('Nome Aggiornato');
-      expect(updated?.description).toBe('Test Description');
-    });
-
-    it('should return null for non-existent id', async () => {
-      const updated = await service.update('medicine-999', {
-        name: 'Test',
-      });
-      expect(updated).toBeNull();
-    });
+    expect(mockRepository.softDelete).toHaveBeenCalledWith('medicine-id');
   });
 
-  describe('softDelete', () => {
-    it('should set isActive to false', async () => {
-      const created = await service.create({
-        code: 'medicine-401',
-        name: 'To Delete',
-        description: 'Medicine to be deleted',
-        category: MedicineCategory.ALTRO,
-        activeIngredient: 'Test',
-        dosageForm: 'Test',
-        strength: 'Test',
-        manufacturer: 'Test',
-      });
+  it('should permanently delete medicine by id', async () => {
+    mockRepository.permanentDelete.mockResolvedValue(null);
 
-      const deleted = await service.softDelete(created.id);
+    await service.permanentDelete('medicine-id');
 
-      expect(deleted).toBeDefined();
-      expect(deleted?.isActive).toBe(false);
-    });
-
-    it('should return null for non-existent id', async () => {
-      const deleted = await service.softDelete('medicine-999');
-      expect(deleted).toBeNull();
-    });
-  });
-
-  describe('permanentDelete', () => {
-    it('should permanently delete a medicine', async () => {
-      const created = await service.create({
-        code: 'medicine-501',
-        name: 'To Delete Permanently',
-        description: 'Medicine to be deleted permanently',
-        category: MedicineCategory.ALTRO,
-        activeIngredient: 'Test',
-        dosageForm: 'Test',
-        strength: 'Test',
-        manufacturer: 'Test',
-      });
-
-      const deleted = await service.permanentDelete(created.id);
-      expect(deleted).toBeDefined();
-
-      const found = await service.findById(created.id);
-      expect(found).toBeNull();
-    });
-
-    it('should return null for non-existent id', async () => {
-      const deleted = await service.permanentDelete('medicine-999');
-      expect(deleted).toBeNull();
-    });
+    expect(mockRepository.permanentDelete).toHaveBeenCalledWith('medicine-id');
   });
 
   describe('getCategories', () => {
-    it('should return all available categories', () => {
+    it('should expose categories with value and label', () => {
       const categories = service.getCategories();
 
-      expect(categories).toBeDefined();
       expect(categories.length).toBeGreaterThan(0);
       expect(categories[0]).toHaveProperty('value');
       expect(categories[0]).toHaveProperty('label');
     });
 
-    it('should format labels correctly', () => {
+    it('should format enum labels in a readable way', () => {
       const categories = service.getCategories();
       const analgesico = categories.find((c) => c.value === MedicineCategory.ANALGESICO);
 
-      expect(analgesico).toBeDefined();
       expect(analgesico?.label).toBe('Analgesico');
     });
 
-    it('should include all MedicineCategory categories', () => {
+    it('should include all MedicineCategory values', () => {
       const categories = service.getCategories();
-      const categoryValues = Object.values(MedicineCategory);
 
-      expect(categories).toHaveLength(categoryValues.length);
+      expect(categories).toHaveLength(Object.values(MedicineCategory).length);
     });
   });
 });

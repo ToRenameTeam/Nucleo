@@ -14,6 +14,13 @@ import java.time.LocalDate
  */
 object DocumentFixtures {
 
+    private fun <T> requireValue(either: it.nucleo.commons.errors.Either<*, T>): T =
+        when (either) {
+            is it.nucleo.commons.errors.Either.Right -> either.value
+            is it.nucleo.commons.errors.Either.Left ->
+                error("Invalid test fixture value: ${either.error.message}")
+        }
+
     const val PATIENT_ID = "patient-001"
     const val DOCTOR_ID = "doctor-001"
     const val DOCUMENT_ID = "doc-001"
@@ -24,9 +31,11 @@ object DocumentFixtures {
         summary: String = "Test summary",
         tags: Set<String> = setOf("test"),
     ) =
-        FileMetadata(
-            summary = Summary(summary),
-            tags = tags.map { Tag(it) }.toSet(),
+        requireValue(
+            FileMetadata(
+                summary = requireValue(Summary(summary)),
+                tags = tags.map { requireValue(Tag(it)) }.toSet(),
+            )
         )
 
     fun medicinePrescription(
@@ -35,19 +44,21 @@ object DocumentFixtures {
         doctorId: String = DOCTOR_ID,
     ): MedicinePrescription =
         MedicinePrescription(
-            id = DocumentId(id),
-            doctorId = DoctorId(doctorId),
-            patientId = PatientId(patientId),
-            issueDate = IssueDate(LocalDate.of(2026, 1, 15)),
-            title = Title("Amoxicillin Prescription"),
+            id = requireValue(DocumentId(id)),
+            doctorId = requireValue(DoctorId(doctorId)),
+            patientId = requireValue(PatientId(patientId)),
+            issueDate = requireValue(IssueDate(LocalDate.of(2026, 1, 15))),
+            title = requireValue(Title("Amoxicillin Prescription")),
             metadata = metadata("Medicine prescription for test"),
             validity = Validity.UntilDate(LocalDate.of(2026, 12, 31)),
             dosage =
-                Dosage(
-                    medicine = MedicineId("medicine-amoxicillin"),
-                    dose = Dose(500, DoseUnit.MILLIGRAM),
-                    frequency = Frequency(3, Period.DAY),
-                    duration = Duration(7, Period.DAY),
+                requireValue(
+                    Dosage(
+                        medicine = requireValue(MedicineId("medicine-amoxicillin")),
+                        dose = requireValue(Dose(500, DoseUnit.MILLIGRAM)),
+                        frequency = requireValue(Frequency(3, Period.DAY)),
+                        duration = requireValue(Duration(7, Period.DAY)),
+                    )
                 ),
         )
 
@@ -57,15 +68,15 @@ object DocumentFixtures {
         doctorId: String = DOCTOR_ID,
     ): ServicePrescription =
         ServicePrescription(
-            id = DocumentId(id),
-            doctorId = DoctorId(doctorId),
-            patientId = PatientId(patientId),
-            issueDate = IssueDate(LocalDate.of(2026, 1, 15)),
-            title = Title("Blood Test Prescription"),
+            id = requireValue(DocumentId(id)),
+            doctorId = requireValue(DoctorId(doctorId)),
+            patientId = requireValue(PatientId(patientId)),
+            issueDate = requireValue(IssueDate(LocalDate.of(2026, 1, 15))),
+            title = requireValue(Title("Blood Test Prescription")),
             metadata = metadata("Service prescription for test"),
             validity = Validity.UntilExecution,
-            serviceId = ServiceId("service-blood-test"),
-            facilityId = FacilityId("facility-lab-001"),
+            serviceId = requireValue(ServiceId("service-blood-test")),
+            facilityId = requireValue(FacilityId("facility-lab-001")),
             priority = Priority.ROUTINE,
         )
 
@@ -79,18 +90,18 @@ object DocumentFixtures {
         recommendations: String? = "Repeat in 12 months",
     ): DefaultReport =
         DefaultReport(
-            id = DocumentId(id),
-            doctorId = DoctorId(doctorId),
-            patientId = PatientId(patientId),
-            issueDate = IssueDate(LocalDate.of(2026, 2, 1)),
-            title = Title("Blood Test Report"),
+            id = requireValue(DocumentId(id)),
+            doctorId = requireValue(DoctorId(doctorId)),
+            patientId = requireValue(PatientId(patientId)),
+            issueDate = requireValue(IssueDate(LocalDate.of(2026, 2, 1))),
+            title = requireValue(Title("Blood Test Report")),
             metadata = metadata("Test report"),
             servicePrescription = servicePrescription,
-            executionDate = ExecutionDate(LocalDate.of(2026, 1, 30)),
-            findings = Findings(findings),
-            clinicalQuestion = ClinicalQuestion("Check for infection markers"),
-            conclusion = conclusion?.let { Conclusion(it) },
-            recommendations = recommendations?.let { Recommendations(it) },
+            executionDate = requireValue(ExecutionDate(LocalDate.of(2026, 1, 30))),
+            findings = requireValue(Findings(findings)),
+            clinicalQuestion = requireValue(ClinicalQuestion("Check for infection markers")),
+            conclusion = conclusion?.let { requireValue(Conclusion(it)) },
+            recommendations = recommendations?.let { requireValue(Recommendations(it)) },
         )
 
     fun medicinePrescriptionRequest(
