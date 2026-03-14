@@ -1,4 +1,3 @@
-import '../setup.js';
 import {
   ServiceCatalogService,
   ServiceCatalogValidationError,
@@ -6,270 +5,219 @@ import {
   type CreateServiceTypeInput,
 } from '../../src/services/service-catalog.service.js';
 import { ServiceCategory } from '../../src/domain/service-catalog/index.js';
+import type { ServiceTypeRepository } from '../../src/domain/repositories/service-type-repository.js';
 
 describe('ServiceCatalogService', () => {
   let service: ServiceCatalogService;
+  let mockRepository: jest.Mocked<ServiceTypeRepository>;
 
   beforeEach(() => {
-    service = new ServiceCatalogService();
+    mockRepository = {
+      findAll: jest.fn(),
+      findById: jest.fn(),
+      findByCode: jest.fn(),
+      create: jest.fn(),
+      updateById: jest.fn(),
+      softDelete: jest.fn(),
+      permanentDelete: jest.fn(),
+    };
+
+    service = new ServiceCatalogService(mockRepository);
   });
 
   describe('create', () => {
-    it('should create a new service type successfully', async () => {
-      const input: CreateServiceTypeInput = {
+    const input: CreateServiceTypeInput = {
+      code: 'service-001',
+      name: 'Visita Cardiologica',
+      description: 'Visita specialistica cardiologica',
+      category: [ServiceCategory.CARDIOLOGIA, ServiceCategory.VISITA_SPECIALISTICA],
+    };
+
+    it('should create service type with isActive defaulted to true', async () => {
+      const created = {
+        id: 'service-id',
+        code: input.code,
+        name: input.name,
+        description: input.description ?? '',
+        category: input.category,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockRepository.findByCode.mockResolvedValue(null);
+      mockRepository.create.mockResolvedValue(created);
+
+      const result = await service.create(input);
+
+      expect(result).toEqual(created);
+      expect(mockRepository.findByCode).toHaveBeenCalledWith('service-001');
+      expect(mockRepository.create).toHaveBeenCalledWith({
         code: 'service-001',
         name: 'Visita Cardiologica',
         description: 'Visita specialistica cardiologica',
         category: [ServiceCategory.CARDIOLOGIA, ServiceCategory.VISITA_SPECIALISTICA],
         isActive: true,
-      };
-
-      const result = await service.create(input);
-
-      expect(result).toBeDefined();
-      expect(result.code).toBe(input.code);
-      expect(result.name).toBe(input.name);
-      expect(result.description).toBe(input.description);
-      expect(result.category).toEqual(input.category);
-      expect(result.isActive).toBe(true);
+      });
     });
 
-    it('should set isActive to true by default', async () => {
-      const input: CreateServiceTypeInput = {
+    it('should keep provided isActive value', async () => {
+      const inactiveInput: CreateServiceTypeInput = {
+        ...input,
         code: 'service-002',
-        name: 'Radiografia',
-        description: 'Esame radiologico',
-        category: [ServiceCategory.DIAGNOSTICA_IMMAGINI],
+        isActive: false,
       };
 
-      const result = await service.create(input);
+      mockRepository.findByCode.mockResolvedValue(null);
+      mockRepository.create.mockResolvedValue({
+        id: 'service-id-2',
+        code: inactiveInput.code,
+        name: inactiveInput.name,
+        description: inactiveInput.description ?? '',
+        category: inactiveInput.category,
+        isActive: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
-      expect(result.isActive).toBe(true);
+      await service.create(inactiveInput);
+
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          code: 'service-002',
+          isActive: false,
+        })
+      );
     });
 
     it('should throw ServiceCatalogValidationError for invalid code', async () => {
-      const input: CreateServiceTypeInput = {
-        code: 'invalid-code',
-        name: 'Test Service',
-        description: 'Test Description',
-        category: [ServiceCategory.ALTRO],
-      };
+      await expect(
+        service.create({
+          ...input,
+          code: 'invalid-code',
+        })
+      ).rejects.toThrow(ServiceCatalogValidationError);
 
-      await expect(service.create(input)).rejects.toThrow(ServiceCatalogValidationError);
-      await expect(service.create(input)).rejects.toThrow('Invalid code format');
+      expect(mockRepository.findByCode).not.toHaveBeenCalled();
+      expect(mockRepository.create).not.toHaveBeenCalled();
     });
 
-    it('should throw ServiceCatalogValidationError for empty code', async () => {
-      const input: CreateServiceTypeInput = {
-        code: '',
-        name: 'Test Service',
-        description: 'Test Description',
-        category: [ServiceCategory.ALTRO],
-      };
+    it('should throw ServiceCatalogConflictError if code already exists', async () => {
+      mockRepository.findByCode.mockResolvedValue({
+        id: 'existing-id',
+        code: input.code,
+        name: input.name,
+        description: input.description ?? '',
+        category: input.category,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
-      await expect(service.create(input)).rejects.toThrow(ServiceCatalogValidationError);
-    });
-
-    it('should throw ServiceCatalogConflictError for duplicate code', async () => {
-      const input: CreateServiceTypeInput = {
-        code: 'service-003',
-        name: 'Analisi del Sangue',
-        description: 'Esami del sangue completi',
-        category: [ServiceCategory.LABORATORIO],
-      };
-
-      await service.create(input);
       await expect(service.create(input)).rejects.toThrow(ServiceCatalogConflictError);
-      await expect(service.create(input)).rejects.toThrow('already exists');
+      expect(mockRepository.create).not.toHaveBeenCalled();
     });
   });
 
   describe('findAll', () => {
-    beforeEach(async () => {
-      // Create some test service types
-      await service.create({
-        code: 'service-101',
-        name: 'ECG',
-        description: 'Elettrocardiogramma',
-        category: [ServiceCategory.CARDIOLOGIA],
-        isActive: true,
-      });
+    it('should call repository with empty query when no filter is provided', async () => {
+      mockRepository.findAll.mockResolvedValue([]);
 
-      await service.create({
-        code: 'service-102',
-        name: 'Ecografia',
-        description: 'Esame ecografico',
-        category: [ServiceCategory.DIAGNOSTICA_IMMAGINI],
-        isActive: true,
-      });
+      await service.findAll();
 
-      await service.create({
-        code: 'service-103',
-        name: 'Visita Ortopedica',
-        description: 'Visita specialistica ortopedica',
-        category: [ServiceCategory.ORTOPEDIA],
-        isActive: false,
-      });
+      expect(mockRepository.findAll).toHaveBeenCalledWith({});
     });
 
-    it('should return all service types', async () => {
-      const results = await service.findAll();
-      expect(results).toHaveLength(3);
-    });
+    it('should build query with category, active and search filters', async () => {
+      mockRepository.findAll.mockResolvedValue([]);
 
-    it('should filter by category', async () => {
-      const results = await service.findAll({
+      await service.findAll({
         category: ServiceCategory.CARDIOLOGIA,
+        active: true,
+        search: 'Visita',
       });
 
-      expect(results).toHaveLength(1);
-      expect(results[0]!.category).toContain(ServiceCategory.CARDIOLOGIA);
-    });
-
-    it('should filter by isActive', async () => {
-      const activeResults = await service.findAll({ active: true });
-      expect(activeResults).toHaveLength(2);
-
-      const inactiveResults = await service.findAll({ active: false });
-      expect(inactiveResults).toHaveLength(1);
-    });
-
-    it('should filter by search text', async () => {
-      const results = await service.findAll({ search: 'ECG' });
-      expect(results.length).toBeGreaterThanOrEqual(1);
-    });
-
-    it('should return empty array if no results', async () => {
-      const results = await service.findAll({
-        category: ServiceCategory.ODONTOIATRIA,
+      expect(mockRepository.findAll).toHaveBeenCalledWith({
+        category: { $in: [ServiceCategory.CARDIOLOGIA] },
+        isActive: true,
+        $text: { $search: 'Visita' },
       });
-      expect(results).toHaveLength(0);
     });
   });
 
-  describe('findById', () => {
-    it('should find a service type by id', async () => {
-      const created = await service.create({
-        code: 'service-201',
-        name: 'TAC',
-        description: 'Tomografia assiale computerizzata',
-        category: [ServiceCategory.DIAGNOSTICA_IMMAGINI],
-      });
+  it('should find service type by id', async () => {
+    const serviceType = {
+      id: 'service-id',
+      code: 'service-101',
+      name: 'ECG',
+      description: 'Elettrocardiogramma',
+      category: [ServiceCategory.CARDIOLOGIA],
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-      const found = await service.findById(created.id);
+    mockRepository.findById.mockResolvedValue(serviceType);
 
-      expect(found).toBeDefined();
-      expect(found?.id).toBe(created.id);
-      expect(found?.name).toBe(created.name);
+    const result = await service.findById('service-id');
+
+    expect(result).toEqual(serviceType);
+    expect(mockRepository.findById).toHaveBeenCalledWith('service-id');
+  });
+
+  it('should update service type by id', async () => {
+    const updated = {
+      id: 'service-id',
+      code: 'service-201',
+      name: 'Nome Aggiornato',
+      description: 'Descrizione aggiornata',
+      category: [ServiceCategory.ALTRO],
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockRepository.updateById.mockResolvedValue(updated);
+
+    const result = await service.update('service-id', {
+      name: 'Nome Aggiornato',
     });
 
-    it('should return null for non-existent id', async () => {
-      const found = await service.findById('service-999');
-      expect(found).toBeNull();
+    expect(result).toEqual(updated);
+    expect(mockRepository.updateById).toHaveBeenCalledWith('service-id', {
+      name: 'Nome Aggiornato',
     });
   });
 
-  describe('update', () => {
-    it('should update a service type', async () => {
-      const created = await service.create({
-        code: 'service-301',
-        name: 'Visita Iniziale',
-        description: 'Prima visita',
-        category: [ServiceCategory.ALTRO],
-      });
+  it('should soft delete service type by id', async () => {
+    mockRepository.softDelete.mockResolvedValue(null);
 
-      const updated = await service.update(created.id, {
-        name: 'Visita Prima Visita Aggiornata',
-        description: 'Descrizione aggiornata',
-      });
+    await service.softDelete('service-id');
 
-      expect(updated).toBeDefined();
-      expect(updated?.name).toBe('Visita Prima Visita Aggiornata');
-      expect(updated?.description).toBe('Descrizione aggiornata');
-    });
-
-    it('should update only provided fields', async () => {
-      const created = await service.create({
-        code: 'service-302',
-        name: 'Test Service',
-        description: 'Test Description',
-        category: [ServiceCategory.ALTRO],
-      });
-
-      const updated = await service.update(created.id, {
-        name: 'Nome Aggiornato',
-      });
-
-      expect(updated?.name).toBe('Nome Aggiornato');
-      expect(updated?.description).toBe('Test Description');
-    });
-
-    it('should return null for non-existent id', async () => {
-      const updated = await service.update('service-999', {
-        name: 'Test',
-      });
-      expect(updated).toBeNull();
-    });
+    expect(mockRepository.softDelete).toHaveBeenCalledWith('service-id');
   });
 
-  describe('softDelete', () => {
-    it('should set isActive to false', async () => {
-      const created = await service.create({
-        code: 'service-401',
-        name: 'To Delete',
-        description: 'Service to be deleted',
-        category: [ServiceCategory.ALTRO],
-      });
+  it('should permanently delete service type by id', async () => {
+    mockRepository.permanentDelete.mockResolvedValue(null);
 
-      const deleted = await service.softDelete(created.id);
+    await service.permanentDelete('service-id');
 
-      expect(deleted).toBeDefined();
-      expect(deleted?.isActive).toBe(false);
-    });
-
-    it('should return null for non-existent id', async () => {
-      const deleted = await service.softDelete('service-999');
-      expect(deleted).toBeNull();
-    });
-  });
-
-  describe('permanentDelete', () => {
-    it('should permanently delete a service type', async () => {
-      const created = await service.create({
-        code: 'service-501',
-        name: 'To Delete Permanently',
-        description: 'Service to be deleted permanently',
-        category: [ServiceCategory.ALTRO],
-      });
-
-      const deleted = await service.permanentDelete(created.id);
-      expect(deleted).toBeDefined();
-
-      const found = await service.findById(created.id);
-      expect(found).toBeNull();
-    });
-
-    it('should return null for non-existent id', async () => {
-      const deleted = await service.permanentDelete('service-999');
-      expect(deleted).toBeNull();
-    });
+    expect(mockRepository.permanentDelete).toHaveBeenCalledWith('service-id');
   });
 
   describe('getCategories', () => {
-    it('should return all available categories', () => {
+    it('should expose categories with value and label', () => {
       const categories = service.getCategories();
 
-      expect(categories).toBeDefined();
       expect(categories.length).toBeGreaterThan(0);
       expect(categories[0]).toHaveProperty('value');
       expect(categories[0]).toHaveProperty('label');
     });
 
-    it('should format labels correctly', () => {
+    it('should format enum labels in a readable way', () => {
       const categories = service.getCategories();
       const cardiologia = categories.find((c) => c.value === ServiceCategory.CARDIOLOGIA);
 
-      expect(cardiologia).toBeDefined();
       expect(cardiologia?.label).toBe('Cardiologia');
     });
   });
