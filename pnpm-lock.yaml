@@ -39,16 +39,16 @@ importers:
   frontend-service:
     dependencies:
       '@fullcalendar/core':
-        specifier: ^6.1.19
+        specifier: ^6.1.20
         version: 6.1.20
       '@fullcalendar/daygrid':
-        specifier: ^6.1.19
+        specifier: ^6.1.20
         version: 6.1.20(@fullcalendar/core@6.1.20)
       '@fullcalendar/interaction':
-        specifier: ^6.1.19
+        specifier: ^6.1.20
         version: 6.1.20(@fullcalendar/core@6.1.20)
       '@fullcalendar/vue3':
-        specifier: ^6.1.19
+        specifier: ^6.1.20
         version: 6.1.20(@fullcalendar/core@6.1.20)(vue@3.5.30(typescript@5.9.3))
       '@heroicons/vue':
         specifier: ^2.2.0
@@ -60,7 +60,7 @@ importers:
         specifier: ^4.5.1
         version: 4.5.1
       vue:
-        specifier: ^3.5.30
+        specifier: ^3.5.24
         version: 3.5.30(typescript@5.9.3)
       vue-chartjs:
         specifier: ^5.3.3
