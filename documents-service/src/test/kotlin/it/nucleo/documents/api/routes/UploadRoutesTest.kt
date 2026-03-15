@@ -38,12 +38,12 @@ class UploadRoutesTest :
             block(client)
         }
 
-        describe("POST /api/patients/{patientId}/documents/upload") {
+        describe("POST /api/documents/patients/{patientId}/upload") {
             it("should upload a valid PDF document successfully") {
                 configuredTestApp { client ->
                     val response =
                         client.submitFormWithBinaryData(
-                            url = "/api/patients/patient-1/documents/upload",
+                            url = "/api/documents/patients/patient-1/upload",
                             formData =
                                 formData {
                                     append(
@@ -72,7 +72,7 @@ class UploadRoutesTest :
                 configuredTestApp { client ->
                     val response =
                         client.submitFormWithBinaryData(
-                            url = "/api/patients/patient-1/documents/upload",
+                            url = "/api/documents/patients/patient-1/upload",
                             formData = formData {},
                         )
 
@@ -87,7 +87,7 @@ class UploadRoutesTest :
                 configuredTestApp { client ->
                     val response =
                         client.submitFormWithBinaryData(
-                            url = "/api/patients/patient-1/documents/upload",
+                            url = "/api/documents/patients/patient-1/upload",
                             formData =
                                 formData {
                                     append(
@@ -115,7 +115,7 @@ class UploadRoutesTest :
                 configuredTestApp { client ->
                     val response =
                         client.submitFormWithBinaryData(
-                            url = "/api/patients/patient-1/documents/upload",
+                            url = "/api/documents/patients/patient-1/upload",
                             formData =
                                 formData {
                                     append(
@@ -143,7 +143,7 @@ class UploadRoutesTest :
                 configuredTestApp { client ->
                     val response =
                         client.submitFormWithBinaryData(
-                            url = "/api/patients/patient-1/documents/upload",
+                            url = "/api/documents/patients/patient-1/upload",
                             formData =
                                 formData {
                                     append(

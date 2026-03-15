@@ -17,8 +17,8 @@ export const DOCUMENTS_API_URL = import.meta.env.VITE_DOCUMENTS_API_URL || 'http
  */
 export const API_ENDPOINTS = {
   // Appointments Service
-  APPOINTMENTS: '/appointments',
-  AVAILABILITIES: '/availabilities',
+  APPOINTMENTS: '/api/appointments',
+  AVAILABILITIES: '/api/availabilities',
 
   // Master Data Service
   SERVICE_CATALOG: '/api/service-catalog',

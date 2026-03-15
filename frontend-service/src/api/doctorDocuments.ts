@@ -305,11 +305,12 @@ export const doctorDocumentsApi = {
   /**
    * Delete a document
    */
-  async deleteDocument(documentId: string): Promise<boolean> {
+  async deleteDocument(patientId: string, documentId: string): Promise<boolean> {
+    const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'doctor delete patientId');
     const sanitizedDocumentId = parseWithSchema(idSchema, documentId, 'doctor delete documentId');
     console.log('[Doctor Documents API] Delete document:', sanitizedDocumentId);
 
-    const url = `${BASE_URL}/documents/${sanitizedDocumentId}`;
+    const url = `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/${sanitizedDocumentId}`;
     console.log('[Doctor Documents API] Delete call to:', url);
 
     try {
@@ -352,7 +353,7 @@ export const doctorDocumentsApi = {
       sanitizedPatientId
     );
 
-    const url = `${BASE_URL}/api/patients/${sanitizedPatientId}/documents`;
+    const url = `${BASE_URL}/api/documents/patients/${sanitizedPatientId}`;
     console.log('[Doctor Documents API] POST call to:', url);
 
     try {
@@ -409,7 +410,7 @@ export const doctorDocumentsApi = {
       sanitizedPatientId
     );
 
-    const url = `${BASE_URL}/api/patients/${sanitizedPatientId}/documents`;
+    const url = `${BASE_URL}/api/documents/patients/${sanitizedPatientId}`;
     console.log('[Doctor Documents API] POST call to:', url);
 
     try {

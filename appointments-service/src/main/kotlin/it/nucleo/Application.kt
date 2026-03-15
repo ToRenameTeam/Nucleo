@@ -115,8 +115,10 @@ private fun Application.configureRouting() {
     routing {
         get("/health") { call.respond(HttpStatusCode.OK, mapOf("status" to "UP")) }
 
-        availabilityRoutes(availabilityService)
-        appointmentRoutes(appointmentService)
+        route("/api") {
+            availabilityRoutes(availabilityService)
+            appointmentRoutes(appointmentService)
+        }
     }
 }
 

@@ -12,13 +12,13 @@ import it.nucleo.documents.domain.PatientId
 import it.nucleo.documents.domain.errors.*
 
 /**
- * Registers download-related routes under `/patients/{patientId}/documents`.
- * - `GET /patients/{patientId}/documents/{documentId}/pdf` – stream the PDF for a document
+ * Registers download-related routes under `/documents/patients/{patientId}`.
+ * - `GET /documents/patients/{patientId}/{documentId}/pdf` – stream the PDF for a document
  */
 fun Route.downloadRoutes(downloadService: DocumentDownloadService) {
-    route("/patients/{patientId}/documents") {
+    route("/documents/patients/{patientId}") {
 
-        // GET /patients/{patientId}/documents/{documentId}/pdf
+        // GET /documents/patients/{patientId}/{documentId}/pdf
         // Streams the PDF file associated with the given document.
         // Sets Content-Disposition: attachment with the original filename.
         get("/{documentId}/pdf") {

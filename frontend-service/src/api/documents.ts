@@ -389,7 +389,7 @@ export const documentsApiService = {
       }),
     };
 
-    const response = await fetch(`${BASE_URL}/api/patients/${sanitizedPatientId}/documents`, {
+    const response = await fetch(`${BASE_URL}/api/documents/patients/${sanitizedPatientId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -414,7 +414,7 @@ export const documentsApiService = {
     formData.append('file', file);
 
     const response = await fetch(
-      `${BASE_URL}/api/patients/${sanitizedPatientId}/documents/upload`,
+      `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/upload`,
       {
         method: 'POST',
         body: formData,
@@ -447,7 +447,7 @@ export const documentsApiService = {
     try {
       const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'get documents by patientId');
 
-      const response = await fetch(`${BASE_URL}/api/patients/${sanitizedPatientId}/documents`, {
+      const response = await fetch(`${BASE_URL}/api/documents/patients/${sanitizedPatientId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -480,7 +480,7 @@ export const documentsApiService = {
       const sanitizedDocumentId = parseWithSchema(idSchema, documentId, 'download documentId');
 
       const response = await fetch(
-        `${BASE_URL}/api/patients/${sanitizedPatientId}/documents/${sanitizedDocumentId}/pdf`,
+        `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/${sanitizedDocumentId}/pdf`,
         {
           method: 'GET',
         }
@@ -546,7 +546,7 @@ export const documentsApiService = {
       const sanitizedDocumentId = parseWithSchema(idSchema, documentId, 'get document documentId');
 
       const response = await fetch(
-        `${BASE_URL}/api/patients/${sanitizedPatientId}/documents/${sanitizedDocumentId}`,
+        `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/${sanitizedDocumentId}`,
         {
           method: 'GET',
           headers: {
@@ -601,9 +601,10 @@ export const documentsApiService = {
   /**
    * Delete a document
    */
-  async deleteDocument(documentId: string): Promise<boolean> {
+  async deleteDocument(patientId: string, documentId: string): Promise<boolean> {
+    const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'delete document patientId');
     const sanitizedDocumentId = parseWithSchema(idSchema, documentId, 'delete document documentId');
-    const url = `${BASE_URL}/documents/${sanitizedDocumentId}`;
+    const url = `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/${sanitizedDocumentId}`;
 
     try {
       const response = await fetch(url, {
@@ -637,7 +638,7 @@ export const documentsApiService = {
       request,
       'create medicine prescription request'
     );
-    const url = `${BASE_URL}/api/patients/${sanitizedPatientId}/documents`;
+    const url = `${BASE_URL}/api/documents/patients/${sanitizedPatientId}`;
 
     try {
       const response = await fetch(url, {
@@ -683,7 +684,7 @@ export const documentsApiService = {
       request,
       'create service prescription request'
     );
-    const url = `${BASE_URL}/api/patients/${sanitizedPatientId}/documents`;
+    const url = `${BASE_URL}/api/documents/patients/${sanitizedPatientId}`;
 
     try {
       const response = await fetch(url, {

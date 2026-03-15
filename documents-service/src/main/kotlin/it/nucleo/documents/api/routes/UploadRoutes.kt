@@ -21,13 +21,13 @@ import it.nucleo.documents.domain.errors.DocumentError
 private const val PDF_CONTENT_TYPE = "application/pdf"
 
 /**
- * Registers upload-related routes under `/patients/{patientId}/documents`.
- * - `POST /patients/{patientId}/documents/upload` – upload a PDF document for a patient
+ * Registers upload-related routes under `/documents/patients/{patientId}`.
+ * - `POST /documents/patients/{patientId}/upload` – upload a PDF document for a patient
  */
 fun Route.uploadRoutes(uploadService: DocumentUploadService) {
-    route("/patients/{patientId}/documents") {
+    route("/documents/patients/{patientId}") {
 
-        // POST /patients/{patientId}/documents/upload
+        // POST /documents/patients/{patientId}/upload
         // Accepts a multipart/form-data request with a "file" field containing a PDF document.
         // Returns the generated document ID on success.
         post("/upload") {

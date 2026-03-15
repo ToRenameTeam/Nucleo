@@ -26,12 +26,12 @@ import kotlinx.serialization.builtins.ListSerializer
 /**
  * Registers all document-related routes.
  *
- * Patient-scoped endpoints (`/patients/{patientId}/documents`):
- * - `GET /patients/{patientId}/documents` – list all documents for a patient
- * - `POST /patients/{patientId}/documents` – create a new document
- * - `GET /patients/{patientId}/documents/{documentId}` – retrieve a document by ID
- * - `PUT /patients/{patientId}/documents/{documentId}/report`– update a report's content
- * - `DELETE /patients/{patientId}/documents/{documentId}` – delete a document
+ * Patient-scoped endpoints (`/documents/patients/{patientId}`):
+ * - `GET /documents/patients/{patientId}` – list all documents for a patient
+ * - `POST /documents/patients/{patientId}` – create a new document
+ * - `GET /documents/patients/{patientId}/{documentId}` – retrieve a document by ID
+ * - `PUT /documents/patients/{patientId}/{documentId}/report`– update a report's content
+ * - `DELETE /documents/patients/{patientId}/{documentId}` – delete a document
  *
  * Global endpoints (`/documents`):
  * - `GET /documents?doctorId={doctorId}` – list all documents by doctor
@@ -39,9 +39,9 @@ import kotlinx.serialization.builtins.ListSerializer
 @Suppress("CyclomaticComplexMethod")
 fun Route.documentRoutes(documentService: DocumentService) {
 
-    route("/patients/{patientId}/documents") {
+    route("/documents/patients/{patientId}") {
 
-        // GET /patients/{patientId}/documents
+        // GET /documents/patients/{patientId}
         // Returns all documents belonging to the specified patient.
         get {
             val patientId =
@@ -67,7 +67,7 @@ fun Route.documentRoutes(documentService: DocumentService) {
             call.respondEitherJson(result, ListSerializer(DocumentResponse.serializer()))
         }
 
-        // POST /patients/{patientId}/documents
+        // POST /documents/patients/{patientId}
         // Creates a new document and associates it with the given patient.
         // The route is responsible for building the domain Document from the request.
         post {
@@ -124,7 +124,7 @@ fun Route.documentRoutes(documentService: DocumentService) {
             call.respondEitherJson(result, DocumentResponse.serializer(), HttpStatusCode.Created)
         }
 
-        // GET /patients/{patientId}/documents/{documentId}
+        // GET /documents/patients/{patientId}/{documentId}
         // Retrieves a single document by its ID, scoped to the given patient.
         get("/{documentId}") {
             val patientId =
@@ -164,7 +164,7 @@ fun Route.documentRoutes(documentService: DocumentService) {
             call.respondEitherJson(result, DocumentResponse.serializer())
         }
 
-        // PUT /patients/{patientId}/documents/{documentId}/report
+        // PUT /documents/patients/{patientId}/{documentId}/report
         // Updates the content of a report document. Only report-type documents can be updated.
         // The route maps UpdateReportRequest fields to domain value objects before calling the
         // service.
@@ -256,7 +256,7 @@ fun Route.documentRoutes(documentService: DocumentService) {
             call.respondEitherJson(result, DocumentResponse.serializer())
         }
 
-        // DELETE /patients/{patientId}/documents/{documentId}
+        // DELETE /documents/patients/{patientId}/{documentId}
         // Permanently removes a document from the patient's medical record.
         delete("/{documentId}") {
             val patientId =
