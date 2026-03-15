@@ -13,6 +13,7 @@
     "start:users": "pnpm --filter @nucleo/users-service start",
     "dev:master-data": "pnpm --filter @nucleo/master-data-service dev",
     "start:master-data": "pnpm --filter @nucleo/master-data-service start",
+    "test:coverage": "pnpm --filter @nucleo/master-data-service test:coverage:all && pnpm --filter @nucleo/users-service test:coverage:all",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",

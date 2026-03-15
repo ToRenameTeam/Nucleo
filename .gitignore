@@ -46,6 +46,7 @@ node_modules/
 
 ### TypeScript ###
 dist/
+**/coverage/
 
 ### Python ###
 .venv/
