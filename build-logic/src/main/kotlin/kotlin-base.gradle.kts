@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     id("com.ncorti.ktfmt.gradle")
+    id("org.jetbrains.kotlinx.kover")
 }
 
 val catalog: VersionCatalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
@@ -24,4 +25,14 @@ configure<KotlinJvmProjectExtension> {
 
 ktfmt {
     kotlinLangStyle()
+}
+
+kover {
+    reports {
+        filters {
+            excludes {
+                packages("it.nucleo.*.infrastructure.*")
+            }
+        }
+    }
 }
