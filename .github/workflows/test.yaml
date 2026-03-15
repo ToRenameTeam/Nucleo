@@ -48,6 +48,9 @@ jobs:
       - name: Check formatting (ktfmt)
         run: ./gradlew ktfmtCheck
 
+      - name: Lint (detekt)
+        run: ./gradlew :commons:detekt :appointments-service:detekt :documents-service:detekt
+
   lint-python:
     name: Lint & Format (Python)
     runs-on: ubuntu-latest
