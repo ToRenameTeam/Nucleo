@@ -1,0 +1,27 @@
+# VCS and IDE metadata
+.git
+.gitignore
+.idea
+.vscode
+
+# OS artifacts
+.DS_Store
+
+# Dependency caches
+node_modules
+**/node_modules
+.pnpm-store
+
+# Build outputs and reports
+build
+**/build
+coverage
+**/coverage
+
+# Local tool caches
+.gradle
+**/.gradle
+
+# Logs
+*.log
+
