@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.plugins.kotlin.serialization.asDependency())
     implementation(libs.plugins.ktfmt.asDependency())
     implementation(libs.plugins.kover.asDependency())
+    implementation(libs.plugins.detekt.asDependency())
 }
 
 fun Provider<PluginDependency>.asDependency(): Provider<String> =

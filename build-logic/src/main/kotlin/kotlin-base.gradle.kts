@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.serialization")
     id("com.ncorti.ktfmt.gradle")
     id("org.jetbrains.kotlinx.kover")
+    id("dev.detekt")
 }
 
 val catalog: VersionCatalog = extensions.getByType<VersionCatalogsExtension>().named("libs")

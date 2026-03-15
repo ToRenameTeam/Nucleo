@@ -3,6 +3,7 @@ kotlin = "2.2.20"
 kotest = "6.1.6"
 ktfmt = "0.18.0"
 kover = "0.9.7"
+detekt = "2.0.0-alpha.2"
 ktor = "3.4.1"
 exposed = "0.57.0"
 hikari = "6.2.1"
@@ -44,4 +45,5 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
