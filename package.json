@@ -20,7 +20,7 @@
   },
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.28.1",
+  "packageManager": "pnpm@10.32.1",
   "lint-staged": {
     "*.{js,ts,json,yaml,css,vue}": [
       "prettier --write"
