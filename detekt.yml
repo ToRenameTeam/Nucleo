@@ -1,0 +1,11 @@
+complexity:
+  LongMethod:
+    active: false
+
+style:
+  ReturnCount:
+    active: false
+  ThrowsCount:
+    active: false
+  WildcardImport:
+    active: false
