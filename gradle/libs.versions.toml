@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.2.20"
+kotlin = "2.3.10"
 kotest = "6.1.6"
 ktfmt = "0.18.0"
 ktor = "3.4.1"
