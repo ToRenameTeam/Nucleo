@@ -18,6 +18,7 @@ catalog:
   '@vue/tsconfig': ^0.8.1
   '@vueuse/core': ^14.1.0
   cors: ^2.8.5
+  dotenv: ^16.5.0
   express: ^5.2.1
   express-session: ^1.19.0
   jest: ^30.2.0

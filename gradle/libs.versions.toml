@@ -12,7 +12,6 @@ kotlinx-serialization = "1.8.1"
 mongodb = "5.5.0"
 minio = "8.6.0"
 pdfbox = "3.0.7"
-logback = "1.5.15"
 
 [libraries]
 kotest = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
