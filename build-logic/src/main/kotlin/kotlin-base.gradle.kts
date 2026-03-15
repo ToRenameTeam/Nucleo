@@ -42,5 +42,5 @@ kover {
 configure<DetektExtension> {
     // Keep default Detekt rules and override only selected checks in shared config.
     buildUponDefaultConfig = true
-    config.setFrom(rootProject.file("detekt.yml"))
+    config.setFrom(rootProject.file("detekt.yaml"))
 }

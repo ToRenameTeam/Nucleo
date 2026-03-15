@@ -11,7 +11,6 @@ import it.nucleo.documents.domain.PatientId
 import it.nucleo.documents.domain.Summary
 import it.nucleo.documents.domain.Tag
 import it.nucleo.documents.domain.Title
-import it.nucleo.documents.domain.errors.*
 import it.nucleo.documents.domain.uploaded.UploadedDocumentType
 import it.nucleo.documents.infrastructure.ai.AiAnalysisResult
 import it.nucleo.documents.infrastructure.ai.AiServiceClient
@@ -149,35 +148,27 @@ class DocumentUploadService(
             return createDefaultMetadata()
         }
 
-        return try {
-            logger.debug("Requesting AI analysis for uploaded document: ${documentId.id}")
+        logger.debug("Requesting AI analysis for uploaded document: ${documentId.id}")
 
-            val result =
-                aiServiceClient.analyzeDocument(
-                    patientId = patientId.id,
-                    documentId = documentId.id
+        val result =
+            aiServiceClient.analyzeDocument(patientId = patientId.id, documentId = documentId.id)
+
+        return when (result) {
+            is AiAnalysisResult.Success -> {
+                logger.info(
+                    "AI analysis successful for uploaded document ${documentId.id}: " +
+                        "summary_length=${result.metadata.summary.summary.length}, " +
+                        "tags_count=${result.metadata.tags.size}"
                 )
-
-            when (result) {
-                is AiAnalysisResult.Success -> {
-                    logger.info(
-                        "AI analysis successful for uploaded document ${documentId.id}: " +
-                            "summary_length=${result.metadata.summary.summary.length}, " +
-                            "tags_count=${result.metadata.tags.size}"
-                    )
-                    result.metadata
-                }
-                is AiAnalysisResult.Failure -> {
-                    logger.warn(
-                        "AI analysis failed for uploaded document ${documentId.id}: " +
-                            "${result.errorCode} - ${result.message}. Using default metadata."
-                    )
-                    createDefaultMetadata()
-                }
+                result.metadata
             }
-        } catch (e: Exception) {
-            logger.error("Error during AI analysis for uploaded document ${documentId.id}", e)
-            createDefaultMetadata()
+            is AiAnalysisResult.Failure -> {
+                logger.warn(
+                    "AI analysis failed for uploaded document ${documentId.id}: " +
+                        "${result.errorCode} - ${result.message}. Using default metadata."
+                )
+                createDefaultMetadata()
+            }
         }
     }
 

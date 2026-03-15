@@ -26,6 +26,7 @@ import it.nucleo.documents.infrastructure.persistence.mongodb.MongoDbFactory
 import it.nucleo.documents.infrastructure.persistence.mongodb.MongoDocumentRepository
 import kotlinx.serialization.json.Json
 
+private const val DEFAULT_SERVER_PORT = 8080
 private val logger = logger("it.nucleo.Application")
 
 fun main() {
@@ -160,7 +161,7 @@ private fun Application.installRoutes(
 
 private object Environment {
     val serverPort: Int
-        get() = System.getenv("SERVER_PORT")?.toIntOrNull() ?: 8080
+        get() = System.getenv("SERVER_PORT")?.toIntOrNull() ?: DEFAULT_SERVER_PORT
 
     val mongoConnectionUri: String
         get() = System.getenv("MONGO_CONNECTION_URI") ?: MongoDbFactory.Defaults.CONNECTION_URI
@@ -189,16 +190,9 @@ private object Environment {
                 ?: AiServiceClient.Companion.Defaults.PORT
 }
 
-private fun createAiServiceClient(): AiServiceClient? {
+private fun createAiServiceClient(): AiServiceClient {
     val host = Environment.aiServiceHost
     val port = Environment.aiServicePort
-    return try {
-        logger.info("Connecting to AI Service at $host:$port")
-        AiServiceClient(host = host, port = port)
-    } catch (e: Exception) {
-        logger.warn(
-            "Failed to initialize AI Service client: ${e.message}. AI analysis will be disabled."
-        )
-        null
-    }
+    logger.info("Connecting to AI Service at $host:$port")
+    return AiServiceClient(host = host, port = port)
 }

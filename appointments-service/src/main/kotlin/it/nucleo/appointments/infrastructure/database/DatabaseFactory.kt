@@ -9,6 +9,8 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 
+private const val MAX_DB_POOL_SIZE = 10
+
 object DatabaseFactory {
     private val logger = LoggerFactory.getLogger(DatabaseFactory::class.java)
 
@@ -39,7 +41,7 @@ object DatabaseFactory {
                 driverClassName = "org.postgresql.Driver"
                 username = System.getenv("DATABASE_USER") ?: "appointments_user"
                 password = System.getenv("DATABASE_PASSWORD") ?: "appointments_pass"
-                maximumPoolSize = 10
+                maximumPoolSize = MAX_DB_POOL_SIZE
                 isAutoCommit = false
                 transactionIsolation = "TRANSACTION_REPEATABLE_READ"
                 validate()

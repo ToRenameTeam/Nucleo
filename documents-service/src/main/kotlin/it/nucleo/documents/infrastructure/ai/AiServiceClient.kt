@@ -6,12 +6,19 @@ import it.nucleo.documents.domain.FileMetadata
 import it.nucleo.documents.domain.Summary
 import it.nucleo.documents.domain.Tag
 import java.io.Closeable
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+
+private const val HTTP_OK = 200
+private const val HTTP_BAD_REQUEST = 400
+private const val HTTP_NOT_FOUND = 404
+private const val HTTP_SERVICE_UNAVAILABLE = 503
 
 sealed class AiAnalysisResult {
 
@@ -65,7 +72,7 @@ class AiServiceClient(host: String, port: Int, private val timeoutMs: Int = 120_
 
                     val responseCode = connection.responseCode
 
-                    if (responseCode == 200) {
+                    if (responseCode == HTTP_OK) {
                         val responseBody = connection.inputStream.bufferedReader().readText()
                         parseSuccessResponse(responseBody, documentId)
                     } else {
@@ -94,12 +101,12 @@ class AiServiceClient(host: String, port: Int, private val timeoutMs: Int = 120_
                     AiErrorCode.CONNECTION_FAILED,
                     "AI service request timed out"
                 )
-            } catch (e: Exception) {
-                logger.error("Unexpected error during AI analysis for document $documentId", e)
-                AiAnalysisResult.Failure(
-                    AiErrorCode.INTERNAL_ERROR,
-                    "Unexpected error: ${e.message}"
-                )
+            } catch (e: IOException) {
+                logger.error("I/O error during AI analysis for document $documentId", e)
+                AiAnalysisResult.Failure(AiErrorCode.CONNECTION_FAILED, "I/O error: ${e.message}")
+            } catch (e: IllegalArgumentException) {
+                logger.error("Invalid AI request/response for document $documentId", e)
+                AiAnalysisResult.Failure(AiErrorCode.INVALID_REQUEST, "Invalid data: ${e.message}")
             }
         }
     }
@@ -141,20 +148,26 @@ class AiServiceClient(host: String, port: Int, private val timeoutMs: Int = 120_
                     response.errorMessage ?: "Unknown error"
                 )
             }
-        } catch (e: Exception) {
-            logger.error("Failed to parse AI response for document $documentId", e)
+        } catch (e: SerializationException) {
+            logger.error("Failed to deserialize AI response for document $documentId", e)
             AiAnalysisResult.Failure(
                 AiErrorCode.INTERNAL_ERROR,
                 "Failed to parse AI response: ${e.message}"
+            )
+        } catch (e: IllegalArgumentException) {
+            logger.error("Invalid AI response content for document $documentId", e)
+            AiAnalysisResult.Failure(
+                AiErrorCode.INTERNAL_ERROR,
+                "Invalid AI response: ${e.message}"
             )
         }
     }
 
     private fun mapHttpErrorCode(httpCode: Int): AiErrorCode {
         return when (httpCode) {
-            404 -> AiErrorCode.DOCUMENT_NOT_FOUND
-            400 -> AiErrorCode.INVALID_REQUEST
-            503 -> AiErrorCode.CONNECTION_FAILED
+            HTTP_NOT_FOUND -> AiErrorCode.DOCUMENT_NOT_FOUND
+            HTTP_BAD_REQUEST -> AiErrorCode.INVALID_REQUEST
+            HTTP_SERVICE_UNAVAILABLE -> AiErrorCode.CONNECTION_FAILED
             else -> AiErrorCode.INTERNAL_ERROR
         }
     }

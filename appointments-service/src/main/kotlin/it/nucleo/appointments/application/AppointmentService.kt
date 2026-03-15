@@ -117,7 +117,10 @@ class AppointmentService(
         val statusValue = status?.let { AppointmentStatus.valueOf(it) }
 
         logger.info(
-            "Fetching appointments with filters - patientId: $patientIdValue, doctorId: $doctorIdValue, status: $statusValue"
+            "Fetching appointments with filters - patientId: {}, doctorId: {}, status: {}",
+            patientIdValue,
+            doctorIdValue,
+            statusValue
         )
 
         val appointments =

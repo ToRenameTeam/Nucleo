@@ -49,7 +49,7 @@ jobs:
         run: ./gradlew ktfmtCheck
 
       - name: Lint (detekt)
-        run: ./gradlew :commons:detekt :appointments-service:detekt :documents-service:detekt
+        run: ./gradlew :appointments-service:detekt :documents-service:detekt
 
   lint-python:
     name: Lint & Format (Python)

@@ -2,6 +2,7 @@ package it.nucleo.documents.api.routes
 
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.server.plugins.ContentTransformationException
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -48,7 +49,7 @@ fun Route.uploadRoutes(uploadService: DocumentUploadService) {
             val multipart =
                 try {
                     call.receiveMultipart()
-                } catch (e: Exception) {
+                } catch (e: ContentTransformationException) {
                     return@post call.respond(
                         HttpStatusCode.BadRequest,
                         ErrorResponse("bad_request", "Invalid multipart request", e.message)

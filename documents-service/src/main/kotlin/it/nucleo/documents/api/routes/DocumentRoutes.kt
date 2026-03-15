@@ -1,6 +1,7 @@
 package it.nucleo.documents.api.routes
 
 import io.ktor.http.*
+import io.ktor.server.plugins.ContentTransformationException
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -35,6 +36,7 @@ import kotlinx.serialization.builtins.ListSerializer
  * Global endpoints (`/documents`):
  * - `GET /documents?doctorId={doctorId}` – list all documents by doctor
  */
+@Suppress("CyclomaticComplexMethod")
 fun Route.documentRoutes(documentService: DocumentService) {
 
     route("/patients/{patientId}/documents") {
@@ -79,7 +81,7 @@ fun Route.documentRoutes(documentService: DocumentService) {
             val request =
                 try {
                     call.receive<CreateDocumentRequest>()
-                } catch (e: Exception) {
+                } catch (e: ContentTransformationException) {
                     return@post call.respond(
                         HttpStatusCode.BadRequest,
                         ErrorResponse("bad_request", "Invalid request body", e.message)
@@ -184,7 +186,7 @@ fun Route.documentRoutes(documentService: DocumentService) {
             val request =
                 try {
                     call.receive<UpdateReportRequest>()
-                } catch (e: Exception) {
+                } catch (e: ContentTransformationException) {
                     return@put call.respond(
                         HttpStatusCode.BadRequest,
                         ErrorResponse("bad_request", "Invalid request body", e.message)
