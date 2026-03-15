@@ -1,43 +1,43 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import FormModal from '../../shared/FormModal.vue'
-import type { UserInfo } from '../../../api/users'
-import { masterDataApi, type Medicine } from '../../../api/masterData'
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import FormModal from '../../shared/FormModal.vue';
+import type { UserInfo } from '../../../api/users';
+import { masterDataApi, type Medicine } from '../../../api/masterData';
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 // Props
 const props = defineProps<{
-  isOpen: boolean
-  saveError?: string
-  isSaving?: boolean
-  isLoadingUsers?: boolean
-  users?: UserInfo[]
-}>()
+  isOpen: boolean;
+  saveError?: string;
+  isSaving?: boolean;
+  isLoadingUsers?: boolean;
+  users?: UserInfo[];
+}>();
 
 // Emits
 const emit = defineEmits<{
-  close: []
-  back: []
-  save: [prescription: MedicinePrescriptionFormData]
-}>()
+  close: [];
+  back: [];
+  save: [prescription: MedicinePrescriptionFormData];
+}>();
 
 // Types
 export interface MedicinePrescriptionFormData {
-  patientId: string
-  patientName: string
-  patientFiscalCode: string
-  medicineId: string
-  medicineName: string
-  validityType: 'until_date' | 'until_execution'
-  validityDate: string
-  doseAmount: number
-  doseUnit: string
-  frequencyTimes: number
-  frequencyPeriod: string
-  durationLength: number
-  durationUnit: string
+  patientId: string;
+  patientName: string;
+  patientFiscalCode: string;
+  medicineId: string;
+  medicineName: string;
+  validityType: 'until_date' | 'until_execution';
+  validityDate: string;
+  doseAmount: number;
+  doseUnit: string;
+  frequencyTimes: number;
+  frequencyPeriod: string;
+  durationLength: number;
+  durationUnit: string;
 }
 
 // Form data
@@ -54,20 +54,20 @@ const formData = ref<MedicinePrescriptionFormData>({
   frequencyTimes: 1,
   frequencyPeriod: 'DAY',
   durationLength: 7,
-  durationUnit: 'DAY'
-})
+  durationUnit: 'DAY',
+});
 
 // Patient search state
-const patientSearchQuery = ref('')
-const showPatientSuggestions = ref(false)
-const selectedPatient = ref<UserInfo | null>(null)
+const patientSearchQuery = ref('');
+const showPatientSuggestions = ref(false);
+const selectedPatient = ref<UserInfo | null>(null);
 
 // Medicine search state
-const medicineSearchQuery = ref('')
-const showMedicineSuggestions = ref(false)
-const selectedMedicine = ref<Medicine | null>(null)
-const allMedicines = ref<Medicine[]>([])
-const isLoadingMedicines = ref(false)
+const medicineSearchQuery = ref('');
+const showMedicineSuggestions = ref(false);
+const selectedMedicine = ref<Medicine | null>(null);
+const allMedicines = ref<Medicine[]>([]);
+const isLoadingMedicines = ref(false);
 
 // Options
 // Backend DoseUnit enum: GRAM, MILLIGRAM, LITER, MILLILITER
@@ -75,49 +75,55 @@ const doseUnits = [
   { value: 'MILLIGRAM', label: 'mg' },
   { value: 'GRAM', label: 'g' },
   { value: 'MILLILITER', label: 'ml' },
-  { value: 'LITER', label: 'l' }
-]
+  { value: 'LITER', label: 'l' },
+];
 
 const frequencyPeriods = [
   { value: 'DAY', label: 'al giorno' },
   { value: 'WEEK', label: 'a settimana' },
-  { value: 'MONTH', label: 'al mese' }
-]
+  { value: 'MONTH', label: 'al mese' },
+];
 
 const durationUnits = [
   { value: 'DAY', label: 'giorni' },
   { value: 'WEEK', label: 'settimane' },
-  { value: 'MONTH', label: 'mesi' }
-]
+  { value: 'MONTH', label: 'mesi' },
+];
 
 // Computed: filtered patients based on search
 const filteredPatients = computed(() => {
   if (!patientSearchQuery.value || patientSearchQuery.value.length < 2) {
-    return []
+    return [];
   }
 
-  const query = patientSearchQuery.value.toLowerCase().trim()
-  return (props.users || []).filter(user => {
-    const fullName = `${user.name} ${user.lastName}`.toLowerCase()
-    const fiscalCode = user.fiscalCode.toLowerCase()
-    return fullName.includes(query) || fiscalCode.includes(query)
-  }).slice(0, 8)
-})
+  const query = patientSearchQuery.value.toLowerCase().trim();
+  return (props.users || [])
+    .filter((user) => {
+      const fullName = `${user.name} ${user.lastName}`.toLowerCase();
+      const fiscalCode = user.fiscalCode.toLowerCase();
+      return fullName.includes(query) || fiscalCode.includes(query);
+    })
+    .slice(0, 8);
+});
 
 // Computed: filtered medicines based on search
 const filteredMedicines = computed(() => {
   if (!medicineSearchQuery.value || medicineSearchQuery.value.length < 2) {
-    return []
+    return [];
   }
 
-  const query = medicineSearchQuery.value.toLowerCase().trim()
-  return allMedicines.value.filter(medicine => {
-    const name = medicine.name.toLowerCase()
-    const activeIngredient = medicine.activeIngredient.toLowerCase()
-    const description = medicine.description.toLowerCase()
-    return name.includes(query) || activeIngredient.includes(query) || description.includes(query)
-  }).slice(0, 8)
-})
+  const query = medicineSearchQuery.value.toLowerCase().trim();
+  return allMedicines.value
+    .filter((medicine) => {
+      const name = medicine.name.toLowerCase();
+      const activeIngredient = medicine.activeIngredient.toLowerCase();
+      const description = medicine.description.toLowerCase();
+      return (
+        name.includes(query) || activeIngredient.includes(query) || description.includes(query)
+      );
+    })
+    .slice(0, 8);
+});
 
 // Computed: form validity check
 const isFormValid = computed(() => {
@@ -131,100 +137,100 @@ const isFormValid = computed(() => {
     formData.value.durationLength > 0 &&
     formData.value.durationUnit &&
     (formData.value.validityType === 'until_execution' || formData.value.validityDate)
-  )
-})
+  );
+});
 
 // Helper functions
 function getDefaultValidityDate(): string {
-  const date = new Date()
-  date.setDate(date.getDate() + 30) // Default 30 days validity
-  return date.toISOString().split('T')[0] ?? ''
+  const date = new Date();
+  date.setDate(date.getDate() + 30); // Default 30 days validity
+  return date.toISOString().split('T')[0] ?? '';
 }
 
 function getMinDate(): string {
-  return new Date().toISOString().split('T')[0] ?? ''
+  return new Date().toISOString().split('T')[0] ?? '';
 }
 
 function getDoseUnitLabel(unit: string): string {
-  const found = doseUnits.find(u => u.value === unit)
-  return found ? found.label : unit
+  const found = doseUnits.find((u) => u.value === unit);
+  return found ? found.label : unit;
 }
 
 // Patient handlers
 const handlePatientInput = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  patientSearchQuery.value = target.value
-  selectedPatient.value = null
-  formData.value.patientId = ''
-  formData.value.patientName = ''
-  formData.value.patientFiscalCode = ''
-  showPatientSuggestions.value = patientSearchQuery.value.length >= 2
-}
+  const target = event.target as HTMLInputElement;
+  patientSearchQuery.value = target.value;
+  selectedPatient.value = null;
+  formData.value.patientId = '';
+  formData.value.patientName = '';
+  formData.value.patientFiscalCode = '';
+  showPatientSuggestions.value = patientSearchQuery.value.length >= 2;
+};
 
 const selectPatient = (user: UserInfo) => {
-  selectedPatient.value = user
-  formData.value.patientId = user.userId
-  formData.value.patientName = `${user.name} ${user.lastName}`
-  formData.value.patientFiscalCode = user.fiscalCode
-  patientSearchQuery.value = `${user.name} ${user.lastName}`
-  showPatientSuggestions.value = false
-}
+  selectedPatient.value = user;
+  formData.value.patientId = user.userId;
+  formData.value.patientName = `${user.name} ${user.lastName}`;
+  formData.value.patientFiscalCode = user.fiscalCode;
+  patientSearchQuery.value = `${user.name} ${user.lastName}`;
+  showPatientSuggestions.value = false;
+};
 
 const handlePatientFocus = () => {
   if (patientSearchQuery.value.length >= 2) {
-    showPatientSuggestions.value = true
+    showPatientSuggestions.value = true;
   }
-}
+};
 
 const handlePatientBlur = () => {
   // Delay to allow click on suggestion
   setTimeout(() => {
-    showPatientSuggestions.value = false
-  }, 200)
-}
+    showPatientSuggestions.value = false;
+  }, 200);
+};
 
 // Medicine handlers
 const handleMedicineInput = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  medicineSearchQuery.value = target.value
-  selectedMedicine.value = null
-  formData.value.medicineId = ''
-  formData.value.medicineName = ''
-  showMedicineSuggestions.value = medicineSearchQuery.value.length >= 2
-}
+  const target = event.target as HTMLInputElement;
+  medicineSearchQuery.value = target.value;
+  selectedMedicine.value = null;
+  formData.value.medicineId = '';
+  formData.value.medicineName = '';
+  showMedicineSuggestions.value = medicineSearchQuery.value.length >= 2;
+};
 
 const selectMedicine = (medicine: Medicine) => {
-  selectedMedicine.value = medicine
-  formData.value.medicineId = medicine._id
-  formData.value.medicineName = medicine.name
-  medicineSearchQuery.value = `${medicine.name} (${medicine.strength})`
-  showMedicineSuggestions.value = false
-}
+  selectedMedicine.value = medicine;
+  formData.value.medicineId = medicine.id;
+  formData.value.medicineName = medicine.name;
+  medicineSearchQuery.value = `${medicine.name} (${medicine.strength})`;
+  showMedicineSuggestions.value = false;
+};
 
 const handleMedicineFocus = () => {
   if (medicineSearchQuery.value.length >= 2) {
-    showMedicineSuggestions.value = true
+    showMedicineSuggestions.value = true;
   }
-}
+};
 
 const handleMedicineBlur = () => {
   setTimeout(() => {
-    showMedicineSuggestions.value = false
-  }, 200)
-}
+    showMedicineSuggestions.value = false;
+  }, 200);
+};
 
 // Load medicines on mount
 const loadMedicines = async () => {
-  isLoadingMedicines.value = true
+  isLoadingMedicines.value = true;
   try {
-    allMedicines.value = await masterDataApi.getMedicines({ active: true })
-    console.log('[MedicinePrescriptionForm] Loaded medicines:', allMedicines.value.length)
+    allMedicines.value = await masterDataApi.getMedicines({ active: true });
+    console.log('[MedicinePrescriptionForm] Loaded medicines:', allMedicines.value.length);
   } catch (error) {
-    console.error('[MedicinePrescriptionForm] Error loading medicines:', error)
+    console.error('[MedicinePrescriptionForm] Error loading medicines:', error);
   } finally {
-    isLoadingMedicines.value = false
+    isLoadingMedicines.value = false;
   }
-}
+};
 
 // Reset form
 const resetForm = () => {
@@ -241,74 +247,76 @@ const resetForm = () => {
     frequencyTimes: 1,
     frequencyPeriod: 'DAY',
     durationLength: 7,
-    durationUnit: 'DAY'
-  }
-  patientSearchQuery.value = ''
-  medicineSearchQuery.value = ''
-  selectedPatient.value = null
-  selectedMedicine.value = null
-  showPatientSuggestions.value = false
-  showMedicineSuggestions.value = false
-}
+    durationUnit: 'DAY',
+  };
+  patientSearchQuery.value = '';
+  medicineSearchQuery.value = '';
+  selectedPatient.value = null;
+  selectedMedicine.value = null;
+  showPatientSuggestions.value = false;
+  showMedicineSuggestions.value = false;
+};
 
 // Watch for modal open/close
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen) {
-    loadMedicines()
-  } else {
-    resetForm()
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen) {
+      loadMedicines();
+    } else {
+      resetForm();
+    }
   }
-})
+);
 
 // Handle save
 const handleSave = () => {
   if (!isFormValid.value) {
-    return
+    return;
   }
-  emit('save', { ...formData.value })
-}
+  emit('save', { ...formData.value });
+};
 
 // Handle cancel
 const handleCancel = () => {
-  emit('close')
-}
+  emit('close');
+};
 
 // Close dropdowns when clicking outside
 const handleClickOutside = (event: MouseEvent) => {
-  const target = event.target as HTMLElement
+  const target = event.target as HTMLElement;
   if (!target.closest('.autocomplete-container')) {
-    showPatientSuggestions.value = false
-    showMedicineSuggestions.value = false
+    showPatientSuggestions.value = false;
+    showMedicineSuggestions.value = false;
   }
-}
+};
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
+  document.addEventListener('click', handleClickOutside);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <template>
-  <FormModal 
-    :is-open="isOpen" 
+  <FormModal
+    :is-open="isOpen"
     :title="t('doctor.documents.prescriptions.medicine.title')"
-    :subtitle="t('doctor.documents.prescriptions.medicine.subtitle')" 
-    :show-back="true" 
+    :subtitle="t('doctor.documents.prescriptions.medicine.subtitle')"
+    :show-back="true"
     :save-label="t('common.save')"
-    :cancel-label="t('common.cancel')" 
-    :is-saving="isSaving" 
-    :save-error="saveError" 
+    :cancel-label="t('common.cancel')"
+    :is-saving="isSaving"
+    :save-error="saveError"
     max-width="md"
-    @close="emit('close')" 
-    @back="emit('back')" 
-    @save="handleSave" 
+    @close="emit('close')"
+    @back="emit('back')"
+    @save="handleSave"
     @cancel="handleCancel"
   >
     <form class="prescription-form" @submit.prevent="handleSave">
-      
       <!-- Patient Search -->
       <div class="form-group">
         <label for="patient-search" class="form-label">
@@ -316,13 +324,17 @@ onUnmounted(() => {
           <span class="required">*</span>
         </label>
         <div class="autocomplete-container">
-          <input 
-            id="patient-search" 
-            :value="patientSearchQuery" 
-            type="text" 
+          <input
+            id="patient-search"
+            :value="patientSearchQuery"
+            type="text"
             class="form-input"
             :class="{ 'has-selection': selectedPatient }"
-            :placeholder="isLoadingUsers ? 'Caricamento pazienti...' : t('doctor.documents.prescriptions.medicine.patientNamePlaceholder')"
+            :placeholder="
+              isLoadingUsers
+                ? 'Caricamento pazienti...'
+                : t('doctor.documents.prescriptions.medicine.patientNamePlaceholder')
+            "
             :disabled="isLoadingUsers"
             autocomplete="off"
             required
@@ -330,12 +342,15 @@ onUnmounted(() => {
             @focus="handlePatientFocus"
             @blur="handlePatientBlur"
           />
-          
+
           <Transition name="dropdown">
-            <div v-if="showPatientSuggestions && filteredPatients.length > 0" class="suggestions-dropdown">
+            <div
+              v-if="showPatientSuggestions && filteredPatients.length > 0"
+              class="suggestions-dropdown"
+            >
               <button
-                v-for="user in filteredPatients" 
-                :key="user.userId" 
+                v-for="user in filteredPatients"
+                :key="user.userId"
                 type="button"
                 class="suggestion-item"
                 @mousedown.prevent="selectPatient(user)"
@@ -347,20 +362,30 @@ onUnmounted(() => {
               </button>
             </div>
           </Transition>
-          
+
           <Transition name="dropdown">
-            <div v-if="showPatientSuggestions && patientSearchQuery.length >= 2 && filteredPatients.length === 0" class="suggestions-dropdown">
+            <div
+              v-if="
+                showPatientSuggestions &&
+                patientSearchQuery.length >= 2 &&
+                filteredPatients.length === 0
+              "
+              class="suggestions-dropdown"
+            >
               <div class="suggestion-item no-results">
                 {{ t('doctor.documents.prescriptions.noPatientResults') }}
               </div>
             </div>
           </Transition>
         </div>
-        
+
         <!-- Selected patient info badge -->
         <div v-if="selectedPatient" class="selected-badge">
           <span class="badge-label">Paziente selezionato:</span>
-          <span class="badge-value">{{ selectedPatient.name }} {{ selectedPatient.lastName }} - {{ selectedPatient.fiscalCode }}</span>
+          <span class="badge-value"
+            >{{ selectedPatient.name }} {{ selectedPatient.lastName }} -
+            {{ selectedPatient.fiscalCode }}</span
+          >
         </div>
       </div>
 
@@ -371,13 +396,17 @@ onUnmounted(() => {
           <span class="required">*</span>
         </label>
         <div class="autocomplete-container">
-          <input 
-            id="medicine-search" 
-            :value="medicineSearchQuery" 
-            type="text" 
+          <input
+            id="medicine-search"
+            :value="medicineSearchQuery"
+            type="text"
             class="form-input"
             :class="{ 'has-selection': selectedMedicine }"
-            :placeholder="isLoadingMedicines ? 'Caricamento farmaci...' : t('doctor.documents.prescriptions.medicine.medicineNamePlaceholder')"
+            :placeholder="
+              isLoadingMedicines
+                ? 'Caricamento farmaci...'
+                : t('doctor.documents.prescriptions.medicine.medicineNamePlaceholder')
+            "
             :disabled="isLoadingMedicines"
             autocomplete="off"
             required
@@ -385,12 +414,15 @@ onUnmounted(() => {
             @focus="handleMedicineFocus"
             @blur="handleMedicineBlur"
           />
-          
+
           <Transition name="dropdown">
-            <div v-if="showMedicineSuggestions && filteredMedicines.length > 0" class="suggestions-dropdown">
+            <div
+              v-if="showMedicineSuggestions && filteredMedicines.length > 0"
+              class="suggestions-dropdown"
+            >
               <button
-                v-for="medicine in filteredMedicines" 
-                :key="medicine._id" 
+                v-for="medicine in filteredMedicines"
+                :key="medicine.id"
                 type="button"
                 class="suggestion-item"
                 @mousedown.prevent="selectMedicine(medicine)"
@@ -399,49 +431,60 @@ onUnmounted(() => {
                   <span class="suggestion-name">{{ medicine.name }}</span>
                   <span class="suggestion-strength">{{ medicine.strength }}</span>
                 </div>
-                <span class="suggestion-detail">{{ medicine.activeIngredient }} - {{ medicine.dosageForm }}</span>
+                <span class="suggestion-detail"
+                  >{{ medicine.activeIngredient }} - {{ medicine.dosageForm }}</span
+                >
               </button>
             </div>
           </Transition>
-          
+
           <Transition name="dropdown">
-            <div v-if="showMedicineSuggestions && medicineSearchQuery.length >= 2 && filteredMedicines.length === 0" class="suggestions-dropdown">
-              <div class="suggestion-item no-results">
-                Nessun farmaco trovato
-              </div>
+            <div
+              v-if="
+                showMedicineSuggestions &&
+                medicineSearchQuery.length >= 2 &&
+                filteredMedicines.length === 0
+              "
+              class="suggestions-dropdown"
+            >
+              <div class="suggestion-item no-results">Nessun farmaco trovato</div>
             </div>
           </Transition>
         </div>
-        
+
         <!-- Selected medicine info badge -->
         <div v-if="selectedMedicine" class="selected-badge medicine-badge">
           <span class="badge-label">Farmaco selezionato:</span>
-          <span class="badge-value">{{ selectedMedicine.name }} {{ selectedMedicine.strength }} ({{ selectedMedicine.activeIngredient }})</span>
+          <span class="badge-value"
+            >{{ selectedMedicine.name }} {{ selectedMedicine.strength }} ({{
+              selectedMedicine.activeIngredient
+            }})</span
+          >
         </div>
       </div>
 
       <!-- Validity Section -->
       <div class="form-section">
         <h3 class="section-title">Validità prescrizione</h3>
-        
+
         <div class="form-row">
           <div class="form-group flex-1">
             <label class="form-label">Tipo validità <span class="required">*</span></label>
             <div class="radio-group">
               <label class="radio-option">
-                <input 
-                  v-model="formData.validityType" 
-                  type="radio" 
-                  value="until_date" 
+                <input
+                  v-model="formData.validityType"
+                  type="radio"
+                  value="until_date"
                   name="validityType"
                 />
                 <span class="radio-label">Fino a data</span>
               </label>
               <label class="radio-option">
-                <input 
-                  v-model="formData.validityType" 
-                  type="radio" 
-                  value="until_execution" 
+                <input
+                  v-model="formData.validityType"
+                  type="radio"
+                  value="until_execution"
                   name="validityType"
                 />
                 <span class="radio-label">Fino ad esecuzione</span>
@@ -449,16 +492,16 @@ onUnmounted(() => {
             </div>
           </div>
         </div>
-        
+
         <div v-if="formData.validityType === 'until_date'" class="form-row">
           <div class="form-group flex-1">
             <label for="validity-date" class="form-label">
               Data scadenza <span class="required">*</span>
             </label>
-            <input 
+            <input
               id="validity-date"
-              v-model="formData.validityDate" 
-              type="date" 
+              v-model="formData.validityDate"
+              type="date"
               class="form-input"
               :min="getMinDate()"
               required
@@ -470,16 +513,16 @@ onUnmounted(() => {
       <!-- Dosage Section -->
       <div class="form-section">
         <h3 class="section-title">{{ t('doctor.documents.prescriptions.medicine.dosage') }}</h3>
-        
+
         <div class="form-row">
           <div class="form-group flex-1">
             <label for="dose-amount" class="form-label">
               Quantità <span class="required">*</span>
             </label>
-            <input 
+            <input
               id="dose-amount"
-              v-model.number="formData.doseAmount" 
-              type="number" 
+              v-model.number="formData.doseAmount"
+              type="number"
               class="form-input"
               min="1"
               step="0.5"
@@ -490,12 +533,7 @@ onUnmounted(() => {
             <label for="dose-unit" class="form-label">
               Unità <span class="required">*</span>
             </label>
-            <select 
-              id="dose-unit"
-              v-model="formData.doseUnit" 
-              class="form-select"
-              required
-            >
+            <select id="dose-unit" v-model="formData.doseUnit" class="form-select" required>
               <option v-for="unit in doseUnits" :key="unit.value" :value="unit.value">
                 {{ unit.label }}
               </option>
@@ -507,16 +545,16 @@ onUnmounted(() => {
       <!-- Frequency Section -->
       <div class="form-section">
         <h3 class="section-title">{{ t('doctor.documents.prescriptions.medicine.frequency') }}</h3>
-        
+
         <div class="form-row">
           <div class="form-group flex-1">
             <label for="frequency-times" class="form-label">
               Volte <span class="required">*</span>
             </label>
-            <input 
+            <input
               id="frequency-times"
-              v-model.number="formData.frequencyTimes" 
-              type="number" 
+              v-model.number="formData.frequencyTimes"
+              type="number"
               class="form-input"
               min="1"
               required
@@ -526,9 +564,9 @@ onUnmounted(() => {
             <label for="frequency-period" class="form-label">
               Periodo <span class="required">*</span>
             </label>
-            <select 
+            <select
               id="frequency-period"
-              v-model="formData.frequencyPeriod" 
+              v-model="formData.frequencyPeriod"
               class="form-select"
               required
             >
@@ -543,16 +581,16 @@ onUnmounted(() => {
       <!-- Duration Section -->
       <div class="form-section">
         <h3 class="section-title">{{ t('doctor.documents.prescriptions.medicine.duration') }}</h3>
-        
+
         <div class="form-row">
           <div class="form-group flex-1">
             <label for="duration-length" class="form-label">
               Durata <span class="required">*</span>
             </label>
-            <input 
+            <input
               id="duration-length"
-              v-model.number="formData.durationLength" 
-              type="number" 
+              v-model.number="formData.durationLength"
+              type="number"
               class="form-input"
               min="1"
               required
@@ -562,12 +600,7 @@ onUnmounted(() => {
             <label for="duration-unit" class="form-label">
               Unità <span class="required">*</span>
             </label>
-            <select 
-              id="duration-unit"
-              v-model="formData.durationUnit" 
-              class="form-select"
-              required
-            >
+            <select id="duration-unit" v-model="formData.durationUnit" class="form-select" required>
               <option v-for="unit in durationUnits" :key="unit.value" :value="unit.value">
                 {{ unit.label }}
               </option>
@@ -580,10 +613,12 @@ onUnmounted(() => {
       <div v-if="isFormValid" class="prescription-summary">
         <h4 class="summary-title">Riepilogo prescrizione</h4>
         <p class="summary-text">
-          <strong>{{ selectedMedicine?.name }}</strong> {{ selectedMedicine?.strength }}<br>
-          {{ formData.doseAmount }} {{ getDoseUnitLabel(formData.doseUnit) }} - 
-          {{ formData.frequencyTimes }} {{ frequencyPeriods.find(p => p.value === formData.frequencyPeriod)?.label }}<br>
-          per {{ formData.durationLength }} {{ durationUnits.find(u => u.value === formData.durationUnit)?.label }}
+          <strong>{{ selectedMedicine?.name }}</strong> {{ selectedMedicine?.strength }}<br />
+          {{ formData.doseAmount }} {{ getDoseUnitLabel(formData.doseUnit) }} -
+          {{ formData.frequencyTimes }}
+          {{ frequencyPeriods.find((p) => p.value === formData.frequencyPeriod)?.label }}<br />
+          per {{ formData.durationLength }}
+          {{ durationUnits.find((u) => u.value === formData.durationUnit)?.label }}
         </p>
       </div>
     </form>
@@ -650,7 +685,9 @@ onUnmounted(() => {
   font-size: 0.9375rem;
   color: var(--text-primary);
   transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
-  box-shadow: 0 2px 4px var(--shadow), inset 0 1px 0 var(--white-90);
+  box-shadow:
+    0 2px 4px var(--shadow),
+    inset 0 1px 0 var(--white-90);
 }
 
 .form-input:focus,
@@ -658,7 +695,9 @@ onUnmounted(() => {
   outline: none;
   border-color: var(--accent-primary);
   background: var(--white-80);
-  box-shadow: 0 4px 12px var(--accent-primary-20), inset 0 1px 0 var(--white);
+  box-shadow:
+    0 4px 12px var(--accent-primary-20),
+    inset 0 1px 0 var(--white);
 }
 
 .form-input::placeholder {
@@ -775,7 +814,11 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 0.25rem;
   padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, var(--accent-primary-10) 0%, var(--accent-secondary-10, var(--accent-primary-10)) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-primary-10) 0%,
+    var(--accent-secondary-10, var(--accent-primary-10)) 100%
+  );
   border: 1px solid var(--accent-primary-30);
   border-radius: 0.75rem;
   margin-top: 0.5rem;
@@ -814,7 +857,7 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.radio-option input[type="radio"] {
+.radio-option input[type='radio'] {
   width: 1.125rem;
   height: 1.125rem;
   accent-color: var(--accent-primary);
@@ -867,7 +910,7 @@ onUnmounted(() => {
   .prescription-form {
     gap: 1.25rem;
   }
-  
+
   .form-section {
     padding: 0.875rem 1rem;
   }

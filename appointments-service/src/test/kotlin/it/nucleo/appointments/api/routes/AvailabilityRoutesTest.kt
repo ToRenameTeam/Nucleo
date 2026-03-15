@@ -1,6 +1,6 @@
 package it.nucleo.appointments.api.routes
 
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldContain
@@ -13,282 +13,202 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import it.nucleo.appointments.application.AvailabilityService
-import it.nucleo.appointments.domain.AvailabilityRepository
-import it.nucleo.appointments.domain.valueobjects.*
-import kotlinx.datetime.LocalDateTime
+import it.nucleo.appointments.domain.*
+import it.nucleo.appointments.fixtures.AppointmentFixtures
+import it.nucleo.appointments.fixtures.FakeAvailabilityRepository
 import kotlinx.serialization.json.Json
 
 class AvailabilityRoutesTest :
-    FunSpec({
-        fun Application.testModule(availabilityRepository: AvailabilityRepository) {
-            install(ContentNegotiation) {
-                json(
-                    Json {
-                        prettyPrint = true
-                        isLenient = true
-                        ignoreUnknownKeys = true
-                    }
-                )
-            }
-            routing {
-                val service = AvailabilityService(availabilityRepository)
-                availabilityRoutes(service)
-            }
+    DescribeSpec({
+        fun configuredTestApp(
+            availabilityRepo: AvailabilityRepository = FakeAvailabilityRepository(),
+            block: suspend ApplicationTestBuilder.() -> Unit,
+        ) = testApplication {
+            application { availabilityTestModule(availabilityRepo) }
+            block()
         }
 
-        test("POST /availabilities - should create availability successfully") {
-            testApplication {
-                application { testModule(FakeAvailabilityRepository()) }
-
-                val response =
-                    client.post("/availabilities") {
-                        contentType(ContentType.Application.Json)
-                        setBody(
-                            """
-                    {
-                        "doctorId": "doc-001",
-                        "facilityId": "facility-001",
-                        "serviceTypeId": "service-001",
-                        "timeSlot": {
-                            "startDateTime": "2026-02-15T09:00:00",
-                            "durationMinutes": 30
+        describe("POST /availabilities") {
+            it("should create an availability successfully") {
+                configuredTestApp {
+                    val response =
+                        client.post("/availabilities") {
+                            contentType(ContentType.Application.Json)
+                            setBody(
+                                """
+                            {
+                                "doctorId": "${AppointmentFixtures.DOCTOR_ID}",
+                                "facilityId": "${AppointmentFixtures.FACILITY_ID}",
+                                "serviceTypeId": "${AppointmentFixtures.SERVICE_TYPE_ID}",
+                                "timeSlot": {
+                                    "startDateTime": "2026-02-15T09:00:00",
+                                    "durationMinutes": 30
+                                }
+                            }
+                        """
+                                    .trimIndent()
+                            )
                         }
-                    }
-                """
-                                .trimIndent()
-                        )
-                    }
 
-                response.status shouldBe HttpStatusCode.Created
-                val body = response.bodyAsText()
-                body shouldContain "availabilityId"
-                body shouldContain "doc-001"
-                body shouldContain "facility-001"
+                    response.status shouldBe HttpStatusCode.Created
+                    val body = response.bodyAsText()
+                    body shouldContain "availabilityId"
+                    body shouldContain AppointmentFixtures.DOCTOR_ID
+                    body shouldContain AppointmentFixtures.FACILITY_ID
+                }
             }
-        }
 
-        test("POST /availabilities - should return 409 on overlap") {
-            testApplication {
-                application { testModule(FakeAvailabilityRepository(overlapDetected = true)) }
-
-                val response =
-                    client.post("/availabilities") {
-                        contentType(ContentType.Application.Json)
-                        setBody(
-                            """
-                    {
-                        "doctorId": "doc-001",
-                        "facilityId": "facility-001",
-                        "serviceTypeId": "service-001",
-                        "timeSlot": {
-                            "startDateTime": "2026-02-15T09:00:00",
-                            "durationMinutes": 30
+            it("should return 409 when an overlap is detected") {
+                configuredTestApp(
+                    availabilityRepo = FakeAvailabilityRepository(overlapDetected = true),
+                ) {
+                    val response =
+                        client.post("/availabilities") {
+                            contentType(ContentType.Application.Json)
+                            setBody(
+                                """
+                            {
+                                "doctorId": "${AppointmentFixtures.DOCTOR_ID}",
+                                "facilityId": "${AppointmentFixtures.FACILITY_ID}",
+                                "serviceTypeId": "${AppointmentFixtures.SERVICE_TYPE_ID}",
+                                "timeSlot": {
+                                    "startDateTime": "2026-02-15T09:00:00",
+                                    "durationMinutes": 30
+                                }
+                            }
+                        """
+                                    .trimIndent()
+                            )
                         }
-                    }
-                """
-                                .trimIndent()
-                        )
-                    }
 
-                response.status shouldBe HttpStatusCode.Conflict
-                val body = response.bodyAsText()
-                body shouldContain "OVERLAP_ERROR"
+                    response.status shouldBe HttpStatusCode.Conflict
+                    response.bodyAsText() shouldContain "OVERLAP_ERROR"
+                }
             }
         }
 
-        test("GET /availabilities/{id} - should return availability by id") {
-            testApplication {
-                application { testModule(FakeAvailabilityRepository()) }
+        describe("GET /availabilities/{id}") {
+            it("should return the availability by id") {
+                configuredTestApp {
+                    val response =
+                        client.get("/availabilities/${AppointmentFixtures.AVAILABILITY_ID}")
 
-                val response = client.get("/availabilities/a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6")
+                    response.status shouldBe HttpStatusCode.OK
+                    val body = response.bodyAsText()
+                    body shouldContain AppointmentFixtures.AVAILABILITY_ID
+                    body shouldContain "AVAILABLE"
+                }
+            }
 
-                response.status shouldBe HttpStatusCode.OK
-                val body = response.bodyAsText()
-                body shouldContain "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"
-                body shouldContain "AVAILABLE"
+            it("should return 404 when the availability is not found") {
+                configuredTestApp(
+                    availabilityRepo = FakeAvailabilityRepository(availabilityExists = false),
+                ) {
+                    val response =
+                        client.get("/availabilities/00000000-0000-0000-0000-000000000000")
+
+                    response.status shouldBe HttpStatusCode.NotFound
+                    response.bodyAsText() shouldContain "AVAILABILITY_NOT_FOUND"
+                }
             }
         }
 
-        test("GET /availabilities/{id} - should return 404 when not found") {
-            testApplication {
-                application { testModule(FakeAvailabilityRepository(availabilityExists = false)) }
+        describe("GET /availabilities") {
+            it("should return all availabilities") {
+                configuredTestApp {
+                    val response = client.get("/availabilities")
 
-                val response = client.get("/availabilities/00000000-0000-0000-0000-000000000000")
+                    response.status shouldBe HttpStatusCode.OK
+                    response.bodyAsText() shouldNotBe ""
+                }
+            }
 
-                response.status shouldBe HttpStatusCode.NotFound
-                val body = response.bodyAsText()
-                body shouldContain "NOT_FOUND"
+            it("should filter by doctorId") {
+                configuredTestApp {
+                    val response =
+                        client.get("/availabilities?doctorId=${AppointmentFixtures.DOCTOR_ID}")
+
+                    response.status shouldBe HttpStatusCode.OK
+                    response.bodyAsText() shouldContain AppointmentFixtures.DOCTOR_ID
+                }
+            }
+
+            it("should filter by status") {
+                configuredTestApp {
+                    val response = client.get("/availabilities?status=AVAILABLE")
+
+                    response.status shouldBe HttpStatusCode.OK
+                    response.bodyAsText() shouldContain "AVAILABLE"
+                }
             }
         }
 
-        test("GET /availabilities - should return all availabilities") {
-            testApplication {
-                application { testModule(FakeAvailabilityRepository()) }
+        describe("PUT /availabilities/{id}") {
+            it("should update an availability successfully") {
+                configuredTestApp {
+                    val response =
+                        client.put("/availabilities/${AppointmentFixtures.AVAILABILITY_ID}") {
+                            contentType(ContentType.Application.Json)
+                            setBody("""{ "status": "BOOKED" }""")
+                        }
 
-                val response = client.get("/availabilities")
+                    response.status shouldBe HttpStatusCode.OK
+                    response.bodyAsText() shouldContain AppointmentFixtures.AVAILABILITY_ID
+                }
+            }
 
-                response.status shouldBe HttpStatusCode.OK
-                val body = response.bodyAsText()
-                body shouldNotBe ""
+            it("should return 404 when the availability is not found") {
+                configuredTestApp(
+                    availabilityRepo = FakeAvailabilityRepository(availabilityExists = false),
+                ) {
+                    val response =
+                        client.put("/availabilities/00000000-0000-0000-0000-000000000000") {
+                            contentType(ContentType.Application.Json)
+                            setBody("""{ "status": "BOOKED" }""")
+                        }
+
+                    response.status shouldBe HttpStatusCode.NotFound
+                    response.bodyAsText() shouldContain "AVAILABILITY_NOT_FOUND"
+                }
             }
         }
 
-        test("GET /availabilities - should filter by doctorId") {
-            testApplication {
-                application { testModule(FakeAvailabilityRepository()) }
+        describe("DELETE /availabilities/{id}") {
+            it("should cancel an availability successfully") {
+                configuredTestApp {
+                    val response =
+                        client.delete("/availabilities/${AppointmentFixtures.AVAILABILITY_ID}")
 
-                val response = client.get("/availabilities?doctorId=doc-001")
-
-                response.status shouldBe HttpStatusCode.OK
-                val body = response.bodyAsText()
-                body shouldContain "doc-001"
+                    response.status shouldBe HttpStatusCode.NoContent
+                }
             }
-        }
 
-        test("GET /availabilities - should filter by status") {
-            testApplication {
-                application { testModule(FakeAvailabilityRepository()) }
+            it("should return 404 when the availability is not found") {
+                configuredTestApp(
+                    availabilityRepo = FakeAvailabilityRepository(availabilityExists = false),
+                ) {
+                    val response =
+                        client.delete("/availabilities/00000000-0000-0000-0000-000000000000")
 
-                val response = client.get("/availabilities?status=AVAILABLE")
-
-                response.status shouldBe HttpStatusCode.OK
-                val body = response.bodyAsText()
-                body shouldContain "AVAILABLE"
-            }
-        }
-
-        test("PUT /availabilities/{id} - should update availability successfully") {
-            testApplication {
-                application { testModule(FakeAvailabilityRepository()) }
-
-                val response =
-                    client.put("/availabilities/a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6") {
-                        contentType(ContentType.Application.Json)
-                        setBody(
-                            """
-                    {
-                        "status": "BOOKED"
-                    }
-                """
-                                .trimIndent()
-                        )
-                    }
-
-                response.status shouldBe HttpStatusCode.OK
-                val body = response.bodyAsText()
-                body shouldContain "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"
-            }
-        }
-
-        test("PUT /availabilities/{id} - should return 404 when not found") {
-            testApplication {
-                application { testModule(FakeAvailabilityRepository(availabilityExists = false)) }
-
-                val response =
-                    client.put("/availabilities/00000000-0000-0000-0000-000000000000") {
-                        contentType(ContentType.Application.Json)
-                        setBody(
-                            """
-                    {
-                        "status": "BOOKED"
-                    }
-                """
-                                .trimIndent()
-                        )
-                    }
-
-                response.status shouldBe HttpStatusCode.NotFound
-                val body = response.bodyAsText()
-                body shouldContain "NOT_FOUND"
-            }
-        }
-
-        test("DELETE /availabilities/{id} - should cancel availability successfully") {
-            testApplication {
-                application { testModule(FakeAvailabilityRepository()) }
-
-                val response = client.delete("/availabilities/a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6")
-
-                response.status shouldBe HttpStatusCode.NoContent
-            }
-        }
-
-        test("DELETE /availabilities/{id} - should return 404 when not found") {
-            testApplication {
-                application { testModule(FakeAvailabilityRepository(availabilityExists = false)) }
-
-                val response = client.delete("/availabilities/00000000-0000-0000-0000-000000000000")
-
-                response.status shouldBe HttpStatusCode.NotFound
-                val body = response.bodyAsText()
-                body shouldContain "NOT_FOUND"
+                    response.status shouldBe HttpStatusCode.NotFound
+                    response.bodyAsText() shouldContain "AVAILABILITY_NOT_FOUND"
+                }
             }
         }
     })
 
-// Fake repository for testing
-class FakeAvailabilityRepository(
-    private val availabilityExists: Boolean = true,
-    private val overlapDetected: Boolean = false,
-    private val availabilityStatus: AvailabilityStatus = AvailabilityStatus.AVAILABLE
-) : AvailabilityRepository {
+private val availabilityTestJson = Json {
+    prettyPrint = true
+    isLenient = true
+    ignoreUnknownKeys = true
+}
 
-    override suspend fun save(
-        availability: it.nucleo.appointments.domain.Availability
-    ): it.nucleo.appointments.domain.Availability = availability
-
-    override suspend fun findById(id: AvailabilityId): it.nucleo.appointments.domain.Availability? {
-        if (!availabilityExists) return null
-
-        return it.nucleo.appointments.domain.Availability(
-            availabilityId = id,
-            doctorId = DoctorId.fromString("doc-001"),
-            facilityId = FacilityId.fromString("facility-001"),
-            serviceTypeId = ServiceTypeId.fromString("service-001"),
-            timeSlot =
-                TimeSlot(
-                    startDateTime = LocalDateTime.parse("2026-02-01T09:00:00"),
-                    durationMinutes = 30
-                ),
-            status = availabilityStatus
-        )
+private fun Application.availabilityTestModule(
+    availabilityRepo: AvailabilityRepository,
+) {
+    install(ContentNegotiation) { json(availabilityTestJson) }
+    routing {
+        val service = AvailabilityService(availabilityRepo)
+        availabilityRoutes(service)
     }
-
-    override suspend fun findByFilters(
-        doctorId: DoctorId?,
-        facilityId: FacilityId?,
-        serviceTypeId: ServiceTypeId?,
-        status: AvailabilityStatus?
-    ): List<it.nucleo.appointments.domain.Availability> {
-        if (!availabilityExists) return emptyList()
-
-        val availability =
-            it.nucleo.appointments.domain.Availability(
-                availabilityId = AvailabilityId.fromString("a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"),
-                doctorId = DoctorId.fromString("doc-001"),
-                facilityId = FacilityId.fromString("facility-001"),
-                serviceTypeId = ServiceTypeId.fromString("service-001"),
-                timeSlot =
-                    TimeSlot(
-                        startDateTime = LocalDateTime.parse("2026-02-01T09:00:00"),
-                        durationMinutes = 30
-                    ),
-                status = AvailabilityStatus.AVAILABLE
-            )
-
-        return listOf(availability)
-    }
-
-    override suspend fun update(
-        availability: it.nucleo.appointments.domain.Availability
-    ): it.nucleo.appointments.domain.Availability? {
-        if (!availabilityExists) return null
-        return availability
-    }
-
-    override suspend fun checkOverlap(
-        doctorId: DoctorId,
-        timeSlot: TimeSlot,
-        excludeId: AvailabilityId?
-    ): Boolean = overlapDetected
 }

@@ -1,7 +1,5 @@
 package it.nucleo.appointments.domain
 
-import it.nucleo.appointments.domain.valueobjects.*
-
 interface AvailabilityRepository {
     suspend fun save(availability: Availability): Availability
 

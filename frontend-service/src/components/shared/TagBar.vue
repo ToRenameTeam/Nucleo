@@ -1,53 +1,56 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { TagBar } from '../../types/tag'
+import { ref, watch, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import type { TagBar } from '../../types/tag';
 
 const props = withDefaults(defineProps<TagBar>(), {
   selectedTag: '',
   multiple: false,
-  activeTags: () => []
-})
+  activeTags: () => [],
+});
 
-const { t } = useI18n()
+const { t } = useI18n();
 
-const localSelectedTag = ref(props.selectedTag || props.tags[0]?.id || '')
+const localSelectedTag = ref(props.selectedTag || props.tags[0]?.id || '');
 
 // Filter tags: hide those with count = 0, except for the "all" tag
 const visibleTags = computed(() => {
-  const allTagLabel = t('tags.all').toLowerCase()
-  
-  return props.tags.filter(tag => {
+  const allTagLabel = t('tags.all').toLowerCase();
+
+  return props.tags.filter((tag) => {
     // The "all" tag is always shown (checks both id and translated label)
     if (tag.id === 'all' || tag.label.toLowerCase() === allTagLabel) {
-      return true
+      return true;
     }
     // Show tags without count or with count > 0
-    return tag.count === undefined || tag.count > 0
-  })
-})
+    return tag.count === undefined || tag.count > 0;
+  });
+});
 
-watch(() => props.selectedTag, (newVal) => {
-  if (newVal) {
-    localSelectedTag.value = newVal
+watch(
+  () => props.selectedTag,
+  (newVal) => {
+    if (newVal) {
+      localSelectedTag.value = newVal;
+    }
   }
-})
+);
 
-const emit = defineEmits<{ tagSelected: [tagId: string] }>()
+const emit = defineEmits<{ tagSelected: [tagId: string] }>();
 
 const isTagActive = (tagId: string) => {
   if (props.multiple) {
-    return props.activeTags.includes(tagId)
+    return props.activeTags.includes(tagId);
   }
-  return localSelectedTag.value === tagId
-}
+  return localSelectedTag.value === tagId;
+};
 
 const selectTag = (tagId: string) => {
   if (!props.multiple) {
-    localSelectedTag.value = tagId
+    localSelectedTag.value = tagId;
   }
-  emit('tagSelected', tagId)
-}
+  emit('tagSelected', tagId);
+};
 </script>
 
 <template>
@@ -59,9 +62,7 @@ const selectTag = (tagId: string) => {
       @click="selectTag(tag.id)"
     >
       {{ tag.label }}
-      <span v-if="tag.count !== undefined">
-        ({{ tag.count }})
-      </span>
+      <span v-if="tag.count !== undefined"> ({{ tag.count }}) </span>
     </button>
   </div>
 </template>
@@ -86,7 +87,9 @@ const selectTag = (tagId: string) => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
-  box-shadow: 0 2px 8px var(--black-6), inset 0 1px 0 var(--white-40);
+  box-shadow:
+    0 2px 8px var(--black-6),
+    inset 0 1px 0 var(--white-40);
 }
 
 .tag-button:hover {
@@ -100,20 +103,24 @@ const selectTag = (tagId: string) => {
   backdrop-filter: blur(16px);
   border-color: var(--white-30);
   color: var(--white);
-  box-shadow: 0 4px 16px var(--accent-primary-30), inset 0 1px 0 var(--white-20);
+  box-shadow:
+    0 4px 16px var(--accent-primary-30),
+    inset 0 1px 0 var(--white-20);
 }
 
 .tag-button.tag-active:hover {
   background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--accent-primary-40), inset 0 1px 0 var(--white-30);
+  box-shadow:
+    0 6px 20px var(--accent-primary-40),
+    inset 0 1px 0 var(--white-30);
 }
 
 @media (max-width: 768px) {
   .tag-bar {
     gap: 0.5rem;
   }
-  
+
   .tag-button {
     font-size: 0.8125rem;
     padding: 0.5rem 1rem;
@@ -128,20 +135,20 @@ const selectTag = (tagId: string) => {
     padding-bottom: 0.5rem;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   .tag-bar::-webkit-scrollbar {
     height: 4px;
   }
-  
+
   .tag-bar::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   .tag-bar::-webkit-scrollbar-thumb {
     background: var(--white-60);
     border-radius: 2px;
   }
-  
+
   .tag-button {
     font-size: 0.75rem;
     padding: 0.5rem 0.875rem;

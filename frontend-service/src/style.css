@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
 
 /* CSS Reset (sostituto di Tailwind Preflight) */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -27,7 +29,12 @@ hr {
   border-top-width: 1px;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-size: inherit;
   font-weight: inherit;
 }
@@ -37,11 +44,15 @@ a {
   text-decoration: inherit;
 }
 
-b, strong {
+b,
+strong {
   font-weight: bolder;
 }
 
-code, kbd, samp, pre {
+code,
+kbd,
+samp,
+pre {
   font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 1em;
 }
@@ -50,7 +61,8 @@ small {
   font-size: 80%;
 }
 
-sub, sup {
+sub,
+sup {
   font-size: 75%;
   line-height: 0;
   position: relative;
@@ -71,7 +83,11 @@ table {
   border-collapse: collapse;
 }
 
-button, input, optgroup, select, textarea {
+button,
+input,
+optgroup,
+select,
+textarea {
   font-family: inherit;
   font-feature-settings: inherit;
   font-variation-settings: inherit;
@@ -83,11 +99,15 @@ button, input, optgroup, select, textarea {
   padding: 0;
 }
 
-button, select {
+button,
+select {
   text-transform: none;
 }
 
-button, [type='button'], [type='reset'], [type='submit'] {
+button,
+[type='button'],
+[type='reset'],
+[type='submit'] {
   -webkit-appearance: button;
   background-color: transparent;
   background-image: none;
@@ -128,7 +148,19 @@ summary {
   display: list-item;
 }
 
-blockquote, dl, dd, h1, h2, h3, h4, h5, h6, hr, figure, p, pre {
+blockquote,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+figure,
+p,
+pre {
   margin: 0;
 }
 
@@ -141,7 +173,9 @@ legend {
   padding: 0;
 }
 
-ol, ul, menu {
+ol,
+ul,
+menu {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -151,12 +185,14 @@ textarea {
   resize: vertical;
 }
 
-input::placeholder, textarea::placeholder {
+input::placeholder,
+textarea::placeholder {
   opacity: 1;
   color: #9ca3af;
 }
 
-button, [role="button"] {
+button,
+[role='button'] {
   cursor: pointer;
 }
 
@@ -164,12 +200,20 @@ button, [role="button"] {
   cursor: default;
 }
 
-img, svg, video, canvas, audio, iframe, embed, object {
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
   display: block;
   vertical-align: middle;
 }
 
-img, video {
+img,
+video {
   max-width: 100%;
   height: auto;
 }
@@ -204,7 +248,7 @@ img, video {
   --success: #10b981;
   --error: #ef4444;
   --warning: #f59e0b;
-  
+
   --bg-secondary-30: rgba(249, 250, 251, 0.3);
   --bg-secondary-40: rgba(249, 250, 251, 0.4);
   --bg-secondary-50: rgba(249, 250, 251, 0.5);
@@ -219,7 +263,7 @@ img, video {
   --bg-secondary-45: rgba(249, 250, 251, 0.45);
   --bg-secondary-15: rgba(249, 250, 251, 0.15);
   --bg-secondary-20: rgba(249, 250, 251, 0.2);
-  
+
   --text-primary-4: rgba(31, 41, 55, 0.04);
   --text-primary-6: rgba(31, 41, 55, 0.06);
   --text-primary-10: rgba(31, 41, 55, 0.1);
@@ -231,38 +275,38 @@ img, video {
   --text-primary-50: rgba(31, 41, 55, 0.5);
   --text-primary-60: rgba(31, 41, 55, 0.6);
   --text-primary-65: rgba(31, 41, 55, 0.65);
-  
+
   --text-secondary-20: rgba(107, 114, 128, 0.2);
-  
+
   /* Heading and title text */
   --text-heading: rgb(26, 26, 26);
   --text-heading-dark: #1a1a1a;
-  
+
   /* Background colors */
   --bg-light: #f8f8f8;
   --bg-hover: #f5f5f5;
-  
+
   /* Border colors */
   --border-light: #e0e0e0;
   --border-medium: #d0d0d0;
-  
+
   /* Notification colors */
   --notification-red: #dc2626;
-  
+
   /* White variations */
   --white-90: rgba(255, 255, 255, 0.9);
-  
+
   /* Topbar icons and text */
   --topbar-icon-color: #1f2937;
   --topbar-text-color: #1f2937;
   --topbar-text-secondary: #6b7280;
-  
+
   /* Widget and section text - adaptive */
   --widget-label-color: #6b7280;
   --widget-value-color: #1f2937;
   --section-title-color: #1f2937;
   --hint-text-color: #6b7280;
-  
+
   --accent-primary-8: rgba(14, 165, 233, 0.08);
   --accent-primary-5: rgba(14, 165, 233, 0.05);
   --accent-primary-10: rgba(14, 165, 233, 0.1);
@@ -278,10 +322,10 @@ img, video {
   --accent-primary-85-black: #0c8dc7;
   --accent-primary-95-black: #0d99d6;
   --accent-primary-8-on-bg: rgba(14, 165, 233, 0.08);
-  
+
   --accent-secondary-15: rgba(168, 85, 247, 0.15);
   --accent-secondary-20: rgba(168, 85, 247, 0.2);
-  
+
   --success-10: rgba(16, 185, 129, 0.1);
   --success-12: rgba(16, 185, 129, 0.12);
   --success-15: rgba(16, 185, 129, 0.15);
@@ -291,7 +335,7 @@ img, video {
   --success-green: #22c55e;
   --success-green-15: rgba(34, 197, 94, 0.15);
   --success-green-30: rgba(34, 197, 94, 0.3);
-  
+
   --error-8: rgba(239, 68, 68, 0.08);
   --error-10: rgba(239, 68, 68, 0.1);
   --error-10-on-bg: rgba(239, 68, 68, 0.1);
@@ -303,19 +347,19 @@ img, video {
   --error-30: rgba(239, 68, 68, 0.3);
   --error-40: rgba(239, 68, 68, 0.4);
   --error-60: rgba(239, 68, 68, 0.6);
-  
+
   --warning-10: rgba(245, 158, 11, 0.1);
   --warning-10-on-bg: rgba(245, 158, 11, 0.1);
   --warning-12: rgba(245, 158, 11, 0.12);
   --warning-15: rgba(245, 158, 11, 0.15);
   --warning-15-on-bg: rgba(245, 158, 11, 0.15);
   --warning-30: rgba(245, 158, 11, 0.3);
-  
+
   --bg-gradient-start-40: rgba(224, 242, 254, 0.4);
   --bg-gradient-start-50: rgba(224, 242, 254, 0.5);
   --bg-gradient-start-10: rgba(224, 242, 254, 0.1);
   --bg-gradient-start-85-black: #b8daf0;
-  
+
   /* Widget colors - white variations */
   --white-15: rgba(255, 255, 255, 0.15);
   --white-20: rgba(255, 255, 255, 0.2);
@@ -332,7 +376,7 @@ img, video {
   --white-95: rgba(255, 255, 255, 0.95);
   --white-100: rgba(255, 255, 255, 1);
   --white: #ffffff;
-  
+
   /* Widget colors - black variations */
   --black-2: rgba(0, 0, 0, 0.02);
   --black-4: rgba(0, 0, 0, 0.04);
@@ -347,7 +391,7 @@ img, video {
   --black-90: rgba(0, 0, 0, 0.9);
   --black-100: rgba(0, 0, 0, 1);
   --black: #000000;
-  
+
   /* Widget colors - gray variations */
   --gray-171717: #171717;
   --gray-404040: #404040;
@@ -355,7 +399,7 @@ img, video {
   --gray-737373: #737373;
   --gray-a3a3a3: #a3a3a3;
   --gray-d1d5db-80: rgba(209, 213, 219, 0.8);
-  
+
   /* Widget colors - blue variations for buttons and selections */
   --blue-3b82f6: #3b82f6;
   --blue-3b82f6-08: rgba(59, 130, 246, 0.08);
@@ -375,14 +419,14 @@ img, video {
   --blue-2563eb: #2563eb;
   --blue-7c3aed: #7c3aed;
   --blue-1e40af: #1e40af;
-  
+
   /* Widget colors - text colors for gray variants */
   --text-gray-400: #9ca3af;
   --text-gray-500: #6b7280;
   --text-gray-600: #4b5563;
   --text-gray-700: #374151;
   --text-gray-900: #111827;
-  
+
   /* Additional colors for specific components */
   --sky-0ea5e9: #0ea5e9;
   --sky-0ea5e9-08: rgba(14, 165, 233, 0.08);
@@ -398,14 +442,14 @@ img, video {
   --purple-a855f7-15: rgba(168, 85, 247, 0.15);
   --purple-a855f7-20: rgba(168, 85, 247, 0.2);
   --green-22c55e: #22c55e;
-  
+
   --bg-gradient-mid-10: rgba(221, 214, 254, 0.1);
   --bg-gradient-mid-40: rgba(221, 214, 254, 0.4);
   --bg-gradient-mid-50: rgba(221, 214, 254, 0.5);
-  
+
   --bg-gradient-end-10: rgba(252, 231, 243, 0.1);
   --bg-gradient-end-85-black: #e4c2d9;
-  
+
   /* Document type colors */
   --doc-prescription: #8b5cf6;
   --doc-prescription-bg: rgba(139, 92, 246, 0.12);
@@ -425,7 +469,7 @@ img, video {
   --doc-other: #64748b;
   --doc-other-bg: rgba(100, 116, 139, 0.12);
   --doc-other-border: rgba(100, 116, 139, 0.3);
-  
+
   /* Medical specialty badge colors - Based on ServiceCategory enum */
   --badge-visita_specialistica: #10b981;
   --badge-visita_specialistica-bg: rgba(16, 185, 129, 0.12);
@@ -511,27 +555,27 @@ img, video {
   --badge-gastroenterologia: #f97316;
   --badge-gastroenterologia-bg: rgba(249, 115, 22, 0.12);
   --badge-gastroenterologia-border: rgba(249, 115, 22, 0.3);
-  
+
   /* Status text colors */
   --success-text-dark: #065f46;
   --warning-text-dark: #92400e;
-  
+
   /* Badge shadow colors */
   --badge-shadow: rgba(0, 0, 0, 0.08);
-  
+
   /* Glassmorphism - Blur Effects */
   --blur-sm: 8px;
   --blur-base: 12px;
   --blur-md: 16px;
   --blur-lg: 24px;
   --blur-xl: 32px;
-  
+
   /* Glassmorphism - Shadows */
   --shadow-glass-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
   --shadow-glass-md: 0 4px 16px rgba(0, 0, 0, 0.12);
   --shadow-glass-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
   --shadow-glass-xl: 0 16px 48px rgba(0, 0, 0, 0.18);
-  
+
   /* Glassmorphism - RGBA variations */
   --rgba-white-5: rgba(255, 255, 255, 0.05);
   --rgba-white-8: rgba(255, 255, 255, 0.08);
@@ -539,7 +583,7 @@ img, video {
   --rgba-white-25: rgba(255, 255, 255, 0.25);
   --rgba-white-35: rgba(255, 255, 255, 0.35);
   --rgba-white-45: rgba(255, 255, 255, 0.45);
-  
+
   /* Border Radius */
   --radius-sm: 0.25rem;
   --radius-base: 0.5rem;
@@ -548,38 +592,38 @@ img, video {
   --radius-xl: 1.5rem;
   --radius-2xl: 2rem;
   --radius-full: 9999px;
-  
+
   /* Primary Color (Sky Blue) */
   --color-primary-400: #38bdf8;
   --color-primary-500: #0ea5e9;
   --color-primary-600: #0284c7;
-  
+
   /* Neutral Colors */
   --color-neutral-400: #a3a3a3;
   --color-neutral-600: #525252;
   --color-neutral-700: #404040;
   --color-neutral-900: #171717;
-  
+
   /* Success Color */
   --color-success: #10b981;
-  
+
   /* Animation */
   --duration-fast: 200ms;
   --duration-base: 300ms;
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
-  
+
   /* Font */
   --font-primary: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
-  
+
   /* Text sizes */
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
   --text-xl: 1.25rem;
-  
+
   /* Spacing */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -588,39 +632,35 @@ img, video {
   --space-6: 1.5rem;
   --space-8: 2rem;
   --space-12: 3rem;
-  
+
   /* Warning badge colors for actions */
   --badge-warning: #f59e0b;
   --badge-warning-bg: rgba(245, 158, 11, 0.15);
   --badge-warning-border: rgba(245, 158, 11, 0.3);
   --badge-warning-shadow: rgba(245, 158, 11, 0.15);
-  
+
   /* Legal footer colors */
   --legal-text: #9ca3af;
   --legal-footer-bg: rgba(255, 255, 255, 0.8);
   --legal-footer-border: rgba(209, 213, 219, 0.8);
   --legal-link-hover: #0ea5e9;
-  
+
   /* Cookie banner colors */
   --cookie-banner-bg: rgba(255, 255, 255, 0.98);
   --cookie-banner-shadow: rgba(0, 0, 0, 0.15);
-  
+
   /* Modal colors */
   --modal-overlay-bg: rgba(0, 0, 0, 0.5);
   --modal-content-bg: #ffffff;
   --modal-shadow: rgba(0, 0, 0, 0.25);
-  
+
   /* FullCalendar colors */
   --fc-button-bg: #000000;
   --fc-button-hover-bg: #1f2937;
   --fc-day-number: #374151;
   --fc-header-text: #111827;
   --fc-today-bg: #fef3c7;
-  
-  /* Chart colors */
-  --chart-tooltip-bg: rgba(0, 0, 0, 0.8);
-  --chart-grid: rgba(0, 0, 0, 0.05);
-  
+
   /* Glass menu colors */
   --glass-menu-bg: rgba(255, 255, 255, 0.95);
   --glass-menu-border: rgba(255, 255, 255, 0.6);
@@ -629,7 +669,7 @@ img, video {
   --glass-menu-hover-bg: rgba(14, 165, 233, 0.08);
   --glass-menu-text-primary: #111827;
   --glass-menu-text-secondary: #4b5563;
-  
+
   /* Accessibilità: colori testo con contrasto WCAG AA (min 4.5:1) */
   --text-default: #1f2937;
   --text-muted: #4b5563;
@@ -639,13 +679,13 @@ img, video {
   --text-interactive: #0369a1;
   --text-interactive-hover: #075985;
   --text-on-tag: #1f2937;
-  
+
   /* Bottoni secondari - si invertono tra tema chiaro e scuro */
   --btn-secondary-bg: #1f2937;
   --btn-secondary-text: #ffffff;
   --btn-secondary-border: rgba(255, 255, 255, 0.2);
   --btn-secondary-shadow: rgba(31, 41, 55, 0.3);
-  
+
   /* Warning accessibile - contrasto minimo 4.5:1 su sfondo chiaro */
   --warning-text-accessible: #92400e;
   --warning-bg-accessible: #fef3c7;
@@ -668,7 +708,7 @@ img, video {
   --success: #34d399;
   --error: #f87171;
   --warning: #fbbf24;
-  
+
   /* Colori con opacità per tema scuro */
   --bg-secondary-30: rgba(17, 24, 39, 0.3);
   --bg-secondary-40: rgba(17, 24, 39, 0.4);
@@ -695,26 +735,26 @@ img, video {
   --text-primary-50: rgba(249, 250, 251, 0.5);
   --text-primary-60: rgba(249, 250, 251, 0.6);
   --text-primary-65: rgba(249, 250, 251, 0.65);
-  
+
   --text-secondary-20: rgba(209, 213, 219, 0.2);
-  
+
   /* Heading and title text for dark theme */
   --text-heading: rgb(249, 250, 251);
-  
+
   /* White/Dark variations for dark theme */
   --white-90: rgba(17, 24, 39, 0.9);
-  
+
   /* Topbar icons and text - dark theme (white for visibility) */
   --topbar-icon-color: #ffffff;
   --topbar-text-color: #ffffff;
   --topbar-text-secondary: rgba(255, 255, 255, 0.7);
-  
+
   /* Widget and section text - dark theme */
   --widget-label-color: rgba(255, 255, 255, 0.75);
   --widget-value-color: #ffffff;
   --section-title-color: #ffffff;
   --hint-text-color: rgba(255, 255, 255, 0.75);
-  
+
   --accent-primary-8: rgba(255, 255, 255, 0.08);
   --accent-primary-25: rgba(255, 255, 255, 0.25);
   --accent-primary-5: rgba(255, 255, 255, 0.05);
@@ -730,15 +770,15 @@ img, video {
   --accent-primary-85-black: #e6e6e6;
   --accent-primary-8-on-bg: rgba(255, 255, 255, 0.08);
   --accent-primary-95-black: #f2f2f2;
-  
+
   --accent-secondary-15: rgba(192, 132, 252, 0.15);
   --accent-secondary-20: rgba(192, 132, 252, 0.2);
-  
+
   --success-10: rgba(52, 211, 153, 0.1);
   --success-20: rgba(52, 211, 153, 0.2);
   --success-30: rgba(52, 211, 153, 0.3);
   --success-40: rgba(52, 211, 153, 0.4);
-  
+
   --error-8: rgba(248, 113, 113, 0.08);
   --error-10-on-bg: rgba(248, 113, 113, 0.1);
   --error-15: rgba(248, 113, 113, 0.15);
@@ -748,23 +788,23 @@ img, video {
   --error-30: rgba(248, 113, 113, 0.3);
   --error-40: rgba(248, 113, 113, 0.4);
   --error-60: rgba(248, 113, 113, 0.6);
-  
+
   --warning-10: rgba(251, 191, 36, 0.1);
   --warning-10-on-bg: rgba(251, 191, 36, 0.1);
   --warning-15-on-bg: rgba(251, 191, 36, 0.15);
   --warning-10: rgba(251, 191, 36, 0.1);
   --warning-30: rgba(251, 191, 36, 0.3);
-  
+
   /* Warning badge colors for actions - dark theme */
   --badge-warning: #fbbf24;
   --badge-warning-bg: rgba(251, 191, 36, 0.15);
   --badge-warning-border: rgba(251, 191, 36, 0.3);
   --badge-warning-shadow: rgba(251, 191, 36, 0.15);
-  
+
   --bg-gradient-start-40: rgba(30, 58, 138, 0.4);
   --bg-gradient-start-50: rgba(30, 58, 138, 0.5);
   --bg-gradient-start-85-black: #192f70;
-  
+
   /* Widget colors - white variations for dark theme */
   --white-15: rgba(255, 255, 255, 0.08);
   --white-20: rgba(255, 255, 255, 0.09);
@@ -776,7 +816,7 @@ img, video {
   --white-70: rgba(255, 255, 255, 0.3);
   --white-80: rgba(255, 255, 255, 0.35);
   --white-90: rgba(255, 255, 255, 0.4);
-  
+
   /* Widget colors - black variations for dark theme */
   --black-2: rgba(255, 255, 255, 0.02);
   --black-4: rgba(255, 255, 255, 0.03);
@@ -789,7 +829,7 @@ img, video {
   --black-20: rgba(255, 255, 255, 0.15);
   --black-80: rgba(255, 255, 255, 0.7);
   --black-90: rgba(255, 255, 255, 0.8);
-  
+
   /* Widget colors - gray variations for dark theme */
   --gray-171717: #e5e7eb;
   --gray-404040: #d1d5db;
@@ -797,7 +837,7 @@ img, video {
   --gray-737373: #9ca3af;
   --gray-a3a3a3: #6b7280;
   --gray-d1d5db-80: rgba(107, 114, 128, 0.8);
-  
+
   /* Widget colors - blue variations stay similar */
   --blue-3b82f6: #60a5fa;
   --blue-3b82f6-10: rgba(96, 165, 250, 0.1);
@@ -809,14 +849,14 @@ img, video {
   --blue-3b82f6-50: rgba(96, 165, 250, 0.5);
   --blue-3b82f6-60: rgba(96, 165, 250, 0.6);
   --blue-8b5cf6: #a78bfa;
-  
+
   /* Widget colors - text colors for dark theme */
   --text-gray-400: #9ca3af;
   --text-gray-500: #9ca3af;
   --text-gray-600: #d1d5db;
   --text-gray-700: #e5e7eb;
   --text-gray-900: #f9fafb;
-  
+
   /* Additional colors for specific components in dark theme */
   --sky-0ea5e9: #38bdf8;
   --sky-0ea5e9-10: rgba(56, 189, 248, 0.1);
@@ -828,7 +868,7 @@ img, video {
   --purple-a855f7: #c084fc;
   --purple-a855f7-15: rgba(192, 132, 252, 0.15);
   --purple-a855f7-20: rgba(192, 132, 252, 0.2);
-  
+
   /* Glass menu colors for dark theme */
   --glass-menu-bg: rgba(31, 41, 55, 0.95);
   --glass-menu-border: rgba(55, 65, 81, 0.6);
@@ -837,7 +877,7 @@ img, video {
   --glass-menu-hover-bg: rgba(56, 189, 248, 0.15);
   --glass-menu-text-primary: #f9fafb;
   --glass-menu-text-secondary: #d1d5db;
-  
+
   /* Accessibilità tema scuro: colori testo con contrasto WCAG AA (min 4.5:1) */
   --text-default: #f9fafb;
   --text-muted: #d1d5db;
@@ -847,22 +887,22 @@ img, video {
   --text-interactive: #7dd3fc;
   --text-interactive-hover: #a5f3fc;
   --text-on-tag: #1f2937;
-  
+
   /* Bottoni secondari - invertiti in tema scuro */
   --btn-secondary-bg: rgba(255, 255, 255, 0.9);
   --btn-secondary-text: #1f2937;
   --btn-secondary-border: rgba(255, 255, 255, 0.3);
   --btn-secondary-shadow: rgba(255, 255, 255, 0.2);
-  
+
   /* Warning accessibile tema scuro - contrasto minimo 4.5:1 */
   --warning-text-accessible: #fcd34d;
   --warning-bg-accessible: rgba(120, 53, 15, 0.3);
-  
+
   --bg-gradient-mid-40: rgba(91, 33, 182, 0.4);
   --bg-gradient-mid-50: rgba(91, 33, 182, 0.5);
-  
+
   --bg-gradient-end-85-black: #5a1336;
-  
+
   /* Medical specialty badge colors - Dark theme */
   --badge-cardiologia: #fca5a5;
   --badge-cardiologia-bg: rgba(252, 165, 165, 0.12);

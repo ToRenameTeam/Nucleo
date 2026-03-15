@@ -5,26 +5,44 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint users-service/src master-data-service/src frontend-service/src",
+    "lint:fix": "eslint users-service/src master-data-service/src frontend-service/src --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "dev:users": "pnpm --filter @nucleo/users-service dev",
     "start:users": "pnpm --filter @nucleo/users-service start",
     "dev:master-data": "pnpm --filter @nucleo/master-data-service dev",
-    "start:master-data": "pnpm --filter @nucleo/master-data-service start"
+    "start:master-data": "pnpm --filter @nucleo/master-data-service start",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "prepare": "husky"
   },
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.28.1",
+  "lint-staged": {
+    "*.{js,ts,json,yaml,css,vue}": [
+      "prettier --write"
+    ],
+    "*.kt": [
+      "bash scripts/ktfmt-staged.sh"
+    ]
+  },
   "devDependencies": {
+    "@commitlint/cli": "^20.4.3",
+    "@commitlint/config-conventional": "^20.4.3",
     "@eslint/js": "^9.39.2",
     "@types/eslint": "^9.6.1",
     "@types/node": "^25.0.10",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.2",
     "prettier": "^3.8.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.53.1"
+    "typescript-eslint": "^8.53.1",
+    "vitepress": "2.0.0-alpha.16"
   }
 }

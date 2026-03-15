@@ -1,38 +1,62 @@
 import { Router } from 'express';
+import { z } from 'zod';
 import {
-    facilityService,
-    FacilityValidationError,
-    FacilityConflictError
-} from '../services/facility.service.js';
+  facilityService,
+  FacilityValidationError,
+  FacilityConflictError,
+} from '../services/index.js';
+import { parseBooleanQuery, sendError, sendServerError, sendSuccess } from './route.utils.js';
+import {
+  ApiValidationError,
+  booleanQueryValueSchema,
+  idParamSchema,
+  nonEmptyTrimmedStringSchema,
+  optionalTrimmedStringSchema,
+  validateWithSchema,
+} from './validation.js';
 
 const router = Router();
+
+const facilityListQuerySchema = z.object({
+  city: optionalTrimmedStringSchema,
+  active: booleanQueryValueSchema.optional(),
+  search: optionalTrimmedStringSchema,
+});
+
+const createFacilityBodySchema = z.object({
+  code: nonEmptyTrimmedStringSchema,
+  name: nonEmptyTrimmedStringSchema,
+  address: nonEmptyTrimmedStringSchema,
+  city: nonEmptyTrimmedStringSchema,
+  isActive: z.boolean().optional(),
+});
+
+const updateFacilityBodySchema = z.object({
+  name: optionalTrimmedStringSchema,
+  address: optionalTrimmedStringSchema,
+  city: optionalTrimmedStringSchema,
+  isActive: z.boolean().optional(),
+});
 
 /**
  * GET /api/facilities
  * Get all facilities with optional filtering
  */
 router.get('/', async (req, res) => {
-    try {
-        const { city, active, search } = req.query;
+  try {
+    const query = validateWithSchema(facilityListQuerySchema, req.query, 'facility query');
 
-        const facilities = await facilityService.findAll({
-            city: city as string | undefined,
-            active: active !== undefined ? active === 'true' : undefined,
-            search: search as string | undefined
-        });
+    const facilities = await facilityService.findAll({
+      city: query.city,
+      active: parseBooleanQuery(query.active),
+      search: query.search,
+    });
 
-        res.json({
-            success: true,
-            count: facilities.length,
-            data: facilities
-        });
-    } catch (error) {
-        console.error('Error fetching facilities:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to fetch facilities'
-        });
-    }
+    sendSuccess(res, facilities, 200, { count: facilities.length });
+  } catch (error) {
+    console.error('Error fetching facilities:', error);
+    sendServerError(res, 'Failed to fetch facilities');
+  }
 });
 
 /**
@@ -40,20 +64,14 @@ router.get('/', async (req, res) => {
  * Get all distinct cities
  */
 router.get('/cities', async (_req, res) => {
-    try {
-        const cities = await facilityService.getCities();
+  try {
+    const cities = await facilityService.getCities();
 
-        res.json({
-            success: true,
-            data: cities
-        });
-    } catch (error) {
-        console.error('Error fetching cities:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to fetch cities'
-        });
-    }
+    sendSuccess(res, cities);
+  } catch (error) {
+    console.error('Error fetching cities:', error);
+    sendServerError(res, 'Failed to fetch cities');
+  }
 });
 
 /**
@@ -61,28 +79,20 @@ router.get('/cities', async (_req, res) => {
  * Get a single facility by ID
  */
 router.get('/:id', async (req, res) => {
-    try {
-        const facility = await facilityService.findById(req.params.id);
+  try {
+    const params = validateWithSchema(idParamSchema, req.params, 'facility id parameter');
+    const facility = await facilityService.findById(params.id);
 
-        if (!facility) {
-            res.status(404).json({
-                success: false,
-                error: 'Facility not found'
-            });
-            return;
-        }
-
-        res.json({
-            success: true,
-            data: facility
-        });
-    } catch (error) {
-        console.error('Error fetching facility:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to fetch facility'
-        });
+    if (!facility) {
+      sendError(res, 404, 'Facility not found');
+      return;
     }
+
+    sendSuccess(res, facility);
+  } catch (error) {
+    console.error('Error fetching facility:', error);
+    sendServerError(res, 'Failed to fetch facility');
+  }
 });
 
 /**
@@ -90,36 +100,30 @@ router.get('/:id', async (req, res) => {
  * Create a new facility
  */
 router.post('/', async (req, res) => {
-    try {
-        const facility = await facilityService.create(req.body);
+  try {
+    const body = validateWithSchema(createFacilityBodySchema, req.body, 'create facility body');
+    const facility = await facilityService.create(body);
 
-        res.status(201).json({
-            success: true,
-            data: facility
-        });
-    } catch (error) {
-        if (error instanceof FacilityValidationError) {
-            res.status(400).json({
-                success: false,
-                error: error.message
-            });
-            return;
-        }
-
-        if (error instanceof FacilityConflictError) {
-            res.status(409).json({
-                success: false,
-                error: error.message
-            });
-            return;
-        }
-
-        console.error('Error creating facility:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to create facility'
-        });
+    sendSuccess(res, facility, 201);
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      sendError(res, 400, error.message);
+      return;
     }
+
+    if (error instanceof FacilityValidationError) {
+      sendError(res, 400, error.message);
+      return;
+    }
+
+    if (error instanceof FacilityConflictError) {
+      sendError(res, 409, error.message);
+      return;
+    }
+
+    console.error('Error creating facility:', error);
+    sendServerError(res, 'Failed to create facility');
+  }
 });
 
 /**
@@ -127,28 +131,26 @@ router.post('/', async (req, res) => {
  * Update a facility
  */
 router.put('/:id', async (req, res) => {
-    try {
-        const facility = await facilityService.update(req.params.id, req.body);
+  try {
+    const params = validateWithSchema(idParamSchema, req.params, 'facility id parameter');
+    const body = validateWithSchema(updateFacilityBodySchema, req.body, 'update facility body');
+    const facility = await facilityService.update(params.id, body);
 
-        if (!facility) {
-            res.status(404).json({
-                success: false,
-                error: 'Facility not found'
-            });
-            return;
-        }
-
-        res.json({
-            success: true,
-            data: facility
-        });
-    } catch (error) {
-        console.error('Error updating facility:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to update facility'
-        });
+    if (!facility) {
+      sendError(res, 404, 'Facility not found');
+      return;
     }
+
+    sendSuccess(res, facility);
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      sendError(res, 400, error.message);
+      return;
+    }
+
+    console.error('Error updating facility:', error);
+    sendServerError(res, 'Failed to update facility');
+  }
 });
 
 /**
@@ -156,29 +158,25 @@ router.put('/:id', async (req, res) => {
  * Soft delete a facility
  */
 router.delete('/:id', async (req, res) => {
-    try {
-        const facility = await facilityService.softDelete(req.params.id);
+  try {
+    const params = validateWithSchema(idParamSchema, req.params, 'facility id parameter');
+    const facility = await facilityService.softDelete(params.id);
 
-        if (!facility) {
-            res.status(404).json({
-                success: false,
-                error: 'Facility not found'
-            });
-            return;
-        }
-
-        res.json({
-            success: true,
-            message: 'Facility deactivated successfully',
-            data: facility
-        });
-    } catch (error) {
-        console.error('Error deleting facility:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to delete facility'
-        });
+    if (!facility) {
+      sendError(res, 404, 'Facility not found');
+      return;
     }
+
+    sendSuccess(res, facility, 200, { message: 'Facility deactivated successfully' });
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      sendError(res, 400, error.message);
+      return;
+    }
+
+    console.error('Error deleting facility:', error);
+    sendServerError(res, 'Failed to delete facility');
+  }
 });
 
 /**
@@ -186,28 +184,25 @@ router.delete('/:id', async (req, res) => {
  * Permanently delete a facility
  */
 router.delete('/:id/permanent', async (req, res) => {
-    try {
-        const facility = await facilityService.permanentDelete(req.params.id);
+  try {
+    const params = validateWithSchema(idParamSchema, req.params, 'facility id parameter');
+    const facility = await facilityService.permanentDelete(params.id);
 
-        if (!facility) {
-            res.status(404).json({
-                success: false,
-                error: 'Facility not found'
-            });
-            return;
-        }
-
-        res.json({
-            success: true,
-            message: 'Facility permanently deleted'
-        });
-    } catch (error) {
-        console.error('Error permanently deleting facility:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to permanently delete facility'
-        });
+    if (!facility) {
+      sendError(res, 404, 'Facility not found');
+      return;
     }
+
+    sendSuccess(res, null, 200, { message: 'Facility permanently deleted' });
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      sendError(res, 400, error.message);
+      return;
+    }
+
+    console.error('Error permanently deleting facility:', error);
+    sendServerError(res, 'Failed to permanently delete facility');
+  }
 });
 
 export default router;

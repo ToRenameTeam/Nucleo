@@ -1,59 +1,41 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import authRoutes from './api/auth.js';
-import userRoutes from './api/user.js';
-import delegationRoutes from './api/delegation.js';
-import {runSeeds} from "./infrastructure/seeds/index.js";
+import 'dotenv/config';
+import { type Server } from 'node:http';
+import { DEFAULT_PORT, disconnectDB, startServer } from './app.js';
 
-const app = express();
-const PORT = process.env.PORT || 3030;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/users_db';
+const port = Number(process.env.PORT) || DEFAULT_PORT;
+let server: Server | null = null;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Health check
-app.get('/health', (req, res) => {
-    res.json({
-        status: 'ok',
-        timestamp: new Date().toISOString(),
-        service: 'users-service'
-    });
+bootstrap().catch(function (error) {
+  console.error('Failed to start users-service:', error);
+  process.exit(1);
 });
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/delegations', delegationRoutes);
+async function bootstrap() {
+  server = await startServer({ port });
 
-startServer();
+  console.log(`Server running on port ${port}`);
+  console.log(`Health check: http://localhost:${port}/health`);
+  console.log(`Users API: http://localhost:${port}/api/users`);
+  console.log(`Auth API: http://localhost:${port}/api/auth`);
+  console.log(`Delegations API: http://localhost:${port}/api/delegations`);
+}
 
-// Start server
-async function startServer() {
-    await connectDB();
-    await runSeeds();
+process.on('SIGINT', async function () {
+  console.log('\nShutting down gracefully...');
 
-    app.listen(PORT, () => {
-        console.log(`🚀 Server running on port ${PORT}`);
-        console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  if (server) {
+    await new Promise<void>(function (resolve, reject) {
+      server?.close(function (error) {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve();
+      });
     });
-}
+  }
 
-// Connect to MongoDB
-async function connectDB() {
-    try {
-        await mongoose.connect(MONGO_URI);
-        console.log('✅ Connected to MongoDB');
-    } catch (error) {
-        console.error('❌ MongoDB connection error:', error);
-        process.exit(1);
-    }
-}
-
-process.on('SIGINT', async () => {
-    console.log('\n⚠️  Shutting down gracefully...');
-    await mongoose.connection.close();
-    process.exit(0);
+  await disconnectDB();
+  process.exit(0);
 });

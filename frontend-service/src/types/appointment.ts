@@ -21,10 +21,10 @@ export interface AppointmentCard {
 }
 
 export interface UpcomingAppointments {
-  appointments: any[];
+  appointments: Appointment[];
 }
 
 export type AppointmentBooking = {
   isOpen: boolean;
   preselectedVisit?: string | null;
-}
+};

@@ -1,38 +1,38 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-const { t } = useI18n()
-const showCookieBanner = ref(false)
-const showPrivacyModal = ref(false)
-const showLegalModal = ref(false)
+const { t } = useI18n();
+const showCookieBanner = ref(false);
+const showPrivacyModal = ref(false);
+const showLegalModal = ref(false);
 
 onMounted(() => {
-  const consent = localStorage.getItem('cookie-consent')
+  const consent = localStorage.getItem('cookie-consent');
   if (!consent) {
-    showCookieBanner.value = true
+    showCookieBanner.value = true;
   }
-})
+});
 
 const acceptAllCookies = () => {
-  localStorage.setItem('cookie-consent', 'all')
-  showCookieBanner.value = false
-}
+  localStorage.setItem('cookie-consent', 'all');
+  showCookieBanner.value = false;
+};
 
 const acceptNecessaryCookies = () => {
-  localStorage.setItem('cookie-consent', 'necessary')
-  showCookieBanner.value = false
-}
+  localStorage.setItem('cookie-consent', 'necessary');
+  showCookieBanner.value = false;
+};
 
 const openPrivacyModal = () => {
-  showPrivacyModal.value = true
-}
+  showPrivacyModal.value = true;
+};
 
 const openLegalModal = () => {
-  showLegalModal.value = true
-}
+  showLegalModal.value = true;
+};
 
-const currentYear = new Date().getFullYear()
+const currentYear = new Date().getFullYear();
 </script>
 
 <template>
@@ -41,32 +41,24 @@ const currentYear = new Date().getFullYear()
     <div class="footer-left">
       <span class="footer-brand">{{ t('app.title') }} © {{ currentYear }}</span>
     </div>
-    
+
     <div class="footer-center">
       <!-- Area centrale come spacer per la BottomBar -->
     </div>
-    
+
     <div class="footer-right">
       <div class="footer-links">
-        <button 
-          @click="openPrivacyModal" 
-          class="footer-link"
-          :aria-label="t('footer.privacyAria')"
-        >
+        <button @click="openPrivacyModal" class="footer-link" :aria-label="t('footer.privacyAria')">
           {{ t('footer.privacy') }}
         </button>
         <span class="footer-separator">|</span>
-        <button 
-          @click="openLegalModal" 
-          class="footer-link"
-          :aria-label="t('footer.legalAria')"
-        >
+        <button @click="openLegalModal" class="footer-link" :aria-label="t('footer.legalAria')">
           {{ t('footer.legalNotes') }}
         </button>
         <span class="footer-separator">|</span>
-        <a 
-          href="https://form.agid.gov.it/" 
-          target="_blank" 
+        <a
+          href="https://form.agid.gov.it/"
+          target="_blank"
           rel="noopener noreferrer"
           class="footer-link"
           :aria-label="t('footer.accessibilityAria')"
@@ -81,27 +73,32 @@ const currentYear = new Date().getFullYear()
 
   <!-- Cookie Banner -->
   <Transition name="slide-up">
-    <div v-if="showCookieBanner" class="cookie-banner" role="dialog" aria-labelledby="cookie-banner-title">
+    <div
+      v-if="showCookieBanner"
+      class="cookie-banner"
+      role="dialog"
+      aria-labelledby="cookie-banner-title"
+    >
       <div class="cookie-content">
         <h3 id="cookie-banner-title">{{ t('footer.cookieTitle') }}</h3>
         <p>{{ t('footer.cookieDescription') }}</p>
         <div class="cookie-actions">
-          <button 
-            @click="acceptNecessaryCookies" 
+          <button
+            @click="acceptNecessaryCookies"
             class="cookie-btn cookie-btn-secondary"
             :aria-label="t('footer.acceptNecessaryAria')"
           >
             {{ t('footer.acceptNecessary') }}
           </button>
-          <button 
-            @click="openPrivacyModal" 
+          <button
+            @click="openPrivacyModal"
             class="cookie-btn cookie-btn-link"
             :aria-label="t('footer.moreInfoAria')"
           >
             {{ t('footer.moreInfo') }}
           </button>
-          <button 
-            @click="acceptAllCookies" 
+          <button
+            @click="acceptAllCookies"
             class="cookie-btn cookie-btn-primary"
             :aria-label="t('footer.acceptAllAria')"
           >
@@ -118,24 +115,30 @@ const currentYear = new Date().getFullYear()
       <div class="modal-container" role="dialog" aria-labelledby="privacy-modal-title">
         <div class="modal-header">
           <h2 id="privacy-modal-title">{{ t('footer.privacyModalTitle') }}</h2>
-          <button 
-            @click="showPrivacyModal = false" 
+          <button
+            @click="showPrivacyModal = false"
             class="modal-close"
             aria-label="Chiudi informativa privacy"
           >
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M6 18L18 6M6 6l12 12"/>
+            <svg
+              class="w-6 h-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        
+
         <div class="modal-body">
           <section>
             <h3>1. Titolare del trattamento</h3>
             <p>
-              <strong>Pubblica Amministrazione Italiana</strong><br>
-              Indirizzo: [Inserire indirizzo]<br>
-              Email: <a href="mailto:privacy@example.gov.it">privacy@example.gov.it</a><br>
+              <strong>Pubblica Amministrazione Italiana</strong><br />
+              Indirizzo: [Inserire indirizzo]<br />
+              Email: <a href="mailto:privacy@example.gov.it">privacy@example.gov.it</a><br />
               PEC: <a href="mailto:pec@example.gov.it">pec@example.gov.it</a>
             </p>
           </section>
@@ -145,7 +148,10 @@ const currentYear = new Date().getFullYear()
             <p>Il sistema raccoglie e tratta le seguenti categorie di dati:</p>
             <ul>
               <li><strong>Dati anagrafici:</strong> nome, cognome, codice fiscale</li>
-              <li><strong>Dati sanitari:</strong> documenti medici, referti, prescrizioni (Art. 9 GDPR)</li>
+              <li>
+                <strong>Dati sanitari:</strong> documenti medici, referti, prescrizioni (Art. 9
+                GDPR)
+              </li>
               <li><strong>Dati di navigazione:</strong> indirizzo IP, cookie tecnici</li>
               <li><strong>Dati di utilizzo:</strong> statistiche aggregate anonime</li>
             </ul>
@@ -164,12 +170,16 @@ const currentYear = new Date().getFullYear()
 
           <section>
             <h3>4. Base giuridica del trattamento</h3>
-            <p>
-              Il trattamento è fondato su:
-            </p>
+            <p>Il trattamento è fondato su:</p>
             <ul>
-              <li><strong>Art. 6 par. 1 lett. e) GDPR:</strong> esecuzione di un compito di interesse pubblico</li>
-              <li><strong>Art. 9 par. 2 lett. h) GDPR:</strong> finalità di medicina preventiva, diagnosi, assistenza sanitaria</li>
+              <li>
+                <strong>Art. 6 par. 1 lett. e) GDPR:</strong> esecuzione di un compito di interesse
+                pubblico
+              </li>
+              <li>
+                <strong>Art. 9 par. 2 lett. h) GDPR:</strong> finalità di medicina preventiva,
+                diagnosi, assistenza sanitaria
+              </li>
               <li><strong>D.Lgs. 196/2003:</strong> Codice Privacy italiano</li>
             </ul>
           </section>
@@ -177,9 +187,9 @@ const currentYear = new Date().getFullYear()
           <section>
             <h3>5. Modalità di trattamento e conservazione</h3>
             <p>
-              I dati sono trattati con strumenti elettronici, con misure di sicurezza tecniche e organizzative 
-              adeguate per garantire la riservatezza e l'integrità. I dati sanitari sono conservati secondo 
-              i termini previsti dalla normativa vigente.
+              I dati sono trattati con strumenti elettronici, con misure di sicurezza tecniche e
+              organizzative adeguate per garantire la riservatezza e l'integrità. I dati sanitari
+              sono conservati secondo i termini previsti dalla normativa vigente.
             </p>
           </section>
 
@@ -196,7 +206,8 @@ const currentYear = new Date().getFullYear()
               <li>Proporre reclamo al Garante Privacy</li>
             </ul>
             <p>
-              Per esercitare i tuoi diritti: <a href="mailto:privacy@example.gov.it">privacy@example.gov.it</a>
+              Per esercitare i tuoi diritti:
+              <a href="mailto:privacy@example.gov.it">privacy@example.gov.it</a>
             </p>
           </section>
 
@@ -207,24 +218,25 @@ const currentYear = new Date().getFullYear()
               <li><strong>cookie-consent:</strong> memorizza la scelta sui cookie</li>
               <li><strong>session:</strong> gestione sessione utente autenticato</li>
             </ul>
-            
+
             <h4>Cookie di analisi (opzionali)</h4>
             <p>
-              Utilizziamo <strong>Matomo Analytics</strong> (self-hosted, GDPR compliant) per raccogliere 
-              statistiche aggregate anonime sull'utilizzo del servizio. Gli indirizzi IP sono anonimizzati.
+              Utilizziamo <strong>Matomo Analytics</strong> (self-hosted, GDPR compliant) per
+              raccogliere statistiche aggregate anonime sull'utilizzo del servizio. Gli indirizzi IP
+              sono anonimizzati.
             </p>
           </section>
 
           <section>
             <h3>8. Modifiche all'informativa</h3>
             <p>
-              Questa informativa può essere aggiornata. La versione aggiornata sarà pubblicata su questa pagina 
-              con indicazione della data di ultima modifica.
+              Questa informativa può essere aggiornata. La versione aggiornata sarà pubblicata su
+              questa pagina con indicazione della data di ultima modifica.
             </p>
             <p><strong>Ultimo aggiornamento:</strong> 6 Gennaio 2026</p>
           </section>
         </div>
-        
+
         <div class="modal-footer">
           <button @click="showPrivacyModal = false" class="btn-primary">
             {{ t('footer.privacyModalClose') }}
@@ -240,24 +252,30 @@ const currentYear = new Date().getFullYear()
       <div class="modal-container" role="dialog" aria-labelledby="legal-modal-title">
         <div class="modal-header">
           <h2 id="legal-modal-title">{{ t('footer.legalModalTitle') }}</h2>
-          <button 
-            @click="showLegalModal = false" 
+          <button
+            @click="showLegalModal = false"
             class="modal-close"
             aria-label="Chiudi note legali"
           >
-            <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M6 18L18 6M6 6l12 12"/>
+            <svg
+              class="icon-close"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        
+
         <div class="modal-body">
           <section>
             <h3>Denominazione ente</h3>
             <p>
-              <strong>Pubblica Amministrazione Italiana</strong><br>
-              Sede legale: [Inserire indirizzo completo]<br>
-              Codice Fiscale: [Inserire CF]<br>
+              <strong>Pubblica Amministrazione Italiana</strong><br />
+              Sede legale: [Inserire indirizzo completo]<br />
+              Codice Fiscale: [Inserire CF]<br />
               Partita IVA: [Inserire P.IVA]
             </p>
           </section>
@@ -265,8 +283,8 @@ const currentYear = new Date().getFullYear()
           <section>
             <h3>Contatti</h3>
             <p>
-              Email: <a href="mailto:info@example.gov.it">info@example.gov.it</a><br>
-              PEC: <a href="mailto:pec@example.gov.it">pec@example.gov.it</a><br>
+              Email: <a href="mailto:info@example.gov.it">info@example.gov.it</a><br />
+              PEC: <a href="mailto:pec@example.gov.it">pec@example.gov.it</a><br />
               Telefono: +39 [numero]
             </p>
           </section>
@@ -274,8 +292,8 @@ const currentYear = new Date().getFullYear()
           <section>
             <h3>Responsabile del procedimento</h3>
             <p>
-              Ai sensi della Legge 241/1990, il Responsabile del procedimento è:<br>
-              <strong>[Nome Cognome]</strong><br>
+              Ai sensi della Legge 241/1990, il Responsabile del procedimento è:<br />
+              <strong>[Nome Cognome]</strong><br />
               Email: <a href="mailto:responsabile@example.gov.it">responsabile@example.gov.it</a>
             </p>
           </section>
@@ -286,7 +304,10 @@ const currentYear = new Date().getFullYear()
               <li>D.Lgs. 82/2005 - Codice dell'Amministrazione Digitale (CAD)</li>
               <li>Regolamento UE 2016/679 (GDPR)</li>
               <li>D.Lgs. 196/2003 - Codice Privacy</li>
-              <li>Legge 4/2004 - Disposizioni per favorire l'accesso dei soggetti disabili agli strumenti informatici</li>
+              <li>
+                Legge 4/2004 - Disposizioni per favorire l'accesso dei soggetti disabili agli
+                strumenti informatici
+              </li>
               <li>Linee guida di design per i servizi digitali della PA (AgID)</li>
             </ul>
           </section>
@@ -294,18 +315,21 @@ const currentYear = new Date().getFullYear()
           <section>
             <h3>Licenze software e contenuti</h3>
             <p>
-              <strong>Codice sorgente:</strong> Licenza European Union Public Licence (EUPL) v. 1.2<br>
-              <strong>Contenuti e documentazione:</strong> Creative Commons Attribution-ShareAlike 4.0 International (CC-BY-SA 4.0)
+              <strong>Codice sorgente:</strong> Licenza European Union Public Licence (EUPL) v.
+              1.2<br />
+              <strong>Contenuti e documentazione:</strong> Creative Commons Attribution-ShareAlike
+              4.0 International (CC-BY-SA 4.0)
             </p>
             <p>
-              Il codice sorgente è disponibile su: <a href="https://github.com/[repository]" target="_blank" rel="noopener">GitHub</a>
+              Il codice sorgente è disponibile su:
+              <a href="https://github.com/[repository]" target="_blank" rel="noopener">GitHub</a>
             </p>
           </section>
 
           <section>
             <h3>Copyright</h3>
             <p>
-              © {{ currentYear }} Pubblica Amministrazione Italiana<br>
+              © {{ currentYear }} Pubblica Amministrazione Italiana<br />
               Tutti i diritti riservati sui marchi e loghi.
             </p>
           </section>
@@ -313,20 +337,18 @@ const currentYear = new Date().getFullYear()
           <section>
             <h3>Limitazione di responsabilità</h3>
             <p>
-              L'amministrazione si impegna a mantenere il servizio accessibile e funzionante, 
-              ma non può garantire l'assenza di interruzioni o errori. L'uso del servizio è a 
-              rischio dell'utente nei limiti consentiti dalla legge.
+              L'amministrazione si impegna a mantenere il servizio accessibile e funzionante, ma non
+              può garantire l'assenza di interruzioni o errori. L'uso del servizio è a rischio
+              dell'utente nei limiti consentiti dalla legge.
             </p>
           </section>
 
           <section>
             <h3>Foro competente</h3>
-            <p>
-              Per eventuali controversie è competente il Foro di [Città], Italia.
-            </p>
+            <p>Per eventuali controversie è competente il Foro di [Città], Italia.</p>
           </section>
         </div>
-        
+
         <div class="modal-footer">
           <button @click="showLegalModal = false" class="btn-primary">
             {{ t('footer.legalModalClose') }}
@@ -457,11 +479,11 @@ const currentYear = new Date().getFullYear()
     gap: 0.5rem;
     padding: 0 0.5rem;
   }
-  
+
   .footer-brand {
     font-size: 0.625rem;
   }
-  
+
   .footer-left {
     padding: 0.5rem 0.25rem;
   }
@@ -471,16 +493,16 @@ const currentYear = new Date().getFullYear()
     width: auto;
     min-width: 0;
   }
-  
+
   .footer-right {
     padding: 0.5rem 0.25rem;
   }
-  
+
   .footer-links {
     gap: 0.25rem;
     align-items: flex-end;
   }
-  
+
   .footer-link,
   .footer-license {
     font-size: 0.625rem;
@@ -733,15 +755,15 @@ const currentYear = new Date().getFullYear()
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .cookie-actions {
     flex-direction: column;
   }
-  
+
   .cookie-btn {
     width: 100%;
   }
-  
+
   .modal-container {
     max-height: 95vh;
     margin: 0.5rem;

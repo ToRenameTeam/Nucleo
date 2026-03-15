@@ -1,269 +1,292 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-import { ArrowLeftIcon, UserIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
-import SearchBar from '../../components/shared/SearchBar.vue'
-import DocumentCard from '../../components/shared/DocumentCard.vue'
-import CardList from '../../components/shared/CardList.vue'
-import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
-import TagBar from '../../components/shared/TagBar.vue'
-import { userApi, type UserInfo } from '../../api/users'
-import { documentsApiService } from '../../api/documents'
-import type { AnyDocument, MedicinePrescription } from '../../types/document'
-import type { Tag } from '../../types/tag'
-import { parseItalianDate } from '../../utils/dateUtils'
+import { ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { ArrowLeftIcon, UserIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
+import SearchBar from '../../components/shared/SearchBar.vue';
+import DocumentCard from '../../components/shared/DocumentCard.vue';
+import CardList from '../../components/shared/CardList.vue';
+import DocumentModal from '../../components/patient/documents/DocumentModal.vue';
+import TagBar from '../../components/shared/TagBar.vue';
+import { userApi, type UserInfo } from '../../api/users';
+import { documentsApiService } from '../../api/documents';
+import type { AnyDocument, MedicinePrescription } from '../../types/document';
+import type { Tag } from '../../types/tag';
+import { parseItalianDate } from '../../utils/dateUtils';
 
-const { t } = useI18n()
-const router = useRouter()
+const { t } = useI18n();
+const router = useRouter();
 
 // Loading states
-const isLoading = ref(false)
-const isLoadingDocuments = ref(false)
-const loadError = ref<string | null>(null)
+const isLoading = ref(false);
+const isLoadingDocuments = ref(false);
+const loadError = ref<string | null>(null);
 
 // Data
-const allPatients = ref<UserInfo[]>([])
-const patientDocuments = ref<AnyDocument[]>([])
+const allPatients = ref<UserInfo[]>([]);
+const patientDocuments = ref<AnyDocument[]>([]);
 
 // UI state
-const searchQuery = ref('')
-const selectedPatient = ref<UserInfo | null>(null)
-const selectedDocument = ref<AnyDocument | null>(null)
-const isModalOpen = ref(false)
-const selectedTags = ref<string[]>([])
+const searchQuery = ref('');
+const selectedPatient = ref<UserInfo | null>(null);
+const selectedDocument = ref<AnyDocument | null>(null);
+const isModalOpen = ref(false);
+const selectedTags = ref<string[]>([]);
 
 // Type guard functions
 const isMedicinePrescription = (doc: AnyDocument): doc is MedicinePrescription => {
-  return 'type' in doc && doc.type === 'medicine_prescription'
-}
+  return 'type' in doc && doc.type === 'medicine_prescription';
+};
 
 const isServicePrescription = (doc: AnyDocument): boolean => {
-  return 'type' in doc && doc.type === 'service_prescription'
-}
+  return 'type' in doc && doc.type === 'service_prescription';
+};
 
 const isReport = (doc: AnyDocument): boolean => {
-  return 'type' in doc && doc.type === 'report'
-}
+  return 'type' in doc && doc.type === 'report';
+};
 
 // Load patients on mount
 onMounted(async () => {
-  await loadPatients()
-})
+  await loadPatients();
+});
 
 const loadPatients = async () => {
-  isLoading.value = true
-  loadError.value = null
+  isLoading.value = true;
+  loadError.value = null;
 
   try {
-    const users = await userApi.getAllUsers()
+    const users = await userApi.getAllUsers();
     // Filter only users who have a patient profile
-    allPatients.value = users.filter(user => user.patient)
-    console.log('[DoctorPatientsPage] Loaded', allPatients.value.length, 'patients')
+    allPatients.value = users.filter((user) => user.patient);
+    console.log('[DoctorPatientsPage] Loaded', allPatients.value.length, 'patients');
   } catch (error) {
-    console.error('[DoctorPatientsPage] Error loading patients:', error)
-    loadError.value = t('doctor.patients.errorLoading')
+    console.error('[DoctorPatientsPage] Error loading patients:', error);
+    loadError.value = t('doctor.patients.errorLoading');
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 
 const loadPatientDocuments = async (patientId: string) => {
-  isLoadingDocuments.value = true
+  isLoadingDocuments.value = true;
 
   try {
-    const documents = await documentsApiService.getDocumentsByPatient(patientId)
-    patientDocuments.value = documents
-    console.log('[DoctorPatientsPage] Loaded', documents.length, 'documents for patient', patientId)
+    const documents = await documentsApiService.getDocumentsByPatient(patientId);
+    patientDocuments.value = documents;
+    console.log(
+      '[DoctorPatientsPage] Loaded',
+      documents.length,
+      'documents for patient',
+      patientId
+    );
   } catch (error) {
-    console.error('[DoctorPatientsPage] Error loading patient documents:', error)
-    patientDocuments.value = []
+    console.error('[DoctorPatientsPage] Error loading patient documents:', error);
+    patientDocuments.value = [];
   } finally {
-    isLoadingDocuments.value = false
+    isLoadingDocuments.value = false;
   }
-}
+};
 
 // Computed properties
 const filteredPatients = computed(() => {
-  let patients = allPatients.value
+  let patients = allPatients.value;
 
   if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase().trim()
-    patients = patients.filter(patient => {
-      const fullName = `${patient.name} ${patient.lastName}`.toLowerCase()
-      const reverseName = `${patient.lastName} ${patient.name}`.toLowerCase()
-      const fiscalCode = patient.fiscalCode.toLowerCase()
+    const query = searchQuery.value.toLowerCase().trim();
+    patients = patients.filter((patient) => {
+      const fullName = `${patient.name} ${patient.lastName}`.toLowerCase();
+      const reverseName = `${patient.lastName} ${patient.name}`.toLowerCase();
+      const fiscalCode = patient.fiscalCode.toLowerCase();
 
-      return fullName.includes(query) ||
-             reverseName.includes(query) ||
-             fiscalCode.includes(query) ||
-             patient.name.toLowerCase().includes(query) ||
-             patient.lastName.toLowerCase().includes(query)
-    })
+      return (
+        fullName.includes(query) ||
+        reverseName.includes(query) ||
+        fiscalCode.includes(query) ||
+        patient.name.toLowerCase().includes(query) ||
+        patient.lastName.toLowerCase().includes(query)
+      );
+    });
   }
 
   // Sort by last name
-  return patients.sort((a, b) => a.lastName.localeCompare(b.lastName, 'it'))
-})
+  return patients.sort((a, b) => a.lastName.localeCompare(b.lastName, 'it'));
+});
 
 // Group patients by first letter of last name (alphabetic directory)
 interface PatientGroup {
-  letter: string
-  patients: UserInfo[]
+  letter: string;
+  patients: UserInfo[];
 }
 
 const groupedPatients = computed<PatientGroup[]>(() => {
-  const groups: Map<string, UserInfo[]> = new Map()
-  
+  const groups: Map<string, UserInfo[]> = new Map();
+
   for (const patient of filteredPatients.value) {
-    const firstLetter = patient.lastName.charAt(0).toUpperCase()
+    const firstLetter = patient.lastName.charAt(0).toUpperCase();
     if (!groups.has(firstLetter)) {
-      groups.set(firstLetter, [])
+      groups.set(firstLetter, []);
     }
-    groups.get(firstLetter)!.push(patient)
+    groups.get(firstLetter)!.push(patient);
   }
-  
+
   // Convert to array and sort by letter
   return Array.from(groups.entries())
     .sort(([a], [b]) => a.localeCompare(b, 'it'))
-    .map(([letter, patients]) => ({ letter, patients }))
-})
+    .map(([letter, patients]) => ({ letter, patients }));
+});
 
 // Get all available letters for quick navigation
 const availableLetters = computed(() => {
-  return groupedPatients.value.map(group => group.letter)
-})
+  return groupedPatients.value.map((group) => group.letter);
+});
 
 // Computed tags for documents
 const tags = computed<Tag[]>(() => {
-  const reportCount = patientDocuments.value.filter(d => isReport(d)).length
-  const medicinePrescriptionCount = patientDocuments.value.filter(d => isMedicinePrescription(d)).length
-  const servicePrescriptionCount = patientDocuments.value.filter(d => isServicePrescription(d)).length
+  const reportCount = patientDocuments.value.filter((d) => isReport(d)).length;
+  const medicinePrescriptionCount = patientDocuments.value.filter((d) =>
+    isMedicinePrescription(d)
+  ).length;
+  const servicePrescriptionCount = patientDocuments.value.filter((d) =>
+    isServicePrescription(d)
+  ).length;
 
   return [
-    { id: 'all', label: t('doctor.documents.categories.all'), count: patientDocuments.value.length },
+    {
+      id: 'all',
+      label: t('doctor.documents.categories.all'),
+      count: patientDocuments.value.length,
+    },
     { id: 'report', label: t('doctor.documents.categories.reports'), count: reportCount },
-    { id: 'medicine_prescription', label: t('doctor.documents.categories.medicinePrescriptions'), count: medicinePrescriptionCount },
-    { id: 'service_prescription', label: t('doctor.documents.categories.servicePrescriptions'), count: servicePrescriptionCount }
-  ]
-})
+    {
+      id: 'medicine_prescription',
+      label: t('doctor.documents.categories.medicinePrescriptions'),
+      count: medicinePrescriptionCount,
+    },
+    {
+      id: 'service_prescription',
+      label: t('doctor.documents.categories.servicePrescriptions'),
+      count: servicePrescriptionCount,
+    },
+  ];
+});
 
 const filteredDocuments = computed(() => {
-  let filtered = patientDocuments.value
+  let filtered = patientDocuments.value;
 
   if (selectedTags.value.length > 0 && !selectedTags.value.includes('all')) {
-    filtered = filtered.filter(doc => {
-      if (!('type' in doc)) return false
-      return selectedTags.value.some(selectedTag => doc.type === selectedTag)
-    })
+    filtered = filtered.filter((doc) => {
+      if (!('type' in doc)) return false;
+      return selectedTags.value.some((selectedTag) => doc.type === selectedTag);
+    });
   }
 
   // Sort by newest first
   filtered.sort((a, b) => {
-    const dateA = parseItalianDate(a.date)
-    const dateB = parseItalianDate(b.date)
-    if (!dateA || !dateB) return 0
-    return dateB.getTime() - dateA.getTime()
-  })
+    const dateA = parseItalianDate(a.date);
+    const dateB = parseItalianDate(b.date);
+    if (!dateA || !dateB) return 0;
+    return dateB.getTime() - dateA.getTime();
+  });
 
-  return filtered
-})
+  return filtered;
+});
 
 const activeTags = computed(() => {
   if (selectedTags.value.length === 0) {
-    return ['all']
+    return ['all'];
   }
-  return selectedTags.value
-})
+  return selectedTags.value;
+});
 
 // Format date of birth for display
 const formatDateOfBirth = (dateStr: string): string => {
   try {
-    const date = new Date(dateStr)
+    const date = new Date(dateStr);
     return date.toLocaleDateString('it-IT', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
-    })
+      year: 'numeric',
+    });
   } catch {
-    return dateStr
+    return dateStr;
   }
-}
+};
 
 // Calculate age from date of birth
 const calculateAge = (dateStr: string): number => {
   try {
-    const birthDate = new Date(dateStr)
-    const today = new Date()
-    let age = today.getFullYear() - birthDate.getFullYear()
-    const monthDiff = today.getMonth() - birthDate.getMonth()
+    const birthDate = new Date(dateStr);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--
+      age--;
     }
-    return age
+    return age;
   } catch {
-    return 0
+    return 0;
   }
-}
+};
 
 // Event handlers
 const handleSearch = (query: string) => {
-  searchQuery.value = query
-}
+  searchQuery.value = query;
+};
 
 const handlePatientClick = async (patient: UserInfo) => {
-  selectedPatient.value = patient
-  selectedTags.value = []
-  
+  selectedPatient.value = patient;
+  selectedTags.value = [];
+
   // Update URL with patient fiscal code for breadcrumb
   router.replace({
-    query: { patient: patient.fiscalCode }
-  })
-  
-  await loadPatientDocuments(patient.userId)
-}
+    query: { patient: patient.fiscalCode },
+  });
+
+  await loadPatientDocuments(patient.userId);
+};
 
 const handleBackToPatients = () => {
-  selectedPatient.value = null
-  patientDocuments.value = []
-  selectedTags.value = []
-  
+  selectedPatient.value = null;
+  patientDocuments.value = [];
+  selectedTags.value = [];
+
   // Remove patient query param from URL
-  router.replace({ query: {} })
-}
+  router.replace({ query: {} });
+};
 
 // Scroll to letter section
 const scrollToLetter = (letter: string) => {
-  const element = document.getElementById(`letter-${letter}`)
+  const element = document.getElementById(`letter-${letter}`);
   if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-}
+};
 
 const handleDocumentClick = (document: AnyDocument) => {
-  selectedDocument.value = document
-  isModalOpen.value = true
-}
+  selectedDocument.value = document;
+  isModalOpen.value = true;
+};
 
 const handleCloseModal = () => {
-  isModalOpen.value = false
+  isModalOpen.value = false;
   setTimeout(() => {
-    selectedDocument.value = null
-  }, 300)
-}
+    selectedDocument.value = null;
+  }, 300);
+};
 
 const handleTagSelected = (tagId: string) => {
   if (tagId === 'all') {
-    selectedTags.value = []
+    selectedTags.value = [];
   } else {
-    const index = selectedTags.value.indexOf(tagId)
+    const index = selectedTags.value.indexOf(tagId);
     if (index > -1) {
-      selectedTags.value.splice(index, 1)
+      selectedTags.value.splice(index, 1);
     } else {
-      selectedTags.value.push(tagId)
+      selectedTags.value.push(tagId);
     }
   }
-}
+};
 </script>
 
 <template>
@@ -286,19 +309,28 @@ const handleTagSelected = (tagId: string) => {
 
         <div class="header-text">
           <h1 class="page-title">
-            {{ selectedPatient
-              ? `${selectedPatient.name} ${selectedPatient.lastName}`
-              : t('doctor.patients.title')
+            {{
+              selectedPatient
+                ? `${selectedPatient.name} ${selectedPatient.lastName}`
+                : t('doctor.patients.title')
             }}
           </h1>
           <p class="page-subtitle">
             <template v-if="selectedPatient">
               {{ t('doctor.patients.medicalRecords') }} · {{ filteredDocuments.length }}
-              {{ filteredDocuments.length === 1 ? t('doctor.patients.document') : t('doctor.patients.documents') }}
+              {{
+                filteredDocuments.length === 1
+                  ? t('doctor.patients.document')
+                  : t('doctor.patients.documents')
+              }}
             </template>
             <template v-else>
               {{ filteredPatients.length }}
-              {{ filteredPatients.length === 1 ? t('doctor.patients.patient') : t('doctor.patients.patientsCount') }}
+              {{
+                filteredPatients.length === 1
+                  ? t('doctor.patients.patient')
+                  : t('doctor.patients.patientsCount')
+              }}
             </template>
           </p>
         </div>
@@ -307,10 +339,7 @@ const handleTagSelected = (tagId: string) => {
 
     <!-- Search Bar (only visible when viewing patient list) -->
     <div v-if="!selectedPatient" class="section-spacing">
-      <SearchBar
-        @search="handleSearch"
-        :placeholder="t('doctor.patients.searchPlaceholder')"
-      />
+      <SearchBar @search="handleSearch" :placeholder="t('doctor.patients.searchPlaceholder')" />
     </div>
 
     <!-- Patient Info Card (when viewing a patient's documents) -->
@@ -385,7 +414,7 @@ const handleTagSelected = (tagId: string) => {
             <span class="letter-badge">{{ group.letter }}</span>
             <span class="letter-count">{{ group.patients.length }}</span>
           </div>
-          
+
           <div class="patients-list">
             <div
               v-for="patient in group.patients"
@@ -404,12 +433,18 @@ const handleTagSelected = (tagId: string) => {
                 <h3 class="patient-name">{{ patient.lastName }} {{ patient.name }}</h3>
                 <p class="patient-fiscal-code">{{ patient.fiscalCode }}</p>
                 <p class="patient-dob">
-                  {{ formatDateOfBirth(patient.dateOfBirth) }} · {{ calculateAge(patient.dateOfBirth) }} {{ t('doctor.patients.years') }}
+                  {{ formatDateOfBirth(patient.dateOfBirth) }} ·
+                  {{ calculateAge(patient.dateOfBirth) }} {{ t('doctor.patients.years') }}
                 </p>
               </div>
               <div class="patient-card-arrow">
                 <svg class="arrow-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </div>
             </div>
@@ -462,7 +497,12 @@ const handleTagSelected = (tagId: string) => {
   max-width: 100vw;
   overflow-x: hidden;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
   position: relative;
 }
 
@@ -495,7 +535,9 @@ const handleTagSelected = (tagId: string) => {
   backdrop-filter: blur(20px);
   border: 1px solid var(--white-60);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-8),
+    inset 0 1px 0 var(--white-80);
 }
 
 .back-button {
@@ -712,12 +754,16 @@ const handleTagSelected = (tagId: string) => {
   border-radius: 1.25rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
-  box-shadow: 0 4px 16px var(--text-primary-8), inset 0 1px 0 var(--bg-secondary-70);
+  box-shadow:
+    0 4px 16px var(--text-primary-8),
+    inset 0 1px 0 var(--bg-secondary-70);
 }
 
 .patient-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px var(--text-primary-12), inset 0 1px 0 var(--bg-secondary-80);
+  box-shadow:
+    0 12px 32px var(--text-primary-12),
+    inset 0 1px 0 var(--bg-secondary-80);
   background: var(--bg-secondary-35);
   border-color: var(--accent-primary-30);
 }
@@ -725,7 +771,9 @@ const handleTagSelected = (tagId: string) => {
 .patient-card:focus {
   outline: none;
   border-color: var(--accent-primary-50);
-  box-shadow: 0 0 0 3px var(--accent-primary-10), 0 12px 32px var(--text-primary-12);
+  box-shadow:
+    0 0 0 3px var(--accent-primary-10),
+    0 12px 32px var(--text-primary-12);
 }
 
 .patient-card-avatar {

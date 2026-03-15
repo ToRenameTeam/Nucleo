@@ -1,132 +1,107 @@
-import { FacilityModel, type IFacility } from '../domains/facility/index.js';
+import type { Facility } from '../domain/index.js';
+import type { FacilityRepository } from '../domain/index.js';
+import { FacilityRepositoryImpl } from '../infrastructure/repositories/implementations/index.js';
+import { isValidResourceCode } from './service.utils.js';
 
 export interface FacilityFilter {
-    city?: string;
-    active?: boolean;
-    search?: string;
+  city?: string;
+  active?: boolean;
+  search?: string;
 }
 
 export interface CreateFacilityInput {
-    code: string;
-    name: string;
-    address: string;
-    city: string;
-    isActive?: boolean;
+  code: string;
+  name: string;
+  address: string;
+  city: string;
+  isActive?: boolean;
 }
 
 export interface UpdateFacilityInput {
-    name?: string;
-    address?: string;
-    city?: string;
-    isActive?: boolean;
+  name?: string;
+  address?: string;
+  city?: string;
+  isActive?: boolean;
 }
 
 export class FacilityService {
-    /**
-     * Get all facilities with optional filtering
-     */
-    async findAll(filter: FacilityFilter = {}): Promise<IFacility[]> {
-        const query: Record<string, unknown> = {};
+  constructor(
+    private readonly facilityRepository: FacilityRepository = new FacilityRepositoryImpl()
+  ) {}
 
-        if (filter.city) {
-            query.city = { $regex: filter.city, $options: 'i' };
-        }
+  async findAll(filter: FacilityFilter = {}): Promise<Facility[]> {
+    const query: Record<string, unknown> = {};
 
-        if (filter.active !== undefined) {
-            query.isActive = filter.active;
-        }
-
-        if (filter.search) {
-            query.$text = { $search: filter.search };
-        }
-
-        return FacilityModel.find(query).sort({ code: 1 });
+    if (filter.city) {
+      query.city = { $regex: filter.city, $options: 'i' };
     }
 
-    /**
-     * Get all distinct cities
-     */
-    async getCities(): Promise<string[]> {
-        return FacilityModel.distinct('city', { isActive: true });
+    if (filter.active !== undefined) {
+      query.isActive = filter.active;
     }
 
-    /**
-     * Get a single facility by ID
-     */
-    async findById(id: string): Promise<IFacility | null> {
-        return FacilityModel.findById(id);
+    if (filter.search) {
+      query.$text = { $search: filter.search };
     }
 
-    /**
-     * Create a new facility
-     */
-    async create(input: CreateFacilityInput): Promise<IFacility> {
-        // Validate code format
-        if (!input.code || !/^facility-\d{3}$/.test(input.code)) {
-            throw new FacilityValidationError('Invalid code format. Must be "facility-XXX" where XXX is a 3-digit number');
-        }
+    return this.facilityRepository.findAll(query);
+  }
 
-        // Check if code already exists
-        const existing = await FacilityModel.findOne({ code: input.code });
-        if (existing) {
-            throw new FacilityConflictError('A facility with this code already exists');
-        }
+  async getCities(): Promise<string[]> {
+    return this.facilityRepository.findActiveCities();
+  }
 
-        const facility = new FacilityModel({
-            _id: input.code,
-            code: input.code,
-            name: input.name,
-            address: input.address,
-            city: input.city,
-            isActive: input.isActive ?? true
-        });
+  async findById(id: string): Promise<Facility | null> {
+    return this.facilityRepository.findById(id);
+  }
 
-        return facility.save();
+  async create(input: CreateFacilityInput): Promise<Facility> {
+    if (!input.code || !isValidResourceCode(input.code, 'facility')) {
+      throw new FacilityValidationError(
+        'Invalid code format. Must be "facility-XXX" where XXX is a 3-digit number'
+      );
     }
 
-    /**
-     * Update a facility
-     */
-    async update(id: string, input: UpdateFacilityInput): Promise<IFacility | null> {
-        return FacilityModel.findByIdAndUpdate(
-            id,
-            input,
-            { new: true, runValidators: true }
-        );
+    const existing = await this.facilityRepository.findByCode(input.code);
+    if (existing) {
+      throw new FacilityConflictError('A facility with this code already exists');
     }
 
-    /**
-     * Soft delete a facility (sets isActive to false)
-     */
-    async softDelete(id: string): Promise<IFacility | null> {
-        return FacilityModel.findByIdAndUpdate(
-            id,
-            { isActive: false },
-            { new: true }
-        );
-    }
+    return this.facilityRepository.create({
+      code: input.code,
+      name: input.name,
+      address: input.address,
+      city: input.city,
+      isActive: input.isActive ?? true,
+    });
+  }
 
-    /**
-     * Permanently delete a facility
-     */
-    async permanentDelete(id: string): Promise<IFacility | null> {
-        return FacilityModel.findByIdAndDelete(id);
-    }
+  async update(id: string, input: UpdateFacilityInput): Promise<Facility | null> {
+    return this.facilityRepository.updateById(id, input);
+  }
+
+  async softDelete(id: string): Promise<Facility | null> {
+    return this.facilityRepository.softDelete(id);
+  }
+
+  async permanentDelete(id: string): Promise<Facility | null> {
+    return this.facilityRepository.permanentDelete(id);
+  }
 }
 
 // Custom error classes for better error handling
 export class FacilityValidationError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'FacilityValidationError';
-    }
+  constructor(message: string) {
+    super(message);
+    this.name = 'FacilityValidationError';
+  }
 }
 
 export class FacilityConflictError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'FacilityConflictError';
-    }
+  constructor(message: string) {
+    super(message);
+    this.name = 'FacilityConflictError';
+  }
 }
 
 // Export singleton instance

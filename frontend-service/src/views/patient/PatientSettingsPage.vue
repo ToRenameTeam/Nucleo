@@ -1,69 +1,68 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useAuth } from '../../composables/useAuth'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-import SettingsItem from '../../components/shared/SettingsItem.vue'
-import BaseModal from '../../components/shared/BaseModal.vue'
-import ProfileViewModal from '../../components/shared/ProfileViewModal.vue'
-import AppearanceSettings from '../../components/shared/AppearanceSettings.vue'
+import { ref, computed } from 'vue';
+import { useAuth } from '../../composables/useAuth';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import SettingsItem from '../../components/shared/SettingsItem.vue';
+import BaseModal from '../../components/shared/BaseModal.vue';
+import ProfileViewModal from '../../components/shared/ProfileViewModal.vue';
+import AppearanceSettings from '../../components/shared/AppearanceSettings.vue';
 import {
   UserCircleIcon,
   BellIcon,
   SwatchIcon,
   DocumentTextIcon,
-  ArrowRightOnRectangleIcon
-} from '@heroicons/vue/24/outline'
+  ArrowRightOnRectangleIcon,
+} from '@heroicons/vue/24/outline';
 
-const { t } = useI18n()
-const router = useRouter()
-const showAppearanceModal = ref(false)
-const showProfileModal = ref(false)
-const { currentPatientProfile, currentUser, logout: authLogout } = useAuth()
+const { t } = useI18n();
+const router = useRouter();
+const showAppearanceModal = ref(false);
+const showProfileModal = ref(false);
+const { currentPatientProfile, currentUser, logout: authLogout } = useAuth();
 
 const handleItemClick = (item: string) => {
   if (item === 'appearance') {
-    showAppearanceModal.value = true
+    showAppearanceModal.value = true;
   } else if (item === 'myProfile') {
-    showProfileModal.value = true
+    showProfileModal.value = true;
   } else if (item === 'logout') {
-    logout()
+    logout();
   } else {
-    console.log('Clicked:', item)
+    console.log('Clicked:', item);
   }
-}
+};
 
 const logout = () => {
-  authLogout()
-  router.push('/login')
-}
-
+  authLogout();
+  router.push('/login');
+};
 
 function handleChangeProfile() {
-  router.push('/patient-choice')
+  router.push('/patient-choice');
 }
 
 const displayUserName = computed(() => {
   if (!currentUser.value || !currentPatientProfile.value) {
-    return t('topbar.user')
+    return t('topbar.user');
   }
   if (currentUser.value.fiscalCode === currentPatientProfile.value.fiscalCode) {
-    return currentPatientProfile.value.name
+    return currentPatientProfile.value.name;
   }
-  return `${currentUser.value.name} @ ${currentPatientProfile.value.name}`
-})
+  return `${currentUser.value.name} @ ${currentPatientProfile.value.name}`;
+});
 
 const isDelegatedProfile = computed(() => {
-  if (!currentUser.value || !currentPatientProfile.value) return false
-  return currentUser.value.fiscalCode !== currentPatientProfile.value.fiscalCode
-})
+  if (!currentUser.value || !currentPatientProfile.value) return false;
+  return currentUser.value.fiscalCode !== currentPatientProfile.value.fiscalCode;
+});
 
 const delegatorName = computed(() => {
-  if (!isDelegatedProfile.value || !currentUser.value) return undefined
-  return currentUser.value.lastName 
+  if (!isDelegatedProfile.value || !currentUser.value) return undefined;
+  return currentUser.value.lastName
     ? `${currentUser.value.name} ${currentUser.value.lastName}`
-    : currentUser.value.name
-})
+    : currentUser.value.name;
+});
 </script>
 
 <template>
@@ -97,8 +96,12 @@ const delegatorName = computed(() => {
         {{ t('settings.profileFamily.title') }}
       </div>
       <div class="settings-list">
-        <SettingsItem :icon="UserCircleIcon" :title="t('settings.profileFamily.myProfile.title')"
-          :subtitle="t('settings.profileFamily.myProfile.subtitle')" @click="handleItemClick('myProfile')" />
+        <SettingsItem
+          :icon="UserCircleIcon"
+          :title="t('settings.profileFamily.myProfile.title')"
+          :subtitle="t('settings.profileFamily.myProfile.subtitle')"
+          @click="handleItemClick('myProfile')"
+        />
       </div>
     </div>
 
@@ -108,10 +111,18 @@ const delegatorName = computed(() => {
         {{ t('settings.app.title') }}
       </div>
       <div class="settings-list">
-        <SettingsItem :icon="BellIcon" :title="t('settings.app.notifications.title')"
-          :subtitle="t('settings.app.notifications.subtitle')" @click="handleItemClick('notifications')" />
-        <SettingsItem :icon="SwatchIcon" :title="t('settings.app.appearance.title')"
-          :subtitle="t('settings.app.appearance.subtitle')" @click="handleItemClick('appearance')" />
+        <SettingsItem
+          :icon="BellIcon"
+          :title="t('settings.app.notifications.title')"
+          :subtitle="t('settings.app.notifications.subtitle')"
+          @click="handleItemClick('notifications')"
+        />
+        <SettingsItem
+          :icon="SwatchIcon"
+          :title="t('settings.app.appearance.title')"
+          :subtitle="t('settings.app.appearance.subtitle')"
+          @click="handleItemClick('appearance')"
+        />
       </div>
     </div>
 
@@ -121,16 +132,25 @@ const delegatorName = computed(() => {
         {{ t('settings.dataPrivacy.title') }}
       </div>
       <div class="settings-list">
-        <SettingsItem :icon="DocumentTextIcon" :title="t('settings.dataPrivacy.terms.title')"
-          :subtitle="t('settings.dataPrivacy.terms.subtitle')" @click="handleItemClick('terms')" />
+        <SettingsItem
+          :icon="DocumentTextIcon"
+          :title="t('settings.dataPrivacy.terms.title')"
+          :subtitle="t('settings.dataPrivacy.terms.subtitle')"
+          @click="handleItemClick('terms')"
+        />
       </div>
     </div>
 
     <!-- Logout -->
     <div class="settings-section">
       <div class="settings-list">
-        <SettingsItem :icon="ArrowRightOnRectangleIcon" :title="t('settings.logout')" variant="danger"
-          :show-chevron="false" @click="handleItemClick('logout')" />
+        <SettingsItem
+          :icon="ArrowRightOnRectangleIcon"
+          :title="t('settings.logout')"
+          variant="danger"
+          :show-chevron="false"
+          @click="handleItemClick('logout')"
+        />
       </div>
     </div>
 
@@ -140,14 +160,17 @@ const delegatorName = computed(() => {
     </div>
 
     <!-- Modal Aspect -->
-    <BaseModal :is-open="showAppearanceModal" :title="t('settings.app.appearance.title')"
-      @close="showAppearanceModal = false">
+    <BaseModal
+      :is-open="showAppearanceModal"
+      :title="t('settings.app.appearance.title')"
+      @close="showAppearanceModal = false"
+    >
       <AppearanceSettings />
     </BaseModal>
 
     <!-- Modal Profilo -->
-    <ProfileViewModal 
-      :is-open="showProfileModal" 
+    <ProfileViewModal
+      :is-open="showProfileModal"
       :profile-data="currentPatientProfile"
       :title="t('settings.profileFamily.myProfile.title')"
       :is-delegated="isDelegatedProfile"
@@ -164,7 +187,12 @@ const delegatorName = computed(() => {
   min-height: 100vh;
   overflow-x: hidden;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
   position: relative;
 }
 
@@ -190,7 +218,9 @@ const delegatorName = computed(() => {
   backdrop-filter: blur(20px);
   border: 1px solid var(--white-60);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   animation: slideInDown 0.5s cubic-bezier(0, 0, 0.2, 1);
 }
 
@@ -257,15 +287,17 @@ const delegatorName = computed(() => {
   border: 1px solid var(--white-50);
   border-radius: 1.25rem;
   overflow: hidden;
-  box-shadow: 0 4px 24px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 4px 24px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
-.settings-list>* {
+.settings-list > * {
   border-bottom: 1px solid var(--white-20);
 }
 
-.settings-list>*:last-child {
+.settings-list > *:last-child {
   border-bottom: none;
 }
 
@@ -278,14 +310,18 @@ const delegatorName = computed(() => {
   backdrop-filter: blur(16px);
   border: 1px solid var(--white-50);
   border-radius: 1.25rem;
-  box-shadow: 0 4px 24px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 4px 24px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
 .settings-account:hover {
   background: var(--white-40);
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px var(--black-12), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-12),
+    inset 0 1px 0 var(--white-80);
 }
 
 .settings-account-avatar {

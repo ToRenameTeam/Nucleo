@@ -1,41 +1,50 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import type { Component } from 'vue'
+import { computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import type { Component } from 'vue';
 
 interface TabIcon {
-  outline: Component
-  solid: Component
+  outline: Component;
+  solid: Component;
 }
 
 interface Tab {
-  id: string
-  label: string
-  icon: TabIcon
+  id: string;
+  label: string;
+  icon: TabIcon;
 }
 
 interface Props {
-  tabs: Tab[]
+  tabs: Tab[];
 }
 
-const props = defineProps<Props>()
-const router = useRouter()
-const route = useRoute()
+const props = defineProps<Props>();
+const router = useRouter();
+const route = useRoute();
 
-const activeTab = computed(() => route.name as string)
+const activeTab = computed(() => route.name as string);
 
 function setActiveTab(tabId: string) {
-  router.push({ name: tabId })
+  router.push({ name: tabId });
 }
 </script>
 
 <template>
   <div class="bottombar-wrapper">
     <div class="bottombar-container">
-      <button v-for="tab in tabs" :key="tab.id" :class="['tab-button', { active: activeTab === tab.id }]"
-        :aria-label="`Vai alla sezione ${tab.label}`" :aria-current="activeTab === tab.id ? 'page' : undefined"
-        @click="setActiveTab(tab.id)">
-        <component :is="activeTab === tab.id ? tab.icon.solid : tab.icon.outline" class="tab-icon" aria-hidden="true" />
+      <button
+        v-for="tab in tabs"
+        :key="tab.id"
+        :class="['tab-button', { active: activeTab === tab.id }]"
+        :aria-label="`Vai alla sezione ${tab.label}`"
+        :aria-current="activeTab === tab.id ? 'page' : undefined"
+        @click="setActiveTab(tab.id)"
+      >
+        <component
+          :is="activeTab === tab.id ? tab.icon.solid : tab.icon.outline"
+          class="tab-icon"
+          aria-hidden="true"
+        />
         <span class="tab-label">{{ tab.label }}</span>
       </button>
     </div>
@@ -110,8 +119,12 @@ function setActiveTab(tabId: string) {
   border-radius: 1rem;
   padding: 2px;
   background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-  -webkit-mask: linear-gradient(var(--white) 0 0) content-box, linear-gradient(var(--white) 0 0);
-  mask: linear-gradient(var(--white) 0 0) content-box, linear-gradient(var(--white) 0 0);
+  -webkit-mask:
+    linear-gradient(var(--white) 0 0) content-box,
+    linear-gradient(var(--white) 0 0);
+  mask:
+    linear-gradient(var(--white) 0 0) content-box,
+    linear-gradient(var(--white) 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0.6;

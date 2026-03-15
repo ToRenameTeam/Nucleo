@@ -1,0 +1,19 @@
+alias i := install
+alias l := lint
+alias f := format
+alias r := run
+
+install:
+	uv sync
+	
+lint:
+	uv run ruff check
+
+fix:
+    uv run ruff check --fix
+	
+format:
+	uv run ruff format
+
+run:
+    uv run main.py

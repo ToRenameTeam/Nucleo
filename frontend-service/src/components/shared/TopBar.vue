@@ -1,54 +1,53 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import { useAuth } from '../../composables/useAuth'
-import { ArrowRightStartOnRectangleIcon, ArrowsRightLeftIcon } from '@heroicons/vue/24/outline'
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import { useAuth } from '../../composables/useAuth';
+import { ArrowRightStartOnRectangleIcon, ArrowsRightLeftIcon } from '@heroicons/vue/24/outline';
 
-const { t, locale } = useI18n()
-const router = useRouter()
-const { currentUser, currentPatientProfile, logout: authLogout } = useAuth()
-const showUserMenu = ref(false)
-const showLanguageMenu = ref(false)
+const { t, locale } = useI18n();
+const router = useRouter();
+const { currentUser, currentPatientProfile, logout: authLogout } = useAuth();
+const showUserMenu = ref(false);
+const showLanguageMenu = ref(false);
 
 const toggleLanguageMenu = () => {
-  showLanguageMenu.value = !showLanguageMenu.value
-}
+  showLanguageMenu.value = !showLanguageMenu.value;
+};
 
 const changeLanguage = (lang: string) => {
-  locale.value = lang
-  showLanguageMenu.value = false
-}
+  locale.value = lang;
+  showLanguageMenu.value = false;
+};
 
 const currentLanguage = computed(() => {
-  return locale.value === 'it' ? 'ITA' : 'ENG'
-})
+  return locale.value === 'it' ? 'ITA' : 'ENG';
+});
 
 const displayUserName = computed(() => {
   if (!currentUser.value || !currentPatientProfile.value) {
-    return t('topbar.user')
+    return t('topbar.user');
   }
   if (currentUser.value.fiscalCode === currentPatientProfile.value.fiscalCode) {
-    return currentPatientProfile.value.name
+    return currentPatientProfile.value.name;
   }
-  return `${currentUser.value.name} @ ${currentPatientProfile.value.name}`
-})
+  return `${currentUser.value.name} @ ${currentPatientProfile.value.name}`;
+});
 
 const toggleUserMenu = () => {
-  showUserMenu.value = !showUserMenu.value
-}
+  showUserMenu.value = !showUserMenu.value;
+};
 
 const logout = () => {
-  authLogout()
-  showUserMenu.value = false
-  router.push('/login')
-}
+  authLogout();
+  showUserMenu.value = false;
+  router.push('/login');
+};
 
 const changeUser = () => {
-  showUserMenu.value = false
-  router.push('/patient-choice')
-}
-
+  showUserMenu.value = false;
+  router.push('/patient-choice');
+};
 </script>
 
 <template>
@@ -59,25 +58,31 @@ const changeUser = () => {
     <div class="topbar-actions">
       <!-- Language Selector -->
       <div class="language-selector">
-        <button 
+        <button
           class="topbar-icon-button language-button"
           :aria-label="t('topbar.languageSelectorAria', { lang: currentLanguage })"
           :aria-expanded="showLanguageMenu"
           @click="toggleLanguageMenu"
         >
           <span class="topbar-text language-text">{{ currentLanguage }}</span>
-          <svg class="topbar-icon-secondary language-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <polyline points="6 9 12 15 18 9"/>
+          <svg
+            class="topbar-icon-secondary language-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <polyline points="6 9 12 15 18 9" />
           </svg>
         </button>
-        <div 
-          v-if="showLanguageMenu" 
-          class="language-menu"
-        >
+        <div v-if="showLanguageMenu" class="language-menu">
           <button
             class="language-menu-item"
-            :class="{ 'selected': locale === 'it' }"
-            :aria-label="locale === 'it' ? t('topbar.italianSelectedAria') : t('topbar.selectItalianAria')"
+            :class="{ selected: locale === 'it' }"
+            :aria-label="
+              locale === 'it' ? t('topbar.italianSelectedAria') : t('topbar.selectItalianAria')
+            "
             :aria-current="locale === 'it' ? 'true' : undefined"
             @click="changeLanguage('it')"
           >
@@ -85,8 +90,10 @@ const changeUser = () => {
           </button>
           <button
             class="language-menu-item"
-            :class="{ 'selected': locale === 'en' }"
-            :aria-label="locale === 'en' ? t('topbar.englishSelectedAria') : t('topbar.selectEnglishAria')"
+            :class="{ selected: locale === 'en' }"
+            :aria-label="
+              locale === 'en' ? t('topbar.englishSelectedAria') : t('topbar.selectEnglishAria')
+            "
             :aria-current="locale === 'en' ? 'true' : undefined"
             @click="changeLanguage('en')"
           >
@@ -95,38 +102,47 @@ const changeUser = () => {
         </div>
       </div>
       <div class="user-menu-container">
-        <button 
+        <button
           class="topbar-icon-button user-menu-button"
-          :aria-label="t('topbar.userMenuAria', { user: currentPatientProfile?.name || t('topbar.user') })"
+          :aria-label="
+            t('topbar.userMenuAria', { user: currentPatientProfile?.name || t('topbar.user') })
+          "
           :aria-expanded="showUserMenu"
           @click="toggleUserMenu"
         >
           <div class="user-avatar">
-            <svg class="topbar-icon user-avatar-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+            <svg
+              class="topbar-icon user-avatar-icon"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"
+              />
             </svg>
           </div>
           <span class="user-name-text">{{ displayUserName }}</span>
-          <svg class="user-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <polyline points="6 9 12 15 18 9"/>
+          <svg
+            class="user-menu-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <polyline points="6 9 12 15 18 9" />
           </svg>
         </button>
         <div v-if="showUserMenu" class="user-menu">
-          <button 
-            class="user-menu-item"
-            @click="changeUser"
-          >
+          <button class="user-menu-item" @click="changeUser">
             <div class="user-menu-icon-container">
               <ArrowsRightLeftIcon class="user-menu-icon" />
             </div>
-            <span class="user-profile-name">{{ t('settings.account.changeProfile')}}</span>
+            <span class="user-profile-name">{{ t('settings.account.changeProfile') }}</span>
           </button>
           <!-- Logout Button -->
-          <button
-            class="user-menu-item"
-            :aria-label="t('userMenu.logout')"
-            @click="logout"
-          >
+          <button class="user-menu-item" :aria-label="t('userMenu.logout')" @click="logout">
             <div class="user-menu-icon-container">
               <ArrowRightStartOnRectangleIcon class="user-menu-icon" />
             </div>
@@ -148,7 +164,9 @@ const changeUser = () => {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--white-60);
-  box-shadow: 0 4px 24px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 4px 24px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   height: 8vh;
   width: 100%;
   padding-left: clamp(2rem, 1.5vw, 3rem);
@@ -186,7 +204,9 @@ const changeUser = () => {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--white-50);
-  box-shadow: 0 2px 8px var(--black-5), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 2px 8px var(--black-5),
+    inset 0 1px 0 var(--white-80);
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
@@ -199,7 +219,9 @@ const changeUser = () => {
 }
 .topbar-icon-button:hover {
   background: var(--white-80);
-  box-shadow: 0 4px 16px var(--black-12), inset 0 1px 0 var(--white-90);
+  box-shadow:
+    0 4px 16px var(--black-12),
+    inset 0 1px 0 var(--white-90);
   transform: translateY(-1px);
 }
 

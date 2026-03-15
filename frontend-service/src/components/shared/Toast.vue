@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import { CheckCircleIcon, XMarkIcon, XCircleIcon } from '@heroicons/vue/24/outline'
-import { useI18n } from 'vue-i18n'
-import type { Toast } from '../../types/shared'
+import { CheckCircleIcon, XMarkIcon, XCircleIcon } from '@heroicons/vue/24/outline';
+import { useI18n } from 'vue-i18n';
+import type { Toast } from '../../types/shared';
 
 const props = withDefaults(defineProps<Toast>(), {
   duration: 3000,
-  type: 'success'
-})
+  type: 'success',
+});
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const emit = defineEmits<{
-  close: []
-}>()
+  close: [];
+}>();
 
 // Auto close after duration
 if (props.show && props.duration > 0) {
   setTimeout(() => {
-    emit('close')
-  }, props.duration)
+    emit('close');
+  }, props.duration);
 }
 
 // Determine aria-live based on type
-const ariaLive = props.type === 'error' ? 'assertive' : 'polite'
+const ariaLive = props.type === 'error' ? 'assertive' : 'polite';
 </script>
 
 <template>
   <Teleport to="body">
     <Transition name="toast">
-      <div 
-        v-if="show" 
+      <div
+        v-if="show"
         class="toast-container"
         role="status"
         :aria-live="ariaLive"
@@ -37,13 +37,17 @@ const ariaLive = props.type === 'error' ? 'assertive' : 'polite'
       >
         <div class="toast-content">
           <div class="toast-icon" :class="`toast-icon-${type}`">
-            <CheckCircleIcon v-if="type === 'success'" class="toast-check-icon" aria-hidden="true" />
+            <CheckCircleIcon
+              v-if="type === 'success'"
+              class="toast-check-icon"
+              aria-hidden="true"
+            />
             <XCircleIcon v-else-if="type === 'error'" class="toast-check-icon" aria-hidden="true" />
             <CheckCircleIcon v-else class="toast-check-icon" aria-hidden="true" />
           </div>
           <p class="toast-message">{{ message }}</p>
-          <button 
-            class="toast-close" 
+          <button
+            class="toast-close"
             @click="emit('close')"
             :aria-label="t('toast.closeNotification')"
           >
@@ -74,7 +78,9 @@ const ariaLive = props.type === 'error' ? 'assertive' : 'polite'
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--white-80);
   border-radius: 1rem;
-  box-shadow: 0 8px 32px var(--black-12), inset 0 1px 0 var(--white-100);
+  box-shadow:
+    0 8px 32px var(--black-12),
+    inset 0 1px 0 var(--white-100);
   min-width: 320px;
   max-width: 480px;
 }

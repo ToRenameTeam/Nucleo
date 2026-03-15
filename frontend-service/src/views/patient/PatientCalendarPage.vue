@@ -1,269 +1,282 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { useAuth } from '../../composables/useAuth'
-import TagBar from '../../components/shared/TagBar.vue'
-import type { Tag } from '../../types/tag'
-import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue'
-import LoadingSpinner from '../../components/shared/LoadingSpinner.vue'
-import BaseCard from '../../components/shared/BaseCard.vue'
-import CardList from '../../components/shared/CardList.vue'
-import type { Appointment } from '../../types/appointment'
-import type { CardMetadata, CardAction } from '../../types/shared'
-import { CalendarIcon, ClockIcon, UserIcon, MapPinIcon, PencilIcon, XCircleIcon } from '@heroicons/vue/24/outline'
-import { useI18n } from 'vue-i18n'
-import { appointmentsApi } from '../../api/appointments'
-import ScheduleModal from '../../components/shared/ScheduleModal.vue'
-import { formatCategory } from '../../utils/formatters'
-import { getBadgeColors, getBadgeIcon } from '../../utils/badgeHelpers'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useAuth } from '../../composables/useAuth';
+import TagBar from '../../components/shared/TagBar.vue';
+import type { Tag } from '../../types/tag';
+import AppointmentsCalendar from '../../components/shared/AppointmentsCalendar.vue';
+import LoadingSpinner from '../../components/shared/LoadingSpinner.vue';
+import BaseCard from '../../components/shared/BaseCard.vue';
+import CardList from '../../components/shared/CardList.vue';
+import type { Appointment } from '../../types/appointment';
+import type { CardMetadata, CardAction } from '../../types/shared';
+import {
+  CalendarIcon,
+  ClockIcon,
+  UserIcon,
+  MapPinIcon,
+  PencilIcon,
+  XCircleIcon,
+} from '@heroicons/vue/24/outline';
+import { useI18n } from 'vue-i18n';
+import { appointmentsApi } from '../../api/appointments';
+import ScheduleModal from '../../components/shared/ScheduleModal.vue';
+import { formatCategory } from '../../utils/formatters';
+import { getBadgeColors, getBadgeIcon } from '../../utils/badgeHelpers';
 
-const { t } = useI18n()
+const { t } = useI18n();
 
-const { currentUser, currentPatientProfile } = useAuth()
+const { currentUser, currentPatientProfile } = useAuth();
 
-const appointments = ref<Appointment[]>([])
-const isLoading = ref(false)
-const error = ref<string | null>(null)
-const isRescheduleModalOpen = ref(false)
-const appointmentToReschedule = ref<Appointment | null>(null)
+const appointments = ref<Appointment[]>([]);
+const isLoading = ref(false);
+const error = ref<string | null>(null);
+const isRescheduleModalOpen = ref(false);
+const appointmentToReschedule = ref<Appointment | null>(null);
 
 async function loadAppointments() {
-  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId
+  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId;
 
   if (!patientId) {
-    console.log('[PatientCalendarPage] No patient ID available')
-    return
+    console.log('[PatientCalendarPage] No patient ID available');
+    return;
   }
 
-  isLoading.value = true
-  error.value = null
-  
+  isLoading.value = true;
+  error.value = null;
+
   try {
-    console.log('[PatientCalendarPage] Fetching appointments for patient:', patientId)
-    const data = await appointmentsApi.getAppointmentsByPatient(patientId)
+    console.log('[PatientCalendarPage] Fetching appointments for patient:', patientId);
+    const data = await appointmentsApi.getAppointmentsByPatient(patientId);
     // Filter only appointments with SCHEDULED status
-    appointments.value = data.filter(apt => apt.status === 'SCHEDULED')
-    console.log('[PatientCalendarPage] Loaded appointments:', data.length, 'Scheduled:', appointments.value.length)
+    appointments.value = data.filter((apt) => apt.status === 'SCHEDULED');
+    console.log(
+      '[PatientCalendarPage] Loaded appointments:',
+      data.length,
+      'Scheduled:',
+      appointments.value.length
+    );
   } catch (err) {
-    console.error('[PatientCalendarPage] Error loading appointments:', err)
-    error.value = err instanceof Error ? err.message : t('calendar.errors.loadingAppointments')
+    console.error('[PatientCalendarPage] Error loading appointments:', err);
+    error.value = err instanceof Error ? err.message : t('calendar.errors.loadingAppointments');
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 onMounted(() => {
-  loadAppointments()
-})
+  loadAppointments();
+});
 
 // Watch for changes in patient profile
-watch(() => currentPatientProfile.value?.userId, () => {
-  loadAppointments()
-})
+watch(
+  () => currentPatientProfile.value?.userId,
+  () => {
+    loadAppointments();
+  }
+);
 
 const tags = computed<Tag[]>(() => {
-  const allAppointments = appointments.value
-  
+  const allAppointments = appointments.value;
+
   // Get unique categories from appointments
-  const categoriesSet = new Set<string>()
-  allAppointments.forEach(apt => {
+  const categoriesSet = new Set<string>();
+  allAppointments.forEach((apt) => {
     if (apt.category && apt.category.length > 0) {
       // Category is now an array, add each category
-      apt.category.forEach(cat => categoriesSet.add(cat))
+      apt.category.forEach((cat) => categoriesSet.add(cat));
     }
-  })
-  
-  const categoryTags: Tag[] = Array.from(categoriesSet).map(category => ({
+  });
+
+  const categoryTags: Tag[] = Array.from(categoriesSet).map((category) => ({
     id: category,
     label: formatCategory(category),
-    count: allAppointments.filter(a => a.category && a.category.includes(category)).length
-  }))
-  
+    count: allAppointments.filter((a) => a.category && a.category.includes(category)).length,
+  }));
+
   return [
     { id: 'all', label: t('calendar.categories.all'), count: allAppointments.length },
-    ...categoryTags
-  ]
-})
+    ...categoryTags,
+  ];
+});
 
-const selectedTag = ref('all')
-const selectedAppointmentId = ref<string | null>(null)
+const selectedTag = ref('all');
+const selectedAppointmentId = ref<string | null>(null);
 
 const filteredAppointments = computed(() => {
-  const allAppointments = appointments.value
+  const allAppointments = appointments.value;
   if (selectedTag.value === 'all') {
-    return allAppointments
+    return allAppointments;
   }
-  return allAppointments.filter(apt => apt.category && apt.category.includes(selectedTag.value))
-})
+  return allAppointments.filter((apt) => apt.category && apt.category.includes(selectedTag.value));
+});
 
 const currentAppointmentInfo = computed(() => {
-  if (!appointmentToReschedule.value) return null
+  if (!appointmentToReschedule.value) return null;
   return {
     user: appointmentToReschedule.value.user,
     date: appointmentToReschedule.value.date,
     time: appointmentToReschedule.value.time,
-    location: appointmentToReschedule.value.location
-  }
-})
+    location: appointmentToReschedule.value.location,
+  };
+});
 
 function handleTagSelected(tagId: string) {
-  selectedTag.value = tagId
+  selectedTag.value = tagId;
 }
 
 function handleCalendarEventClick(appointmentId: string) {
-  selectedAppointmentId.value = appointmentId
-  
+  selectedAppointmentId.value = appointmentId;
+
   if (window.innerWidth >= 768) {
-    const element = document.getElementById(appointmentId)
+    const element = document.getElementById(appointmentId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
 }
 
 function handleDateSelect(dateRange: { start: string; end: string }) {
-  console.log('Selected date range:', dateRange)
+  console.log('Selected date range:', dateRange);
 }
 
 function handleAppointmentClick(id: string) {
-  selectedAppointmentId.value = id
+  selectedAppointmentId.value = id;
 }
 
 async function handleEditAppointment(id: string) {
   try {
-    isLoading.value = true
-    
-    const appointment = await appointmentsApi.getAppointmentById(id)
-    
+    isLoading.value = true;
+
+    const appointment = await appointmentsApi.getAppointmentById(id);
+
     if (appointment) {
-      appointmentToReschedule.value = appointment
-      isRescheduleModalOpen.value = true
+      appointmentToReschedule.value = appointment;
+      isRescheduleModalOpen.value = true;
     } else {
-      console.error('[PatientCalendarPage] Appointment not found:', id)
-      error.value = t('calendar.errors.appointmentNotFound')
+      console.error('[PatientCalendarPage] Appointment not found:', id);
+      error.value = t('calendar.errors.appointmentNotFound');
     }
   } catch (err) {
-    console.error('[PatientCalendarPage] Error loading appointment details:', err)
-    error.value = t('calendar.errors.loadingDetails')
+    console.error('[PatientCalendarPage] Error loading appointment details:', err);
+    error.value = t('calendar.errors.loadingDetails');
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 async function handleCancelAppointment(id: string) {
-  console.log('Cancel appointment:', id)
+  console.log('Cancel appointment:', id);
   if (!confirm(t('appointments.confirmCancel'))) {
-    return
+    return;
   }
-  
+
   try {
-    await appointmentsApi.deleteAppointment(id)
+    await appointmentsApi.deleteAppointment(id);
     // Reload appointments after cancellation
-    await loadAppointments()
+    await loadAppointments();
   } catch (err) {
-    console.error('[PatientCalendarPage] Error cancelling appointment:', err)
-    error.value = t('calendar.errors.cancellingAppointment')
+    console.error('[PatientCalendarPage] Error cancelling appointment:', err);
+    error.value = t('calendar.errors.cancellingAppointment');
   }
 }
 
 async function handleSelectAvailability(availabilityId: string) {
-  if (!appointmentToReschedule.value) return
-  
+  if (!appointmentToReschedule.value) return;
+
   try {
-    isLoading.value = true
-    
+    isLoading.value = true;
+
     await appointmentsApi.updateAppointment(
       appointmentToReschedule.value.id,
       undefined,
       availabilityId
-    )
-    
-    isRescheduleModalOpen.value = false
-    appointmentToReschedule.value = null
-    
+    );
+
+    isRescheduleModalOpen.value = false;
+    appointmentToReschedule.value = null;
+
     // Reload appointments after rescheduling
-    await loadAppointments()
+    await loadAppointments();
   } catch (err) {
-    console.error('[PatientCalendarPage] Error rescheduling appointment:', err)
-    error.value = t('calendar.errors.reschedulingAppointment')
+    console.error('[PatientCalendarPage] Error rescheduling appointment:', err);
+    error.value = t('calendar.errors.reschedulingAppointment');
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 // Parse date and time for comparison
 function parseDateForComparison(dateStr: string, timeStr?: string): Date {
-  const parts = dateStr.split('/').map(Number)
-  const day = parts[0] || 1
-  const month = parts[1] || 1
-  const year = parts[2] || new Date().getFullYear()
-  const date = new Date(year, month - 1, day)
-  
+  const parts = dateStr.split('/').map(Number);
+  const day = parts[0] || 1;
+  const month = parts[1] || 1;
+  const year = parts[2] || new Date().getFullYear();
+  const date = new Date(year, month - 1, day);
+
   if (timeStr) {
-    const timeParts = timeStr.split(':').map(Number)
-    const hours = timeParts[0] || 0
-    const minutes = timeParts[1] || 0
-    date.setHours(hours, minutes)
+    const timeParts = timeStr.split(':').map(Number);
+    const hours = timeParts[0] || 0;
+    const minutes = timeParts[1] || 0;
+    date.setHours(hours, minutes);
   }
-  
-  return date
+
+  return date;
 }
 
 // Check if appointment is in the future (can be modified/cancelled)
 function isAppointmentFuture(appointment: Appointment): boolean {
-  if (!appointment.date) return false
-  
-  const timeStr = appointment.time?.split(' - ')[0] || '00:00'
-  const appointmentDateTime = parseDateForComparison(appointment.date, timeStr)
-  const now = new Date()
-  
+  if (!appointment.date) return false;
+
+  const timeStr = appointment.time?.split(' - ')[0] || '00:00';
+  const appointmentDateTime = parseDateForComparison(appointment.date, timeStr);
+  const now = new Date();
+
   // Appointment is in the future if its start time hasn't passed yet
-  return appointmentDateTime >= now
+  return appointmentDateTime >= now;
 }
 
 // Get actions for appointment card (only for future appointments)
 function getAppointmentActions(appointment: Appointment): CardAction[] {
   // Only show actions for future appointments
   if (!isAppointmentFuture(appointment)) {
-    return []
+    return [];
   }
-  
+
   return [
     {
       id: 'edit',
       label: t('appointments.editAppointment'),
       icon: PencilIcon,
       variant: 'warning',
-      onClick: handleEditAppointment
+      onClick: handleEditAppointment,
     },
     {
       id: 'cancel',
       label: t('appointments.cancelAppointment'),
       icon: XCircleIcon,
       variant: 'danger',
-      onClick: handleCancelAppointment
-    }
-  ]
+      onClick: handleCancelAppointment,
+    },
+  ];
 }
 
 // Get metadata for appointment card
 function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
-  const meta: CardMetadata[] = [
-    { icon: CalendarIcon, label: appointment.date }
-  ]
-  
+  const meta: CardMetadata[] = [{ icon: CalendarIcon, label: appointment.date }];
+
   if (appointment.time) {
-    meta.push({ icon: ClockIcon, label: appointment.time })
+    meta.push({ icon: ClockIcon, label: appointment.time });
   }
-  
+
   if (appointment.user) {
-    meta.push({ icon: UserIcon, label: appointment.user })
+    meta.push({ icon: UserIcon, label: appointment.user });
   }
-  
+
   if (appointment.location) {
-    meta.push({ icon: MapPinIcon, label: appointment.location })
+    meta.push({ icon: MapPinIcon, label: appointment.location });
   }
-  
-  return meta
+
+  return meta;
 }
 </script>
 
@@ -299,20 +312,16 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
       <!-- Appointments List -->
       <div class="appointments-list-container">
         <h2 class="appointments-list-title">{{ $t('calendar.appointments') }}</h2>
-        
+
         <!-- Loading State -->
-        <LoadingSpinner 
-          v-if="isLoading" 
-          :message="$t('calendar.loading')" 
-          size="medium"
-        />
-        
+        <LoadingSpinner v-if="isLoading" :message="$t('calendar.loading')" size="medium" />
+
         <!-- Error State -->
         <div v-else-if="error" class="error-state">
           <p class="error-text">{{ error }}</p>
           <button class="retry-btn" @click="loadAppointments">{{ $t('calendar.retry') }}</button>
         </div>
-        
+
         <!-- Appointments List -->
         <CardList v-else-if="filteredAppointments.length > 0" gap="sm">
           <BaseCard
@@ -329,14 +338,14 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
           >
             <template v-if="appointment.category && appointment.category.length > 0" #badges>
               <div class="badges-row">
-                <div 
+                <div
                   v-for="cat in appointment.category"
                   :key="cat"
-                  class="appointment-badge" 
+                  class="appointment-badge"
                   :style="{
                     color: getBadgeColors(cat).color,
                     backgroundColor: getBadgeColors(cat).bgColor,
-                    borderColor: getBadgeColors(cat).borderColor
+                    borderColor: getBadgeColors(cat).borderColor,
                   }"
                 >
                   <span class="badge-icon">{{ getBadgeIcon(cat) }}</span>
@@ -346,7 +355,7 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
             </template>
           </BaseCard>
         </CardList>
-        
+
         <div v-else class="empty-state">
           <p class="empty-state-text">{{ $t('calendar.noAppointments') }}</p>
         </div>
@@ -376,7 +385,12 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   max-width: 100vw;
   overflow-x: hidden;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
   position: relative;
 }
 
@@ -387,7 +401,7 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, var(--sky-0ea5e9-20) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, var(--purple-a855f7-20) 0%, transparent 50%);
   pointer-events: none;
@@ -410,7 +424,9 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   backdrop-filter: blur(20px);
   border: 1px solid var(--white-60);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   animation: slideInDown 0.5s cubic-bezier(0, 0, 0.2, 1);
 }
 
@@ -464,12 +480,16 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   border: 1px solid var(--white-60);
   border-radius: 1.5rem;
   padding: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
 .appointments-list-container:hover {
-  box-shadow: 0 12px 40px var(--black-12), inset 0 1px 0 var(--white-90);
+  box-shadow:
+    0 12px 40px var(--black-12),
+    inset 0 1px 0 var(--white-90);
 }
 
 .appointments-list-title {
@@ -497,7 +517,9 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   -webkit-backdrop-filter: blur(12px);
   font-weight: 600;
   font-size: 0.8125rem;
-  box-shadow: 0 2px 8px var(--badge-shadow), inset 0 1px 0 var(--white-40);
+  box-shadow:
+    0 2px 8px var(--badge-shadow),
+    inset 0 1px 0 var(--white-40);
   width: fit-content;
   animation: fadeInScale 0.4s cubic-bezier(0, 0, 0.2, 1);
   transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
@@ -645,7 +667,7 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
     padding: 0.625rem 1rem;
     font-size: 0.875rem;
   }
-  
+
   .appointments-list-title {
     font-size: 1.125rem;
   }
@@ -655,22 +677,22 @@ function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
   .calendar-page {
     padding: 0.5rem;
   }
-  
+
   .header-content {
     padding: 1rem;
   }
-  
+
   .page-title {
     font-size: 1.375rem;
   }
-  
+
   .page-subtitle {
     font-size: 0.8125rem;
   }
 }
 
 .calendar-container {
-    padding: 0.5rem;
+  padding: 0.5rem;
 }
 
 .appointments-container {

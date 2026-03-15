@@ -251,7 +251,7 @@
     "footer": {
       "version": "Nucleo v0.1 · Prototipo"
     }
-  }, 
+  },
   "footer": {
     "privacy": "Privacy",
     "privacyAria": "Apri informativa privacy e cookie policy",
@@ -572,9 +572,7 @@
         }
       }
     },
-    "settings":{
-
-    }
+    "settings": {}
   },
   "common": {
     "loading": "Caricamento...",
@@ -638,14 +636,8 @@
     "progress": {
       "title": "Caricamento in corso",
       "successTitle": "Caricamento completato",
-      "received": "Documento ricevuto",
-      "receivedDesc": "Il file è stato ricevuto correttamente dal server",
-      "stored": "Documento archiviato",
-      "storedDesc": "Il file è stato salvato in modo sicuro",
-      "analyzed": "Analisi completata",
-      "analyzedDesc": "Il documento è stato analizzato dall'intelligenza artificiale",
-      "completed": "Caricamento completato",
-      "completedDesc": "Il documento è pronto e disponibile"
+      "loadingMessage": "Il documento è in fase di caricamento e analisi. Potrebbe richiedere qualche istante.",
+      "successMessage": "Il documento è stato caricato e analizzato con successo ed è ora disponibile."
     },
     "nonMedicalDocument": "Il documento non è stato accettato. Solo documenti medici (referti, prescrizioni, note cliniche) sono permessi."
   }

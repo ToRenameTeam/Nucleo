@@ -1,6 +1,8 @@
 package it.nucleo.appointments.domain
 
-import it.nucleo.appointments.domain.valueobjects.*
+import it.nucleo.appointments.domain.errors.*
+import it.nucleo.commons.errors.*
+import java.util.UUID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -25,43 +27,93 @@ data class Appointment(
         }
     }
 
-    fun complete(): Appointment {
-        require(status.canTransitionTo(AppointmentStatus.COMPLETED)) {
-            "Cannot complete appointment in status $status"
+    fun complete(): Either<AppointmentError.InvalidStatusTransition, Appointment> =
+        transitionTo(AppointmentStatus.COMPLETED)
+
+    fun markNoShow(): Either<AppointmentError.InvalidStatusTransition, Appointment> =
+        transitionTo(AppointmentStatus.NO_SHOW)
+
+    fun cancel(): Either<AppointmentError.InvalidStatusTransition, Appointment> =
+        transitionTo(AppointmentStatus.CANCELLED)
+
+    fun reschedule(
+        newAvailabilityId: AvailabilityId
+    ): Either<AppointmentError.InvalidStatusTransition, Appointment> {
+        if (status != AppointmentStatus.SCHEDULED) {
+            return failure(
+                AppointmentError.InvalidStatusTransition(
+                    from = status.name,
+                    to = "SCHEDULED (reschedule)"
+                )
+            )
         }
-        return copy(
-            status = AppointmentStatus.COMPLETED,
-            updatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+        return success(
+            copy(
+                availabilityId = newAvailabilityId,
+                updatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+            )
         )
     }
 
-    fun markNoShow(): Appointment {
-        require(status.canTransitionTo(AppointmentStatus.NO_SHOW)) {
-            "Cannot mark as no-show appointment in status $status"
+    private fun transitionTo(
+        target: AppointmentStatus
+    ): Either<AppointmentError.InvalidStatusTransition, Appointment> {
+        if (!status.canTransitionTo(target)) {
+            return failure(
+                AppointmentError.InvalidStatusTransition(from = status.name, to = target.name)
+            )
         }
-        return copy(
-            status = AppointmentStatus.NO_SHOW,
-            updatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+        return success(
+            copy(status = target, updatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC))
         )
+    }
+}
+
+@JvmInline
+value class AppointmentId private constructor(val value: String) {
+    companion object {
+        fun generate(): AppointmentId = AppointmentId(UUID.randomUUID().toString())
+
+        operator fun invoke(value: String): Either<DomainError, AppointmentId> {
+            if (value.isBlank()) {
+                return failure(ValidationError("AppointmentId cannot be blank"))
+            }
+            return success(AppointmentId(value))
+        }
     }
 
-    fun cancel(): Appointment {
-        require(status.canTransitionTo(AppointmentStatus.CANCELLED)) {
-            "Cannot cancel appointment in status $status"
+    override fun toString(): String = value
+}
+
+enum class AppointmentStatus {
+    SCHEDULED,
+    COMPLETED,
+    NO_SHOW,
+    CANCELLED;
+
+    fun canTransitionTo(newStatus: AppointmentStatus): Boolean {
+        return when (this) {
+            SCHEDULED -> newStatus in setOf(COMPLETED, NO_SHOW, CANCELLED)
+            COMPLETED,
+            NO_SHOW,
+            CANCELLED -> false
         }
-        return copy(
-            status = AppointmentStatus.CANCELLED,
-            updatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
-        )
+    }
+}
+
+@JvmInline
+value class PatientId private constructor(val value: String) {
+    companion object {
+        operator fun invoke(value: String): Either<DomainError, PatientId> {
+            if (value.isBlank()) {
+                return failure(ValidationError("PatientId cannot be blank"))
+            }
+            if (value.length > 50) {
+                return failure(ValidationError("PatientId cannot exceed 50 characters"))
+            }
+            return success(PatientId(value))
+        }
     }
 
-    fun reschedule(newAvailabilityId: AvailabilityId): Appointment {
-        require(status == AppointmentStatus.SCHEDULED) {
-            "Can only reschedule appointments in SCHEDULED status"
-        }
-        return copy(
-            availabilityId = newAvailabilityId,
-            updatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
-        )
-    }
+    override fun toString(): String = value
 }

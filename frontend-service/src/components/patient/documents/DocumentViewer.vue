@@ -1,38 +1,38 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
-import { useI18n } from 'vue-i18n'
-import type { DocumentViewer } from '../../../types/document'
-import { normalizeToSpecialization } from '../../../utils/specialization'
+import { computed } from 'vue';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline';
+import { useI18n } from 'vue-i18n';
+import type { DocumentViewer } from '../../../types/document';
+import { normalizeToSpecialization } from '../../../utils/specialization';
 
 // Import report images (currently the same for all)
-import referto1 from '../../../assets/documents/referto_ECG_1.jpg'
-import referto2 from '../../../assets/documents/referto_ECG_2.jpg'
-import referto3 from '../../../assets/documents/referto_ECG_3.jpg'
+import referto1 from '../../../assets/documents/referto_ECG_1.jpg';
+import referto2 from '../../../assets/documents/referto_ECG_2.jpg';
+import referto3 from '../../../assets/documents/referto_ECG_3.jpg';
 
 const props = withDefaults(defineProps<DocumentViewer>(), {
   showPanel: true,
   previewHeight: '22rem',
-  showHospital: false
-})
+  showHospital: false,
+});
 
 const emit = defineEmits<{
-  prevPage: []
-  nextPage: []
-}>()
+  prevPage: [];
+  nextPage: [];
+}>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 // Array delle immagini del referto
-const documentImages = [referto1, referto2, referto3]
-const totalPages = documentImages.length
+const documentImages = [referto1, referto2, referto3];
+const totalPages = documentImages.length;
 
 const currentImage = computed(() => {
-  return documentImages[props.currentPageIndex]
-})
+  return documentImages[props.currentPageIndex];
+});
 
-const canGoPrev = computed(() => props.currentPageIndex > 0)
-const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
+const canGoPrev = computed(() => props.currentPageIndex > 0);
+const canGoNext = computed(() => props.currentPageIndex < totalPages - 1);
 </script>
 
 <template>
@@ -64,7 +64,9 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
           class="nav-button"
           :disabled="!canGoNext"
           @click="emit('nextPage')"
-          :aria-label="t('documents.viewer.page', { current: currentPageIndex + 2, total: totalPages })"
+          :aria-label="
+            t('documents.viewer.page', { current: currentPageIndex + 2, total: totalPages })
+          "
         >
           <ChevronRightIcon class="icon-nav" />
         </button>
@@ -91,11 +93,7 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
           <div class="info-section">
             <span class="info-label">{{ t('documents.viewer.tags') }}</span>
             <div v-if="document?.tags?.length" class="info-tags">
-              <span
-                v-for="(tag, index) in document.tags"
-                :key="index"
-                class="info-tag"
-              >
+              <span v-for="(tag, index) in document.tags" :key="index" class="info-tag">
                 {{ normalizeToSpecialization(tag) }}
               </span>
             </div>
@@ -135,7 +133,9 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
   border: 1px solid var(--white-40);
   border-radius: 1.25rem;
   padding: 1.25rem;
-  box-shadow: 0 4px 16px var(--black-6), inset 0 1px 0 var(--white-50);
+  box-shadow:
+    0 4px 16px var(--black-6),
+    inset 0 1px 0 var(--white-50);
 }
 
 .document-viewer-standalone {
@@ -180,7 +180,11 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
 }
 
 .preview-area {
-  background: linear-gradient(135deg, var(--bg-gradient-start-40) 0%, var(--bg-gradient-mid-40) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start-40) 0%,
+    var(--bg-gradient-mid-40) 100%
+  );
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--white-60);
@@ -190,7 +194,9 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
   align-items: center;
   justify-content: center;
   flex: 1;
-  box-shadow: 0 4px 16px var(--shadow), inset 0 1px 0 var(--white-60);
+  box-shadow:
+    0 4px 16px var(--shadow),
+    inset 0 1px 0 var(--white-60);
   overflow: hidden;
 }
 
@@ -208,7 +214,11 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--bg-gradient-start-50) 0%, var(--bg-gradient-mid-50) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start-50) 0%,
+    var(--bg-gradient-mid-50) 100%
+  );
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--white-60);
@@ -216,7 +226,9 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
   color: var(--accent-primary);
   flex-shrink: 0;
-  box-shadow: 0 4px 16px var(--accent-primary-20), inset 0 1px 0 var(--white-70);
+  box-shadow:
+    0 4px 16px var(--accent-primary-20),
+    inset 0 1px 0 var(--white-70);
 }
 
 .icon-nav {
@@ -227,7 +239,9 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
 .nav-button:hover:not(:disabled) {
   background: var(--white-60);
   transform: scale(1.1);
-  box-shadow: 0 6px 20px var(--shadow), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 6px 20px var(--shadow),
+    inset 0 1px 0 var(--white-80);
 }
 
 .nav-button:disabled {
@@ -243,7 +257,11 @@ const canGoNext = computed(() => props.currentPageIndex < totalPages - 1)
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text-secondary);
-  background: linear-gradient(135deg, var(--bg-gradient-start-40) 0%, var(--bg-gradient-mid-40) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start-40) 0%,
+    var(--bg-gradient-mid-40) 100%
+  );
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 0.375rem 0.875rem;

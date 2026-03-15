@@ -1,236 +1,237 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { 
-  ChevronRightIcon,
-  MagnifyingGlassIcon
-} from '@heroicons/vue/24/outline'
-import BaseModal from '../shared/BaseModal.vue'
-import AvailabilitySlotsList from '../shared/AvailabilitySlotsList.vue'
-import type { AvailabilityDisplay } from '../../types/availability'
-import type { ServiceType } from '../../api/masterData'
-import type { UserInfo } from '../../api/users'
-import { masterDataApi } from '../../api/masterData'
-import { userApi } from '../../api/users'
-import { availabilitiesApi } from '../../api/availabilities'
-import { hasMatchingSpecialization } from '../../utils/specialization'
+import { ref, computed, watch, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { ChevronRightIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
+import BaseModal from '../shared/BaseModal.vue';
+import AvailabilitySlotsList from '../shared/AvailabilitySlotsList.vue';
+import type { AvailabilityDisplay } from '../../types/availability';
+import type { ServiceType } from '../../api/masterData';
+import type { UserInfo } from '../../api/users';
+import { masterDataApi } from '../../api/masterData';
+import { userApi } from '../../api/users';
+import { availabilitiesApi } from '../../api/availabilities';
+import { hasMatchingSpecialization } from '../../utils/specialization';
 
 interface Props {
-  isOpen: boolean
-  preselectedVisit?: string | null
+  isOpen: boolean;
+  preselectedVisit?: string | null;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  close: []
-  confirm: [availabilityId: string]
-}>()
+  close: [];
+  confirm: [availabilityId: string];
+}>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 // Step state
-const currentStep = ref(1)
+const currentStep = ref(1);
 
 // Step 1: Service Type selection
-const serviceTypes = ref<ServiceType[]>([])
-const selectedServiceType = ref<ServiceType | null>(null)
-const loadingServiceTypes = ref(false)
-const searchQuery = ref('')
+const serviceTypes = ref<ServiceType[]>([]);
+const selectedServiceType = ref<ServiceType | null>(null);
+const loadingServiceTypes = ref(false);
+const searchQuery = ref('');
 
 const filteredServiceTypes = computed(() => {
   if (!searchQuery.value.trim()) {
-    return serviceTypes.value
+    return serviceTypes.value;
   }
-  
-  const query = searchQuery.value.toLowerCase().trim()
-  return serviceTypes.value.filter(st => 
-    st.name.toLowerCase().includes(query) ||
-    (st.description && st.description.toLowerCase().includes(query))
-  )
-})
+
+  const query = searchQuery.value.toLowerCase().trim();
+  return serviceTypes.value.filter(
+    (st) =>
+      st.name.toLowerCase().includes(query) ||
+      (st.description && st.description.toLowerCase().includes(query))
+  );
+});
 
 // Step 2: Doctor selection
-const doctors = ref<UserInfo[]>([])
+const doctors = ref<UserInfo[]>([]);
 const filteredDoctors = computed(() => {
   if (!selectedServiceType.value || !selectedServiceType.value.category) {
-    return []
+    return [];
   }
 
-  const categories = Array.isArray(selectedServiceType.value.category) 
-    ? selectedServiceType.value.category 
-    : [selectedServiceType.value.category]
+  const categories = Array.isArray(selectedServiceType.value.category)
+    ? selectedServiceType.value.category
+    : [selectedServiceType.value.category];
 
-  return doctors.value.filter(doctor => {
-    if (!doctor.doctor?.specializations) return false
-    
+  return doctors.value.filter((doctor) => {
+    if (!doctor.doctor?.specializations) return false;
+
     // Use utility function to match specializations with categories
-    return hasMatchingSpecialization(doctor.doctor.specializations, categories)
-  })
-})
-const selectedDoctor = ref<UserInfo | null>(null)
-const loadingDoctors = ref(false)
+    return hasMatchingSpecialization(doctor.doctor.specializations, categories);
+  });
+});
+const selectedDoctor = ref<UserInfo | null>(null);
+const loadingDoctors = ref(false);
 
 // Step 3: Availability selection
-const availabilities = ref<AvailabilityDisplay[]>([])
-const selectedAvailability = ref<AvailabilityDisplay | null>(null)
-const loadingAvailabilities = ref(false)
+const availabilities = ref<AvailabilityDisplay[]>([]);
+const selectedAvailability = ref<AvailabilityDisplay | null>(null);
+const loadingAvailabilities = ref(false);
 
 // Can proceed to next step
 const canProceed = computed(() => {
-  if (currentStep.value === 1) return selectedServiceType.value !== null
-  if (currentStep.value === 2) return selectedDoctor.value !== null
-  if (currentStep.value === 3) return selectedAvailability.value !== null
-  return false
-})
+  if (currentStep.value === 1) return selectedServiceType.value !== null;
+  if (currentStep.value === 2) return selectedDoctor.value !== null;
+  if (currentStep.value === 3) return selectedAvailability.value !== null;
+  return false;
+});
 
 // Load service types
 async function loadServiceTypes() {
-  loadingServiceTypes.value = true
+  loadingServiceTypes.value = true;
   try {
-    serviceTypes.value = await masterDataApi.getServiceTypes()
+    serviceTypes.value = await masterDataApi.getServiceTypes();
   } catch (error) {
-    console.error('Error loading service types:', error)
+    console.error('Error loading service types:', error);
   } finally {
-    loadingServiceTypes.value = false
+    loadingServiceTypes.value = false;
   }
 }
 
 // Load doctors
 async function loadDoctors() {
-  loadingDoctors.value = true
+  loadingDoctors.value = true;
   try {
-    const allUsers = await userApi.getAllUsers()
-    doctors.value = allUsers.filter(user => user.doctor !== undefined)
-    console.log('[BookingModal] Doctors loaded:', doctors.value.length)
+    const allUsers = await userApi.getAllUsers();
+    doctors.value = allUsers.filter((user) => user.doctor !== undefined);
+    console.log('[BookingModal] Doctors loaded:', doctors.value.length);
   } catch (error) {
-    console.error('[BookingModal] Error loading doctors:', error)
+    console.error('[BookingModal] Error loading doctors:', error);
   } finally {
-    loadingDoctors.value = false
+    loadingDoctors.value = false;
   }
 }
 
 // Load availabilities for selected doctor
 async function loadAvailabilities() {
-  if (!selectedDoctor.value) return
-  
-  loadingAvailabilities.value = true
+  if (!selectedDoctor.value) return;
+
+  loadingAvailabilities.value = true;
   try {
-    console.log('[BookingModal] Loading availabilities for doctor:', selectedDoctor.value.userId)
+    console.log('[BookingModal] Loading availabilities for doctor:', selectedDoctor.value.userId);
     const fetchedAvailabilities = await availabilitiesApi.getAvailabilitiesByDoctor(
       selectedDoctor.value.userId
-    )
-    availabilities.value = fetchedAvailabilities
-    console.log('[BookingModal] Availabilities loaded:', availabilities.value.length)
+    );
+    availabilities.value = fetchedAvailabilities;
+    console.log('[BookingModal] Availabilities loaded:', availabilities.value.length);
   } catch (error) {
-    console.error('[BookingModal] Error loading availabilities:', error)
-    availabilities.value = []
+    console.error('[BookingModal] Error loading availabilities:', error);
+    availabilities.value = [];
   } finally {
-    loadingAvailabilities.value = false
+    loadingAvailabilities.value = false;
   }
 }
 
 // Select service type
 function selectServiceType(serviceType: ServiceType) {
-  selectedServiceType.value = serviceType
-  selectedDoctor.value = null
-  selectedAvailability.value = null
-  availabilities.value = []
+  selectedServiceType.value = serviceType;
+  selectedDoctor.value = null;
+  selectedAvailability.value = null;
+  availabilities.value = [];
 }
 
 // Select doctor
 function selectDoctor(doctor: UserInfo) {
-  selectedDoctor.value = doctor
-  selectedAvailability.value = null
-  loadAvailabilities()
+  selectedDoctor.value = doctor;
+  selectedAvailability.value = null;
+  loadAvailabilities();
 }
 
 // Handle availability selection from AvailabilitySlotsList component
 function handleSelectAvailability(availabilityId: string) {
-  const availability = availabilities.value.find(a => a.id === availabilityId)
+  const availability = availabilities.value.find((a) => a.id === availabilityId);
   if (availability) {
-    selectedAvailability.value = availability
+    selectedAvailability.value = availability;
   }
 }
 
 // Next step
 async function nextStep() {
-  if (!canProceed.value) return
-  
+  if (!canProceed.value) return;
+
   if (currentStep.value === 1) {
     if (doctors.value.length === 0) {
-      await loadDoctors()
+      await loadDoctors();
     }
-    console.log('[BookingModal] Selected service:', selectedServiceType.value?.name)
-    console.log('[BookingModal] Service categories:', selectedServiceType.value?.category)
-    console.log('[BookingModal] Filtered doctors for this service:', filteredDoctors.value.length)
+    console.log('[BookingModal] Selected service:', selectedServiceType.value?.name);
+    console.log('[BookingModal] Service categories:', selectedServiceType.value?.category);
+    console.log('[BookingModal] Filtered doctors for this service:', filteredDoctors.value.length);
   }
-  
+
   if (currentStep.value < 3) {
-    currentStep.value++
+    currentStep.value++;
   }
 }
 
 // Previous step
 function previousStep() {
   if (currentStep.value > 1) {
-    currentStep.value--
+    currentStep.value--;
   }
 }
 
 // Confirm booking
 function handleConfirm() {
-  if (!selectedAvailability.value) return
-  emit('confirm', selectedAvailability.value.id)
+  if (!selectedAvailability.value) return;
+  emit('confirm', selectedAvailability.value.id);
 }
 
 // Close modal
 function handleClose() {
-  emit('close')
+  emit('close');
 }
 
 // Reset modal state
 function resetModal() {
-  currentStep.value = 1
-  selectedServiceType.value = null
-  selectedDoctor.value = null
-  selectedAvailability.value = null
-  availabilities.value = []
-  searchQuery.value = ''
+  currentStep.value = 1;
+  selectedServiceType.value = null;
+  selectedDoctor.value = null;
+  selectedAvailability.value = null;
+  availabilities.value = [];
+  searchQuery.value = '';
 }
 
 // Format doctor name with specializations
 function formatDoctorName(doctor: UserInfo): string {
-  const specs = doctor.doctor?.specializations || []
-  const specsText = specs.length > 0 ? ` (${specs.join(', ')})` : ''
-  return `Dott. ${doctor.lastName} ${doctor.name}${specsText}`
+  const specs = doctor.doctor?.specializations || [];
+  const specsText = specs.length > 0 ? ` (${specs.join(', ')})` : '';
+  return `Dott. ${doctor.lastName} ${doctor.name}${specsText}`;
 }
 
 // Watch for modal open
-watch(() => props.isOpen, async (isOpen) => {
-  if (isOpen) {
-    resetModal()
-    if (serviceTypes.value.length === 0) {
-      await loadServiceTypes()
-    }
-    
-    // Preselect service type if provided
-    if (props.preselectedVisit) {
-      const preselected = serviceTypes.value.find(
-        st => st.name.toLowerCase() === props.preselectedVisit?.toLowerCase()
-      )
-      if (preselected) {
-        selectServiceType(preselected)
+watch(
+  () => props.isOpen,
+  async (isOpen) => {
+    if (isOpen) {
+      resetModal();
+      if (serviceTypes.value.length === 0) {
+        await loadServiceTypes();
+      }
+
+      // Preselect service type if provided
+      if (props.preselectedVisit) {
+        const preselected = serviceTypes.value.find(
+          (st) => st.name.toLowerCase() === props.preselectedVisit?.toLowerCase()
+        );
+        if (preselected) {
+          selectServiceType(preselected);
+        }
       }
     }
   }
-})
+);
 
 onMounted(() => {
   if (props.isOpen && serviceTypes.value.length === 0) {
-    loadServiceTypes()
+    loadServiceTypes();
   }
-})
+});
 </script>
 
 <template>
@@ -245,13 +246,13 @@ onMounted(() => {
     <div class="booking-modal">
       <!-- Progress Steps -->
       <div class="steps-indicator">
-        <div 
-          v-for="step in 3" 
+        <div
+          v-for="step in 3"
           :key="step"
           class="step"
-          :class="{ 
-            active: currentStep === step, 
-            completed: currentStep > step 
+          :class="{
+            active: currentStep === step,
+            completed: currentStep > step,
           }"
         >
           <div class="step-number">{{ step }}</div>
@@ -266,7 +267,7 @@ onMounted(() => {
       <!-- Step 1: Service Type Selection -->
       <div v-if="currentStep === 1" class="step-content">
         <h3 class="step-title">{{ t('patient.booking.modal.selectServiceType') }}</h3>
-        
+
         <!-- Search Bar -->
         <div class="search-bar">
           <MagnifyingGlassIcon class="search-icon" />
@@ -277,7 +278,7 @@ onMounted(() => {
             :placeholder="t('appointmentBooking.searchPlaceholder')"
           />
         </div>
-        
+
         <div v-if="loadingServiceTypes" class="loading-state">
           <div class="spinner"></div>
           <p>{{ t('common.loading') }}</p>
@@ -290,9 +291,9 @@ onMounted(() => {
         <div v-else class="options-list">
           <button
             v-for="serviceType in filteredServiceTypes"
-            :key="serviceType._id"
+            :key="serviceType.id"
             class="option-card"
-            :class="{ selected: selectedServiceType?._id === serviceType._id }"
+            :class="{ selected: selectedServiceType?.id === serviceType.id }"
             @click="selectServiceType(serviceType)"
           >
             <div class="option-content">
@@ -309,7 +310,7 @@ onMounted(() => {
       <!-- Step 2: Doctor Selection -->
       <div v-if="currentStep === 2" class="step-content">
         <h3 class="step-title">{{ t('patient.booking.modal.selectDoctor') }}</h3>
-        
+
         <div v-if="selectedServiceType" class="selected-info">
           <span class="info-label">{{ t('patient.booking.modal.selectedService') }}:</span>
           <span class="info-value">{{ selectedServiceType.name }}</span>
@@ -343,7 +344,7 @@ onMounted(() => {
       <!-- Step 3: Availability Selection -->
       <div v-if="currentStep === 3" class="step-content">
         <h3 class="step-title">{{ t('patient.booking.modal.selectSlot') }}</h3>
-        
+
         <div class="selected-info-group">
           <div v-if="selectedServiceType" class="selected-info">
             <span class="info-label">{{ t('patient.booking.modal.selectedService') }}:</span>
@@ -372,14 +373,10 @@ onMounted(() => {
 
       <!-- Actions -->
       <div class="modal-actions">
-        <button
-          v-if="currentStep > 1"
-          class="btn btn-outline"
-          @click="previousStep"
-        >
+        <button v-if="currentStep > 1" class="btn btn-outline" @click="previousStep">
           {{ t('common.back') }}
         </button>
-        
+
         <button
           v-if="currentStep < 3"
           class="btn btn-primary"
@@ -649,7 +646,9 @@ onMounted(() => {
 .option-card.selected {
   background: var(--accent-primary-15);
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 4px var(--accent-primary-10), var(--shadow-glass-md);
+  box-shadow:
+    0 0 0 4px var(--accent-primary-10),
+    var(--shadow-glass-md);
 }
 
 .option-content {
@@ -784,7 +783,9 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Empty State */
@@ -840,12 +841,16 @@ onMounted(() => {
   background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   color: var(--white);
   border-color: var(--white-20);
-  box-shadow: 0 4px 16px var(--accent-primary-30), inset 0 1px 0 var(--white-20);
+  box-shadow:
+    0 4px 16px var(--accent-primary-30),
+    inset 0 1px 0 var(--white-20);
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--accent-primary-40), inset 0 1px 0 var(--white-30);
+  box-shadow:
+    0 6px 20px var(--accent-primary-40),
+    inset 0 1px 0 var(--white-30);
 }
 
 .btn-primary:active:not(:disabled) {
@@ -862,13 +867,17 @@ onMounted(() => {
   backdrop-filter: blur(12px);
   color: var(--text-primary);
   border-color: var(--white-60);
-  box-shadow: 0 2px 8px var(--shadow), inset 0 1px 0 var(--white-60);
+  box-shadow:
+    0 2px 8px var(--shadow),
+    inset 0 1px 0 var(--white-60);
 }
 
 .btn-outline:hover:not(:disabled) {
   background: var(--white-50);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--shadow), inset 0 1px 0 var(--white-70);
+  box-shadow:
+    0 4px 12px var(--shadow),
+    inset 0 1px 0 var(--white-70);
 }
 
 .btn-outline:active:not(:disabled) {

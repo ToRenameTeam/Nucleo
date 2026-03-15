@@ -1,60 +1,65 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { CalendarIcon, ClockIcon } from '@heroicons/vue/24/outline'
-import type { AvailabilityDisplay } from '../../types/availability'
-import { formatDateSlash, formatTime, formatDayName, parseItalianDateSlash } from '../../utils/dateUtils'
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { CalendarIcon, ClockIcon } from '@heroicons/vue/24/outline';
+import type { AvailabilityDisplay } from '../../types/availability';
+import {
+  formatDateSlash,
+  formatTime,
+  formatDayName,
+  parseItalianDateSlash,
+} from '../../utils/dateUtils';
 
 interface Props {
-  availabilities: AvailabilityDisplay[]
-  selectedAvailabilityId?: string | null
-  emptyMessage?: string
+  availabilities: AvailabilityDisplay[];
+  selectedAvailabilityId?: string | null;
+  emptyMessage?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   selectedAvailabilityId: null,
-  emptyMessage: undefined
-})
+  emptyMessage: undefined,
+});
 
 const emit = defineEmits<{
-  selectAvailability: [availabilityId: string]
-}>()
+  selectAvailability: [availabilityId: string];
+}>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 // Group availabilities by date
 const availableDates = computed(() => {
-  const now = new Date()
-  const dateMap = new Map<string, AvailabilityDisplay[]>()
-  
+  const now = new Date();
+  const dateMap = new Map<string, AvailabilityDisplay[]>();
+
   props.availabilities
-    .filter(a => {
+    .filter((a) => {
       // Filter only available, not booked, and future availabilities
-      return a.status === 'AVAILABLE' && !a.isBooked && a.startDateTime > now
+      return a.status === 'AVAILABLE' && !a.isBooked && a.startDateTime > now;
     })
-    .forEach(availability => {
-      const dateKey = formatDateSlash(availability.startDateTime)
+    .forEach((availability) => {
+      const dateKey = formatDateSlash(availability.startDateTime);
       if (!dateMap.has(dateKey)) {
-        dateMap.set(dateKey, [])
+        dateMap.set(dateKey, []);
       }
-      dateMap.get(dateKey)!.push(availability)
-    })
-  
+      dateMap.get(dateKey)!.push(availability);
+    });
+
   return Array.from(dateMap.entries())
     .map(([date, slots]) => ({
       date,
-      slots: slots.sort((a, b) => a.startDateTime.getTime() - b.startDateTime.getTime())
+      slots: slots.sort((a, b) => a.startDateTime.getTime() - b.startDateTime.getTime()),
     }))
     .sort((a, b) => {
-      const dateA = parseItalianDateSlash(a.date)
-      const dateB = parseItalianDateSlash(b.date)
-      if (!dateA || !dateB) return 0
-      return dateA.getTime() - dateB.getTime()
-    })
-})
+      const dateA = parseItalianDateSlash(a.date);
+      const dateB = parseItalianDateSlash(b.date);
+      if (!dateA || !dateB) return 0;
+      return dateA.getTime() - dateB.getTime();
+    });
+});
 
 function selectAvailability(availabilityId: string) {
-  emit('selectAvailability', availabilityId)
+  emit('selectAvailability', availabilityId);
 }
 </script>
 
@@ -65,11 +70,7 @@ function selectAvailability(availabilityId: string) {
     </div>
 
     <div v-else class="dates-list">
-      <div
-        v-for="dateGroup in availableDates"
-        :key="dateGroup.date"
-        class="date-group"
-      >
+      <div v-for="dateGroup in availableDates" :key="dateGroup.date" class="date-group">
         <div class="date-header">
           <CalendarIcon class="date-icon" />
           <div>

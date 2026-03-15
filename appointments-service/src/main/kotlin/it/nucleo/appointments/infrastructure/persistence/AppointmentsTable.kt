@@ -1,7 +1,7 @@
 package it.nucleo.appointments.infrastructure.persistence
 
-import it.nucleo.appointments.domain.Appointment
-import it.nucleo.appointments.domain.valueobjects.*
+import it.nucleo.appointments.domain.*
+import it.nucleo.commons.errors.getOrElse
 import kotlinx.datetime.toKotlinLocalDateTime
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.datetime
@@ -18,10 +18,23 @@ object AppointmentsTable : Table("appointments") {
 }
 
 fun ResultRow.toAppointment(): Appointment {
+    val id =
+        AppointmentId(this[AppointmentsTable.appointmentId]).getOrElse {
+            throw IllegalStateException("Invalid persisted appointmentId: ${it.message}")
+        }
+    val patientId =
+        PatientId(this[AppointmentsTable.patientId]).getOrElse {
+            throw IllegalStateException("Invalid persisted patientId: ${it.message}")
+        }
+    val availabilityId =
+        AvailabilityId(this[AppointmentsTable.availabilityId]).getOrElse {
+            throw IllegalStateException("Invalid persisted availabilityId: ${it.message}")
+        }
+
     return Appointment(
-        id = AppointmentId.fromString(this[AppointmentsTable.appointmentId]),
-        patientId = PatientId.fromString(this[AppointmentsTable.patientId]),
-        availabilityId = AvailabilityId.fromString(this[AppointmentsTable.availabilityId]),
+        id = id,
+        patientId = patientId,
+        availabilityId = availabilityId,
         status = AppointmentStatus.valueOf(this[AppointmentsTable.status]),
         createdAt = this[AppointmentsTable.createdAt].toKotlinLocalDateTime(),
         updatedAt = this[AppointmentsTable.updatedAt].toKotlinLocalDateTime()

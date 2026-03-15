@@ -3,11 +3,14 @@
  */
 
 // Base API URLs - configured via environment variables
-export const APPOINTMENTS_API_URL = import.meta.env.VITE_APPOINTMENTS_API_URL || 'http://localhost:8080'
-export const MASTER_DATA_API_URL = import.meta.env.VITE_MASTER_DATA_API_URL || 'http://localhost:3040'
-export const USERS_API_URL = import.meta.env.VITE_USERS_API_URL || 'http://localhost:3030'
-export const DELEGATIONS_API_URL = import.meta.env.VITE_DELEGATIONS_API_URL || 'http://localhost:3030'
-export const DOCUMENTS_API_URL = import.meta.env.VITE_DOCUMENTS_API_URL || 'http://localhost:8090'
+export const APPOINTMENTS_API_URL =
+  import.meta.env.VITE_APPOINTMENTS_API_URL || 'http://localhost:8080';
+export const MASTER_DATA_API_URL =
+  import.meta.env.VITE_MASTER_DATA_API_URL || 'http://localhost:3040';
+export const USERS_API_URL = import.meta.env.VITE_USERS_API_URL || 'http://localhost:3030';
+export const DELEGATIONS_API_URL =
+  import.meta.env.VITE_DELEGATIONS_API_URL || 'http://localhost:3030';
+export const DOCUMENTS_API_URL = import.meta.env.VITE_DOCUMENTS_API_URL || 'http://localhost:8090';
 
 /**
  * API Endpoints
@@ -16,47 +19,58 @@ export const API_ENDPOINTS = {
   // Appointments Service
   APPOINTMENTS: '/appointments',
   AVAILABILITIES: '/availabilities',
-  
+
   // Master Data Service
   SERVICE_CATALOG: '/api/service-catalog',
   FACILITIES: '/api/facilities',
-  
+
   // Users Service
   USERS: '/api/users',
   AUTH: '/api/auth',
-  
+
   // Delegations Service
   DELEGATIONS: '/api/delegations',
 
   // Documents Service
   DOCUMENTS: '/api/documents',
-} as const
+} as const;
 
 /**
  * Helper function to handle API responses
  */
+interface ApiErrorPayload {
+  message?: string;
+  code?: string;
+  [key: string]: unknown;
+}
+
 export async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
-    const error = new Error(errorData.message || 'Request failed') as Error & { code?: string; details?: any }
-    error.code = errorData.code
-    error.details = errorData
-    throw error
+    const errorData: ApiErrorPayload = await response
+      .json()
+      .catch(() => ({ message: 'Unknown error' }));
+    const error = new Error(errorData.message || 'Request failed') as Error & {
+      code?: string;
+      details?: ApiErrorPayload;
+    };
+    error.code = errorData.code;
+    error.details = errorData;
+    throw error;
   }
-  
-  const data = await response.json()
-  return data.data || data
+
+  const data = await response.json();
+  return data.data || data;
 }
 
 /**
  * API Error class for typed errors
  */
 export class ApiError extends Error {
-  statusCode: number
-  
+  statusCode: number;
+
   constructor(statusCode: number, message: string) {
-    super(message)
-    this.statusCode = statusCode
-    this.name = 'ApiError'
+    super(message);
+    this.statusCode = statusCode;
+    this.name = 'ApiError';
   }
 }

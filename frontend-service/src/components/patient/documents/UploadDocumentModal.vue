@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import BaseModal from '../../shared/BaseModal.vue'
-import { DocumentIcon } from '@heroicons/vue/24/outline'
+import { computed } from 'vue';
+import BaseModal from '../../shared/BaseModal.vue';
+import { DocumentIcon } from '@heroicons/vue/24/outline';
 
 interface Props {
-  isOpen: boolean
-  file: File | null
+  isOpen: boolean;
+  file: File | null;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  close: []
-  confirm: []
-}>()
+  close: [];
+  confirm: [];
+}>();
 
 const fileSize = computed(() => {
-  if (!props.file) return '0 KB'
+  if (!props.file) return '0 KB';
 
-  const bytes = props.file.size
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
-})
+  const bytes = props.file.size;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+});
 
-const fileName = computed(() => props.file?.name || '')
+const fileName = computed(() => props.file?.name || '');
 </script>
 
 <template>
@@ -55,16 +55,10 @@ const fileName = computed(() => props.file?.name || '')
 
     <!-- Footer Buttons -->
     <template #footer>
-      <button
-        class="modal-button cancel-button"
-        @click="emit('close')"
-      >
+      <button class="modal-button cancel-button" @click="emit('close')">
         {{ $t('upload.cancel') }}
       </button>
-      <button
-        class="modal-button confirm-button"
-        @click="emit('confirm')"
-      >
+      <button class="modal-button confirm-button" @click="emit('confirm')">
         {{ $t('upload.confirmUpload') }}
       </button>
     </template>
@@ -160,13 +154,17 @@ const fileName = computed(() => props.file?.name || '')
   -webkit-backdrop-filter: blur(8px);
   color: var(--gray-525252);
   border: 1px solid var(--white-50);
-  box-shadow: 0 2px 8px var(--black-6), inset 0 1px 0 var(--white-50);
+  box-shadow:
+    0 2px 8px var(--black-6),
+    inset 0 1px 0 var(--white-50);
 }
 
 .cancel-button:hover {
   background: var(--white-50);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--black-8), inset 0 1px 0 var(--white-60);
+  box-shadow:
+    0 4px 12px var(--black-8),
+    inset 0 1px 0 var(--white-60);
 }
 
 .confirm-button {

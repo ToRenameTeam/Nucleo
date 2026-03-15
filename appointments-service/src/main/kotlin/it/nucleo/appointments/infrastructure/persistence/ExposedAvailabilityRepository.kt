@@ -1,8 +1,6 @@
 package it.nucleo.appointments.infrastructure.persistence
 
-import it.nucleo.appointments.domain.Availability
-import it.nucleo.appointments.domain.AvailabilityRepository
-import it.nucleo.appointments.domain.valueobjects.*
+import it.nucleo.appointments.domain.*
 import kotlinx.datetime.toJavaLocalDateTime
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction

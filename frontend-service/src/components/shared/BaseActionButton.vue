@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { type Component } from 'vue'
+import { type Component } from 'vue';
 
 defineProps<{
-  label: string
-  icon: Component
-  position?: 'fixed' | 'inline'
-  variant?: 'primary' | 'secondary'
-}>()
+  label: string;
+  icon: Component;
+  position?: 'fixed' | 'inline';
+  variant?: 'primary' | 'secondary';
+}>();
 
 const emit = defineEmits<{
-  click: []
-}>()
+  click: [];
+}>();
 </script>
 
 <template>
@@ -18,7 +18,7 @@ const emit = defineEmits<{
     :class="[
       'action-button',
       position === 'fixed' ? 'action-button--fixed' : 'action-button--inline',
-      `action-button--${variant || 'primary'}`
+      `action-button--${variant || 'primary'}`,
     ]"
     @click="emit('click')"
   >
@@ -85,7 +85,10 @@ const emit = defineEmits<{
   bottom: 2rem;
   right: 2rem;
   border-radius: 9999px;
-  box-shadow: 0 4px 16px var(--accent-primary-30), 0 2px 8px var(--accent-primary-20), inset 0 1px 0 var(--white-20);
+  box-shadow:
+    0 4px 16px var(--accent-primary-30),
+    0 2px 8px var(--accent-primary-20),
+    inset 0 1px 0 var(--white-20);
   animation: fadeIn 0.6s cubic-bezier(0, 0, 0.2, 1);
   animation-delay: 0.6s;
   animation-fill-mode: both;
@@ -93,7 +96,10 @@ const emit = defineEmits<{
 
 .action-button--fixed:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px var(--accent-primary-40), 0 4px 12px var(--accent-primary-30), inset 0 1px 0 var(--white-30);
+  box-shadow:
+    0 8px 24px var(--accent-primary-40),
+    0 4px 12px var(--accent-primary-30),
+    inset 0 1px 0 var(--white-30);
 }
 
 .action-button--fixed:active {

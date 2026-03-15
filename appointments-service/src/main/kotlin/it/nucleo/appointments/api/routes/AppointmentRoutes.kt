@@ -5,278 +5,139 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import it.nucleo.appointments.api.dto.CreateAppointmentRequest
-import it.nucleo.appointments.api.dto.ErrorResponse
 import it.nucleo.appointments.api.dto.UpdateAppointmentRequest
-import it.nucleo.appointments.api.toDetailsResponse
-import it.nucleo.appointments.api.toResponse
+import it.nucleo.appointments.api.dto.toDetailsResponse
+import it.nucleo.appointments.api.dto.toResponse
+import it.nucleo.appointments.api.respondEither
+import it.nucleo.appointments.api.respondEitherNoContent
 import it.nucleo.appointments.application.AppointmentService
-import it.nucleo.appointments.application.AvailabilityNotAvailableException
-import it.nucleo.appointments.application.AvailabilityNotFoundException
-import org.slf4j.LoggerFactory
+import it.nucleo.commons.api.ErrorResponse
+import it.nucleo.commons.errors.map
 
-private val logger = LoggerFactory.getLogger("AppointmentRoutes")
-
+/**
+ * Registers all appointment-related routes under `/appointments`.
+ * - `POST /appointments` – book a new appointment
+ * - `GET /appointments` – list appointments (filterable by patientId, doctorId, status)
+ * - `GET /appointments/{id}` – retrieve an appointment by ID
+ * - `GET /appointments/{id}/details` – retrieve an appointment with full availability data
+ * - `PUT /appointments/{id}` – update an appointment's status or availability slot
+ * - `DELETE /appointments/{id}` – cancel an appointment
+ */
 fun Route.appointmentRoutes(service: AppointmentService) {
     route("/appointments") {
-        // Create appointment
+
+        // POST /appointments
+        // Books a new appointment by linking a patient to an available slot.
         post {
-            try {
-                val request = call.receive<CreateAppointmentRequest>()
-
-                val command =
-                    AppointmentService.CreateAppointmentCommand(
-                        patientId = request.patientId,
-                        availabilityId = request.availabilityId
+            val request =
+                try {
+                    call.receive<CreateAppointmentRequest>()
+                } catch (_: Exception) {
+                    return@post call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(error = "INVALID_BODY", message = "Invalid request body")
                     )
-
-                val appointment = service.createAppointment(command)
-                call.respond(HttpStatusCode.Created, appointment.toResponse())
-            } catch (e: AvailabilityNotFoundException) {
-                logger.warn("Availability not found: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.NotFound,
-                    ErrorResponse(
-                        message = e.message ?: "Availability not found",
-                        code = "AVAILABILITY_NOT_FOUND"
-                    )
-                )
-            } catch (e: AvailabilityNotAvailableException) {
-                logger.warn("Availability not available: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    ErrorResponse(
-                        message = e.message ?: "Availability is not available",
-                        code = "AVAILABILITY_NOT_AVAILABLE"
-                    )
-                )
-            } catch (e: IllegalArgumentException) {
-                logger.error("Invalid request for creating appointment: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    ErrorResponse(
-                        message = e.message ?: "Invalid request",
-                        code = "INVALID_REQUEST"
-                    )
-                )
-            } catch (e: Exception) {
-                logger.error("Error creating appointment: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
-                )
-            }
-        }
-
-        // Get appointment by ID
-        get("/{id}") {
-            try {
-                val id =
-                    call.parameters["id"]
-                        ?: return@get call.respond(
-                            HttpStatusCode.BadRequest,
-                            ErrorResponse(message = "Missing ID", code = "MISSING_ID")
-                        )
-
-                val appointment = service.getAppointmentById(id)
-
-                if (appointment == null) {
-                    call.respond(
-                        HttpStatusCode.NotFound,
-                        ErrorResponse(message = "Appointment not found", code = "NOT_FOUND")
-                    )
-                } else {
-                    call.respond(HttpStatusCode.OK, appointment.toResponse())
                 }
-            } catch (e: IllegalArgumentException) {
-                logger.error("Invalid appointment ID: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    ErrorResponse(message = e.message ?: "Invalid ID", code = "INVALID_ID")
+
+            val result =
+                service.createAppointment(
+                    patientId = request.patientId,
+                    availabilityId = request.availabilityId,
                 )
-            } catch (e: Exception) {
-                logger.error("Error fetching appointment by ID: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
-                )
-            }
+            call.respondEither(result, HttpStatusCode.Created) { it.toResponse() }
         }
 
-        // Get appointment details by ID (with joined availability data)
-        get("/{id}/details") {
-            try {
-                val id =
-                    call.parameters["id"]
-                        ?: return@get call.respond(
-                            HttpStatusCode.BadRequest,
-                            ErrorResponse(message = "Missing ID", code = "MISSING_ID")
-                        )
-
-                val appointmentDetails = service.getAppointmentDetails(id)
-
-                if (appointmentDetails == null) {
-                    call.respond(
-                        HttpStatusCode.NotFound,
-                        ErrorResponse(message = "Appointment not found", code = "NOT_FOUND")
-                    )
-                } else {
-                    call.respond(HttpStatusCode.OK, appointmentDetails.toDetailsResponse())
-                }
-            } catch (e: AvailabilityNotFoundException) {
-                logger.error("Availability not found for appointment: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.NotFound,
-                    ErrorResponse(
-                        message = e.message ?: "Availability not found",
-                        code = "AVAILABILITY_NOT_FOUND"
-                    )
-                )
-            } catch (e: IllegalArgumentException) {
-                logger.error("Invalid appointment ID: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    ErrorResponse(message = e.message ?: "Invalid ID", code = "INVALID_ID")
-                )
-            } catch (e: Exception) {
-                logger.error("Error fetching appointment details: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
-                )
-            }
-        }
-
-        // Get all appointments (with filters)
+        // GET /appointments?patientId=&doctorId=&status=
+        // Returns all appointments, optionally filtered by patient, doctor, and/or status.
         get {
-            try {
-                val patientId = call.request.queryParameters["patientId"]
-                val doctorId = call.request.queryParameters["doctorId"]
-                val status = call.request.queryParameters["status"]
+            val patientId = call.request.queryParameters["patientId"]
+            val doctorId = call.request.queryParameters["doctorId"]
+            val status = call.request.queryParameters["status"]
 
-                val appointments =
-                    service.getAppointmentsByFilters(
+            val result =
+                service
+                    .getAppointmentsByFilters(
                         patientId = patientId,
                         doctorId = doctorId,
                         status = status
                     )
+                    .map { appointments -> appointments.map { it.toResponse() } }
 
-                call.respond(HttpStatusCode.OK, appointments.map { it.toResponse() })
-            } catch (e: IllegalArgumentException) {
-                logger.error("Invalid query parameters: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    ErrorResponse(
-                        message = e.message ?: "Invalid query parameters",
-                        code = "INVALID_QUERY_PARAMETERS"
-                    )
-                )
-            } catch (e: Exception) {
-                logger.error("Error fetching appointments: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
-                )
-            }
+            call.respondEither(result)
         }
 
-        // Update appointment
+        // GET /appointments/{id}
+        // Retrieves an appointment by its ID.
+        get("/{id}") {
+            val id =
+                call.parameters["id"]
+                    ?: return@get call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(error = "MISSING_ID", message = "Appointment ID is required")
+                    )
+
+            val result = service.getAppointmentById(id).map { it.toResponse() }
+            call.respondEither(result)
+        }
+
+        // GET /appointments/{id}/details
+        // Retrieves an appointment enriched with the joined availability data (doctor, facility,
+        // slot).
+        get("/{id}/details") {
+            val id =
+                call.parameters["id"]
+                    ?: return@get call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(error = "MISSING_ID", message = "Appointment ID is required")
+                    )
+
+            val result = service.getAppointmentDetails(id).map { it.toDetailsResponse() }
+            call.respondEither(result)
+        }
+
+        // PUT /appointments/{id}
+        // Updates an appointment's status and/or reassigns it to a different availability slot.
         put("/{id}") {
-            try {
-                val id =
-                    call.parameters["id"]
-                        ?: return@put call.respond(
-                            HttpStatusCode.BadRequest,
-                            ErrorResponse(message = "Missing ID", code = "MISSING_ID")
-                        )
+            val id =
+                call.parameters["id"]
+                    ?: return@put call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(error = "MISSING_ID", message = "Appointment ID is required")
+                    )
 
-                val request = call.receive<UpdateAppointmentRequest>()
+            val request =
+                try {
+                    call.receive<UpdateAppointmentRequest>()
+                } catch (_: Exception) {
+                    return@put call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(error = "INVALID_BODY", message = "Invalid request body")
+                    )
+                }
 
-                val command =
-                    AppointmentService.UpdateAppointmentCommand(
+            val result =
+                service
+                    .updateAppointment(
                         id = id,
                         status = request.status,
-                        availabilityId = request.availabilityId
+                        availabilityId = request.availabilityId,
                     )
-
-                val updated = service.updateAppointment(command)
-
-                if (updated == null) {
-                    call.respond(
-                        HttpStatusCode.NotFound,
-                        ErrorResponse(message = "Appointment not found", code = "NOT_FOUND")
-                    )
-                } else {
-                    call.respond(HttpStatusCode.OK, updated.toResponse())
-                }
-            } catch (e: AvailabilityNotFoundException) {
-                logger.warn("Availability not found: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.NotFound,
-                    ErrorResponse(
-                        message = e.message ?: "New availability not found",
-                        code = "AVAILABILITY_NOT_FOUND"
-                    )
-                )
-            } catch (e: AvailabilityNotAvailableException) {
-                logger.warn("Availability not available: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    ErrorResponse(
-                        message = e.message ?: "New availability is not available",
-                        code = "AVAILABILITY_NOT_AVAILABLE"
-                    )
-                )
-            } catch (e: IllegalArgumentException) {
-                logger.error("Invalid request for updating appointment: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    ErrorResponse(
-                        message = e.message ?: "Invalid request",
-                        code = "INVALID_REQUEST"
-                    )
-                )
-            } catch (e: Exception) {
-                logger.error("Error updating appointment: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
-                )
-            }
+                    .map { it.toResponse() }
+            call.respondEither(result)
         }
 
-        // Delete appointment
+        // DELETE /appointments/{id}
+        // Cancels an appointment. Responds with 204 No Content on success.
         delete("/{id}") {
-            try {
-                val id =
-                    call.parameters["id"]
-                        ?: return@delete call.respond(
-                            HttpStatusCode.BadRequest,
-                            ErrorResponse(message = "Missing ID", code = "MISSING_ID")
-                        )
-
-                val deleted = service.deleteAppointment(id)
-
-                if (deleted) {
-                    call.respond(HttpStatusCode.NoContent)
-                } else {
-                    call.respond(
-                        HttpStatusCode.NotFound,
-                        ErrorResponse(message = "Appointment not found", code = "NOT_FOUND")
+            val id =
+                call.parameters["id"]
+                    ?: return@delete call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(error = "MISSING_ID", message = "Appointment ID is required")
                     )
-                }
-            } catch (e: IllegalArgumentException) {
-                logger.error("Invalid appointment ID: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    ErrorResponse(message = e.message ?: "Invalid ID", code = "INVALID_ID")
-                )
-            } catch (e: Exception) {
-                logger.error("Error deleting appointment: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    ErrorResponse(message = "Internal server error", code = "INTERNAL_ERROR")
-                )
-            }
+
+            val result = service.deleteAppointment(id)
+            call.respondEitherNoContent(result)
         }
     }
 }

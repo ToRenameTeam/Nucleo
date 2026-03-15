@@ -1,73 +1,69 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import type { BreadcrumbItem } from '../../types/shared'
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import type { BreadcrumbItem } from '../../types/shared';
 
-const route = useRoute()
-const router = useRouter()
-const { t } = useI18n()
+const route = useRoute();
+const router = useRouter();
+const { t } = useI18n();
 
 const breadcrumbs = computed<BreadcrumbItem[]>(() => {
-  const items: BreadcrumbItem[] = []
-  
+  const items: BreadcrumbItem[] = [];
+
   // Determine home path based on current route
-  const isInDoctorArea = route.path.startsWith('/doctor')
-  const homePath = isInDoctorArea ? '/doctor/appointments' : '/patient/home'
-  const homeName = isInDoctorArea ? 'doctor-appointments' : 'patient-home'
-  
+  const isInDoctorArea = route.path.startsWith('/doctor');
+  const homePath = isInDoctorArea ? '/doctor/appointments' : '/patient/home';
+  const homeName = isInDoctorArea ? 'doctor-appointments' : 'patient-home';
+
   // Always add 'home' as the first item if not on home page
   if (route.name !== homeName) {
     items.push({
       name: t('breadcrumbs.home'),
-      path: homePath
-    })
+      path: homePath,
+    });
   }
 
   // Add current page
   if (route.name && route.name !== 'login') {
-    const currentPageKey = `breadcrumbs.${String(route.name)}`
-    
+    const currentPageKey = `breadcrumbs.${String(route.name)}`;
+
     // Check if there's a patient query param (for doctor-patients page)
-    const patientFiscalCode = route.query.patient as string | undefined
-    
+    const patientFiscalCode = route.query.patient as string | undefined;
+
     if (patientFiscalCode) {
       // Add the current page as a link
       items.push({
         name: t(currentPageKey),
-        path: route.path
-      })
+        path: route.path,
+      });
       // Add the patient fiscal code as the current item
       items.push({
-        name: patientFiscalCode
-      })
+        name: patientFiscalCode,
+      });
     } else {
       items.push({
-        name: t(currentPageKey)
-      })
+        name: t(currentPageKey),
+      });
     }
   }
 
-  return items
-  })
+  return items;
+});
 
 const navigateTo = (path: string) => {
-  router.push(path)
-}
+  router.push(path);
+};
 </script>
 
 <template>
-  <nav 
+  <nav
     v-if="breadcrumbs.length > 0"
     class="breadcrumbs-container"
     aria-label="Navigazione breadcrumb"
   >
     <ol class="breadcrumbs-list">
-      <li 
-        v-for="(item, index) in breadcrumbs"
-        :key="index"
-        class="breadcrumb-item"
-      >
+      <li v-for="(item, index) in breadcrumbs" :key="index" class="breadcrumb-item">
         <!-- Link for non-final items -->
         <button
           v-if="item.path"
@@ -77,18 +73,14 @@ const navigateTo = (path: string) => {
         >
           {{ item.name }}
         </button>
-        
+
         <!-- Text for final item -->
-        <span 
-          v-else
-          class="breadcrumb-current"
-          aria-current="page"
-        >
+        <span v-else class="breadcrumb-current" aria-current="page">
           {{ item.name }}
         </span>
-        
+
         <!-- Separator (not after last item) -->
-        <svg 
+        <svg
           v-if="index < breadcrumbs.length - 1"
           class="breadcrumb-separator"
           viewBox="0 0 24 24"
@@ -97,7 +89,7 @@ const navigateTo = (path: string) => {
           stroke-width="2"
           aria-hidden="true"
         >
-          <polyline points="9 18 15 12 9 6"/>
+          <polyline points="9 18 15 12 9 6" />
         </svg>
       </li>
     </ol>

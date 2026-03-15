@@ -1,289 +1,289 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuth } from '../../composables/useAuth'
-import { CheckCircleIcon, CalendarIcon } from '@heroicons/vue/24/outline'
-import SearchBar from '../../components/shared/SearchBar.vue'
-import TagBar from '../../components/shared/TagBar.vue'
-import DocumentCard from '../../components/shared/DocumentCard.vue'
-import CardList from '../../components/shared/CardList.vue'
-import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
-import DateRangeFilter from '../../components/patient/documents/DateRangeFilter.vue'
-import type { DateRange } from '../../types/date-range'
-import BatchActionsBar from '../../components/patient/documents/BatchActionsBar.vue'
-import type { Tag } from '../../types/tag'
-import type { Document, ServicePrescription, AnyDocument } from '../../types/document'
-import { parseItalianDate, parseAnyDate, isDateInRange } from '../../utils/dateUtils'
-import { documentsApiService } from '../../api/documents'
-import { masterDataApi, type ServiceType } from '../../api/masterData'
-import { normalizeToSpecialization } from '../../utils/specialization'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuth } from '../../composables/useAuth';
+import { CheckCircleIcon, CalendarIcon } from '@heroicons/vue/24/outline';
+import SearchBar from '../../components/shared/SearchBar.vue';
+import TagBar from '../../components/shared/TagBar.vue';
+import DocumentCard from '../../components/shared/DocumentCard.vue';
+import CardList from '../../components/shared/CardList.vue';
+import DocumentModal from '../../components/patient/documents/DocumentModal.vue';
+import DateRangeFilter from '../../components/patient/documents/DateRangeFilter.vue';
+import type { DateRange } from '../../types/date-range';
+import BatchActionsBar from '../../components/patient/documents/BatchActionsBar.vue';
+import type { Tag } from '../../types/tag';
+import type { Document, ServicePrescription, AnyDocument } from '../../types/document';
+import { parseItalianDate, parseAnyDate, isDateInRange } from '../../utils/dateUtils';
+import { documentsApiService } from '../../api/documents';
+import { masterDataApi, type ServiceType } from '../../api/masterData';
+import { normalizeToSpecialization } from '../../utils/specialization';
 
-const { currentUser, currentPatientProfile } = useAuth()
-const router = useRouter()
+const { currentUser, currentPatientProfile } = useAuth();
+const router = useRouter();
 
-const searchQuery = ref('')
-const selectedTags = ref<string[]>([])
-const selectedDocument = ref<Document | null>(null)
-const isModalOpen = ref(false)
-const isLoading = ref(false)
+const searchQuery = ref('');
+const selectedTags = ref<string[]>([]);
+const selectedDocument = ref<Document | null>(null);
+const isModalOpen = ref(false);
+const isLoading = ref(false);
 
 // Selection mode
-const selectionMode = ref(false)
-const selectedDocumentIds = ref<Set<string>>(new Set())
+const selectionMode = ref(false);
+const selectedDocumentIds = ref<Set<string>>(new Set());
 
 // Date range filter
 const dateRange = ref<DateRange>({
   from: null,
-  to: null
-})
+  to: null,
+});
 
-const documents = ref<AnyDocument[]>([])
-const serviceTypes = ref<ServiceType[]>([])
+const documents = ref<AnyDocument[]>([]);
+const serviceTypes = ref<ServiceType[]>([]);
 
 const tags = computed<Tag[]>(() => {
   // Estrai tutti i tag unici dai documenti
-  const tagCounts = new Map<string, number>()
-  
-  documents.value.forEach(doc => {
-    doc.tags.forEach(tag => {
-      const normalizedTag = tag.toLowerCase().trim()
+  const tagCounts = new Map<string, number>();
+
+  documents.value.forEach((doc) => {
+    doc.tags.forEach((tag) => {
+      const normalizedTag = tag.toLowerCase().trim();
       if (normalizedTag) {
-        tagCounts.set(normalizedTag, (tagCounts.get(normalizedTag) || 0) + 1)
+        tagCounts.set(normalizedTag, (tagCounts.get(normalizedTag) || 0) + 1);
       }
-    })
-  })
-  
+    });
+  });
+
   // Converti in array e ordina per conteggio (decrescente)
   const sortedTags = Array.from(tagCounts.entries())
     .map(([tag, count]) => ({
       id: tag,
       label: normalizeToSpecialization(tag), // Usa la funzione utility
-      count
+      count,
     }))
     .sort((a, b) => b.count - a.count)
-    .slice(0, 5) // Limita a 5 tag
-  
+    .slice(0, 5); // Limita a 5 tag
+
   // Aggiungi "Tutti" all'inizio
-  return [
-    { id: 'tutti', label: 'Tutti', count: documents.value.length },
-    ...sortedTags
-  ]
-})
+  return [{ id: 'tutti', label: 'Tutti', count: documents.value.length }, ...sortedTags];
+});
 
 // Type guard for ServicePrescription
 function isServicePrescription(doc: AnyDocument): doc is ServicePrescription {
-  return 'type' in doc && doc.type === 'service_prescription'
+  return 'type' in doc && doc.type === 'service_prescription';
 }
 
 async function loadDocuments() {
-  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId
+  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId;
 
   if (!patientId) {
-    console.log('[PatientDocumentsPage] No patient ID available')
-    return
+    console.log('[PatientDocumentsPage] No patient ID available');
+    return;
   }
 
-  isLoading.value = true
-  
+  isLoading.value = true;
+
   try {
     const [fetchedDocuments, fetchedServiceTypes] = await Promise.all([
       documentsApiService.getDocumentsByPatient(patientId),
-      masterDataApi.getServiceTypes()
-    ])
-    documents.value = fetchedDocuments
-    serviceTypes.value = fetchedServiceTypes
-    
+      masterDataApi.getServiceTypes(),
+    ]);
+    documents.value = fetchedDocuments;
+    serviceTypes.value = fetchedServiceTypes;
+
     // Debug: log documents to check structure
-    console.log('[PatientDocumentsPage] Total documents:', fetchedDocuments.length)
+    console.log('[PatientDocumentsPage] Total documents:', fetchedDocuments.length);
     fetchedDocuments.forEach((doc, idx) => {
       console.log(`[PatientDocumentsPage] Document ${idx}:`, {
         id: doc.id,
         title: doc.title,
         type: 'type' in doc ? doc.type : 'NO TYPE FIELD',
         hasType: 'type' in doc,
-        isServicePrescription: isServicePrescription(doc)
-      })
-    })
+        isServicePrescription: isServicePrescription(doc),
+      });
+    });
   } catch (err) {
-    console.error('[PatientDocumentsPage] Error loading documents:', err)
+    console.error('[PatientDocumentsPage] Error loading documents:', err);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 // Get service type name from serviceId
 function getServiceTypeName(serviceId: string): string | null {
-  const service = serviceTypes.value.find(st => st._id === serviceId)
-  return service?.name || null
+  const service = serviceTypes.value.find((st) => st.id === serviceId);
+  return service?.name || null;
 }
 
 // Handle booking button click for service prescription
 function handleBookVisit(doc: ServicePrescription) {
-  const serviceName = getServiceTypeName(doc.serviceId)
+  const serviceName = getServiceTypeName(doc.serviceId);
   if (serviceName) {
     // Navigate to home with booking modal state
     router.push({
       name: 'patient-home',
       query: {
-        bookVisit: serviceName
-      }
-    })
+        bookVisit: serviceName,
+      },
+    });
   }
 }
 
 onMounted(() => {
-  loadDocuments()
-})
+  loadDocuments();
+});
 
 // Watch for changes in patient profile
-watch(() => currentPatientProfile.value?.userId, () => {
-  loadDocuments()
-  // Reset selection when changing profile
-  selectionMode.value = false
-  selectedDocumentIds.value.clear()
-})
+watch(
+  () => currentPatientProfile.value?.userId,
+  () => {
+    loadDocuments();
+    // Reset selection when changing profile
+    selectionMode.value = false;
+    selectedDocumentIds.value.clear();
+  }
+);
 
 const filteredDocuments = computed(() => {
-  let filtered = documents.value
+  let filtered = documents.value;
 
   // Filter by search query
   if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(doc =>
-      doc.title.toLowerCase().includes(query) ||
-      doc.description.toLowerCase().includes(query) ||
-      doc.tags.some(tag => tag.toLowerCase().includes(query))
-    )
+    const query = searchQuery.value.toLowerCase();
+    filtered = filtered.filter(
+      (doc) =>
+        doc.title.toLowerCase().includes(query) ||
+        doc.description.toLowerCase().includes(query) ||
+        doc.tags.some((tag) => tag.toLowerCase().includes(query))
+    );
   }
 
   // Filter by multiple tags
   if (selectedTags.value.length > 0 && !selectedTags.value.includes('tutti')) {
-    filtered = filtered.filter(doc => 
-      selectedTags.value.some(selectedTag =>
-        doc.tags.some(tag => tag.toLowerCase() === selectedTag.toLowerCase())
+    filtered = filtered.filter((doc) =>
+      selectedTags.value.some((selectedTag) =>
+        doc.tags.some((tag) => tag.toLowerCase() === selectedTag.toLowerCase())
       )
-    )
+    );
   }
 
   // Filter by date range
   if (dateRange.value.from || dateRange.value.to) {
-    filtered = filtered.filter(doc => {
-      const docDate = parseAnyDate(doc.date)
-      if (!docDate) return false
-      return isDateInRange(docDate, dateRange.value.from, dateRange.value.to)
-    })
+    filtered = filtered.filter((doc) => {
+      const docDate = parseAnyDate(doc.date);
+      if (!docDate) return false;
+      return isDateInRange(docDate, dateRange.value.from, dateRange.value.to);
+    });
   }
 
   // Always sort by newest first
   filtered.sort((a, b) => {
-    const dateA = parseItalianDate(a.date)
-    const dateB = parseItalianDate(b.date)
-    
-    if (!dateA || !dateB) return 0
-    
-    return dateB.getTime() - dateA.getTime()
-  })
+    const dateA = parseItalianDate(a.date);
+    const dateB = parseItalianDate(b.date);
 
-  return filtered
-})
+    if (!dateA || !dateB) return 0;
+
+    return dateB.getTime() - dateA.getTime();
+  });
+
+  return filtered;
+});
 
 const selectedDocuments = computed(() => {
-  return filteredDocuments.value.filter(doc => selectedDocumentIds.value.has(doc.id))
-})
+  return filteredDocuments.value.filter((doc) => selectedDocumentIds.value.has(doc.id));
+});
 
 // Active tags for TagBar - include 'tutti' when no tags are selected
 const activeTags = computed(() => {
   if (selectedTags.value.length === 0) {
-    return ['tutti']
+    return ['tutti'];
   }
-  return selectedTags.value
-})
+  return selectedTags.value;
+});
 
 const handleSearch = (query: string) => {
-  searchQuery.value = query
-}
+  searchQuery.value = query;
+};
 
 const handleTagSelected = (tagId: string) => {
   if (tagId === 'tutti') {
-    selectedTags.value = []
+    selectedTags.value = [];
   } else {
-    const index = selectedTags.value.indexOf(tagId)
+    const index = selectedTags.value.indexOf(tagId);
     if (index > -1) {
-      selectedTags.value.splice(index, 1)
+      selectedTags.value.splice(index, 1);
     } else {
-      selectedTags.value.push(tagId)
+      selectedTags.value.push(tagId);
     }
   }
-}
+};
 
 const toggleSelectionMode = () => {
-  selectionMode.value = !selectionMode.value
+  selectionMode.value = !selectionMode.value;
   if (!selectionMode.value) {
-    selectedDocumentIds.value.clear()
+    selectedDocumentIds.value.clear();
   }
-}
+};
 
 const toggleDocumentSelection = (docId: string) => {
   if (selectedDocumentIds.value.has(docId)) {
-    selectedDocumentIds.value.delete(docId)
+    selectedDocumentIds.value.delete(docId);
   } else {
-    selectedDocumentIds.value.add(docId)
+    selectedDocumentIds.value.add(docId);
   }
-}
+};
 
 const selectAll = () => {
-  filteredDocuments.value.forEach(doc => {
-    selectedDocumentIds.value.add(doc.id)
-  })
-}
+  filteredDocuments.value.forEach((doc) => {
+    selectedDocumentIds.value.add(doc.id);
+  });
+};
 
 const deselectAll = () => {
-  selectedDocumentIds.value.clear()
-}
+  selectedDocumentIds.value.clear();
+};
 
 const handleDownloadAll = async () => {
-  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId
+  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId;
 
   if (selectedDocuments.value.length === 0 || !patientId) {
-    return
+    return;
   }
 
   try {
-    console.log('[PatientDocumentsPage] Downloading', selectedDocuments.value.length, 'documents')
+    console.log('[PatientDocumentsPage] Downloading', selectedDocuments.value.length, 'documents');
 
-    const documentsToDownload = selectedDocuments.value.map(doc => ({
+    const documentsToDownload = selectedDocuments.value.map((doc) => ({
       patientId: patientId,
       documentId: doc.id,
-      title: doc.title
-    }))
+      title: doc.title,
+    }));
 
-    await documentsApiService.downloadMultipleDocuments(documentsToDownload)
-    console.log('[PatientDocumentsPage] Download batch completed')
+    await documentsApiService.downloadMultipleDocuments(documentsToDownload);
+    console.log('[PatientDocumentsPage] Download batch completed');
   } catch (error) {
-    console.error('[PatientDocumentsPage] Error downloading documents:', error)
+    console.error('[PatientDocumentsPage] Error downloading documents:', error);
     // TODO: Mostrare un messaggio di errore all'utente
   }
-}
+};
 
 const handleCancelSelection = () => {
-  selectionMode.value = false
-  selectedDocumentIds.value.clear()
-}
+  selectionMode.value = false;
+  selectedDocumentIds.value.clear();
+};
 
 const handleDocumentClick = (document: Document) => {
   if (!selectionMode.value) {
-    selectedDocument.value = document
-    isModalOpen.value = true
+    selectedDocument.value = document;
+    isModalOpen.value = true;
   }
-}
+};
 
 const handleCloseModal = () => {
-  isModalOpen.value = false
+  isModalOpen.value = false;
   setTimeout(() => {
-    selectedDocument.value = null
-  }, 300)
-}
-
+    selectedDocument.value = null;
+  }, 300);
+};
 </script>
 
 <template>
@@ -293,17 +293,22 @@ const handleCloseModal = () => {
         <div>
           <h1 class="page-title">{{ $t('documents.title') }}</h1>
           <p class="page-subtitle">
-            {{ filteredDocuments.length }} {{ filteredDocuments.length === 1 ? 'documento' : 'documenti' }}
+            {{ filteredDocuments.length }}
+            {{ filteredDocuments.length === 1 ? 'documento' : 'documenti' }}
           </p>
         </div>
         <div class="header-actions">
-          <button 
+          <button
             class="action-btn selection-btn"
-            :class="{ 'active': selectionMode }"
+            :class="{ active: selectionMode }"
             @click="toggleSelectionMode"
           >
             <CheckCircleIcon class="action-icon" />
-            {{ selectionMode ? $t('documents.selection.cancel') : $t('documents.selection.selectMode') }}
+            {{
+              selectionMode
+                ? $t('documents.selection.cancel')
+                : $t('documents.selection.selectMode')
+            }}
           </button>
         </div>
       </div>
@@ -312,7 +317,7 @@ const handleCloseModal = () => {
     <!-- Search Bar & Date Range Filter -->
     <div class="section-spacing">
       <div class="filters-row">
-        <SearchBar @search="handleSearch" :placeholder="$t('documents.searchPlaceholder')"/>
+        <SearchBar @search="handleSearch" :placeholder="$t('documents.searchPlaceholder')" />
         <DateRangeFilter v-model="dateRange" />
       </div>
     </div>
@@ -327,8 +332,8 @@ const handleCloseModal = () => {
           :active-tags="activeTags"
           @tag-selected="handleTagSelected"
         />
-        <button 
-          v-if="selectionMode && filteredDocuments.length > 0" 
+        <button
+          v-if="selectionMode && filteredDocuments.length > 0"
           class="select-all-btn"
           @click="selectAll"
         >
@@ -374,11 +379,7 @@ const handleCloseModal = () => {
 
   <!-- Document Modal (Teleported to body) -->
   <Teleport to="body">
-    <DocumentModal
-      :document="selectedDocument"
-      :is-open="isModalOpen"
-      @close="handleCloseModal"
-    />
+    <DocumentModal :document="selectedDocument" :is-open="isModalOpen" @close="handleCloseModal" />
   </Teleport>
 </template>
 
@@ -419,7 +420,9 @@ const handleCloseModal = () => {
   backdrop-filter: blur(20px);
   border: 1px solid var(--white-60);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   animation: slideInDown 0.5s cubic-bezier(0, 0, 0.2, 1);
 }
 
@@ -565,7 +568,12 @@ const handleCloseModal = () => {
   min-height: 100vh;
   overflow-x: hidden;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
   position: relative;
 }
 
@@ -592,7 +600,9 @@ const handleCloseModal = () => {
   backdrop-filter: blur(20px);
   border: 1px solid var(--white-60);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   animation: slideInDown 0.5s cubic-bezier(0, 0, 0.2, 1);
 }
 
@@ -666,11 +676,11 @@ const handleCloseModal = () => {
   .documents-page {
     padding: 1rem;
   }
-  
+
   .page-title {
     font-size: 1.5rem;
   }
-  
+
   .page-subtitle {
     font-size: 0.875rem;
   }
@@ -680,7 +690,7 @@ const handleCloseModal = () => {
   .documents-page {
     padding: 0.75rem;
   }
-  
+
   .page-title {
     font-size: 1.375rem;
   }
@@ -731,4 +741,5 @@ const handleCloseModal = () => {
     width: 1rem;
     height: 1rem;
   }
-}</style>
+}
+</style>

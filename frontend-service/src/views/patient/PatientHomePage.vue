@@ -1,290 +1,297 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuth } from '../../composables/useAuth'
-import { DocumentPlusIcon, PlusIcon, CalendarIcon, ClockIcon, UserIcon, MapPinIcon } from '@heroicons/vue/24/outline'
-import Toast from '../../components/shared/Toast.vue'
-import BaseCard from '../../components/shared/BaseCard.vue'
-import DocumentCard from '../../components/shared/DocumentCard.vue'
-import LoadingSpinner from '../../components/shared/LoadingSpinner.vue'
-import DocumentModal from '../../components/patient/documents/DocumentModal.vue'
-import UploadDocumentModal from '../../components/patient/documents/UploadDocumentModal.vue'
-import UploadProgressModal from '../../components/patient/documents/UploadProgressModal.vue'
-import BookingModal from '../../components/patient/BookingModal.vue'
-import CardList from '../../components/shared/CardList.vue'
-import type { Document } from '../../types/document'
-import type { Appointment } from '../../types/appointment'
-import type { CardMetadata } from '../../types/shared'
-import { appointmentsApi } from '../../api/appointments'
-import { documentsApiService } from '../../api/documents'
-import { parseItalianDateSlash, setTimeOnDate } from '../../utils/dateUtils'
-import { formatCategory } from '../../utils/formatters'
-import { getBadgeColors, getBadgeIcon } from '../../utils/badgeHelpers'
-import { useI18n } from 'vue-i18n'
-import type { UploadProgressEvent, UploadProgressEventType } from '../../api/documents'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useAuth } from '../../composables/useAuth';
+import {
+  DocumentPlusIcon,
+  PlusIcon,
+  CalendarIcon,
+  ClockIcon,
+  UserIcon,
+  MapPinIcon,
+} from '@heroicons/vue/24/outline';
+import Toast from '../../components/shared/Toast.vue';
+import BaseCard from '../../components/shared/BaseCard.vue';
+import DocumentCard from '../../components/shared/DocumentCard.vue';
+import LoadingSpinner from '../../components/shared/LoadingSpinner.vue';
+import DocumentModal from '../../components/patient/documents/DocumentModal.vue';
+import UploadDocumentModal from '../../components/patient/documents/UploadDocumentModal.vue';
+import UploadProgressModal from '../../components/patient/documents/UploadProgressModal.vue';
+import BookingModal from '../../components/patient/BookingModal.vue';
+import CardList from '../../components/shared/CardList.vue';
+import type { Document } from '../../types/document';
+import type { Appointment } from '../../types/appointment';
+import type { CardMetadata } from '../../types/shared';
+import { appointmentsApi } from '../../api/appointments';
+import { documentsApiService } from '../../api/documents';
+import { parseItalianDateSlash, setTimeOnDate } from '../../utils/dateUtils';
+import { formatCategory } from '../../utils/formatters';
+import { getBadgeColors, getBadgeIcon } from '../../utils/badgeHelpers';
+import { useI18n } from 'vue-i18n';
 
-useI18n()
-const { currentUser, currentPatientProfile } = useAuth()
-const router = useRouter()
-const route = useRoute()
+useI18n();
+const { currentUser, currentPatientProfile } = useAuth();
+const router = useRouter();
+const route = useRoute();
 
-const appointmentsData = ref<Appointment[]>([])
-const documentsData = ref<Document[]>([])
-const isLoading = ref(false)
+const appointmentsData = ref<Appointment[]>([]);
+const documentsData = ref<Document[]>([]);
+const isLoading = ref(false);
 
 function parseAppointmentDateTime(appointment: Appointment): Date | null {
-  const date = parseItalianDateSlash(appointment.date)
-  if (!date) return null
-  return setTimeOnDate(new Date(date), appointment.time)
+  const date = parseItalianDateSlash(appointment.date);
+  if (!date) return null;
+  return setTimeOnDate(new Date(date), appointment.time);
 }
 
 const upcomingAppointments = computed(() => {
-  const now = new Date()
-  
+  const now = new Date();
+
   return appointmentsData.value
-    .filter(appointment => {
-      const appointmentDate = parseAppointmentDateTime(appointment)
-      return appointmentDate && appointmentDate > now
+    .filter((appointment) => {
+      const appointmentDate = parseAppointmentDateTime(appointment);
+      return appointmentDate && appointmentDate > now;
     })
     .sort((a, b) => {
-      const dateA = parseAppointmentDateTime(a)
-      const dateB = parseAppointmentDateTime(b)
-      
-      if (!dateA || !dateB) return 0
-      
-      return dateA.getTime() - dateB.getTime()
+      const dateA = parseAppointmentDateTime(a);
+      const dateB = parseAppointmentDateTime(b);
+
+      if (!dateA || !dateB) return 0;
+
+      return dateA.getTime() - dateB.getTime();
     })
-    .slice(0, 3)
-})
+    .slice(0, 3);
+});
 
 const recentDocuments = computed(() => {
   return documentsData.value
     .sort((a, b) => {
-      const dateA = parseItalianDateSlash(a.date)
-      const dateB = parseItalianDateSlash(b.date)
-      
-      if (!dateA || !dateB) return 0
-      
-      // Sort by most recent first (descending order)
-      return dateB.getTime() - dateA.getTime()
-    })
-    .slice(0, 2)
-})
+      const dateA = parseItalianDateSlash(a.date);
+      const dateB = parseItalianDateSlash(b.date);
 
-const selectedDocument = ref<Document | null>(null)
-const isDocumentModalOpen = ref(false)
-const preselectedVisitType = ref<string | null>(null)
-const showSuccessToast = ref(false)
-const toastMessage = ref('')
-const toastType = ref<'success' | 'error'>('success')
+      if (!dateA || !dateB) return 0;
+
+      // Sort by most recent first (descending order)
+      return dateB.getTime() - dateA.getTime();
+    })
+    .slice(0, 2);
+});
+
+const selectedDocument = ref<Document | null>(null);
+const isDocumentModalOpen = ref(false);
+const preselectedVisitType = ref<string | null>(null);
+const showSuccessToast = ref(false);
+const toastMessage = ref('');
+const toastType = ref<'success' | 'error'>('success');
 
 // Booking modal states
-const isBookingModalOpen = ref(false)
+const isBookingModalOpen = ref(false);
 
 // Upload refs
-const isUploadModalOpen = ref(false)
-const isUploadProgressModalOpen = ref(false)
-const selectedFile = ref<File | null>(null)
-const fileInputRef = ref<HTMLInputElement | null>(null)
-const uploadProgress = ref<UploadProgressEventType | null>(null)
-const uploadError = ref<string | null>(null)
-const uploadingFilename = ref<string>('')
+const isUploadModalOpen = ref(false);
+const isUploadProgressModalOpen = ref(false);
+const selectedFile = ref<File | null>(null);
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const isUploading = ref(false);
+const uploadError = ref<string | null>(null);
+const uploadingFilename = ref<string>('');
 
 async function loadData() {
-  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId
+  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId;
 
   if (!patientId) {
-    console.log('[PatientHomePage] No patient ID available')
-    return
+    console.log('[PatientHomePage] No patient ID available');
+    return;
   }
 
-  isLoading.value = true
-  
+  isLoading.value = true;
+
   try {
     const [fetchedAppointments, fetchedDocuments] = await Promise.all([
-      appointmentsApi.getAppointmentsByPatient(patientId ),
-      documentsApiService.getDocumentsByPatient(patientId)
-    ])
-    
-    appointmentsData.value = fetchedAppointments
-    documentsData.value = fetchedDocuments
+      appointmentsApi.getAppointmentsByPatient(patientId),
+      documentsApiService.getDocumentsByPatient(patientId),
+    ]);
+
+    appointmentsData.value = fetchedAppointments;
+    documentsData.value = fetchedDocuments;
   } catch (err) {
-    console.error('[PatientHomePage] Error loading data:', err)
+    console.error('[PatientHomePage] Error loading data:', err);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 onMounted(() => {
-  loadData()
-  
+  loadData();
+
   // Check if we should open booking modal with preselected visit
   if (route.query.bookVisit) {
-    const visitName = route.query.bookVisit as string
-    preselectedVisitType.value = visitName
-    isBookingModalOpen.value = true
-    
+    const visitName = route.query.bookVisit as string;
+    preselectedVisitType.value = visitName;
+    isBookingModalOpen.value = true;
+
     // Clear query param from URL
-    router.replace({ query: {} })
+    router.replace({ query: {} });
   }
-})
+});
 
 // Watch for changes in patient profile
-watch(() => currentPatientProfile.value?.userId, () => {
-  loadData()
-})
+watch(
+  () => currentPatientProfile.value?.userId,
+  () => {
+    loadData();
+  }
+);
 
 // Watch for route changes (when navigating to home from other pages)
-watch(() => route.query.bookVisit, (visitName) => {
-  if (visitName && typeof visitName === 'string') {
-    preselectedVisitType.value = visitName
-    isBookingModalOpen.value = true
-    
-    // Clear query param from URL
-    router.replace({ query: {} })
+watch(
+  () => route.query.bookVisit,
+  (visitName) => {
+    if (visitName && typeof visitName === 'string') {
+      preselectedVisitType.value = visitName;
+      isBookingModalOpen.value = true;
+
+      // Clear query param from URL
+      router.replace({ query: {} });
+    }
   }
-})
+);
 
 const handleUpload = () => {
   // Trigger file input click
-  fileInputRef.value?.click()
-}
+  fileInputRef.value?.click();
+};
 
 const handleFileSelected = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
 
-  if (!file) return
+  if (!file) return;
 
   // Validate file type
   if (file.type !== 'application/pdf') {
-    toastMessage.value = 'upload.invalidFileType'
-    toastType.value = 'error'
-    showSuccessToast.value = true
-    return
+    toastMessage.value = 'upload.invalidFileType';
+    toastType.value = 'error';
+    showSuccessToast.value = true;
+    return;
   }
 
   // Validate file size (max 10MB)
-  const maxSize = 10 * 1024 * 1024 // 10MB in bytes
+  const maxSize = 10 * 1024 * 1024; // 10MB in bytes
   if (file.size > maxSize) {
-    toastMessage.value = 'upload.fileTooLarge'
-    toastType.value = 'error'
-    showSuccessToast.value = true
-    return
+    toastMessage.value = 'upload.fileTooLarge';
+    toastType.value = 'error';
+    showSuccessToast.value = true;
+    return;
   }
 
-  selectedFile.value = file
-  isUploadModalOpen.value = true
+  selectedFile.value = file;
+  isUploadModalOpen.value = true;
 
   // Reset input value to allow re-selecting the same file
   if (target) {
-    target.value = ''
+    target.value = '';
   }
-}
+};
 
 const handleUploadConfirm = async () => {
-  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId
+  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId;
 
-  if (!selectedFile.value || !patientId) return
+  if (!selectedFile.value || !patientId) return;
 
   // Save filename before clearing selectedFile
-  uploadingFilename.value = selectedFile.value.name
+  uploadingFilename.value = selectedFile.value.name;
 
   // Close the confirmation modal
-  isUploadModalOpen.value = false
+  isUploadModalOpen.value = false;
 
   // Open the progress modal
-  isUploadProgressModalOpen.value = true
-  uploadProgress.value = null
-  uploadError.value = null
+  isUploadProgressModalOpen.value = true;
+  isUploading.value = true;
+  uploadError.value = null;
 
-  const fileToUpload = selectedFile.value
-  selectedFile.value = null
+  const fileToUpload = selectedFile.value;
+  selectedFile.value = null;
 
   try {
-    await documentsApiService.uploadDocumentWithProgress(
-        patientId,
-        fileToUpload,
-        (event: UploadProgressEvent) => {
-          console.log('[PatientHomePage] Upload progress:', event.type, event.data)
-          uploadProgress.value = event.type
-        }
-    )
+    await documentsApiService.uploadDocument(patientId, fileToUpload);
 
     // Success - reload documents
-    await loadData()
+    await loadData();
 
     // Show success toast
-    toastMessage.value = 'upload.success'
-    toastType.value = 'success'
-    showSuccessToast.value = true
+    toastMessage.value = 'upload.success';
+    toastType.value = 'success';
+    showSuccessToast.value = true;
   } catch (error: any) {
-    console.error('[PatientHomePage] Error uploading document:', error)
+    console.error('[PatientHomePage] Error uploading document:', error);
 
     // Set error in progress modal
     if (error.message && error.message.includes('does not appear to be a medical document')) {
-      uploadError.value = 'upload.nonMedicalDocument'
+      uploadError.value = 'upload.nonMedicalDocument';
     } else {
-      uploadError.value = error.message || 'upload.error'
+      uploadError.value = error.message || 'upload.error';
     }
 
     // Also show error toast after closing progress modal
-    toastMessage.value = uploadError.value || 'upload.error'
-    toastType.value = 'error'
+    toastMessage.value = uploadError.value || 'upload.error';
+    toastType.value = 'error';
+  } finally {
+    isUploading.value = false;
   }
-}
+};
 
 const handleUploadProgressClose = () => {
-  isUploadProgressModalOpen.value = false
-  
+  isUploadProgressModalOpen.value = false;
+
   // If there was an error, show toast
   if (uploadError.value) {
-    showSuccessToast.value = true
+    showSuccessToast.value = true;
   }
-  
+
   // Reset state
-  uploadProgress.value = null
-  uploadError.value = null
-  uploadingFilename.value = ''
-}
+  isUploading.value = false;
+  uploadError.value = null;
+  uploadingFilename.value = '';
+};
 
 const handleUploadCancel = () => {
-  isUploadModalOpen.value = false
-  selectedFile.value = null
-}
+  isUploadModalOpen.value = false;
+  selectedFile.value = null;
+};
 
 function handleCloseBooking() {
-  isBookingModalOpen.value = false
+  isBookingModalOpen.value = false;
 }
 
 async function handleBookingConfirmed(availabilityId: string) {
-  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId
+  const patientId = currentPatientProfile.value?.userId || currentUser.value?.userId;
 
-  if (!patientId) return
+  if (!patientId) return;
 
   try {
-    await appointmentsApi.createAppointment(patientId, availabilityId)
+    await appointmentsApi.createAppointment(patientId, availabilityId);
 
-    toastMessage.value = 'toast.bookingConfirmed'
-    toastType.value = 'success'
-    showSuccessToast.value = true
-    
-    isBookingModalOpen.value = false
-    
+    toastMessage.value = 'toast.bookingConfirmed';
+    toastType.value = 'success';
+    showSuccessToast.value = true;
+
+    isBookingModalOpen.value = false;
+
     // Ricarica appuntamenti
-    await loadData()
+    await loadData();
   } catch (error) {
-    console.error('[PatientHomePage] Error booking appointment:', error)
-    toastMessage.value = 'Errore durante la prenotazione'
-    toastType.value = 'error'
-    showSuccessToast.value = true
+    console.error('[PatientHomePage] Error booking appointment:', error);
+    toastMessage.value = 'Errore durante la prenotazione';
+    toastType.value = 'error';
+    showSuccessToast.value = true;
   }
 }
 
 const handleNewAppointment = () => {
-  preselectedVisitType.value = null
-  isBookingModalOpen.value = true
-}
+  preselectedVisitType.value = null;
+  isBookingModalOpen.value = true;
+};
 
 /*
 const handleNewAppointmentWithType = (visitType: string) => {
@@ -294,67 +301,58 @@ const handleNewAppointmentWithType = (visitType: string) => {
 */
 
 const handleAppointmentClick = (id: string) => {
-  console.log('Appointment clicked:', id)
-}
+  console.log('Appointment clicked:', id);
+};
 
 // Get metadata for appointment card
 function getAppointmentMetadata(appointment: Appointment): CardMetadata[] {
-  const meta: CardMetadata[] = [
-    { icon: CalendarIcon, label: appointment.date }
-  ]
-  
+  const meta: CardMetadata[] = [{ icon: CalendarIcon, label: appointment.date }];
+
   if (appointment.time) {
-    meta.push({ icon: ClockIcon, label: appointment.time })
+    meta.push({ icon: ClockIcon, label: appointment.time });
   }
-  
+
   if (appointment.user) {
-    meta.push({ icon: UserIcon, label: appointment.user })
+    meta.push({ icon: UserIcon, label: appointment.user });
   }
-  
+
   if (appointment.location) {
-    meta.push({ icon: MapPinIcon, label: appointment.location })
+    meta.push({ icon: MapPinIcon, label: appointment.location });
   }
-  
-  return meta
+
+  return meta;
 }
 
 const handleDocumentClick = (document: Document) => {
-  selectedDocument.value = document
-  isDocumentModalOpen.value = true
-}
+  selectedDocument.value = document;
+  isDocumentModalOpen.value = true;
+};
 
 const handleCloseDocumentModal = () => {
-  isDocumentModalOpen.value = false
+  isDocumentModalOpen.value = false;
   setTimeout(() => {
-    selectedDocument.value = null
-  }, 300)
-}
+    selectedDocument.value = null;
+  }, 300);
+};
 
 const handleCloseToast = () => {
-  showSuccessToast.value = false
-  toastMessage.value = ''
-  toastType.value = 'success'
-}
+  showSuccessToast.value = false;
+  toastMessage.value = '';
+  toastType.value = 'success';
+};
 </script>
 
 <template>
   <div class="home-page">
     <div class="content-grid">
       <div class="main-column">
-
         <div class="quick-actions">
           <div class="quick-actions-flex">
-            <button 
-              @click="handleUpload"
-              class="quick-action-btn quick-action-btn-flex"
-            >
+            <button @click="handleUpload" class="quick-action-btn quick-action-btn-flex">
               <DocumentPlusIcon class="quick-action-icon" />
               <span>{{ $t('home.uploadDocument') }}</span>
             </button>
-            <button 
-              @click="handleNewAppointment"
-              class="quick-action-btn quick-action-btn-flex"
-            >
+            <button @click="handleNewAppointment" class="quick-action-btn quick-action-btn-flex">
               <PlusIcon class="quick-action-icon" />
               <span>{{ $t('home.newAppointment') }}</span>
             </button>
@@ -363,19 +361,19 @@ const handleCloseToast = () => {
 
         <div class="section-card">
           <h3 class="section-title">{{ $t('home.upcomingAppointments') }}</h3>
-          
+
           <!-- Loading State -->
-          <LoadingSpinner 
-            v-if="isLoading" 
-            :message="$t('home.loadingAppointments')" 
+          <LoadingSpinner
+            v-if="isLoading"
+            :message="$t('home.loadingAppointments')"
             size="medium"
           />
-          
+
           <!-- Empty State -->
           <div v-else-if="upcomingAppointments.length === 0" class="empty-card-message">
             {{ $t('home.noAppointments') }}
           </div>
-          
+
           <!-- Appointments List -->
           <CardList v-else>
             <BaseCard
@@ -389,14 +387,14 @@ const handleCloseToast = () => {
             >
               <template v-if="appointment.category && appointment.category.length > 0" #badges>
                 <div class="badges-row">
-                  <div 
+                  <div
                     v-for="cat in appointment.category"
                     :key="cat"
-                    class="appointment-badge" 
+                    class="appointment-badge"
                     :style="{
                       color: getBadgeColors(cat).color,
                       backgroundColor: getBadgeColors(cat).bgColor,
-                      borderColor: getBadgeColors(cat).borderColor
+                      borderColor: getBadgeColors(cat).borderColor,
                     }"
                   >
                     <span class="badge-icon">{{ getBadgeIcon(cat) }}</span>
@@ -442,7 +440,7 @@ const handleCloseToast = () => {
     <!-- Upload Progress Modal -->
     <UploadProgressModal
       :is-open="isUploadProgressModalOpen"
-      :current-step="uploadProgress"
+      :is-loading="isUploading"
       :error="uploadError"
       :filename="uploadingFilename"
       @close="handleUploadProgressClose"
@@ -485,7 +483,12 @@ const handleCloseToast = () => {
   width: 100%;
   overflow-x: hidden;
   padding: 1.5rem;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
   position: relative;
 }
 
@@ -496,7 +499,7 @@ const handleCloseToast = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, var(--sky-0ea5e9-20) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, var(--purple-a855f7-20) 0%, transparent 50%);
   pointer-events: none;
@@ -572,7 +575,9 @@ const handleCloseToast = () => {
   -webkit-backdrop-filter: blur(12px);
   font-weight: 600;
   font-size: 0.8125rem;
-  box-shadow: 0 2px 8px var(--badge-shadow), inset 0 1px 0 var(--white-40);
+  box-shadow:
+    0 2px 8px var(--badge-shadow),
+    inset 0 1px 0 var(--white-40);
   width: fit-content;
   animation: fadeInScale 0.4s cubic-bezier(0, 0, 0.2, 1);
   transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
@@ -629,7 +634,7 @@ const handleCloseToast = () => {
   .section-card {
     padding: 1rem;
   }
-  
+
   .quick-actions {
     padding: 1rem;
   }
@@ -675,13 +680,17 @@ const handleCloseToast = () => {
   border: 1px solid var(--white-50);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
-  box-shadow: 0 4px 16px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 4px 16px var(--black-8),
+    inset 0 1px 0 var(--white-80);
 }
 
 .quick-action-btn:hover {
   transform: translateY(-2px);
   background: var(--white-80);
-  box-shadow: 0 8px 24px var(--black-12), inset 0 1px 0 var(--white-90);
+  box-shadow:
+    0 8px 24px var(--black-12),
+    inset 0 1px 0 var(--white-90);
 }
 
 .section-title {

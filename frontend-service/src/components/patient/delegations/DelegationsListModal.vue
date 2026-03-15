@@ -1,126 +1,124 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { ArrowLeftIcon, CheckIcon, XMarkIcon, TrashIcon } from '@heroicons/vue/24/outline'
-import BaseModal from '../../shared/BaseModal.vue'
-import { parseItalianDate } from '../../../utils/dateUtils'
-import { useDelegations } from '../../../composables/useDelegations'
-import { useAuth } from '../../../composables/useAuth'
+import { computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { ArrowLeftIcon, CheckIcon, XMarkIcon, TrashIcon } from '@heroicons/vue/24/outline';
+import BaseModal from '../../shared/BaseModal.vue';
+import { parseItalianDate } from '../../../utils/dateUtils';
+import { useDelegations } from '../../../composables/useDelegations';
+import { useAuth } from '../../../composables/useAuth';
 
-const { t } = useI18n()
-const { currentUser } = useAuth()
+const { t } = useI18n();
+const { currentUser } = useAuth();
 const {
   delegations,
   isLoading,
   loadDelegations,
   acceptDelegation,
   declineDelegation,
-  removeDelegation
-} = useDelegations()
+  removeDelegation,
+} = useDelegations();
 
 const props = defineProps<{
-  isOpen: boolean
-  type: 'received' | 'sent'
-}>()
+  isOpen: boolean;
+  type: 'received' | 'sent';
+}>();
 
 const emit = defineEmits<{
-  close: []
-  back: []
-}>()
+  close: [];
+  back: [];
+}>();
 
-watch(() => props.isOpen, async (isOpen) => {
-  if (isOpen && currentUser.value?.userId) {
-    await loadDelegations(currentUser.value.userId, props.type)
+watch(
+  () => props.isOpen,
+  async (isOpen) => {
+    if (isOpen && currentUser.value?.userId) {
+      await loadDelegations(currentUser.value.userId, props.type);
+    }
   }
-})
+);
 
 const title = computed(() => {
-  return props.type === 'received' 
+  return props.type === 'received'
     ? t('delegations.receivedList.title')
-    : t('delegations.sentList.title')
-})
+    : t('delegations.sentList.title');
+});
 
 const subtitle = computed(() => {
-  const count = delegations.value.length
+  const count = delegations.value.length;
   return props.type === 'received'
     ? t('delegations.receivedList.subtitle', { count })
-    : t('delegations.sentList.subtitle', { count })
-})
+    : t('delegations.sentList.subtitle', { count });
+});
 
 const getInitials = (name: string, lastName: string) => {
-  return `${name.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
-}
+  return `${name.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+};
 
 const getStatusBadge = (status: string) => {
   if (status === 'Pending') {
     return {
       label: t('delegations.status.pending'),
-      class: 'status-pending'
-    }
+      class: 'status-pending',
+    };
   }
   if (status === 'Active') {
     return {
       label: t('delegations.status.active'),
-      class: 'status-active'
-    }
+      class: 'status-active',
+    };
   }
   if (status === 'Declined') {
     return {
       label: t('delegations.status.declined'),
-      class: 'status-declined'
-    }
+      class: 'status-declined',
+    };
   }
   if (status === 'Deleted') {
     return {
       label: t('delegations.status.deleted'),
-      class: 'status-deleted'
-    }
+      class: 'status-deleted',
+    };
   }
-  return null
-}
+  return null;
+};
 
 const handleAccept = async (delegationId: string) => {
-  if (!currentUser.value?.userId) return
-  
-  const success = await acceptDelegation(delegationId, currentUser.value.userId)
+  if (!currentUser.value?.userId) return;
+
+  const success = await acceptDelegation(delegationId, currentUser.value.userId);
   if (success) {
-    await loadDelegations(currentUser.value.userId, props.type)
-    window.dispatchEvent(new CustomEvent('delegations-updated'))
+    await loadDelegations(currentUser.value.userId, props.type);
+    window.dispatchEvent(new CustomEvent('delegations-updated'));
   }
-}
+};
 
 const handleDecline = async (delegationId: string) => {
-  if (!currentUser.value?.userId) return
-  
-  const success = await declineDelegation(delegationId, currentUser.value.userId)
+  if (!currentUser.value?.userId) return;
+
+  const success = await declineDelegation(delegationId, currentUser.value.userId);
   if (success) {
-    await loadDelegations(currentUser.value.userId, props.type)
-    window.dispatchEvent(new CustomEvent('delegations-updated'))
+    await loadDelegations(currentUser.value.userId, props.type);
+    window.dispatchEvent(new CustomEvent('delegations-updated'));
   }
-}
+};
 
 const handleRemove = async (delegationId: string) => {
-  if (!currentUser.value?.userId) return
-  
-  const success = await removeDelegation(delegationId, currentUser.value.userId)
+  if (!currentUser.value?.userId) return;
+
+  const success = await removeDelegation(delegationId, currentUser.value.userId);
   if (success) {
-    await loadDelegations(currentUser.value.userId, props.type)
-    window.dispatchEvent(new CustomEvent('delegations-updated'))
+    await loadDelegations(currentUser.value.userId, props.type);
+    window.dispatchEvent(new CustomEvent('delegations-updated'));
   }
-}
+};
 
 const handleBack = () => {
-  emit('back')
-}
+  emit('back');
+};
 </script>
 
 <template>
-  <BaseModal
-    :is-open="isOpen"
-    :show-footer="false"
-    max-width="sm"
-    @close="emit('close')"
-  >
+  <BaseModal :is-open="isOpen" :show-footer="false" max-width="sm" @close="emit('close')">
     <template #header>
       <div class="custom-header">
         <button class="back-button" @click="handleBack" :aria-label="t('delegations.back')">
@@ -142,11 +140,7 @@ const handleBack = () => {
     </div>
 
     <div v-else class="delegations-list">
-      <div
-        v-for="delegation in delegations"
-        :key="delegation.delegationId"
-        class="delegation-item"
-      >
+      <div v-for="delegation in delegations" :key="delegation.delegationId" class="delegation-item">
         <div class="delegation-header">
           <div class="user-avatar">
             {{ getInitials(delegation.name, delegation.lastName) }}
@@ -154,8 +148,8 @@ const handleBack = () => {
           <div class="user-info">
             <div class="user-name-row">
               <h4 class="user-name">{{ delegation.name }} {{ delegation.lastName }}</h4>
-              <span 
-                v-if="getStatusBadge(delegation.status)" 
+              <span
+                v-if="getStatusBadge(delegation.status)"
                 :class="['status-badge', getStatusBadge(delegation.status)?.class]"
               >
                 {{ getStatusBadge(delegation.status)?.label }}
@@ -167,20 +161,35 @@ const handleBack = () => {
         </div>
 
         <!-- Actions for received delegations (pending) -->
-        <div v-if="type === 'received' && delegation.status === 'Pending'" class="delegation-actions">
-          <button class="action-button accept-button" @click="handleAccept(delegation.delegationId)">
+        <div
+          v-if="type === 'received' && delegation.status === 'Pending'"
+          class="delegation-actions"
+        >
+          <button
+            class="action-button accept-button"
+            @click="handleAccept(delegation.delegationId)"
+          >
             <CheckIcon class="action-icon" />
             {{ t('delegations.actions.accept') }}
           </button>
-          <button class="action-button decline-button" @click="handleDecline(delegation.delegationId)">
+          <button
+            class="action-button decline-button"
+            @click="handleDecline(delegation.delegationId)"
+          >
             <XMarkIcon class="action-icon" />
             {{ t('delegations.actions.decline') }}
           </button>
         </div>
 
         <!-- Actions for received delegations (active) - can revoke -->
-        <div v-if="type === 'received' && delegation.status === 'Active'" class="delegation-actions">
-          <button class="action-button remove-button" @click="handleRemove(delegation.delegationId)">
+        <div
+          v-if="type === 'received' && delegation.status === 'Active'"
+          class="delegation-actions"
+        >
+          <button
+            class="action-button remove-button"
+            @click="handleRemove(delegation.delegationId)"
+          >
             <TrashIcon class="action-icon" />
             {{ t('delegations.actions.revoke') }}
           </button>
@@ -188,7 +197,10 @@ const handleBack = () => {
 
         <!-- Actions for sent delegations (active) - can remove access -->
         <div v-if="type === 'sent' && delegation.status === 'Active'" class="delegation-actions">
-          <button class="action-button remove-button" @click="handleRemove(delegation.delegationId)">
+          <button
+            class="action-button remove-button"
+            @click="handleRemove(delegation.delegationId)"
+          >
             <TrashIcon class="action-icon" />
             {{ t('delegations.actions.remove') }}
           </button>
@@ -273,7 +285,9 @@ const handleBack = () => {
   border: 1px solid var(--white-50);
   border-radius: 0.75rem;
   padding: 1rem;
-  box-shadow: 0 2px 8px var(--shadow), inset 0 1px 0 var(--white-60);
+  box-shadow:
+    0 2px 8px var(--shadow),
+    inset 0 1px 0 var(--white-60);
 }
 
 .delegation-header {

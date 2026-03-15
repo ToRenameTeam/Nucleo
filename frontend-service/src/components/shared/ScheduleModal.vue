@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { 
+import { ref, computed, watch, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import {
   CalendarIcon,
   ClockIcon,
   BuildingOffice2Icon,
   ClipboardDocumentListIcon,
   UserIcon,
-  MapPinIcon
-} from '@heroicons/vue/24/outline'
-import BaseModal from '../shared/BaseModal.vue'
-import AvailabilitySlotsList from '../shared/AvailabilitySlotsList.vue'
-import type { ScheduleModalProps, AvailabilityDisplay } from '../../types/availability'
-import type { Facility, ServiceType } from '../../api/masterData'
-import { masterDataApi } from '../../api/masterData'
-import { availabilitiesApi } from '../../api/availabilities'
-import { formatDateToISO, formatTimeForInput } from '../../utils/dateUtils'
+  MapPinIcon,
+} from '@heroicons/vue/24/outline';
+import BaseModal from '../shared/BaseModal.vue';
+import AvailabilitySlotsList from '../shared/AvailabilitySlotsList.vue';
+import type { ScheduleModalProps, AvailabilityDisplay } from '../../types/availability';
+import type { Facility, ServiceType } from '../../api/masterData';
+import { masterDataApi } from '../../api/masterData';
+import { availabilitiesApi } from '../../api/availabilities';
+import { formatDateToISO, formatTimeForInput } from '../../utils/dateUtils';
 
 const props = withDefaults(defineProps<ScheduleModalProps>(), {
   mode: 'create',
@@ -23,37 +23,39 @@ const props = withDefaults(defineProps<ScheduleModalProps>(), {
   preselectedDate: null,
   preselectedHour: null,
   doctorId: undefined,
-  currentAppointment: null
-})
+  currentAppointment: null,
+});
 
 const emit = defineEmits<{
-  close: []
-  save: [data: {
-    facilityId: string
-    serviceTypeId: string
-    startDateTime: string
-    durationMinutes: number
-  }]
-  selectAvailability: [availabilityId: string]
-}>()
+  close: [];
+  save: [
+    data: {
+      facilityId: string;
+      serviceTypeId: string;
+      startDateTime: string;
+      durationMinutes: number;
+    },
+  ];
+  selectAvailability: [availabilityId: string];
+}>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 // Form state (for create/edit modes)
-const selectedDate = ref('')
-const selectedTime = ref('')
-const selectedFacilityId = ref('')
-const selectedServiceTypeId = ref('')
-const selectedDuration = ref(30)
-const isLoading = ref(false)
-const isSaving = ref(false)
+const selectedDate = ref('');
+const selectedTime = ref('');
+const selectedFacilityId = ref('');
+const selectedServiceTypeId = ref('');
+const selectedDuration = ref(30);
+const isLoading = ref(false);
+const isSaving = ref(false);
 
 // Selection state (for select mode)
-const availabilitiesList = ref<AvailabilityDisplay[]>([])
-const selectedAvailabilityId = ref<string | null>(null)
+const availabilitiesList = ref<AvailabilityDisplay[]>([]);
+const selectedAvailabilityId = ref<string | null>(null);
 
-const facilities = ref<Facility[]>([])
-const serviceTypes = ref<ServiceType[]>([])
+const facilities = ref<Facility[]>([]);
+const serviceTypes = ref<ServiceType[]>([]);
 
 const durationOptions = [
   { value: 15, label: '15 minuti' },
@@ -61,146 +63,151 @@ const durationOptions = [
   { value: 45, label: '45 minuti' },
   { value: 60, label: '1 ora' },
   { value: 90, label: '1 ora e 30 minuti' },
-  { value: 120, label: '2 ore' }
-]
+  { value: 120, label: '2 ore' },
+];
 
-const modalTitle = computed(() => t(props.title))
+const modalTitle = computed(() => t(props.title));
 
-const modalSubtitle = computed(() => t(props.subtitle))
+const modalSubtitle = computed(() => t(props.subtitle));
 
 const isFormValid = computed(() => {
   if (props.mode === 'select') {
-    return selectedAvailabilityId.value !== null
+    return selectedAvailabilityId.value !== null;
   }
-  return selectedDate.value && 
-         selectedTime.value && 
-         selectedFacilityId.value && 
-         selectedServiceTypeId.value &&
-         selectedDuration.value > 0
-})
+  return (
+    selectedDate.value &&
+    selectedTime.value &&
+    selectedFacilityId.value &&
+    selectedServiceTypeId.value &&
+    selectedDuration.value > 0
+  );
+});
 
 async function loadMasterData() {
-  isLoading.value = true
+  isLoading.value = true;
   try {
     const [facilitiesData, serviceTypesData] = await Promise.all([
       masterDataApi.getFacilities(),
-      masterDataApi.getServiceTypes()
-    ])
-    facilities.value = facilitiesData
-    serviceTypes.value = serviceTypesData
+      masterDataApi.getServiceTypes(),
+    ]);
+    facilities.value = facilitiesData;
+    serviceTypes.value = serviceTypesData;
   } catch (error) {
-    console.error('Error loading master data:', error)
+    console.error('Error loading master data:', error);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 async function loadAvailabilities() {
-  if (props.mode !== 'select' || !props.doctorId) return
-  
-  isLoading.value = true
+  if (props.mode !== 'select' || !props.doctorId) return;
+
+  isLoading.value = true;
   try {
-    const fetchedAvailabilities = await availabilitiesApi.getAvailabilitiesByDoctor(props.doctorId)
-    availabilitiesList.value = fetchedAvailabilities
+    const fetchedAvailabilities = await availabilitiesApi.getAvailabilitiesByDoctor(props.doctorId);
+    availabilitiesList.value = fetchedAvailabilities;
   } catch (error) {
-    console.error('Error loading availabilities:', error)
+    console.error('Error loading availabilities:', error);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 function initializeForm() {
   if (props.mode === 'edit' && props.availability) {
     // Edit mode - populate from availability
-    const avail = props.availability
-    selectedDate.value = formatDateToISO(avail.startDateTime)
-    selectedTime.value = formatTimeForInput(avail.startDateTime)
-    selectedFacilityId.value = avail.facilityId
-    selectedServiceTypeId.value = avail.serviceTypeId
-    selectedDuration.value = avail.durationMinutes
+    const avail = props.availability;
+    selectedDate.value = formatDateToISO(avail.startDateTime);
+    selectedTime.value = formatTimeForInput(avail.startDateTime);
+    selectedFacilityId.value = avail.facilityId;
+    selectedServiceTypeId.value = avail.serviceTypeId;
+    selectedDuration.value = avail.durationMinutes;
   } else if (props.preselectedDate) {
     // Create mode with preselected date/hour
-    selectedDate.value = formatDateToISO(props.preselectedDate)
+    selectedDate.value = formatDateToISO(props.preselectedDate);
     if (props.preselectedHour !== null) {
-      selectedTime.value = `${props.preselectedHour.toString().padStart(2, '0')}:00`
+      selectedTime.value = `${props.preselectedHour.toString().padStart(2, '0')}:00`;
     }
-    selectedFacilityId.value = ''
-    selectedServiceTypeId.value = ''
-    selectedDuration.value = 30
+    selectedFacilityId.value = '';
+    selectedServiceTypeId.value = '';
+    selectedDuration.value = 30;
   } else {
     // Fresh create mode
-    selectedDate.value = ''
-    selectedTime.value = ''
-    selectedFacilityId.value = ''
-    selectedServiceTypeId.value = ''
-    selectedDuration.value = 30
+    selectedDate.value = '';
+    selectedTime.value = '';
+    selectedFacilityId.value = '';
+    selectedServiceTypeId.value = '';
+    selectedDuration.value = 30;
   }
-  
+
   // Reset selection state
-  selectedAvailabilityId.value = null
+  selectedAvailabilityId.value = null;
 }
 
 function selectAvailability(availabilityId: string) {
-  selectedAvailabilityId.value = availabilityId
+  selectedAvailabilityId.value = availabilityId;
 }
 
 async function handleSave() {
-  if (!isFormValid.value) return
-  
+  if (!isFormValid.value) return;
+
   if (props.mode === 'select') {
     // Emit the selected availability
     if (selectedAvailabilityId.value) {
-      emit('selectAvailability', selectedAvailabilityId.value)
+      emit('selectAvailability', selectedAvailabilityId.value);
     }
-    return
+    return;
   }
-  
-  isSaving.value = true
-  
+
+  isSaving.value = true;
+
   try {
     // Combine date and time in LocalDateTime format (no timezone conversion)
     // Format: YYYY-MM-DDTHH:mm:ss
-    const localDateTime = `${selectedDate.value}T${selectedTime.value}:00`
-    
+    const localDateTime = `${selectedDate.value}T${selectedTime.value}:00`;
+
     emit('save', {
       facilityId: selectedFacilityId.value,
       serviceTypeId: selectedServiceTypeId.value,
       startDateTime: localDateTime,
-      durationMinutes: selectedDuration.value
-    })
+      durationMinutes: selectedDuration.value,
+    });
   } catch (error) {
-    console.error('Error saving availability:', error)
+    console.error('Error saving availability:', error);
   } finally {
-    isSaving.value = false
+    isSaving.value = false;
   }
 }
 
 function handleClose() {
-  emit('close')
+  emit('close');
 }
 
 // Watch for modal open
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen) {
-    initializeForm()
-    if (props.mode === 'select') {
-      loadAvailabilities()
-    } else if (facilities.value.length === 0) {
-      loadMasterData()
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen) {
+      initializeForm();
+      if (props.mode === 'select') {
+        loadAvailabilities();
+      } else if (facilities.value.length === 0) {
+        loadMasterData();
+      }
     }
   }
-})
+);
 
 onMounted(() => {
   if (props.isOpen) {
-    initializeForm()
+    initializeForm();
     if (props.mode === 'select') {
-      loadAvailabilities()
+      loadAvailabilities();
     } else {
-      loadMasterData()
+      loadMasterData();
     }
   }
-})
+});
 </script>
 
 <template>
@@ -277,12 +284,7 @@ onMounted(() => {
             <ClockIcon class="label-icon" />
             {{ t('doctor.availabilities.modal.time') }}
           </label>
-          <input
-            v-model="selectedTime"
-            type="time"
-            class="form-input"
-            step="900"
-          />
+          <input v-model="selectedTime" type="time" class="form-input" step="900" />
         </div>
 
         <!-- Duration Field -->
@@ -292,11 +294,7 @@ onMounted(() => {
             {{ t('doctor.availabilities.modal.duration') }}
           </label>
           <select v-model="selectedDuration" class="form-select">
-            <option 
-              v-for="option in durationOptions" 
-              :key="option.value" 
-              :value="option.value"
-            >
+            <option v-for="option in durationOptions" :key="option.value" :value="option.value">
               {{ option.label }}
             </option>
           </select>
@@ -312,11 +310,7 @@ onMounted(() => {
             <option value="" disabled>
               {{ t('doctor.availabilities.modal.selectFacility') }}
             </option>
-            <option 
-              v-for="facility in facilities" 
-              :key="facility._id" 
-              :value="facility._id"
-            >
+            <option v-for="facility in facilities" :key="facility.id" :value="facility.id">
               {{ facility.name }}
             </option>
           </select>
@@ -332,10 +326,10 @@ onMounted(() => {
             <option value="" disabled>
               {{ t('doctor.availabilities.modal.selectServiceType') }}
             </option>
-            <option 
-              v-for="serviceType in serviceTypes" 
-              :key="serviceType._id" 
-              :value="serviceType._id"
+            <option
+              v-for="serviceType in serviceTypes"
+              :key="serviceType.id"
+              :value="serviceType.id"
             >
               {{ serviceType.name }}
             </option>
@@ -346,20 +340,16 @@ onMounted(() => {
 
     <template #footer>
       <div class="modal-actions">
-        <button 
-          class="btn btn-secondary" 
-          @click="handleClose"
-          :disabled="isSaving"
-        >
+        <button class="btn btn-secondary" @click="handleClose" :disabled="isSaving">
           {{ mode === 'select' ? t('common.cancel') : t('doctor.availabilities.modal.cancel') }}
         </button>
-        <button 
-          class="btn btn-primary" 
-          @click="handleSave"
-          :disabled="!isFormValid || isSaving"
-        >
+        <button class="btn btn-primary" @click="handleSave" :disabled="!isFormValid || isSaving">
           <span v-if="isSaving">{{ t('common.loading') }}</span>
-          <span v-else>{{ mode === 'select' ? t('doctor.appointments.reschedule.confirm') : t('doctor.availabilities.modal.save') }}</span>
+          <span v-else>{{
+            mode === 'select'
+              ? t('doctor.appointments.reschedule.confirm')
+              : t('doctor.availabilities.modal.save')
+          }}</span>
         </button>
       </div>
     </template>
@@ -394,7 +384,9 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Select Mode Styles */

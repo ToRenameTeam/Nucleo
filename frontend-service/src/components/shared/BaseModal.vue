@@ -1,49 +1,44 @@
 <script setup lang="ts">
-import { XMarkIcon } from '@heroicons/vue/24/outline'
-import type { BaseModal } from '../../types/shared'
+import { XMarkIcon } from '@heroicons/vue/24/outline';
+import type { BaseModal } from '../../types/shared';
 
 const props = withDefaults(defineProps<BaseModal>(), {
   maxWidth: 'md',
   showFooter: true,
-  closeOnBackdrop: true
-})
+  closeOnBackdrop: true,
+});
 
 const emit = defineEmits<{
-  close: []
-}>()
+  close: [];
+}>();
 
 const maxWidthClasses = {
   sm: 'modal-sm',
   md: 'modal-md',
   lg: 'modal-lg',
-  xl: 'modal-xl'
-}
+  xl: 'modal-xl',
+};
 
 // Handle close if clicking outside the modal content
 const handleBackdropClick = () => {
   if (props.closeOnBackdrop) {
-    emit('close')
+    emit('close');
   }
-}
-
+};
 </script>
 
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div 
-        v-if="props.isOpen" 
-        class="modal-overlay" 
+      <div
+        v-if="props.isOpen"
+        class="modal-overlay"
         role="dialog"
         aria-modal="true"
         :aria-labelledby="title ? 'modal-title' : undefined"
         @click.self="handleBackdropClick"
       >
-        <div 
-          ref="modalRef"
-          class="modal-container" 
-          :class="maxWidthClasses[maxWidth]"
-        >
+        <div ref="modalRef" class="modal-container" :class="maxWidthClasses[maxWidth]">
           <!-- Header -->
           <div class="modal-header">
             <div v-if="$slots.header || title" class="header-content">
@@ -54,11 +49,7 @@ const handleBackdropClick = () => {
                 </div>
               </slot>
             </div>
-            <button 
-              class="close-button"
-              @click="emit('close')"
-              aria-label="$t('documents.close')"
-            >
+            <button class="close-button" @click="emit('close')" aria-label="$t('documents.close')">
               <XMarkIcon class="close-icon" />
             </button>
           </div>
@@ -85,7 +76,12 @@ const handleBackdropClick = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, var(--bg-gradient-start-10) 0%, var(--bg-gradient-mid-10) 50%, var(--bg-gradient-end-10) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start-10) 0%,
+    var(--bg-gradient-mid-10) 50%,
+    var(--bg-gradient-end-10) 100%
+  );
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   display: flex;
@@ -103,7 +99,7 @@ const handleBackdropClick = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, var(--sky-0ea5e9-20) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, var(--purple-a855f7-20) 0%, transparent 50%);
   pointer-events: none;
@@ -114,7 +110,9 @@ const handleBackdropClick = () => {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 32px var(--black-8), inset 0 1px 0 var(--white-80);
+  box-shadow:
+    0 8px 32px var(--black-8),
+    inset 0 1px 0 var(--white-80);
   width: 100%;
   max-height: 90vh;
   display: flex;
@@ -179,7 +177,9 @@ const handleBackdropClick = () => {
   border: 1px solid var(--white-50);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
-  box-shadow: 0 2px 8px var(--black-6), inset 0 1px 0 var(--white-50);
+  box-shadow:
+    0 2px 8px var(--black-6),
+    inset 0 1px 0 var(--white-50);
   flex-shrink: 0;
 }
 
@@ -193,7 +193,9 @@ const handleBackdropClick = () => {
 .close-button:hover {
   background: var(--white-40);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px var(--black-10), inset 0 1px 0 var(--white-70);
+  box-shadow:
+    0 4px 16px var(--black-10),
+    inset 0 1px 0 var(--white-70);
 }
 
 .modal-body {

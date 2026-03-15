@@ -1,0 +1,97 @@
+import type { UserRepository, UserData } from '../domain/repositories/index.js';
+import type { PatientRepository } from '../domain/repositories/index.js';
+import type { DoctorRepository } from '../domain/repositories/index.js';
+import { Patient, Doctor, FiscalCode, User, Credentials, ProfileInfo } from '../domain/index.js';
+import { AuthenticatedUserFactory, IAuthenticatedUser } from './authenticated-user.factory.js';
+import { toUUID } from '../utils/uuid.js';
+
+export class AuthenticationService {
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly patientRepository: PatientRepository,
+    private readonly doctorRepository: DoctorRepository
+  ) {}
+
+  async login(fiscalCodeValue: string, password: string): Promise<IAuthenticatedUser> {
+    const userData = await this.userRepository.findByFiscalCode(fiscalCodeValue);
+    if (!userData) throw new Error('Invalid credentials');
+
+    const user = this.reconstructUser(userData);
+    const isValid = await user.authenticate(password);
+    if (!isValid) throw new Error('Invalid credentials');
+
+    const { patient, doctor } = await this.loadUserProfiles(userData.userId);
+
+    // Use factory to create appropriate authenticated user type
+    return AuthenticatedUserFactory.create(user, patient, doctor);
+  }
+
+  private reconstructUser(userData: UserData): User {
+    const fiscalCode = FiscalCode.reconstitute(userData.fiscalCode);
+    const credentials = Credentials.reconstitute(fiscalCode, userData.passwordHash);
+    const profileInfo = ProfileInfo.reconstitute(
+      userData.name,
+      userData.lastName,
+      userData.dateOfBirth
+    );
+    return User.reconstitute(toUUID(userData.userId), fiscalCode, credentials, profileInfo);
+  }
+
+  async getProfileData(userId: string, selectedProfile: 'PATIENT' | 'DOCTOR') {
+    const userData = await this.userRepository.findUserById(userId);
+    if (!userData) throw new Error('User not found');
+
+    const { patientData, doctorData } = await this.loadUserProfiles(userId);
+
+    const baseData = {
+      userId: userData.userId,
+      fiscalCode: userData.fiscalCode,
+      name: userData.name,
+      lastName: userData.lastName,
+      dateOfBirth: userData.dateOfBirth,
+      activeProfile: selectedProfile,
+    };
+
+    if (selectedProfile === 'PATIENT') {
+      return {
+        ...baseData,
+        patient: {
+          userId: patientData.userId,
+        },
+      };
+    }
+
+    if (!doctorData) {
+      throw new Error('User does not have doctor profile');
+    }
+
+    return {
+      ...baseData,
+      doctor: {
+        userId: doctorData.userId,
+        medicalLicenseNumber: doctorData.medicalLicenseNumber,
+        specializations: doctorData.specializations,
+      },
+    };
+  }
+
+  private async loadUserProfiles(userId: string) {
+    const patientData = await this.patientRepository.findByUserId(userId);
+    const doctorData = await this.doctorRepository.findByUserId(userId);
+
+    if (!patientData) {
+      throw new Error('Patient profile not found. Data integrity issue.');
+    }
+
+    const patient = Patient.reconstitute(toUUID(patientData.userId));
+    const doctor = doctorData
+      ? Doctor.reconstitute(
+          toUUID(doctorData.userId),
+          doctorData.medicalLicenseNumber,
+          doctorData.specializations
+        )
+      : null;
+
+    return { patient, doctor, patientData, doctorData };
+  }
+}

@@ -1,0 +1,14 @@
+import type { Doctor } from '../index.js';
+
+export interface DoctorData {
+  userId: string;
+  medicalLicenseNumber: string;
+  specializations: string[];
+}
+
+export interface DoctorRepository {
+  findByUserId(userId: string): Promise<DoctorData | null>;
+  findByLicenseNumber(licenseNumber: string): Promise<DoctorData | null>;
+  save(doctor: Doctor): Promise<void>;
+  delete(userId: string): Promise<void>;
+}

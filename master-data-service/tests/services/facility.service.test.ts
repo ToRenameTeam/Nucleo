@@ -1,316 +1,212 @@
-import '../setup.js';
-import { 
-    FacilityService, 
-    FacilityValidationError, 
-    FacilityConflictError,
-    type CreateFacilityInput 
-} from '../../src/services/facility.service.js';
+import {
+  FacilityService,
+  FacilityValidationError,
+  FacilityConflictError,
+  type CreateFacilityInput,
+} from '../../src/services/index.js';
+import type { FacilityRepository } from '../../src/domain/index.js';
 
 describe('FacilityService', () => {
-    let service: FacilityService;
+  let service: FacilityService;
+  let mockRepository: jest.Mocked<FacilityRepository>;
 
-    beforeEach(() => {
-        service = new FacilityService();
+  beforeEach(() => {
+    mockRepository = {
+      findAll: jest.fn(),
+      findActiveCities: jest.fn(),
+      findById: jest.fn(),
+      findByCode: jest.fn(),
+      create: jest.fn(),
+      updateById: jest.fn(),
+      softDelete: jest.fn(),
+      permanentDelete: jest.fn(),
+    };
+
+    service = new FacilityService(mockRepository);
+  });
+
+  describe('create', () => {
+    const input: CreateFacilityInput = {
+      code: 'facility-001',
+      name: 'Ospedale San Giovanni',
+      address: 'Via Roma 123',
+      city: 'Milano',
+    };
+
+    it('should create facility with isActive defaulted to true', async () => {
+      const created = {
+        id: 'facility-id',
+        ...input,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockRepository.findByCode.mockResolvedValue(null);
+      mockRepository.create.mockResolvedValue(created);
+
+      const result = await service.create(input);
+
+      expect(result).toEqual(created);
+      expect(mockRepository.findByCode).toHaveBeenCalledWith('facility-001');
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        code: 'facility-001',
+        name: 'Ospedale San Giovanni',
+        address: 'Via Roma 123',
+        city: 'Milano',
+        isActive: true,
+      });
     });
 
-    describe('create', () => {
-        it('should create a new facility successfully', async () => {
-            const input: CreateFacilityInput = {
-                code: 'facility-001',
-                name: 'Ospedale San Giovanni',
-                address: 'Via Roma 123',
-                city: 'Milano',
-                isActive: true
-            };
+    it('should preserve provided isActive value', async () => {
+      const inactiveInput: CreateFacilityInput = {
+        ...input,
+        code: 'facility-002',
+        isActive: false,
+      };
 
-            const result = await service.create(input);
+      mockRepository.findByCode.mockResolvedValue(null);
+      mockRepository.create.mockResolvedValue({
+        id: 'facility-id-2',
+        code: inactiveInput.code,
+        name: inactiveInput.name,
+        address: inactiveInput.address,
+        city: inactiveInput.city,
+        isActive: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
-            expect(result).toBeDefined();
-            expect(result.code).toBe(input.code);
-            expect(result.name).toBe(input.name);
-            expect(result.address).toBe(input.address);
-            expect(result.city).toBe(input.city);
-            expect(result.isActive).toBe(true);
-        });
+      await service.create(inactiveInput);
 
-        it('should set isActive to true by default', async () => {
-            const input: CreateFacilityInput = {
-                code: 'facility-002',
-                name: 'Clinica Privata',
-                address: 'Corso Italia 45',
-                city: 'Roma'
-            };
-
-            const result = await service.create(input);
-
-            expect(result.isActive).toBe(true);
-        });
-
-        it('should throw FacilityValidationError for invalid code', async () => {
-            const input: CreateFacilityInput = {
-                code: 'invalid-code',
-                name: 'Test Facility',
-                address: 'Test Address',
-                city: 'Test City'
-            };
-
-            await expect(service.create(input)).rejects.toThrow(FacilityValidationError);
-            await expect(service.create(input)).rejects.toThrow('Invalid code format');
-        });
-
-        it('should throw FacilityValidationError for empty code', async () => {
-            const input: CreateFacilityInput = {
-                code: '',
-                name: 'Test Facility',
-                address: 'Test Address',
-                city: 'Test City'
-            };
-
-            await expect(service.create(input)).rejects.toThrow(FacilityValidationError);
-        });
-
-        it('should throw FacilityConflictError for duplicate code', async () => {
-            const input: CreateFacilityInput = {
-                code: 'facility-003',
-                name: 'Policlinico',
-                address: 'Viale Europa 10',
-                city: 'Napoli'
-            };
-
-            await service.create(input);
-            await expect(service.create(input)).rejects.toThrow(FacilityConflictError);
-            await expect(service.create(input)).rejects.toThrow('already exists');
-        });
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          code: 'facility-002',
+          isActive: false,
+        })
+      );
     });
 
-    describe('findAll', () => {
-        beforeEach(async () => {
-            // Create some test facilities
-            await service.create({
-                code: 'facility-101',
-                name: 'Ospedale Maggiore',
-                address: 'Via Grande 1',
-                city: 'Milano',
-                isActive: true
-            });
+    it('should throw FacilityValidationError for invalid code format', async () => {
+      await expect(
+        service.create({
+          ...input,
+          code: 'invalid-code',
+        })
+      ).rejects.toThrow(FacilityValidationError);
 
-            await service.create({
-                code: 'facility-102',
-                name: 'Clinica Sant\'Anna',
-                address: 'Via Piccola 2',
-                city: 'Roma',
-                isActive: true
-            });
-
-            await service.create({
-                code: 'facility-103',
-                name: 'Poliambulatorio Centro',
-                address: 'Piazza Centrale 3',
-                city: 'Milano',
-                isActive: false
-            });
-        });
-
-        it('should return all facilities', async () => {
-            const results = await service.findAll();
-            expect(results).toHaveLength(3);
-        });
-
-        it('should filter by city', async () => {
-            const results = await service.findAll({ city: 'Milano' });
-            expect(results).toHaveLength(2);
-            results.forEach(facility => {
-                expect(facility.city).toBe('Milano');
-            });
-        });
-
-        it('should filter by city case-insensitive', async () => {
-            const results = await service.findAll({ city: 'milano' });
-            expect(results).toHaveLength(2);
-        });
-
-        it('should filter by isActive', async () => {
-            const activeResults = await service.findAll({ active: true });
-            expect(activeResults).toHaveLength(2);
-
-            const inactiveResults = await service.findAll({ active: false });
-            expect(inactiveResults).toHaveLength(1);
-        });
-
-        it('should filter by search text', async () => {
-            const results = await service.findAll({ search: 'Ospedale' });
-            expect(results.length).toBeGreaterThanOrEqual(1);
-        });
-
-        it('should return empty array if no results', async () => {
-            const results = await service.findAll({ city: 'Torino' });
-            expect(results).toHaveLength(0);
-        });
+      expect(mockRepository.findByCode).not.toHaveBeenCalled();
+      expect(mockRepository.create).not.toHaveBeenCalled();
     });
 
-    describe('findById', () => {
-        it('should find a facility by id', async () => {
-            const created = await service.create({
-                code: 'facility-201',
-                name: 'Centro Medico',
-                address: 'Via Test 123',
-                city: 'Bologna'
-            });
+    it('should throw FacilityConflictError when code already exists', async () => {
+      mockRepository.findByCode.mockResolvedValue({
+        id: 'existing-id',
+        ...input,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
-            const found = await service.findById(created._id);
+      await expect(service.create(input)).rejects.toThrow(FacilityConflictError);
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
+  });
 
-            expect(found).toBeDefined();
-            expect(found?._id).toBe(created._id);
-            expect(found?.name).toBe(created.name);
-        });
+  describe('findAll', () => {
+    it('should call repository with empty query when no filter is provided', async () => {
+      mockRepository.findAll.mockResolvedValue([]);
 
-        it('should return null for non-existent id', async () => {
-            const found = await service.findById('facility-999');
-            expect(found).toBeNull();
-        });
+      await service.findAll();
+
+      expect(mockRepository.findAll).toHaveBeenCalledWith({});
     });
 
-    describe('update', () => {
-        it('should update a facility', async () => {
-            const created = await service.create({
-                code: 'facility-301',
-                name: 'Nome Originale',
-                address: 'Indirizzo Originale',
-                city: 'Città Originale'
-            });
+    it('should build query from city, active and search filters', async () => {
+      mockRepository.findAll.mockResolvedValue([]);
 
-            const updated = await service.update(created._id, {
-                name: 'Nome Aggiornato',
-                address: 'Indirizzo Aggiornato'
-            });
+      await service.findAll({
+        city: 'Milano',
+        active: true,
+        search: 'San Giovanni',
+      });
 
-            expect(updated).toBeDefined();
-            expect(updated?.name).toBe('Nome Aggiornato');
-            expect(updated?.address).toBe('Indirizzo Aggiornato');
-            expect(updated?.city).toBe('Città Originale');
-        });
+      expect(mockRepository.findAll).toHaveBeenCalledWith({
+        city: { $regex: 'Milano', $options: 'i' },
+        isActive: true,
+        $text: { $search: 'San Giovanni' },
+      });
+    });
+  });
 
-        it('should update only provided fields', async () => {
-            const created = await service.create({
-                code: 'facility-302',
-                name: 'Test Facility',
-                address: 'Test Address',
-                city: 'Test City'
-            });
+  it('should return active cities from repository', async () => {
+    mockRepository.findActiveCities.mockResolvedValue(['Milano', 'Roma']);
 
-            const updated = await service.update(created._id, {
-                name: 'Nome Aggiornato'
-            });
+    const cities = await service.getCities();
 
-            expect(updated?.name).toBe('Nome Aggiornato');
-            expect(updated?.address).toBe('Test Address');
-            expect(updated?.city).toBe('Test City');
-        });
+    expect(cities).toEqual(['Milano', 'Roma']);
+    expect(mockRepository.findActiveCities).toHaveBeenCalledTimes(1);
+  });
 
-        it('should return null for non-existent id', async () => {
-            const updated = await service.update('facility-999', {
-                name: 'Test'
-            });
-            expect(updated).toBeNull();
-        });
+  it('should find a facility by id', async () => {
+    const facility = {
+      id: 'facility-id',
+      code: 'facility-101',
+      name: 'Centro Medico',
+      address: 'Via Test 1',
+      city: 'Bologna',
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockRepository.findById.mockResolvedValue(facility);
+
+    const result = await service.findById('facility-id');
+
+    expect(result).toEqual(facility);
+    expect(mockRepository.findById).toHaveBeenCalledWith('facility-id');
+  });
+
+  it('should update a facility by id', async () => {
+    const updated = {
+      id: 'facility-id',
+      code: 'facility-301',
+      name: 'Nome Aggiornato',
+      address: 'Via Aggiornata 2',
+      city: 'Firenze',
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockRepository.updateById.mockResolvedValue(updated);
+
+    const result = await service.update('facility-id', {
+      name: 'Nome Aggiornato',
+      address: 'Via Aggiornata 2',
     });
 
-    describe('softDelete', () => {
-        it('should set isActive to false', async () => {
-            const created = await service.create({
-                code: 'facility-401',
-                name: 'To Delete',
-                address: 'Address',
-                city: 'City'
-            });
-
-            const deleted = await service.softDelete(created._id);
-
-            expect(deleted).toBeDefined();
-            expect(deleted?.isActive).toBe(false);
-        });
-
-        it('should return null for non-existent id', async () => {
-            const deleted = await service.softDelete('facility-999');
-            expect(deleted).toBeNull();
-        });
+    expect(result).toEqual(updated);
+    expect(mockRepository.updateById).toHaveBeenCalledWith('facility-id', {
+      name: 'Nome Aggiornato',
+      address: 'Via Aggiornata 2',
     });
+  });
 
-    describe('permanentDelete', () => {
-        it('should permanently delete a facility', async () => {
-            const created = await service.create({
-                code: 'facility-501',
-                name: 'To Delete Permanently',
-                address: 'Address',
-                city: 'City'
-            });
+  it('should soft delete a facility', async () => {
+    mockRepository.softDelete.mockResolvedValue(null);
 
-            const deleted = await service.permanentDelete(created._id);
-            expect(deleted).toBeDefined();
+    await service.softDelete('facility-id');
 
-            const found = await service.findById(created._id);
-            expect(found).toBeNull();
-        });
+    expect(mockRepository.softDelete).toHaveBeenCalledWith('facility-id');
+  });
 
-        it('should return null for non-existent id', async () => {
-            const deleted = await service.permanentDelete('facility-999');
-            expect(deleted).toBeNull();
-        });
-    });
+  it('should permanently delete a facility', async () => {
+    mockRepository.permanentDelete.mockResolvedValue(null);
 
-    describe('getCities', () => {
-        beforeEach(async () => {
-            await service.create({
-                code: 'facility-601',
-                name: 'Facility Milano 1',
-                address: 'Address 1',
-                city: 'Milano',
-                isActive: true
-            });
+    await service.permanentDelete('facility-id');
 
-            await service.create({
-                code: 'facility-602',
-                name: 'Facility Milano 2',
-                address: 'Address 2',
-                city: 'Milano',
-                isActive: true
-            });
-
-            await service.create({
-                code: 'facility-603',
-                name: 'Facility Roma',
-                address: 'Address 3',
-                city: 'Roma',
-                isActive: true
-            });
-
-            await service.create({
-                code: 'facility-604',
-                name: 'Facility Torino Inattiva',
-                address: 'Address 4',
-                city: 'Torino',
-                isActive: false
-            });
-        });
-
-        it('should return all unique cities of active facilities', async () => {
-            const cities = await service.getCities();
-
-            expect(cities).toBeDefined();
-            expect(cities).toContain('Milano');
-            expect(cities).toContain('Roma');
-            expect(cities).not.toContain('Torino');
-        });
-
-        it('should return empty array if no active facilities', async () => {
-            // Disable all facilities
-            const all = await service.findAll({ active: true });
-            for (const facility of all) {
-                await service.softDelete(facility._id);
-            }
-
-            const cities = await service.getCities();
-            expect(cities).toHaveLength(0);
-        });
-    });
+    expect(mockRepository.permanentDelete).toHaveBeenCalledWith('facility-id');
+  });
 });

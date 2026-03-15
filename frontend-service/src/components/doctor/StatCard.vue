@@ -1,40 +1,40 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
+import type { Component } from 'vue';
 
 interface Props {
-  value: number
-  label: string
-  icon?: Component
-  iconBgColor?: string
-  iconColor?: string
-  indicatorBgColor?: string
-  indicatorBorderColor?: string
+  value: number;
+  label: string;
+  icon?: Component;
+  iconBgColor?: string;
+  iconColor?: string;
+  indicatorBgColor?: string;
+  indicatorBorderColor?: string;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 </script>
 
 <template>
   <div class="stat-card">
     <!-- Icon or Indicator -->
-    <component 
-      v-if="icon" 
-      :is="icon" 
+    <component
+      v-if="icon"
+      :is="icon"
       class="stat-icon"
       :style="{
         backgroundColor: iconBgColor,
-        color: iconColor
+        color: iconColor,
       }"
     />
-    <div 
-      v-else 
+    <div
+      v-else
       class="stat-indicator"
       :style="{
         backgroundColor: indicatorBgColor,
-        borderColor: indicatorBorderColor
+        borderColor: indicatorBorderColor,
       }"
     ></div>
-    
+
     <!-- Content -->
     <div class="stat-content">
       <span class="stat-value">{{ value }}</span>
