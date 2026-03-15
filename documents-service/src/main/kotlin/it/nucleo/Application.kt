@@ -5,6 +5,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
@@ -60,6 +61,18 @@ internal fun Application.configureSerialization() {
 
 internal fun Application.configureStatusPages() {
     install(StatusPages) {
+        exception<BadRequestException> { call, cause ->
+            logger.warn("Bad request: ${cause.message}")
+            call.respond(
+                HttpStatusCode.BadRequest,
+                ErrorResponse(
+                    error = "bad_request",
+                    message = "Invalid request body",
+                    details = cause.message
+                )
+            )
+        }
+
         exception<IllegalArgumentException> { call, cause ->
             logger.warn("Invalid request: ${cause.message}")
             call.respond(
