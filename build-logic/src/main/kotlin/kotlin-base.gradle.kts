@@ -13,6 +13,7 @@ val catalog: VersionCatalog = extensions.getByType<VersionCatalogsExtension>().n
 
 dependencies {
     testImplementation(catalog.findLibrary("kotest").get())
+    testImplementation(catalog.findLibrary("testcontainers").get())
 }
 
 tasks.test {

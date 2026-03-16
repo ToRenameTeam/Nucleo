@@ -1,6 +1,7 @@
 [versions]
 kotlin = "2.2.20"
 kotest = "6.1.6"
+testcontainers = "2.0.2"
 ktfmt = "0.18.0"
 kover = "0.9.7"
 detekt = "2.0.0-alpha.2"
@@ -17,6 +18,8 @@ pdfbox = "3.0.7"
 
 [libraries]
 kotest = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers" }
+testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
