@@ -18,8 +18,9 @@ services=(
     "appointments-service"
     "users-service"
     "master-data-service"
-    "frontend-service"
     "documents-service"
+    "infrastructure/nginx"
+    "frontend-service"
 )
 
 failed_services=()

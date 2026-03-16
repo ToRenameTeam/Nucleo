@@ -1,20 +1,14 @@
-/**
- * Centralized API Configuration
- */
+// All backend traffic goes through the API Gateway.
+export const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:8088';
 
-// Base API URLs - configured via environment variables
-export const APPOINTMENTS_API_URL =
-  import.meta.env.VITE_APPOINTMENTS_API_URL || 'http://localhost:8080';
-export const MASTER_DATA_API_URL =
-  import.meta.env.VITE_MASTER_DATA_API_URL || 'http://localhost:3040';
-export const USERS_API_URL = import.meta.env.VITE_USERS_API_URL || 'http://localhost:3030';
-export const DELEGATIONS_API_URL =
-  import.meta.env.VITE_DELEGATIONS_API_URL || 'http://localhost:3030';
-export const DOCUMENTS_API_URL = import.meta.env.VITE_DOCUMENTS_API_URL || 'http://localhost:8090';
+// Kept for backward compatibility with existing API modules.
+// TODO: should refactor these modules to use API_GATEWAY_URL directly and remove these constants.
+export const APPOINTMENTS_API_URL = API_GATEWAY_URL;
+export const MASTER_DATA_API_URL = API_GATEWAY_URL;
+export const USERS_API_URL = API_GATEWAY_URL;
+export const DELEGATIONS_API_URL = API_GATEWAY_URL;
+export const DOCUMENTS_API_URL = API_GATEWAY_URL;
 
-/**
- * API Endpoints
- */
 export const API_ENDPOINTS = {
   // Appointments Service
   APPOINTMENTS: '/api/appointments',
@@ -35,9 +29,6 @@ export const API_ENDPOINTS = {
   DOCUMENTS: '/api/documents',
 } as const;
 
-/**
- * Helper function to handle API responses
- */
 interface ApiErrorPayload {
   message?: string;
   code?: string;
@@ -62,9 +53,6 @@ export async function handleApiResponse<T>(response: Response): Promise<T> {
   return data.data || data;
 }
 
-/**
- * API Error class for typed errors
- */
 export class ApiError extends Error {
   statusCode: number;
 

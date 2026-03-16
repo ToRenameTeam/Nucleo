@@ -17,8 +17,22 @@ echo -e "${CYAN}=====================================${NC}"
 echo ""
 
 # Service definitions
-declare -a service_names=("appointments-service" "users-service" "master-data-service" "frontend-service" "documents-service")
-declare -a service_paths=("appointments-service" "users-service" "master-data-service" "frontend-service" "documents-service")
+declare -a service_names=(
+    "appointments-service"
+    "users-service"
+    "master-data-service"
+    "documents-service"
+    "infrastructure-nginx"
+    "frontend-service"
+)
+declare -a service_paths=(
+    "appointments-service"
+    "users-service"
+    "master-data-service"
+    "documents-service"
+    "infrastructure/nginx"
+    "frontend-service"
+)
 
 # Function to handle .env files interactively
 setup_env_file() {
@@ -90,11 +104,7 @@ MONGO_INITDB_ROOT_USERNAME=admin
 MONGO_INITDB_ROOT_PASSWORD=password
 "
 setup_env_file "frontend-service" "frontend-service" "
-VITE_APPOINTMENTS_API_URL=http://localhost:8080
-VITE_DOCUMENTS_API_URL=http://localhost:8090
-VITE_MASTER_DATA_API_URL=http://localhost:3040
-VITE_USERS_API_URL=http://localhost:3030
-VITE_DELEGATIONS_API_URL=http://localhost:3030
+VITE_API_GATEWAY_URL=http://localhost:8088
 "
 
 setup_env_file "documents-service" "documents-service" "GROQ_API_KEY="
@@ -150,6 +160,7 @@ if [ ${#failed_services[@]} -eq 0 ]; then
     echo -e "${GREEN}✅ All services started successfully!${NC}"
     echo ""
     echo -e "${CYAN}🌐 Services available at:${NC}"
+    echo -e "${WHITE}  • API Gateway (NGINX):     http://localhost:8088${NC}"
     echo -e "${WHITE}  • Frontend Service:        http://localhost:3000${NC}"
     echo -e "${WHITE}  • Users Service:           http://localhost:3030${NC}"
     echo -e "${WHITE}  • Master Data Service:     http://localhost:3040${NC}"
