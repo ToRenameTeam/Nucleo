@@ -1,4 +1,6 @@
 import dev.detekt.gradle.extensions.DetektExtension
+import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 plugins {
@@ -19,6 +21,25 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+val testSourceSet = extensions.getByType<JavaPluginExtension>().sourceSets.getByName("test")
+
+val integrationTest by
+    tasks.registering(Test::class) {
+        description = "Runs integration tests only."
+        group = LifecycleBasePlugin.VERIFICATION_GROUP
+
+        testClassesDirs = testSourceSet.output.classesDirs
+        classpath = testSourceSet.runtimeClasspath
+        shouldRunAfter(tasks.test)
+        useJUnitPlatform()
+
+        filter {
+            includeTestsMatching("it.nucleo.*.integration.*")
+            includeTestsMatching("*IntegrationTest")
+            isFailOnNoMatchingTests = false
+        }
+    }
 
 val javaVersion: String by project
 
