@@ -12,7 +12,6 @@ private const val DATABASE_URL_PROPERTY = "DATABASE_URL"
 private const val DATABASE_USER_PROPERTY = "DATABASE_USER"
 private const val DATABASE_PASSWORD_PROPERTY = "DATABASE_PASSWORD"
 
-@Suppress("DEPRECATION")
 object PostgresContainerSupport {
     private val container =
         PostgreSQLContainer(DockerImageName.parse("postgres:16-alpine"))
