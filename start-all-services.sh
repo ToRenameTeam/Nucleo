@@ -18,6 +18,7 @@ echo ""
 
 # Service definitions
 declare -a service_names=(
+    "kafka" 
     "appointments-service"
     "users-service"
     "master-data-service"
@@ -26,6 +27,7 @@ declare -a service_names=(
     "frontend-service"
 )
 declare -a service_paths=(
+    "infrastructure/kafka" 
     "appointments-service"
     "users-service"
     "master-data-service"
@@ -109,6 +111,16 @@ VITE_API_GATEWAY_URL=http://localhost:8088
 
 setup_env_file "documents-service" "documents-service" "GROQ_API_KEY="
 
+setup_env_file "infrastructure/kafka" "kafka" "
+KAFKA_CONTAINER_NAME=kafka
+KAFKA_HOST_PORT=29092
+KAFKA_BROKER_PORT=9092
+KAFKA_CONTROLLER_PORT=9093
+KAFKA_NODE_ID=1
+KAFKA_CLUSTER_ID=CiTQ5Q8mS9-Ef6M2Wf4h2A
+KAFKA_LOG_RETENTION_HOURS=168
+"
+
 echo -e "${GREEN}✅ .env configuration completed for all services${NC}"
 echo ""
 echo -e "${YELLOW}Press ENTER to proceed with starting services, or CTRL+C to cancel...${NC}"
@@ -166,6 +178,7 @@ if [ ${#failed_services[@]} -eq 0 ]; then
     echo -e "${WHITE}  • Master Data Service:     http://localhost:3040${NC}"
     echo -e "${WHITE}  • Appointments Service:    http://localhost:8080${NC}"
     echo -e "${WHITE}  • Documents Service:       http://localhost:8090${NC}"
+    echo -e "${WHITE}  • Kafka Broker:            localhost:29092${NC}"
 else
     echo -e "${YELLOW}⚠️  Some services encountered problems during startup:${NC}"
     for failed in "${failed_services[@]}"; do
