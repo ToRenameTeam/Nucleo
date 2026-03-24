@@ -17,6 +17,8 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
+    "release:services": "node scripts/release-all-services.mjs",
+    "release:services:dry": "node scripts/release-all-services.mjs --dry-run",
     "prepare": "husky"
   },
   "author": "",
@@ -31,19 +33,22 @@
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.4.3",
-    "@commitlint/config-conventional": "^20.4.3",
-    "@eslint/js": "^9.39.2",
-    "@types/eslint": "^9.6.1",
-    "@types/node": "^25.0.10",
-    "eslint": "^9.39.2",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@eslint/js": "^9.39.4",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.6",
+    "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
-    "lint-staged": "^16.3.2",
+    "lint-staged": "^16.4.0",
     "prettier": "^3.8.1",
+    "semantic-release": "^24.2.9",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.53.1",
+    "typescript-eslint": "^8.57.2",
     "vitepress": "2.0.0-alpha.16"
   }
 }
