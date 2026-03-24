@@ -47,8 +47,6 @@ export default defineConfig({
             items: [
               { text: 'Microservices', link: '/implementation/microservices' },
               { text: 'Testing', link: '/implementation/testing' },
-              { text: 'Multiplatform', link: '/implementation/multiplatform' },
-              { text: 'Experiments', link: '/implementation/experiments' },
               { text: 'Monitoring', link: '/implementation/monitoring' },
             ],
           },
@@ -62,7 +60,6 @@ export default defineConfig({
             ],
           },
           { text: 'Deployment', link: '/deployment' },
-          { text: 'Benchmark', link: '/benchmark' },
           { text: 'Conclusions', link: '/conclusions' },
         ],
       },
