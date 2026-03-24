@@ -1,8 +1,10 @@
+# Event Storming
+
 We conducted a virtual **Event Storming** session to explore the chosen domain and discover system boundaries. This section presents the outcomes of each phase of the iterative process.
 
 The session was carried out using **Miro** as our collaborative workspace.
 
-You can access the board here: Nucleo’s Event Storming
+You can access the board here: [Nucleo’s Event Storming](https://miro.com/app/board/uXjVGH0KK-o=/?share_link_id=612522295550)
 
 ## Chaotic Exploration
 
@@ -60,8 +62,7 @@ Finally, we established the **Bounded Contexts** by grouping aggregates that sha
 
 The identified bounded contexts are:
 
-- `Users`
-- `Appointment`
-- `Document`
-- `Notification`
-- `Master Data`
+- `Users`: everything related to users, including delegations and authentication.
+- `Appointment`: covers scheduling, rescheduling and canceling of appointments.
+- `Document`: everything concerning medical documents, including their creation / upload / download / analysis.
+- `Master Data`: handles third-party data not owned by the system, such as medicines, facilities, etc.
