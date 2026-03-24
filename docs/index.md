@@ -4,7 +4,7 @@ layout: home
 
 hero:
   name: 'Nucleo'
-  text: "A family-friendly health data platform"
+  text: 'A family-friendly health data platform'
   actions:
     - theme: brand
       text: Report
