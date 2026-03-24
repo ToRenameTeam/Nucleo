@@ -4,18 +4,20 @@ layout: home
 
 hero:
   name: 'Nucleo'
-  text: "Nucleo's documentation"
-  tagline: My great project tagline
+  text: "A family-friendly health data platform"
   actions:
     - theme: brand
       text: Report
       link: /introduction
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - icon: 👵🏻
+    title: Family & Delegation Management
+    details: Delegate access to your health data to family members or caregivers and seamlessly switch between profiles within a single session.
+  - icon: 📂
+    title: Unified Health Records
+    details: Manage medical documents, prescriptions and lab results in one place. AI-powered analysis extracts key data automatically.
+  - icon: 📅
+    title: Appointment Booking
+    details: Book visits manually or directly from a prescription and modify or cancel existing bookings with ease.
 ---
