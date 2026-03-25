@@ -38,12 +38,13 @@ if (!repository) {
 const imageBase = `ghcr.io/${repository.toLowerCase()}/${service.image}`;
 const tags = [version, 'latest'];
 
+const buildContext = '.';
 const buildArgs = [
   'build',
   '-f',
   service.dockerfile,
   ...tags.flatMap((tag) => ['-t', `${imageBase}:${tag}`]),
-  service.path,
+  buildContext,
 ];
 
 console.log(
