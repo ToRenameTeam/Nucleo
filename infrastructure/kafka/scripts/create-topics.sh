@@ -1,12 +1,15 @@
 #!/bin/bash
 
-# Script to create initial Kafka topics
-echo "Waiting for Kafka to become ready..."
+set -euo pipefail
 
+# Script to create initial Kafka topics
+BOOTSTRAP_SERVER="${KAFKA_BOOTSTRAP_SERVER:-kafka:9092}"
 KAFKA_TOPICS_BIN="/opt/kafka/bin/kafka-topics.sh"
 
+echo "Waiting for Kafka to become ready at ${BOOTSTRAP_SERVER}..."
+
 # Wait for Kafka to be ready
-until "$KAFKA_TOPICS_BIN" --bootstrap-server kafka:9092 --list > /dev/null 2>&1; do
+until "$KAFKA_TOPICS_BIN" --bootstrap-server "$BOOTSTRAP_SERVER" --list > /dev/null 2>&1; do
   echo "Kafka not yet ready... waiting 5 seconds"
   sleep 5
 done
@@ -22,7 +25,7 @@ for topic_definition in "${TOPICS_TO_CREATE[@]}"; do
   IFS=':' read -r TOPIC_NAME TOPIC_PARTITIONS TOPIC_REPLICATION <<< "$topic_definition"
 
   echo "Creating Kafka topic: $TOPIC_NAME (partitions=$TOPIC_PARTITIONS, replication=$TOPIC_REPLICATION)"
-  "$KAFKA_TOPICS_BIN" --bootstrap-server kafka:9092 --create --if-not-exists \
+  "$KAFKA_TOPICS_BIN" --bootstrap-server "$BOOTSTRAP_SERVER" --create --if-not-exists \
     --topic "$TOPIC_NAME" \
     --partitions "$TOPIC_PARTITIONS" \
     --replication-factor "$TOPIC_REPLICATION"
@@ -32,6 +35,6 @@ done
 
 # List created topics
 echo "Topics created successfully! Current topics:"
-"$KAFKA_TOPICS_BIN" --bootstrap-server kafka:9092 --list
+"$KAFKA_TOPICS_BIN" --bootstrap-server "$BOOTSTRAP_SERVER" --list
 
 echo "Topic initialization complete!"

@@ -113,12 +113,12 @@ setup_env_file "documents-service" "documents-service" "GROQ_API_KEY="
 
 setup_env_file "infrastructure/kafka" "kafka" "
 KAFKA_CONTAINER_NAME=kafka
-KAFKA_HOST_PORT=29092
-KAFKA_BROKER_PORT=9092
-KAFKA_CONTROLLER_PORT=9093
+KAFKA_VERSION=latest
 KAFKA_NODE_ID=1
-KAFKA_CLUSTER_ID=CiTQ5Q8mS9-Ef6M2Wf4h2A
-KAFKA_LOG_RETENTION_HOURS=168
+KAFKA_KRAFT_CLUSTER_ID=CiTQ5Q8mS9-Ef6M2Wf4h2A
+KAFKA_PORT=9092
+KAFKA_EXTERNAL_PORT=29092
+KAFKA_UI_PORT=8089
 "
 
 echo -e "${GREEN}✅ .env configuration completed for all services${NC}"

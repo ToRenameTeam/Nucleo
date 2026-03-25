@@ -37,6 +37,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+    environment:
+      - KAFKA_BOOTSTRAP_SERVER=kafka:${KAFKA_PORT}
     entrypoint: ['/bin/bash', '/scripts/create-topics.sh']
     volumes:
       - ./scripts:/scripts

@@ -4,6 +4,7 @@ const serviceScopes = [
   'commons',
   'documents',
   'frontend',
+  'infrastructure',
   'master-data',
   'users',
 ];
