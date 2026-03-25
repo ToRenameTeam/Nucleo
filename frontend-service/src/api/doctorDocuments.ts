@@ -68,21 +68,21 @@ interface BaseDocumentResponse {
 }
 
 interface MedicinePrescriptionResponse extends BaseDocumentResponse {
-  type: 'medicine_prescription';
-  validity: Validity;
+  _t: 'medicine_prescription';
+  validity: ValidityResponse;
   dosage: Dosage;
 }
 
 interface ServicePrescriptionResponse extends BaseDocumentResponse {
-  type: 'service_prescription';
-  validity: Validity;
+  _t: 'service_prescription';
+  validity: ValidityResponse;
   serviceId: string;
   facilityId: string;
   priority: string;
 }
 
 interface ReportResponse extends BaseDocumentResponse {
-  type: 'report';
+  _t: 'report';
   servicePrescription: ServicePrescriptionResponse;
   executionDate: string;
   clinicalQuestion?: string;
@@ -92,6 +92,8 @@ interface ReportResponse extends BaseDocumentResponse {
 }
 
 type DocumentResponse = MedicinePrescriptionResponse | ServicePrescriptionResponse | ReportResponse;
+
+type ValidityResponse = { _t: 'until_date'; date: string } | { _t: 'until_execution' };
 
 const fileMetadataSchema = z.object({
   summary: nonEmptyTrimmedStringSchema,
@@ -139,9 +141,9 @@ const createServicePrescriptionRequestSchema = z.object({
   priority: nonEmptyTrimmedStringSchema,
 });
 
-const validityResponseSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('until_date'), date: nonEmptyTrimmedStringSchema }),
-  z.object({ type: z.literal('until_execution') }),
+const validityResponseSchema = z.discriminatedUnion('_t', [
+  z.object({ _t: z.literal('until_date'), date: nonEmptyTrimmedStringSchema }),
+  z.object({ _t: z.literal('until_execution') }),
 ]);
 
 const baseDocumentResponseSchema = z.object({
@@ -153,13 +155,13 @@ const baseDocumentResponseSchema = z.object({
 });
 
 const medicinePrescriptionResponseSchema = baseDocumentResponseSchema.extend({
-  type: z.literal('medicine_prescription'),
+  _t: z.literal('medicine_prescription'),
   validity: validityResponseSchema,
   dosage: dosageSchema,
 });
 
 const servicePrescriptionResponseSchema = baseDocumentResponseSchema.extend({
-  type: z.literal('service_prescription'),
+  _t: z.literal('service_prescription'),
   validity: validityResponseSchema,
   serviceId: idSchema,
   facilityId: idSchema,
@@ -167,7 +169,7 @@ const servicePrescriptionResponseSchema = baseDocumentResponseSchema.extend({
 });
 
 const reportResponseSchema = baseDocumentResponseSchema.extend({
-  type: z.literal('report'),
+  _t: z.literal('report'),
   servicePrescription: servicePrescriptionResponseSchema,
   executionDate: nonEmptyTrimmedStringSchema,
   clinicalQuestion: nonEmptyTrimmedStringSchema.optional(),
@@ -176,28 +178,36 @@ const reportResponseSchema = baseDocumentResponseSchema.extend({
   recommendations: nonEmptyTrimmedStringSchema.optional(),
 });
 
-const documentResponseSchema = z.discriminatedUnion('type', [
+const documentResponseSchema = z.discriminatedUnion('_t', [
   medicinePrescriptionResponseSchema,
   servicePrescriptionResponseSchema,
   reportResponseSchema,
 ]);
 
+function mapValidityResponse(validity: ValidityResponse): Validity {
+  if (validity._t === 'until_date') {
+    return { type: 'until_date', date: validity.date };
+  }
+
+  return { type: 'until_execution' };
+}
+
 function mapDocumentResponse(response: DocumentResponse): AnyDocument {
   const baseDocument: Document = {
     id: response.id,
-    title: response.metadata.summary || getDocumentTypeLabel(response.type),
+    title: response.metadata.summary || getDocumentTypeLabel(response._t),
     description: response.metadata.summary || '',
     date: response.issueDate,
     tags: response.metadata.tags || [],
   };
 
   // Map to specific document types
-  switch (response.type) {
+  switch (response._t) {
     case 'medicine_prescription': {
       const medicinePrescription: MedicinePrescription = {
         ...baseDocument,
         type: 'medicine_prescription',
-        validity: response.validity,
+        validity: mapValidityResponse(response.validity),
         dosage: response.dosage,
       };
       return medicinePrescription;
@@ -207,7 +217,7 @@ function mapDocumentResponse(response: DocumentResponse): AnyDocument {
       const servicePrescription: ServicePrescription = {
         ...baseDocument,
         type: 'service_prescription',
-        validity: response.validity,
+        validity: mapValidityResponse(response.validity),
         serviceId: response.serviceId,
         facilityId: response.facilityId,
         priority: response.priority,

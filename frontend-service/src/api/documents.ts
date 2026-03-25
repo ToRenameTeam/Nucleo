@@ -73,6 +73,56 @@ export type CreateDocumentRequest =
   | CreateServicePrescriptionRequest
   | CreateReportRequest;
 
+type ApiValidity =
+  | {
+      _t: 'until_date';
+      date: string;
+    }
+  | {
+      _t: 'until_execution';
+    };
+
+type BackendValidity =
+  | {
+      _t: 'until_date';
+      date: string;
+    }
+  | {
+      _t: 'until_execution';
+    };
+
+type BackendCreateDocumentRequest =
+  | {
+      _t: 'medicine_prescription';
+      doctorId: string;
+      title: string;
+      metadata: FileMetadata;
+      validity: BackendValidity;
+      dosage: CreateMedicinePrescriptionRequest['dosage'];
+    }
+  | {
+      _t: 'service_prescription';
+      doctorId: string;
+      title: string;
+      metadata: FileMetadata;
+      validity: BackendValidity;
+      serviceId: string;
+      facilityId: string;
+      priority: CreateServicePrescriptionRequest['priority'];
+    }
+  | {
+      _t: 'report';
+      doctorId: string;
+      title: string;
+      metadata: FileMetadata;
+      servicePrescriptionId: string;
+      executionDate: string;
+      findings: string;
+      clinicalQuestion?: string;
+      conclusion?: string;
+      recommendations?: string;
+    };
+
 export interface DocumentResponse {
   id: string;
   doctorId: string;
@@ -85,14 +135,14 @@ export interface DocumentResponse {
 export interface MedicinePrescriptionResponse extends DocumentResponse {
   _t: 'medicine_prescription';
   title: string;
-  validity: Validity;
+  validity: ApiValidity;
   dosage: Dosage;
 }
 
 export interface ServicePrescriptionResponse extends DocumentResponse {
   _t: 'service_prescription';
   title: string;
-  validity: Validity;
+  validity: ApiValidity;
   serviceId: string;
   facilityId: string;
   priority: string;
@@ -137,13 +187,23 @@ const fileMetadataSchema = z.object({
   tags: z.array(nonEmptyTrimmedStringSchema),
 });
 
-const validitySchema = z.discriminatedUnion('type', [
+const validityRequestSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('until_date'),
     date: nonEmptyTrimmedStringSchema,
   }),
   z.object({
     type: z.literal('until_execution'),
+  }),
+]);
+
+const validityApiSchema = z.discriminatedUnion('_t', [
+  z.object({
+    _t: z.literal('until_date'),
+    date: nonEmptyTrimmedStringSchema,
+  }),
+  z.object({
+    _t: z.literal('until_execution'),
   }),
 ]);
 
@@ -167,7 +227,7 @@ const createMedicinePrescriptionRequestSchema = z.object({
   type: z.literal('medicine_prescription'),
   doctorId: idSchema,
   metadata: fileMetadataSchema,
-  validity: validitySchema,
+  validity: validityRequestSchema,
   dosage: dosageSchema,
 });
 
@@ -175,7 +235,7 @@ const createServicePrescriptionRequestSchema = z.object({
   type: z.literal('service_prescription'),
   doctorId: idSchema,
   metadata: fileMetadataSchema,
-  validity: validitySchema,
+  validity: validityRequestSchema,
   serviceId: idSchema,
   facilityId: idSchema,
   priority: z.enum(['ROUTINE', 'URGENT', 'EMERGENCY']),
@@ -212,13 +272,13 @@ const documentResponseSchema = z
 
 const medicinePrescriptionResponseSchema = documentResponseSchema.extend({
   _t: z.literal('medicine_prescription'),
-  validity: validitySchema,
+  validity: validityApiSchema,
   dosage: dosageSchema,
 });
 
 const servicePrescriptionResponseSchema = documentResponseSchema.extend({
   _t: z.literal('service_prescription'),
-  validity: validitySchema,
+  validity: validityApiSchema,
   serviceId: idSchema,
   facilityId: idSchema,
   priority: nonEmptyTrimmedStringSchema,
@@ -256,6 +316,83 @@ const uploadResponseSchema = z
   .passthrough();
 
 // Helper functions
+function mapValidityResponse(validity: ApiValidity): Validity {
+  if (validity._t === 'until_date') {
+    return {
+      type: 'until_date',
+      date: validity.date,
+    };
+  }
+
+  return {
+    type: 'until_execution',
+  };
+}
+
+function mapValidityToBackend(
+  validity: CreateMedicinePrescriptionRequest['validity']
+): BackendValidity {
+  if (validity.type === 'until_date') {
+    return {
+      _t: 'until_date',
+      date: validity.date ?? '',
+    };
+  }
+
+  return {
+    _t: 'until_execution',
+  };
+}
+
+function buildDocumentTitle(type: CreateDocumentRequest['type'], summary: string): string {
+  return summary.trim() || getDocumentTypeLabel(type);
+}
+
+function toBackendCreateDocumentRequest(
+  request: CreateDocumentRequest
+): BackendCreateDocumentRequest {
+  const title = buildDocumentTitle(request.type, request.metadata.summary);
+
+  switch (request.type) {
+    case 'medicine_prescription':
+      return {
+        _t: 'medicine_prescription',
+        doctorId: request.doctorId,
+        title,
+        metadata: request.metadata,
+        validity: mapValidityToBackend(request.validity),
+        dosage: request.dosage,
+      };
+
+    case 'service_prescription':
+      return {
+        _t: 'service_prescription',
+        doctorId: request.doctorId,
+        title,
+        metadata: request.metadata,
+        validity: mapValidityToBackend(request.validity),
+        serviceId: request.serviceId,
+        facilityId: request.facilityId,
+        priority: request.priority,
+      };
+
+    case 'report':
+      return {
+        _t: 'report',
+        doctorId: request.doctorId,
+        title,
+        metadata: request.metadata,
+        servicePrescriptionId: request.servicePrescriptionId,
+        executionDate: request.executionDate,
+        findings: request.findings,
+        clinicalQuestion: request.clinicalQuestion,
+        conclusion: request.conclusion,
+        recommendations: request.recommendations,
+      };
+  }
+}
+
+// Helper functions
 function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {
   console.log('[Documents API] Mapping document response:', {
     id: response.id,
@@ -279,7 +416,7 @@ function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {
       const medicinePrescription: MedicinePrescription = {
         ...baseDocument,
         type: 'medicine_prescription',
-        validity: response.validity,
+        validity: mapValidityResponse(response.validity),
         dosage: response.dosage,
       };
       console.log('[Documents API] Mapped as MedicinePrescription');
@@ -290,7 +427,7 @@ function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {
       const servicePrescription: ServicePrescription = {
         ...baseDocument,
         type: 'service_prescription',
-        validity: response.validity,
+        validity: mapValidityResponse(response.validity),
         serviceId: response.serviceId,
         facilityId: response.facilityId,
         priority: response.priority,
@@ -366,28 +503,7 @@ export const documentsApiService = {
       'create document request'
     );
 
-    const payload = {
-      '@type': sanitizedRequest.type,
-      doctorId: sanitizedRequest.doctorId,
-      metadata: sanitizedRequest.metadata,
-      ...('validity' in sanitizedRequest && { validity: sanitizedRequest.validity }),
-      ...('dosage' in sanitizedRequest && { dosage: sanitizedRequest.dosage }),
-      ...('serviceId' in sanitizedRequest && { serviceId: sanitizedRequest.serviceId }),
-      ...('facilityId' in sanitizedRequest && { facilityId: sanitizedRequest.facilityId }),
-      ...('priority' in sanitizedRequest && { priority: sanitizedRequest.priority }),
-      ...('servicePrescriptionId' in sanitizedRequest && {
-        servicePrescriptionId: sanitizedRequest.servicePrescriptionId,
-      }),
-      ...('executionDate' in sanitizedRequest && { executionDate: sanitizedRequest.executionDate }),
-      ...('findings' in sanitizedRequest && { findings: sanitizedRequest.findings }),
-      ...('clinicalQuestion' in sanitizedRequest && {
-        clinicalQuestion: sanitizedRequest.clinicalQuestion,
-      }),
-      ...('conclusion' in sanitizedRequest && { conclusion: sanitizedRequest.conclusion }),
-      ...('recommendations' in sanitizedRequest && {
-        recommendations: sanitizedRequest.recommendations,
-      }),
-    };
+    const payload = toBackendCreateDocumentRequest(sanitizedRequest);
 
     const response = await fetch(`${BASE_URL}/api/documents/patients/${sanitizedPatientId}`, {
       method: 'POST',
@@ -640,13 +756,15 @@ export const documentsApiService = {
     );
     const url = `${BASE_URL}/api/documents/patients/${sanitizedPatientId}`;
 
+    const payload = toBackendCreateDocumentRequest(sanitizedRequest);
+
     try {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(sanitizedRequest),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -686,13 +804,15 @@ export const documentsApiService = {
     );
     const url = `${BASE_URL}/api/documents/patients/${sanitizedPatientId}`;
 
+    const payload = toBackendCreateDocumentRequest(sanitizedRequest);
+
     try {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(sanitizedRequest),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
