@@ -1,3 +1,81 @@
+### Features
+
+
+- remove unused (33ff523)
+- appointment detail API (edde4b1)
+- configure CORS to allow all hosts for development (dc6e374)
+- delete appointment (2b892b6)
+- update appointment (d543792)
+- filtered appointments and appointments by id (543b270)
+- create and findAll appointments (38e864d)
+- create appointments value objects (74b5dbd)
+- appointments database schema and seed (604e415)
+- check availabilities overlaps (194ac7d)
+- availability update and (soft) delete (2cd8891)
+- filtered availability (b1ef679)
+- add logging configurations (97001ef)
+- create health, insert and findAll API (b242c1c)
+- create value objects (ba75b94)
+- create availability table in database (a998833)
+
+### Fixes
+
+
+- rest api routes format (a36afde)
+- filter appointments by doctor (b6c9ded)
+- kotlinx-serialization dependency (518629d)
+- availability uuid (b8c832a)
+- downgrade to kotlin 2.2.20 (13691d6)
+
+### Other
+
+
+- ci: use separate task for running integration tests in kt services (d1c014b)
+- test: integration tests with testcontainers (73d3eb9)
+- refactor: fix linting errors (92a85ed)
+- chore: softer detekt settings (dc00e6d)
+- chore: add detekt kotlin linter (09713d2)
+- chore: setup kover (c569c71)
+- refactor: value objects validation with smart constructor in kt ms (bc8fe7b)
+- refactor: prettify js, ts, json, yaml, css and vue files (6c86380)
+- chore: add commons to dockerfiles (b6e2d46)
+- refactor: create commons module for shared code among kotlin microservices (d458fa6)
+- chore: delete dummy test (29c400a)
+- refactor: refactor tests to describe spec and centralize fixtures (ef62e71)
+- refactor: remove pass-through command objs (626ae6a)
+- refactor: kotlin services entrypoint file (798c1ef)
+- refactor: re-organize REST API routes in Kotlin services (821558a)
+- chore: update seed using current date (aec3c24)
+- refactor: move value objs in aggregate files (5538617)
+- refactor: move dto mappers to dto package (26d52a9)
+- refactor: group api dtos (58cfff2)
+- refactor: handle errors as values in appointments and documents service (ec3146a)
+- refactor: uniform backend services dockerfiles (99faa8b)
+- chore: change seed dates (e9624ff)
+- refactor: update seeds (bc5ca73)
+- chore: merge branch dev into feat/documents (0b343c6)
+- refactor: remove appointment duplicated information from availability to prevent inconsistency (89466bf)
+- chore: merge branch 'feat/appointments' into dev (32e61c4)
+- refactor: move env variables to proper file (fb3d9db)
+- refactor: format code with ktfmt (d50eae4)
+- test: appointments (f06b748)
+- test: availabilities (5d51aa7)
+- test: add dependencies (49937fd)
+- chore: move appointment logic into service (826a270)
+- chore: move availability logic into service (cec719a)
+- chore: rename repository classes (a38f4f1)
+- chore: separate availability repository interface from its implementation (39f44ec)
+- chore: format availabilities file (94bc225)
+- chore: update .gitignore (82045d4)
+- chore: add ktor dependency (48775c4)
+- chore: add docker compose with database (fa06f98)
+- chore: init documents service (ebb9f43)
+- chore: add kotest dependency to kotlin-base plugin (e27cd7a)
+- chore: add ktfmt to kotlin-base custom plugin (dc07828)
+- chore: configure build-logic for shared custom gradle plugins (59fea61)
+- chore: init appointments module (8961699)
+- chore: init (e60d783)
+
 ### Breaking Changes
 
 
