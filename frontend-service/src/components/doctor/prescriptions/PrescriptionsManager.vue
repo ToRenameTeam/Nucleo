@@ -81,7 +81,7 @@ const handleSaveMedicinePrescription = async (prescription: MedicinePrescription
 
     // Build the request with the proper format for the API
     const request = {
-      _t: 'medicine_prescription' as const,
+      type: 'medicine_prescription' as const,
       doctorId,
       title: `Prescrizione: ${prescription.medicineName}`,
       metadata: {
@@ -90,9 +90,9 @@ const handleSaveMedicinePrescription = async (prescription: MedicinePrescription
       },
       validity:
         prescription.validityType === 'until_execution'
-          ? { _t: 'until_execution' as const }
+          ? { type: 'until_execution' as const }
           : {
-              _t: 'until_date' as const,
+              type: 'until_date' as const,
               date: prescription.validityDate, // Already in yyyy-MM-dd format from date input
             },
       dosage: {
@@ -141,7 +141,7 @@ const handleSaveServicePrescription = async (prescription: ServicePrescriptionFo
 
     // Build the request with the proper format for the API
     const request = {
-      _t: 'service_prescription' as const,
+      type: 'service_prescription' as const,
       doctorId,
       title: `Prescrizione: ${prescription.serviceName}`,
       metadata: {
@@ -150,9 +150,9 @@ const handleSaveServicePrescription = async (prescription: ServicePrescriptionFo
       },
       validity:
         prescription.validityType === 'until_execution'
-          ? { _t: 'until_execution' as const }
+          ? { type: 'until_execution' as const }
           : {
-              _t: 'until_date' as const,
+              type: 'until_date' as const,
               date: prescription.validityDate, // Already in yyyy-MM-dd format from date input
             },
       serviceId: prescription.serviceId,

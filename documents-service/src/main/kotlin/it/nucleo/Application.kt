@@ -53,7 +53,7 @@ internal fun Application.configureSerialization() {
                 isLenient = true
                 ignoreUnknownKeys = true
                 encodeDefaults = true
-                classDiscriminator = "_t"
+                classDiscriminator = "type"
             }
         )
     }

@@ -107,7 +107,7 @@ class DocumentsApiIntegrationTest :
                     documents shouldHaveSize 1
                     documents.first().jsonObject.getValue("id").jsonPrimitive.content shouldBe
                         documentId
-                    documents.first().jsonObject.getValue("_t").jsonPrimitive.content shouldBe
+                    documents.first().jsonObject.getValue("type").jsonPrimitive.content shouldBe
                         "uploaded_document"
 
                     val byIdResponse = client.get("/api/documents/patients/$patientId/$documentId")

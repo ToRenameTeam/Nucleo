@@ -196,7 +196,7 @@ private val downloadTestJson = Json {
     isLenient = true
     ignoreUnknownKeys = true
     encodeDefaults = true
-    classDiscriminator = "_t"
+    classDiscriminator = "type"
 }
 
 private fun Application.downloadTestModule(

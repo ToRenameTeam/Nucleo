@@ -19,7 +19,7 @@ private val json = Json {
     isLenient = true
     ignoreUnknownKeys = true
     encodeDefaults = true
-    classDiscriminator = "_t"
+    classDiscriminator = "type"
 }
 
 /**

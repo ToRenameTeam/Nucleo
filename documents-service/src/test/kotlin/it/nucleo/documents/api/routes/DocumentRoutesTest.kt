@@ -427,7 +427,7 @@ private val testJson = Json {
     isLenient = true
     ignoreUnknownKeys = true
     encodeDefaults = true
-    classDiscriminator = "_t"
+    classDiscriminator = "type"
 }
 
 private fun Application.testModule(
