@@ -64,5 +64,5 @@ The identified bounded contexts are:
 
 - `Users`: everything related to users, including delegations and authentication.
 - `Appointment`: covers scheduling, rescheduling and canceling of appointments.
-- `Document`: everything concerning medical documents, including their creation / upload / download / analysis.
-- `Master Data`: handles third-party data not owned by the system, such as medicines, facilities, etc.
+- `Document`: everything concerning medical documents.
+- `Master Data`: handles third-party data not owned by the system (e.g., medicines, facilities).
