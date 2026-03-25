@@ -13,6 +13,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -51,10 +52,10 @@ class DocumentRoutesTest :
             }
         }
 
-        describe("GET /api/patients/{patientId}/documents") {
+        describe("GET /api/documents/patients/{patientId}") {
             it("should return an empty list for a patient with no documents") {
                 configuredTestApp { client ->
-                    val response = client.get("/api/patients/unknown/documents")
+                    val response = client.get("/api/documents/patients/unknown")
 
                     response.status shouldBe HttpStatusCode.OK
                     response.body<List<DocumentResponse>>().shouldBeEmpty()
@@ -70,7 +71,7 @@ class DocumentRoutesTest :
                     client.createServicePrescription("patient-1")
 
                     // When
-                    val response = client.get("/api/patients/patient-1/documents")
+                    val response = client.get("/api/documents/patients/patient-1")
 
                     // Then
                     response.status shouldBe HttpStatusCode.OK
@@ -85,7 +86,7 @@ class DocumentRoutesTest :
                     client.createMedicinePrescription("patient-a")
                     client.createServicePrescription("patient-b")
 
-                    val response = client.get("/api/patients/patient-a/documents")
+                    val response = client.get("/api/documents/patients/patient-a")
 
                     response.status shouldBe HttpStatusCode.OK
                     val docs = response.body<List<DocumentResponse>>()
@@ -95,10 +96,10 @@ class DocumentRoutesTest :
             }
         }
 
-        describe("GET /api/patients/{patientId}/documents/{documentId}") {
+        describe("GET /api/documents/patients/{patientId}/{documentId}") {
             it("should return 404 for a non-existent document") {
                 configuredTestApp { client ->
-                    val response = client.get("/api/patients/p1/documents/non-existent")
+                    val response = client.get("/api/documents/patients/p1/non-existent")
 
                     response.status shouldBe HttpStatusCode.NotFound
                     response.body<ErrorResponse>().error shouldBe "not_found"
@@ -111,7 +112,7 @@ class DocumentRoutesTest :
                 configuredTestApp(docRepo, fileRepo) { client ->
                     val created = client.createMedicinePrescription("patient-1")
 
-                    val response = client.get("/api/patients/patient-1/documents/${created.id}")
+                    val response = client.get("/api/documents/patients/patient-1/${created.id}")
 
                     response.status shouldBe HttpStatusCode.OK
                     val doc = response.body<MedicinePrescriptionResponse>()
@@ -126,14 +127,14 @@ class DocumentRoutesTest :
                 configuredTestApp(docRepo, fileRepo) { client ->
                     val created = client.createMedicinePrescription("patient-a")
 
-                    val response = client.get("/api/patients/patient-b/documents/${created.id}")
+                    val response = client.get("/api/documents/patients/patient-b/${created.id}")
 
                     response.status shouldBe HttpStatusCode.NotFound
                 }
             }
         }
 
-        describe("POST /api/patients/{patientId}/documents") {
+        describe("POST /api/documents/patients/{patientId}") {
             describe("medicine prescription") {
                 it("should create a medicine prescription with valid data") {
                     val docRepo = FakeDocumentRepository()
@@ -265,7 +266,7 @@ class DocumentRoutesTest :
                 it("should return 400 for invalid JSON") {
                     configuredTestApp { client ->
                         val response =
-                            client.post("/api/patients/p1/documents") {
+                            client.post("/api/documents/patients/p1") {
                                 contentType(ContentType.Application.Json)
                                 setBody("{ invalid json }")
                             }
@@ -276,7 +277,7 @@ class DocumentRoutesTest :
             }
         }
 
-        describe("DELETE /api/patients/{patientId}/documents/{documentId}") {
+        describe("DELETE /api/documents/patients/{patientId}/{documentId}") {
             it("should delete an existing document") {
                 val docRepo = FakeDocumentRepository()
                 val fileRepo = FakeFileStorageRepository()
@@ -284,27 +285,27 @@ class DocumentRoutesTest :
                     val created = client.createMedicinePrescription("patient-1")
 
                     val deleteResponse =
-                        client.delete("/api/patients/patient-1/documents/${created.id}")
+                        client.delete("/api/documents/patients/patient-1/${created.id}")
 
                     deleteResponse.status shouldBe HttpStatusCode.OK
                     deleteResponse.body<DeleteResponse>().message shouldContain "deleted"
 
                     // Verify it is gone
-                    val getResponse = client.get("/api/patients/patient-1/documents/${created.id}")
+                    val getResponse = client.get("/api/documents/patients/patient-1/${created.id}")
                     getResponse.status shouldBe HttpStatusCode.NotFound
                 }
             }
 
             it("should return 404 when deleting a non-existent document") {
                 configuredTestApp { client ->
-                    val response = client.delete("/api/patients/p1/documents/non-existent")
+                    val response = client.delete("/api/documents/patients/p1/non-existent")
 
                     response.status shouldBe HttpStatusCode.NotFound
                 }
             }
         }
 
-        describe("PUT /api/patients/{patientId}/documents/{documentId}/report") {
+        describe("PUT /api/documents/patients/{patientId}/{documentId}/report") {
             it("should update the editable fields of a report") {
                 val docRepo = FakeDocumentRepository()
                 val fileRepo = FakeFileStorageRepository()
@@ -333,7 +334,7 @@ class DocumentRoutesTest :
                             conclusion = "New conclusion",
                         )
                     val response =
-                        client.put("/api/patients/patient-1/documents/${report.id}/report") {
+                        client.put("/api/documents/patients/patient-1/${report.id}/report") {
                             contentType(ContentType.Application.Json)
                             setBody(updateRequest)
                         }
@@ -353,7 +354,7 @@ class DocumentRoutesTest :
                     val mp = client.createMedicinePrescription("patient-1")
 
                     val response =
-                        client.put("/api/patients/patient-1/documents/${mp.id}/report") {
+                        client.put("/api/documents/patients/patient-1/${mp.id}/report") {
                             contentType(ContentType.Application.Json)
                             setBody(UpdateReportRequest(findings = "New findings"))
                         }
@@ -366,7 +367,7 @@ class DocumentRoutesTest :
             it("should return 404 when the document does not exist") {
                 configuredTestApp { client ->
                     val response =
-                        client.put("/api/patients/p1/documents/non-existent/report") {
+                        client.put("/api/documents/patients/p1/non-existent/report") {
                             contentType(ContentType.Application.Json)
                             setBody(UpdateReportRequest(findings = "New findings"))
                         }
@@ -401,7 +402,7 @@ class DocumentRoutesTest :
 
                     // When: updating only recommendations
                     val response =
-                        client.put("/api/patients/patient-1/documents/${report.id}/report") {
+                        client.put("/api/documents/patients/patient-1/${report.id}/report") {
                             contentType(ContentType.Application.Json)
                             setBody(
                                 UpdateReportRequest(
@@ -426,7 +427,7 @@ private val testJson = Json {
     isLenient = true
     ignoreUnknownKeys = true
     encodeDefaults = true
-    classDiscriminator = "_t"
+    classDiscriminator = "type"
 }
 
 private fun Application.testModule(
@@ -435,6 +436,12 @@ private fun Application.testModule(
 ) {
     install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) { json(testJson) }
     install(StatusPages) {
+        exception<BadRequestException> { call, cause ->
+            call.respond(
+                HttpStatusCode.BadRequest,
+                ErrorResponse("bad_request", "Invalid request body", cause.message),
+            )
+        }
         exception<IllegalArgumentException> { call, cause ->
             call.respond(
                 HttpStatusCode.BadRequest,
@@ -467,7 +474,7 @@ private suspend fun io.ktor.client.HttpClient.postDocument(
     patientId: String,
     request: CreateDocumentRequest,
 ): HttpResponse =
-    post("/api/patients/$patientId/documents") {
+    post("/api/documents/patients/$patientId") {
         contentType(ContentType.Application.Json)
         setBody(request)
     }

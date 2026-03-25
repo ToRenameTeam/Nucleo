@@ -8,6 +8,8 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
+private const val MAX_PATIENT_ID_LENGTH = 50
+
 data class Appointment(
     val id: AppointmentId,
     val patientId: PatientId,
@@ -108,8 +110,10 @@ value class PatientId private constructor(val value: String) {
             if (value.isBlank()) {
                 return failure(ValidationError("PatientId cannot be blank"))
             }
-            if (value.length > 50) {
-                return failure(ValidationError("PatientId cannot exceed 50 characters"))
+            if (value.length > MAX_PATIENT_ID_LENGTH) {
+                return failure(
+                    ValidationError("PatientId cannot exceed $MAX_PATIENT_ID_LENGTH characters")
+                )
             }
             return success(PatientId(value))
         }

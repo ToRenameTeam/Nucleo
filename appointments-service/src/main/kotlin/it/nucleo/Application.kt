@@ -24,6 +24,7 @@ import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 
+private const val DEFAULT_SERVER_PORT = 8080
 private val logger = LoggerFactory.getLogger("it.nucleo.Application")
 
 fun main() {
@@ -114,12 +115,14 @@ private fun Application.configureRouting() {
     routing {
         get("/health") { call.respond(HttpStatusCode.OK, mapOf("status" to "UP")) }
 
-        availabilityRoutes(availabilityService)
-        appointmentRoutes(appointmentService)
+        route("/api") {
+            availabilityRoutes(availabilityService)
+            appointmentRoutes(appointmentService)
+        }
     }
 }
 
 private object Environment {
     val serverPort: Int
-        get() = System.getenv("SERVER_PORT")?.toIntOrNull() ?: 8080
+        get() = System.getenv("SERVER_PORT")?.toIntOrNull() ?: DEFAULT_SERVER_PORT
 }

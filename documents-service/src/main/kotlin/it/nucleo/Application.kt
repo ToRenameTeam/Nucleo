@@ -5,6 +5,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
@@ -26,6 +27,7 @@ import it.nucleo.documents.infrastructure.persistence.mongodb.MongoDbFactory
 import it.nucleo.documents.infrastructure.persistence.mongodb.MongoDocumentRepository
 import kotlinx.serialization.json.Json
 
+private const val DEFAULT_SERVER_PORT = 8080
 private val logger = logger("it.nucleo.Application")
 
 fun main() {
@@ -51,7 +53,7 @@ internal fun Application.configureSerialization() {
                 isLenient = true
                 ignoreUnknownKeys = true
                 encodeDefaults = true
-                classDiscriminator = "_t"
+                classDiscriminator = "type"
             }
         )
     }
@@ -59,6 +61,18 @@ internal fun Application.configureSerialization() {
 
 internal fun Application.configureStatusPages() {
     install(StatusPages) {
+        exception<BadRequestException> { call, cause ->
+            logger.warn("Bad request: ${cause.message}")
+            call.respond(
+                HttpStatusCode.BadRequest,
+                ErrorResponse(
+                    error = "bad_request",
+                    message = "Invalid request body",
+                    details = cause.message
+                )
+            )
+        }
+
         exception<IllegalArgumentException> { call, cause ->
             logger.warn("Invalid request: ${cause.message}")
             call.respond(
@@ -160,7 +174,7 @@ private fun Application.installRoutes(
 
 private object Environment {
     val serverPort: Int
-        get() = System.getenv("SERVER_PORT")?.toIntOrNull() ?: 8080
+        get() = System.getenv("SERVER_PORT")?.toIntOrNull() ?: DEFAULT_SERVER_PORT
 
     val mongoConnectionUri: String
         get() = System.getenv("MONGO_CONNECTION_URI") ?: MongoDbFactory.Defaults.CONNECTION_URI
@@ -189,16 +203,9 @@ private object Environment {
                 ?: AiServiceClient.Companion.Defaults.PORT
 }
 
-private fun createAiServiceClient(): AiServiceClient? {
+private fun createAiServiceClient(): AiServiceClient {
     val host = Environment.aiServiceHost
     val port = Environment.aiServicePort
-    return try {
-        logger.info("Connecting to AI Service at $host:$port")
-        AiServiceClient(host = host, port = port)
-    } catch (e: Exception) {
-        logger.warn(
-            "Failed to initialize AI Service client: ${e.message}. AI analysis will be disabled."
-        )
-        null
-    }
+    logger.info("Connecting to AI Service at $host:$port")
+    return AiServiceClient(host = host, port = port)
 }

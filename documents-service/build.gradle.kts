@@ -11,6 +11,8 @@ dependencies {
     implementation(libs.pdfbox)
 
     testImplementation(libs.ktor.client.content.negotiation)
+    testImplementation(libs.testcontainers.mongodb)
+    testImplementation(libs.testcontainers.minio)
 }
 
 application {

@@ -30,11 +30,11 @@ class AppointmentRoutesTest :
             block()
         }
 
-        describe("POST /appointments") {
+        describe("POST /api/appointments") {
             it("should create an appointment successfully") {
                 configuredTestApp {
                     val response =
-                        client.post("/appointments") {
+                        client.post("/api/appointments") {
                             contentType(ContentType.Application.Json)
                             setBody(
                                 """
@@ -60,7 +60,7 @@ class AppointmentRoutesTest :
                     availabilityRepo = FakeAvailabilityRepository(availabilityExists = false),
                 ) {
                     val response =
-                        client.post("/appointments") {
+                        client.post("/api/appointments") {
                             contentType(ContentType.Application.Json)
                             setBody(
                                 """
@@ -86,7 +86,7 @@ class AppointmentRoutesTest :
                         ),
                 ) {
                     val response =
-                        client.post("/appointments") {
+                        client.post("/api/appointments") {
                             contentType(ContentType.Application.Json)
                             setBody(
                                 """
@@ -105,10 +105,11 @@ class AppointmentRoutesTest :
             }
         }
 
-        describe("GET /appointments/{id}") {
+        describe("GET /api/appointments/{id}") {
             it("should return the appointment by id") {
                 configuredTestApp {
-                    val response = client.get("/appointments/${AppointmentFixtures.APPOINTMENT_ID}")
+                    val response =
+                        client.get("/api/appointments/${AppointmentFixtures.APPOINTMENT_ID}")
 
                     response.status shouldBe HttpStatusCode.OK
                     val body = response.bodyAsText()
@@ -121,7 +122,8 @@ class AppointmentRoutesTest :
                 configuredTestApp(
                     appointmentRepo = FakeAppointmentRepository(appointmentExists = false),
                 ) {
-                    val response = client.get("/appointments/00000000-0000-0000-0000-000000000000")
+                    val response =
+                        client.get("/api/appointments/00000000-0000-0000-0000-000000000000")
 
                     response.status shouldBe HttpStatusCode.NotFound
                     response.bodyAsText() shouldContain "APPOINTMENT_NOT_FOUND"
@@ -129,10 +131,10 @@ class AppointmentRoutesTest :
             }
         }
 
-        describe("GET /appointments") {
+        describe("GET /api/appointments") {
             it("should return all appointments") {
                 configuredTestApp {
-                    val response = client.get("/appointments")
+                    val response = client.get("/api/appointments")
 
                     response.status shouldBe HttpStatusCode.OK
                     response.bodyAsText() shouldContain "appointmentId"
@@ -142,7 +144,7 @@ class AppointmentRoutesTest :
             it("should filter appointments by patientId") {
                 configuredTestApp {
                     val response =
-                        client.get("/appointments?patientId=${AppointmentFixtures.PATIENT_ID}")
+                        client.get("/api/appointments?patientId=${AppointmentFixtures.PATIENT_ID}")
 
                     response.status shouldBe HttpStatusCode.OK
                     response.bodyAsText() shouldContain AppointmentFixtures.PATIENT_ID
@@ -152,7 +154,7 @@ class AppointmentRoutesTest :
             it("should filter appointments by doctorId") {
                 configuredTestApp {
                     val response =
-                        client.get("/appointments?doctorId=${AppointmentFixtures.DOCTOR_ID}")
+                        client.get("/api/appointments?doctorId=${AppointmentFixtures.DOCTOR_ID}")
 
                     response.status shouldBe HttpStatusCode.OK
                     response.bodyAsText() shouldNotBe ""
@@ -161,7 +163,7 @@ class AppointmentRoutesTest :
 
             it("should filter appointments by status") {
                 configuredTestApp {
-                    val response = client.get("/appointments?status=SCHEDULED")
+                    val response = client.get("/api/appointments?status=SCHEDULED")
 
                     response.status shouldBe HttpStatusCode.OK
                     response.bodyAsText() shouldContain "SCHEDULED"
@@ -169,11 +171,11 @@ class AppointmentRoutesTest :
             }
         }
 
-        describe("PUT /appointments/{id}") {
+        describe("PUT /api/appointments/{id}") {
             it("should update the appointment status") {
                 configuredTestApp {
                     val response =
-                        client.put("/appointments/${AppointmentFixtures.APPOINTMENT_ID}") {
+                        client.put("/api/appointments/${AppointmentFixtures.APPOINTMENT_ID}") {
                             contentType(ContentType.Application.Json)
                             setBody("""{ "status": "CANCELLED" }""")
                         }
@@ -186,7 +188,7 @@ class AppointmentRoutesTest :
             it("should update the appointment availability") {
                 configuredTestApp {
                     val response =
-                        client.put("/appointments/${AppointmentFixtures.APPOINTMENT_ID}") {
+                        client.put("/api/appointments/${AppointmentFixtures.APPOINTMENT_ID}") {
                             contentType(ContentType.Application.Json)
                             setBody(
                                 """{ "availabilityId": "${AppointmentFixtures.OTHER_AVAILABILITY_ID}" }"""
@@ -203,7 +205,7 @@ class AppointmentRoutesTest :
                     appointmentRepo = FakeAppointmentRepository(appointmentExists = false),
                 ) {
                     val response =
-                        client.put("/appointments/non-existent-id") {
+                        client.put("/api/appointments/non-existent-id") {
                             contentType(ContentType.Application.Json)
                             setBody("""{ "status": "CANCELLED" }""")
                         }
@@ -214,7 +216,7 @@ class AppointmentRoutesTest :
             }
         }
 
-        describe("DELETE /appointments/{id}") {
+        describe("DELETE /api/appointments/{id}") {
             it("should delete an appointment successfully") {
                 configuredTestApp(
                     availabilityRepo =
@@ -223,7 +225,7 @@ class AppointmentRoutesTest :
                         ),
                 ) {
                     val response =
-                        client.delete("/appointments/${AppointmentFixtures.APPOINTMENT_ID}")
+                        client.delete("/api/appointments/${AppointmentFixtures.APPOINTMENT_ID}")
 
                     response.status shouldBe HttpStatusCode.NoContent
                 }
@@ -234,7 +236,7 @@ class AppointmentRoutesTest :
                     appointmentRepo = FakeAppointmentRepository(appointmentExists = false),
                 ) {
                     val response =
-                        client.delete("/appointments/00000000-0000-0000-0000-000000000000")
+                        client.delete("/api/appointments/00000000-0000-0000-0000-000000000000")
 
                     response.status shouldBe HttpStatusCode.NotFound
                     response.bodyAsText() shouldContain "APPOINTMENT_NOT_FOUND"
@@ -256,6 +258,6 @@ private fun Application.appointmentTestModule(
     install(ContentNegotiation) { json(appointmentTestJson) }
     routing {
         val service = AppointmentService(appointmentRepo, availabilityRepo)
-        appointmentRoutes(service)
+        route("/api") { appointmentRoutes(service) }
     }
 }

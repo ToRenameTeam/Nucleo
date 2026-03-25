@@ -48,6 +48,9 @@ jobs:
       - name: Check formatting (ktfmt)
         run: ./gradlew ktfmtCheck
 
+      - name: Lint (detekt)
+        run: ./gradlew :appointments-service:detekt :documents-service:detekt
+
   lint-python:
     name: Lint & Format (Python)
     runs-on: ubuntu-latest
@@ -144,8 +147,14 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Run tests
+      - name: Run unit tests
         run: ./gradlew :appointments-service:test
+
+      - name: Verify Docker availability
+        run: docker info
+
+      - name: Run integration tests
+        run: ./gradlew :appointments-service:integrationTest
 
   test-documents-service:
     name: Test – documents-service
@@ -163,5 +172,11 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Run tests
+      - name: Run unit tests
         run: ./gradlew :documents-service:test
+
+      - name: Verify Docker availability
+        run: docker info
+
+      - name: Run integration tests
+        run: ./gradlew :documents-service:integrationTest

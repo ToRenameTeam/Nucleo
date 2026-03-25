@@ -152,35 +152,27 @@ class DocumentService(
             return document
         }
 
-        return try {
-            logger.debug("Requesting AI analysis for document: ${document.id.id}")
+        logger.debug("Requesting AI analysis for document: ${document.id.id}")
 
-            val result =
-                aiServiceClient.analyzeDocument(
-                    patientId = patientId.id,
-                    documentId = document.id.id
+        val result =
+            aiServiceClient.analyzeDocument(patientId = patientId.id, documentId = document.id.id)
+
+        return when (result) {
+            is AiAnalysisResult.Success -> {
+                logger.info(
+                    "AI analysis successful for document ${document.id.id}: " +
+                        "summary_length=${result.metadata.summary.summary.length}, " +
+                        "tags_count=${result.metadata.tags.size}"
                 )
-
-            when (result) {
-                is AiAnalysisResult.Success -> {
-                    logger.info(
-                        "AI analysis successful for document ${document.id.id}: " +
-                            "summary_length=${result.metadata.summary.summary.length}, " +
-                            "tags_count=${result.metadata.tags.size}"
-                    )
-                    document.withMetadata(result.metadata)
-                }
-                is AiAnalysisResult.Failure -> {
-                    logger.warn(
-                        "AI analysis failed for document ${document.id.id}: " +
-                            "${result.errorCode} - ${result.message}. Using provided metadata."
-                    )
-                    document
-                }
+                document.withMetadata(result.metadata)
             }
-        } catch (e: Exception) {
-            logger.error("Error during AI analysis for document ${document.id.id}", e)
-            document
+            is AiAnalysisResult.Failure -> {
+                logger.warn(
+                    "AI analysis failed for document ${document.id.id}: " +
+                        "${result.errorCode} - ${result.message}. Using provided metadata."
+                )
+                document
+            }
         }
     }
 }

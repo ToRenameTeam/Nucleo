@@ -8,7 +8,7 @@ import MedicinePrescriptionModal from './MedicinePrescriptionForm.vue';
 import ServicePrescriptionModal from './ServicePrescriptionForm.vue';
 import Toast from '../../shared/Toast.vue';
 import { userApi, type UserInfo } from '../../../api/users';
-import { doctorDocumentsApi } from '../../../api/doctorDocuments';
+import { documentsApiService } from '../../../api/documents';
 import type { MedicinePrescriptionFormData } from './MedicinePrescriptionForm.vue';
 import type { ServicePrescriptionFormData } from './ServicePrescriptionForm.vue';
 
@@ -81,18 +81,17 @@ const handleSaveMedicinePrescription = async (prescription: MedicinePrescription
 
     // Build the request with the proper format for the API
     const request = {
-      _t: 'medicine_prescription' as const,
+      type: 'medicine_prescription' as const,
       doctorId,
-      title: `Prescrizione: ${prescription.medicineName}`,
       metadata: {
         summary: t('prescriptionSummary.medicine', { medicine: prescription.medicineName }),
         tags: [t('prescriptionTags.prescription'), t('prescriptionTags.medicines')],
       },
       validity:
         prescription.validityType === 'until_execution'
-          ? { _t: 'until_execution' as const }
+          ? { type: 'until_execution' as const }
           : {
-              _t: 'until_date' as const,
+              type: 'until_date' as const,
               date: prescription.validityDate, // Already in yyyy-MM-dd format from date input
             },
       dosage: {
@@ -112,7 +111,7 @@ const handleSaveMedicinePrescription = async (prescription: MedicinePrescription
       },
     };
 
-    await doctorDocumentsApi.createMedicinePrescription(prescription.patientId, request);
+    await documentsApiService.createMedicinePrescription(prescription.patientId, request);
 
     isMedicinePrescriptionModalOpen.value = false;
     successToastMessage.value = t('doctor.documents.prescriptions.toast.medicineSaved');
@@ -141,18 +140,17 @@ const handleSaveServicePrescription = async (prescription: ServicePrescriptionFo
 
     // Build the request with the proper format for the API
     const request = {
-      _t: 'service_prescription' as const,
+      type: 'service_prescription' as const,
       doctorId,
-      title: `Prescrizione: ${prescription.serviceName}`,
       metadata: {
         summary: t('prescriptionSummary.service', { service: prescription.serviceName }),
         tags: [t('prescriptionTags.prescription'), t('prescriptionTags.services')],
       },
       validity:
         prescription.validityType === 'until_execution'
-          ? { _t: 'until_execution' as const }
+          ? { type: 'until_execution' as const }
           : {
-              _t: 'until_date' as const,
+              type: 'until_date' as const,
               date: prescription.validityDate, // Already in yyyy-MM-dd format from date input
             },
       serviceId: prescription.serviceId,
@@ -160,7 +158,7 @@ const handleSaveServicePrescription = async (prescription: ServicePrescriptionFo
       priority: prescription.priority,
     };
 
-    await doctorDocumentsApi.createServicePrescription(prescription.patientId, request);
+    await documentsApiService.createServicePrescription(prescription.patientId, request);
 
     isServicePrescriptionModalOpen.value = false;
     successToastMessage.value = t('doctor.documents.prescriptions.toast.serviceSaved');

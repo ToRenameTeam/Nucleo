@@ -14,18 +14,18 @@ import it.nucleo.commons.api.ErrorResponse
 import it.nucleo.commons.errors.map
 
 /**
- * Registers all availability-related routes under `/availabilities`.
- * - `POST /availabilities` – create a new availability slot for a doctor
- * - `GET /availabilities` – list availability slots (filterable by doctorId, facilityId,
+ * Registers all availability-related routes under `/api/availabilities`.
+ * - `POST /api/availabilities` – create a new availability slot for a doctor
+ * - `GET /api/availabilities` – list availability slots (filterable by doctorId, facilityId,
  *   serviceTypeId, status)
- * - `GET /availabilities/{id}` – retrieve an availability slot by ID
- * - `PUT /availabilities/{id}` – update an availability slot
- * - `DELETE /availabilities/{id}` – cancel an availability slot
+ * - `GET /api/availabilities/{id}` – retrieve an availability slot by ID
+ * - `PUT /api/availabilities/{id}` – update an availability slot
+ * - `DELETE /api/availabilities/{id}` – cancel an availability slot
  */
 fun Route.availabilityRoutes(service: AvailabilityService) {
     route("/availabilities") {
 
-        // POST /availabilities
+        // POST /api/availabilities
         // Creates a new availability slot and assigns it to the given doctor and facility.
         post {
             val request =
@@ -48,7 +48,7 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
             call.respondEither(result, HttpStatusCode.Created) { it.toResponse() }
         }
 
-        // GET /availabilities?doctorId=&facilityId=&serviceTypeId=&status=
+        // GET /api/availabilities?doctorId=&facilityId=&serviceTypeId=&status=
         // Returns all availability slots, optionally filtered by doctor, facility, service type,
         // and/or status.
         get {
@@ -70,7 +70,7 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
             call.respondEither(result)
         }
 
-        // GET /availabilities/{id}
+        // GET /api/availabilities/{id}
         // Retrieves an availability slot by its ID.
         get("/{id}") {
             val id =
@@ -84,7 +84,7 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
             call.respondEither(result)
         }
 
-        // PUT /availabilities/{id}
+        // PUT /api/availabilities/{id}
         // Updates the facility, service type, and/or time slot of an existing availability.
         put("/{id}") {
             val id =
@@ -116,7 +116,7 @@ fun Route.availabilityRoutes(service: AvailabilityService) {
             call.respondEither(result)
         }
 
-        // DELETE /availabilities/{id}
+        // DELETE /api/availabilities/{id}
         // Cancels an availability slot. Responds with 204 No Content on success.
         delete("/{id}") {
             val id =

@@ -15,18 +15,18 @@ import it.nucleo.commons.api.ErrorResponse
 import it.nucleo.commons.errors.map
 
 /**
- * Registers all appointment-related routes under `/appointments`.
- * - `POST /appointments` – book a new appointment
- * - `GET /appointments` – list appointments (filterable by patientId, doctorId, status)
- * - `GET /appointments/{id}` – retrieve an appointment by ID
- * - `GET /appointments/{id}/details` – retrieve an appointment with full availability data
- * - `PUT /appointments/{id}` – update an appointment's status or availability slot
- * - `DELETE /appointments/{id}` – cancel an appointment
+ * Registers all appointment-related routes under `/api/appointments`.
+ * - `POST /api/appointments` – book a new appointment
+ * - `GET /api/appointments` – list appointments (filterable by patientId, doctorId, status)
+ * - `GET /api/appointments/{id}` – retrieve an appointment by ID
+ * - `GET /api/appointments/{id}/details` – retrieve an appointment with full availability data
+ * - `PUT /api/appointments/{id}` – update an appointment's status or availability slot
+ * - `DELETE /api/appointments/{id}` – cancel an appointment
  */
 fun Route.appointmentRoutes(service: AppointmentService) {
     route("/appointments") {
 
-        // POST /appointments
+        // POST /api/appointments
         // Books a new appointment by linking a patient to an available slot.
         post {
             val request =
@@ -47,7 +47,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
             call.respondEither(result, HttpStatusCode.Created) { it.toResponse() }
         }
 
-        // GET /appointments?patientId=&doctorId=&status=
+        // GET /api/appointments?patientId=&doctorId=&status=
         // Returns all appointments, optionally filtered by patient, doctor, and/or status.
         get {
             val patientId = call.request.queryParameters["patientId"]
@@ -66,7 +66,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
             call.respondEither(result)
         }
 
-        // GET /appointments/{id}
+        // GET /api/appointments/{id}
         // Retrieves an appointment by its ID.
         get("/{id}") {
             val id =
@@ -80,7 +80,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
             call.respondEither(result)
         }
 
-        // GET /appointments/{id}/details
+        // GET /api/appointments/{id}/details
         // Retrieves an appointment enriched with the joined availability data (doctor, facility,
         // slot).
         get("/{id}/details") {
@@ -95,7 +95,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
             call.respondEither(result)
         }
 
-        // PUT /appointments/{id}
+        // PUT /api/appointments/{id}
         // Updates an appointment's status and/or reassigns it to a different availability slot.
         put("/{id}") {
             val id =
@@ -126,7 +126,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
             call.respondEither(result)
         }
 
-        // DELETE /appointments/{id}
+        // DELETE /api/appointments/{id}
         // Cancels an appointment. Responds with 204 No Content on success.
         delete("/{id}") {
             val id =

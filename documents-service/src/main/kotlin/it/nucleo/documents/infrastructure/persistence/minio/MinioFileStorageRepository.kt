@@ -9,6 +9,7 @@ import io.minio.PutObjectArgs
 import io.minio.RemoveObjectArgs
 import io.minio.StatObjectArgs
 import io.minio.errors.ErrorResponseException
+import io.minio.errors.MinioException
 import it.nucleo.commons.errors.*
 import it.nucleo.commons.logging.logger
 import it.nucleo.documents.domain.DocumentId
@@ -16,7 +17,13 @@ import it.nucleo.documents.domain.FileStorageRepository
 import it.nucleo.documents.domain.PatientId
 import it.nucleo.documents.domain.StoredFile
 import it.nucleo.documents.domain.errors.*
+import java.io.IOException
 import java.io.InputStream
+import java.security.InvalidKeyException
+import java.security.NoSuchAlgorithmException
+
+private const val HTTP_NOT_FOUND = 404
+private const val MAX_OBJECT_NAME_LENGTH = 255
 
 // Storage structure: patients/{patientId}/documents/{documentId}/{filename}
 
@@ -54,7 +61,19 @@ class MinioFileStorageRepository(
             )
             logger.info("Document stored successfully: $objectKey (documentId: ${documentId.id})")
             success(Unit)
-        } catch (e: Exception) {
+        } catch (e: ErrorResponseException) {
+            logger.error("Failed to store document: $objectKey", e)
+            failure(StorageError.OperationFailed("Failed to store document: ${e.message}", e))
+        } catch (e: MinioException) {
+            logger.error("Failed to store document: $objectKey", e)
+            failure(StorageError.OperationFailed("Failed to store document: ${e.message}", e))
+        } catch (e: InvalidKeyException) {
+            logger.error("Failed to store document: $objectKey", e)
+            failure(StorageError.OperationFailed("Failed to store document: ${e.message}", e))
+        } catch (e: NoSuchAlgorithmException) {
+            logger.error("Failed to store document: $objectKey", e)
+            failure(StorageError.OperationFailed("Failed to store document: ${e.message}", e))
+        } catch (e: IOException) {
             logger.error("Failed to store document: $objectKey", e)
             failure(StorageError.OperationFailed("Failed to store document: ${e.message}", e))
         }
@@ -103,7 +122,11 @@ class MinioFileStorageRepository(
             val httpStatusCode = e.response().code
             logger.debug("MinIO error - HTTP status: $httpStatusCode, error code: $errorCode")
 
-            if (httpStatusCode == 404 || errorCode == "NoSuchKey" || errorCode == "NoSuchObject") {
+            if (
+                httpStatusCode == HTTP_NOT_FOUND ||
+                    errorCode == "NoSuchKey" ||
+                    errorCode == "NoSuchObject"
+            ) {
                 logger.warn("Document not found: ${documentId.id}")
                 failure(StorageError.FileNotFound(documentId.id))
             } else {
@@ -112,7 +135,16 @@ class MinioFileStorageRepository(
                     StorageError.OperationFailed("Failed to retrieve document: ${e.message}", e)
                 )
             }
-        } catch (e: Exception) {
+        } catch (e: MinioException) {
+            logger.error("Failed to retrieve document: ${documentId.id}", e)
+            failure(StorageError.OperationFailed("Failed to retrieve document: ${e.message}", e))
+        } catch (e: InvalidKeyException) {
+            logger.error("Failed to retrieve document: ${documentId.id}", e)
+            failure(StorageError.OperationFailed("Failed to retrieve document: ${e.message}", e))
+        } catch (e: NoSuchAlgorithmException) {
+            logger.error("Failed to retrieve document: ${documentId.id}", e)
+            failure(StorageError.OperationFailed("Failed to retrieve document: ${e.message}", e))
+        } catch (e: IOException) {
             logger.error("Failed to retrieve document: ${documentId.id}", e)
             failure(StorageError.OperationFailed("Failed to retrieve document: ${e.message}", e))
         }
@@ -146,7 +178,19 @@ class MinioFileStorageRepository(
                 logger.warn("No files found to delete for document: ${documentId.id}")
             }
             success(Unit)
-        } catch (e: Exception) {
+        } catch (e: ErrorResponseException) {
+            logger.error("Failed to delete document: ${documentId.id}", e)
+            failure(StorageError.OperationFailed("Failed to delete document: ${e.message}", e))
+        } catch (e: MinioException) {
+            logger.error("Failed to delete document: ${documentId.id}", e)
+            failure(StorageError.OperationFailed("Failed to delete document: ${e.message}", e))
+        } catch (e: InvalidKeyException) {
+            logger.error("Failed to delete document: ${documentId.id}", e)
+            failure(StorageError.OperationFailed("Failed to delete document: ${e.message}", e))
+        } catch (e: NoSuchAlgorithmException) {
+            logger.error("Failed to delete document: ${documentId.id}", e)
+            failure(StorageError.OperationFailed("Failed to delete document: ${e.message}", e))
+        } catch (e: IOException) {
             logger.error("Failed to delete document: ${documentId.id}", e)
             failure(StorageError.OperationFailed("Failed to delete document: ${e.message}", e))
         }
@@ -161,7 +205,10 @@ class MinioFileStorageRepository(
     }
 
     private fun sanitizeFilename(filename: String): String {
-        return filename.replace(Regex("[^a-zA-Z0-9._-]"), "_").replace(Regex("_+"), "_").take(255)
+        return filename
+            .replace(Regex("[^a-zA-Z0-9._-]"), "_")
+            .replace(Regex("_+"), "_")
+            .take(MAX_OBJECT_NAME_LENGTH)
     }
 
     private fun ensureBucketExists() {
@@ -175,9 +222,21 @@ class MinioFileStorageRepository(
             } else {
                 logger.debug("Bucket '$bucketName' already exists")
             }
-        } catch (e: Exception) {
+        } catch (e: ErrorResponseException) {
             logger.error("Failed to check/create bucket '$bucketName'", e)
-            throw RuntimeException("Failed to initialize storage bucket: ${e.message}", e)
+            throw IllegalStateException("Failed to initialize storage bucket: ${e.message}", e)
+        } catch (e: MinioException) {
+            logger.error("Failed to check/create bucket '$bucketName'", e)
+            throw IllegalStateException("Failed to initialize storage bucket: ${e.message}", e)
+        } catch (e: InvalidKeyException) {
+            logger.error("Failed to check/create bucket '$bucketName'", e)
+            throw IllegalStateException("Failed to initialize storage bucket: ${e.message}", e)
+        } catch (e: NoSuchAlgorithmException) {
+            logger.error("Failed to check/create bucket '$bucketName'", e)
+            throw IllegalStateException("Failed to initialize storage bucket: ${e.message}", e)
+        } catch (e: IOException) {
+            logger.error("Failed to check/create bucket '$bucketName'", e)
+            throw IllegalStateException("Failed to initialize storage bucket: ${e.message}", e)
         }
     }
 }

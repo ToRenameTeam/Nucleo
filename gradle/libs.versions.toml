@@ -1,7 +1,10 @@
 [versions]
 kotlin = "2.2.20"
 kotest = "6.1.6"
+testcontainers = "2.0.2"
 ktfmt = "0.18.0"
+kover = "0.9.7"
+detekt = "2.0.0-alpha.2"
 ktor = "3.4.1"
 exposed = "0.57.0"
 hikari = "6.2.1"
@@ -15,6 +18,10 @@ pdfbox = "3.0.7"
 
 [libraries]
 kotest = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers" }
+testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
+testcontainers-mongodb = { module = "org.testcontainers:testcontainers-mongodb", version.ref = "testcontainers" }
+testcontainers-minio = { module = "org.testcontainers:testcontainers-minio", version.ref = "testcontainers" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
@@ -42,4 +49,6 @@ logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }

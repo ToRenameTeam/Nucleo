@@ -1,5 +1,6 @@
 package it.nucleo.documents.infrastructure.persistence.mongodb
 
+import com.mongodb.MongoException
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.model.Updates
@@ -45,7 +46,7 @@ class MongoDocumentRepository(database: MongoDatabase) : DocumentRepository {
                 "Document added successfully for patient: ${patientId.id}, documentId: ${document.id.id}"
             )
             success(Unit)
-        } catch (e: Exception) {
+        } catch (e: MongoException) {
             logger.error("Failed to add document for patient: ${patientId.id}", e)
             failure(
                 RepositoryError.OperationFailed(
@@ -85,7 +86,7 @@ class MongoDocumentRepository(database: MongoDatabase) : DocumentRepository {
                 )
                 success(Unit)
             }
-        } catch (e: Exception) {
+        } catch (e: MongoException) {
             logger.error(
                 "Failed to delete document: ${documentId.id} for patient: ${patientId.id}",
                 e
@@ -112,7 +113,7 @@ class MongoDocumentRepository(database: MongoDatabase) : DocumentRepository {
             val documents = record?.documents?.map { it.toDomain() } ?: emptyList()
             logger.debug("Found ${documents.size} documents for patient: ${patientId.id}")
             success(documents)
-        } catch (e: Exception) {
+        } catch (e: MongoException) {
             logger.error("Failed to find documents for patient: ${patientId.id}", e)
             failure(
                 RepositoryError.OperationFailed(
@@ -140,7 +141,7 @@ class MongoDocumentRepository(database: MongoDatabase) : DocumentRepository {
 
             logger.debug("Found ${allDocuments.size} documents for doctor: ${doctorId.id}")
             success(allDocuments)
-        } catch (e: Exception) {
+        } catch (e: MongoException) {
             logger.error("Failed to find documents for doctor: ${doctorId.id}", e)
             failure(
                 RepositoryError.OperationFailed(
@@ -171,7 +172,7 @@ class MongoDocumentRepository(database: MongoDatabase) : DocumentRepository {
                 logger.debug("Document found: ${documentId.id} for patient: ${patientId.id}")
                 success(documentDto.toDomain())
             }
-        } catch (e: Exception) {
+        } catch (e: MongoException) {
             logger.error(
                 "Failed to find document: ${documentId.id} for patient: ${patientId.id}",
                 e
@@ -230,7 +231,7 @@ class MongoDocumentRepository(database: MongoDatabase) : DocumentRepository {
                 )
                 success(Unit)
             }
-        } catch (e: Exception) {
+        } catch (e: MongoException) {
             logger.error("Failed to update report: ${report.id.id} for patient: ${patientId.id}", e)
             failure(
                 RepositoryError.OperationFailed(

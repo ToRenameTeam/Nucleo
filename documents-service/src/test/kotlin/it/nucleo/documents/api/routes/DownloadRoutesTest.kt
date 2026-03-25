@@ -43,7 +43,7 @@ class DownloadRoutesTest :
             }
         }
 
-        describe("GET /api/patients/{patientId}/documents/{documentId}/pdf") {
+        describe("GET /api/documents/patients/{patientId}/{documentId}/pdf") {
             it("should download an uploaded document successfully") {
                 val fileRepo = FakeFileStorageRepository()
                 val docRepo = FakeDocumentRepository()
@@ -57,7 +57,7 @@ class DownloadRoutesTest :
                     // Upload first
                     val uploadResponse =
                         client.submitFormWithBinaryData(
-                            url = "/api/patients/patient-1/documents/upload",
+                            url = "/api/documents/patients/patient-1/upload",
                             formData =
                                 formData {
                                     append(
@@ -78,7 +78,7 @@ class DownloadRoutesTest :
 
                     // Download
                     val downloadResponse =
-                        client.get("/api/patients/patient-1/documents/$docId/pdf")
+                        client.get("/api/documents/patients/patient-1/$docId/pdf")
 
                     downloadResponse.status shouldBe HttpStatusCode.OK
                     downloadResponse.contentType()?.toString() shouldBe "application/pdf"
@@ -92,7 +92,7 @@ class DownloadRoutesTest :
 
             it("should return 404 for a non-existent document") {
                 configuredTestApp { client ->
-                    val response = client.get("/api/patients/patient-1/documents/non-existent/pdf")
+                    val response = client.get("/api/documents/patients/patient-1/non-existent/pdf")
 
                     response.status shouldBe HttpStatusCode.NotFound
                     val error = response.body<ErrorResponse>()
@@ -114,7 +114,7 @@ class DownloadRoutesTest :
                     // Upload for patient-a
                     val uploadResponse =
                         client.submitFormWithBinaryData(
-                            url = "/api/patients/patient-a/documents/upload",
+                            url = "/api/documents/patients/patient-a/upload",
                             formData =
                                 formData {
                                     append(
@@ -134,7 +134,7 @@ class DownloadRoutesTest :
 
                     // Try to download as patient-b
                     val downloadResponse =
-                        client.get("/api/patients/patient-b/documents/$docId/pdf")
+                        client.get("/api/documents/patients/patient-b/$docId/pdf")
 
                     downloadResponse.status shouldBe HttpStatusCode.NotFound
                 }
@@ -164,7 +164,7 @@ class DownloadRoutesTest :
                     val docId1 =
                         client
                             .submitFormWithBinaryData(
-                                url = "/api/patients/patient-1/documents/upload",
+                                url = "/api/documents/patients/patient-1/upload",
                                 formData = uploadForm("doc1.pdf"),
                             )
                             .body<UploadResponse>()
@@ -173,14 +173,14 @@ class DownloadRoutesTest :
                     val docId2 =
                         client
                             .submitFormWithBinaryData(
-                                url = "/api/patients/patient-1/documents/upload",
+                                url = "/api/documents/patients/patient-1/upload",
                                 formData = uploadForm("doc2.pdf"),
                             )
                             .body<UploadResponse>()
                             .documentId!!
 
-                    val download1 = client.get("/api/patients/patient-1/documents/$docId1/pdf")
-                    val download2 = client.get("/api/patients/patient-1/documents/$docId2/pdf")
+                    val download1 = client.get("/api/documents/patients/patient-1/$docId1/pdf")
+                    val download2 = client.get("/api/documents/patients/patient-1/$docId2/pdf")
 
                     download1.status shouldBe HttpStatusCode.OK
                     download2.status shouldBe HttpStatusCode.OK
@@ -196,7 +196,7 @@ private val downloadTestJson = Json {
     isLenient = true
     ignoreUnknownKeys = true
     encodeDefaults = true
-    classDiscriminator = "_t"
+    classDiscriminator = "type"
 }
 
 private fun Application.downloadTestModule(

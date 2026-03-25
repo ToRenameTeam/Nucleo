@@ -27,6 +27,7 @@ class DocumentPdfGenerator {
         private const val TITLE_SIZE = 16f
         private const val HEADER_SIZE = 12f
         private const val BODY_SIZE = 10f
+        private const val HEADER_BOTTOM_SPACING = 4f
     }
 
     /**
@@ -80,10 +81,10 @@ class DocumentPdfGenerator {
             "Dose",
             "${prescription.dosage.dose.amount} ${prescription.dosage.dose.unit.symbol}"
         )
-        writer.writeField(
-            "Frequency",
-            "${prescription.dosage.frequency.timesPerPeriod} times per ${prescription.dosage.frequency.period.name.lowercase()}"
-        )
+        val frequencyDescription =
+            "${prescription.dosage.frequency.timesPerPeriod} times per " +
+                prescription.dosage.frequency.period.name.lowercase()
+        writer.writeField("Frequency", frequencyDescription)
         writer.writeField(
             "Duration",
             "${prescription.dosage.duration.length} ${prescription.dosage.duration.unit.name.lowercase()}(s)"
@@ -209,7 +210,7 @@ class DocumentPdfGenerator {
             content.newLineAtOffset(MARGIN, currentY)
             content.showText(text)
             content.endText()
-            currentY -= HEADER_SIZE + 4
+            currentY -= HEADER_SIZE + HEADER_BOTTOM_SPACING
         }
 
         fun writeField(label: String, value: String) {

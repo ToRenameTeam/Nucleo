@@ -6,11 +6,14 @@ import kotlinx.datetime.toKotlinLocalDateTime
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.datetime
 
+private const val ID_COLUMN_LENGTH = 50
+private const val STATUS_COLUMN_LENGTH = 20
+
 object AppointmentsTable : Table("appointments") {
-    val appointmentId = varchar("appointment_id", 50).uniqueIndex()
-    val patientId = varchar("patient_id", 50)
-    val availabilityId = varchar("availability_id", 50)
-    val status = varchar("status", 20)
+    val appointmentId = varchar("appointment_id", ID_COLUMN_LENGTH).uniqueIndex()
+    val patientId = varchar("patient_id", ID_COLUMN_LENGTH)
+    val availabilityId = varchar("availability_id", ID_COLUMN_LENGTH)
+    val status = varchar("status", STATUS_COLUMN_LENGTH)
     val createdAt = datetime("created_at")
     val updatedAt = datetime("updated_at")
 

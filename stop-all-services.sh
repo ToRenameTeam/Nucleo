@@ -18,8 +18,10 @@ services=(
     "appointments-service"
     "users-service"
     "master-data-service"
-    "frontend-service"
     "documents-service"
+    "frontend-service"
+    "infrastructure/nginx"
+    "infrastructure/kafka"
 )
 
 failed_services=()

@@ -12,6 +12,8 @@ dependencies {
     implementation(libs.hikari)
     implementation(libs.postgresql)
     implementation(libs.kotlinx.datetime)
+
+    testImplementation(libs.testcontainers.postgresql)
 }
 
 application {

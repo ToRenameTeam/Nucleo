@@ -9,6 +9,9 @@ import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinLocalDateTime
 import kotlinx.serialization.Serializable
 
+private const val MAX_IDENTIFIER_LENGTH = 50
+private const val MAX_DURATION_MINUTES = 1440
+
 @Serializable
 data class Availability(
     val availabilityId: AvailabilityId,
@@ -131,8 +134,10 @@ value class DoctorId private constructor(val value: String) {
             if (value.isBlank()) {
                 return failure(ValidationError("DoctorId cannot be blank"))
             }
-            if (value.length > 50) {
-                return failure(ValidationError("DoctorId cannot exceed 50 characters"))
+            if (value.length > MAX_IDENTIFIER_LENGTH) {
+                return failure(
+                    ValidationError("DoctorId cannot exceed $MAX_IDENTIFIER_LENGTH characters")
+                )
             }
             return success(DoctorId(value))
         }
@@ -149,8 +154,10 @@ value class FacilityId private constructor(val value: String) {
             if (value.isBlank()) {
                 return failure(ValidationError("FacilityId cannot be blank"))
             }
-            if (value.length > 50) {
-                return failure(ValidationError("FacilityId cannot exceed 50 characters"))
+            if (value.length > MAX_IDENTIFIER_LENGTH) {
+                return failure(
+                    ValidationError("FacilityId cannot exceed $MAX_IDENTIFIER_LENGTH characters")
+                )
             }
             return success(FacilityId(value))
         }
@@ -167,8 +174,10 @@ value class ServiceTypeId private constructor(val value: String) {
             if (value.isBlank()) {
                 return failure(ValidationError("ServiceTypeId cannot be blank"))
             }
-            if (value.length > 50) {
-                return failure(ValidationError("ServiceTypeId cannot exceed 50 characters"))
+            if (value.length > MAX_IDENTIFIER_LENGTH) {
+                return failure(
+                    ValidationError("ServiceTypeId cannot exceed $MAX_IDENTIFIER_LENGTH characters")
+                )
             }
             return success(ServiceTypeId(value))
         }
@@ -189,8 +198,12 @@ private constructor(val startDateTime: LocalDateTime, val durationMinutes: Int) 
             if (durationMinutes <= 0) {
                 return failure(ValidationError("Duration must be positive"))
             }
-            if (durationMinutes > 1440) {
-                return failure(ValidationError("Duration cannot exceed 24 hours (1440 minutes)"))
+            if (durationMinutes > MAX_DURATION_MINUTES) {
+                return failure(
+                    ValidationError(
+                        "Duration cannot exceed 24 hours ($MAX_DURATION_MINUTES minutes)"
+                    )
+                )
             }
             return success(TimeSlot(startDateTime, durationMinutes))
         }

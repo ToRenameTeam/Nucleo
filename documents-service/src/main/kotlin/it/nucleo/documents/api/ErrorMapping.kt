@@ -11,6 +11,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 
+private const val INTERNAL_SERVER_ERROR_THRESHOLD = 500
 private val logger = LoggerFactory.getLogger("ErrorMapping")
 
 private val json = Json {
@@ -18,7 +19,7 @@ private val json = Json {
     isLenient = true
     ignoreUnknownKeys = true
     encodeDefaults = true
-    classDiscriminator = "_t"
+    classDiscriminator = "type"
 }
 
 /**
@@ -59,7 +60,7 @@ suspend fun <T> RoutingCall.respondEitherJson(
 
 private suspend fun RoutingCall.respondError(error: DomainError) {
     val status = error.toHttpStatusCode()
-    if (status.value >= 500) {
+    if (status.value >= INTERNAL_SERVER_ERROR_THRESHOLD) {
         logger.error("Internal error: ${error.message}")
     } else {
         logger.warn("Domain error: ${error.message}")

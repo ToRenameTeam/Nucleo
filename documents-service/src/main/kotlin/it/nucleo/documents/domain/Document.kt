@@ -7,6 +7,10 @@ import it.nucleo.commons.errors.failure
 import it.nucleo.commons.errors.success
 import java.time.LocalDate
 
+private const val MAX_TITLE_LENGTH = 200
+private const val MAX_SUMMARY_LENGTH = 2000
+private const val MAX_TAG_LENGTH = 100
+
 interface Document {
     val id: DocumentId
 
@@ -84,8 +88,8 @@ value class Title private constructor(val value: String) {
     companion object {
         operator fun invoke(value: String): Either<DomainError, Title> {
             if (value.isBlank()) return failure(ValidationError("Title cannot be blank"))
-            if (value.length > 200) {
-                return failure(ValidationError("Title cannot exceed 200 characters"))
+            if (value.length > MAX_TITLE_LENGTH) {
+                return failure(ValidationError("Title cannot exceed $MAX_TITLE_LENGTH characters"))
             }
             return success(Title(value))
         }
@@ -97,8 +101,10 @@ value class Summary private constructor(val summary: String) {
     companion object {
         operator fun invoke(summary: String): Either<DomainError, Summary> {
             if (summary.isBlank()) return failure(ValidationError("Summary cannot be blank"))
-            if (summary.length > 2000) {
-                return failure(ValidationError("Summary cannot exceed 2000 characters"))
+            if (summary.length > MAX_SUMMARY_LENGTH) {
+                return failure(
+                    ValidationError("Summary cannot exceed $MAX_SUMMARY_LENGTH characters")
+                )
             }
             return success(Summary(summary))
         }
@@ -110,8 +116,8 @@ value class Tag private constructor(val tag: String) {
     companion object {
         operator fun invoke(tag: String): Either<DomainError, Tag> {
             if (tag.isBlank()) return failure(ValidationError("Tag cannot be blank"))
-            if (tag.length > 100) {
-                return failure(ValidationError("Tag cannot exceed 100 characters"))
+            if (tag.length > MAX_TAG_LENGTH) {
+                return failure(ValidationError("Tag cannot exceed $MAX_TAG_LENGTH characters"))
             }
             return success(Tag(tag))
         }
