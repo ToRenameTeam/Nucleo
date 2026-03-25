@@ -2,13 +2,12 @@ import { DOCUMENTS_API_URL } from './config';
 import { z } from 'zod';
 import { idSchema, nonEmptyTrimmedStringSchema, parseWithSchema } from './validation';
 import type {
+  AnyDocument,
   Document,
+  Dosage,
   MedicinePrescription,
   ServicePrescription,
-  Report,
-  AnyDocument,
   Validity,
-  Dosage,
 } from '../types/document';
 
 const BASE_URL = DOCUMENTS_API_URL;
@@ -121,10 +120,6 @@ export type DocumentApiResponse =
   | ServicePrescriptionResponse
   | ReportResponse
   | UploadedDocumentResponse;
-
-export interface UploadDocumentRequest {
-  file: File;
-}
 
 export interface UploadResponse {
   success: boolean;
@@ -307,7 +302,7 @@ function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {
     }
 
     case 'report': {
-      const report: Report = {
+      return {
         ...baseDocument,
         type: 'report',
         servicePrescription: mapDocumentResponse(
@@ -319,7 +314,6 @@ function mapDocumentResponse(response: DocumentApiResponse): AnyDocument {
         conclusion: response.conclusion,
         recommendations: response.recommendations,
       };
-      return report;
     }
 
     case 'uploaded_document': {
@@ -707,6 +701,3 @@ export const documentsApiService = {
     }
   },
 };
-
-// Backward compatibility alias
-export const doctorDocumentsApi = documentsApiService;
