@@ -1,0 +1,29 @@
+# Dependencies and package manager caches
+**/node_modules/
+.pnpm-store/
+
+# Build artifacts and reports
+**/build/
+**/dist/
+**/coverage/
+
+# Gradle/Kotlin caches
+**/.gradle/
+.kotlin/
+
+# Python virtualenvs and caches
+**/.venv/
+**/__pycache__/
+**/.ruff_cache/
+
+# Documentation generated output
+/docs/.vitepress/cache/
+/docs/.vitepress/dist/
+
+# Generated or machine-managed files
+CHANGELOG.md
+pnpm-lock.yaml
+ai-service/uv.lock
+
+# Logs
+**/*.log
