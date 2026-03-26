@@ -12,6 +12,7 @@ dependencies {
     implementation(catalog.findLibrary("ktor-serialization-kotlinx-json").get())
     implementation(catalog.findLibrary("ktor-server-status-pages").get())
     implementation(catalog.findLibrary("ktor-server-cors").get())
+    implementation(catalog.findLibrary("kafka-clients").get())
     implementation(catalog.findLibrary("logback").get())
 
     testImplementation(catalog.findLibrary("ktor-server-test-host").get())

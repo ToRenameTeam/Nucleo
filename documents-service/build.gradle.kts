@@ -1,5 +1,5 @@
 plugins {
-    id("ktor")
+    id("nucleo-services")
     alias(libs.plugins.ktor)
 }
 
