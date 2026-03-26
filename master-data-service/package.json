@@ -21,7 +21,8 @@
     "express": "catalog:",
     "express-session": "catalog:",
     "mongoose": "catalog:",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "kafkajs": "catalog:"
   },
   "devDependencies": {
     "@types/cors": "catalog:",
