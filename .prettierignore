@@ -2,10 +2,11 @@
 **/node_modules/
 .pnpm-store/
 
-# Build artifacts and reports
+# Build artifacts, reports and documentation
 **/build/
 **/dist/
 **/coverage/
+**/docs/
 
 # Gradle/Kotlin caches
 **/.gradle/
@@ -15,10 +16,6 @@
 **/.venv/
 **/__pycache__/
 **/.ruff_cache/
-
-# Documentation generated output
-/docs/.vitepress/cache/
-/docs/.vitepress/dist/
 
 # Generated or machine-managed files
 CHANGELOG.md
