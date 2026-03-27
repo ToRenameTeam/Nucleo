@@ -104,6 +104,8 @@ KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:29092
 KAFKA_CLIENT_ID=appointments-service
 KAFKA_CONSUMER_GROUP_ID=appointments-service
 KAFKA_TOPIC_USER_DELETED=users.user-deleted
+KAFKA_TOPIC_FACILITY_DELETED=master-data.facility-deleted
+KAFKA_TOPIC_SERVICE_TYPE_DELETED=master-data.service-type-deleted
 
 # Application Port
 APP_PORT=8080
@@ -112,6 +114,13 @@ setup_env_file "master-data-service" "master-data-service" "
 PORT=3040
 MONGO_URI=mongodb://admin:password@mongodb:27017/master_data_db?authSource=admin
 MONGODB_PORT=27027
+
+KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:29092
+KAFKA_CLIENT_ID=master-data-service
+KAFKA_TOPIC_MEDICINE_DELETED=master-data.medicine-deleted
+KAFKA_TOPIC_FACILITY_DELETED=master-data.facility-deleted
+KAFKA_TOPIC_SERVICE_TYPE_DELETED=master-data.service-type-deleted
+
 MONGO_INITDB_ROOT_USERNAME=admin
 MONGO_INITDB_ROOT_PASSWORD=password
 "
@@ -125,6 +134,8 @@ KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:29092
 KAFKA_CLIENT_ID=documents-service
 KAFKA_CONSUMER_GROUP_ID=documents-service
 KAFKA_TOPIC_USER_DELETED=users.user-deleted
+KAFKA_TOPIC_MEDICINE_DELETED=master-data.medicine-deleted
+KAFKA_TOPIC_SERVICE_TYPE_DELETED=master-data.service-type-deleted
 "
 
 setup_env_file "infrastructure/kafka" "kafka" "

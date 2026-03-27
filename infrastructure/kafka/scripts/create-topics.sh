@@ -20,6 +20,15 @@ echo "Kafka is ready! Creating topics..."
 TOPICS_TO_CREATE=(
   # Publisher: User Service | Consumers: Appointment Service, Document Service
   "users.user-deleted:3:1"
+
+  # Publisher: Master Data Service | Consumers: Document Service
+  "master-data.medicine-deleted:3:1"
+
+  # Publisher: Master Data Service | Consumers: Appointment Service
+  "master-data.facility-deleted:3:1"
+
+  # Publisher: Master Data Service | Consumers: Appointment Service, Document Service
+  "master-data.service-type-deleted:3:1"
 )
 
 for topic_definition in "${TOPICS_TO_CREATE[@]}"; do
