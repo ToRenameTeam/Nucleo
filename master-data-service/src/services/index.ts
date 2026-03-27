@@ -9,6 +9,12 @@ export {
   type CategoryInfo,
 } from './service-catalog.service.js';
 
+export { MasterDataEventsPublisher } from '../infrastructure/kafka/master-data-events.publisher.js';
+
+import { MasterDataEventsPublisher } from '../infrastructure/kafka/master-data-events.publisher.js';
+
+export const masterDataEventsPublisher = new MasterDataEventsPublisher();
+
 export {
   FacilityService,
   facilityService,

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import {
   medicineService,
+  masterDataEventsPublisher,
   MedicineValidationError,
   MedicineConflictError,
 } from '../services/index.js';
@@ -171,6 +172,15 @@ router.delete('/:id', async (req, res) => {
       return;
     }
 
+    try {
+      await masterDataEventsPublisher.publishMedicineDeleted({
+        id: medicine.id,
+        deletedAt: new Date().toISOString(),
+      });
+    } catch (publishError) {
+      console.error('Failed to publish medicine-deleted event:', publishError);
+    }
+
     sendSuccess(res, medicine, 200, { message: 'Medicine deactivated successfully' });
   } catch (error) {
     if (error instanceof ApiValidationError) {
@@ -195,6 +205,15 @@ router.delete('/:id/permanent', async (req, res) => {
     if (!medicine) {
       sendError(res, 404, 'Medicine not found');
       return;
+    }
+
+    try {
+      await masterDataEventsPublisher.publishMedicineDeleted({
+        id: medicine.id,
+        deletedAt: new Date().toISOString(),
+      });
+    } catch (publishError) {
+      console.error('Failed to publish medicine-deleted event:', publishError);
     }
 
     sendSuccess(res, null, 200, { message: 'Medicine permanently deleted' });

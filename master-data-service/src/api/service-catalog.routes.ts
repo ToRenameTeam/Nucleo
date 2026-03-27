@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import {
   serviceCatalogService,
+  masterDataEventsPublisher,
   ServiceCatalogValidationError,
   ServiceCatalogConflictError,
 } from '../services/index.js';
@@ -188,6 +189,15 @@ router.delete('/:id', async (req, res) => {
       return;
     }
 
+    try {
+      await masterDataEventsPublisher.publishServiceTypeDeleted({
+        id: serviceType.id,
+        deletedAt: new Date().toISOString(),
+      });
+    } catch (publishError) {
+      console.error('Failed to publish service-type-deleted event:', publishError);
+    }
+
     sendSuccess(res, serviceType, 200, { message: 'Service type deactivated successfully' });
   } catch (error) {
     if (error instanceof ApiValidationError) {
@@ -212,6 +222,15 @@ router.delete('/:id/permanent', async (req, res) => {
     if (!serviceType) {
       sendError(res, 404, 'Service type not found');
       return;
+    }
+
+    try {
+      await masterDataEventsPublisher.publishServiceTypeDeleted({
+        id: serviceType.id,
+        deletedAt: new Date().toISOString(),
+      });
+    } catch (publishError) {
+      console.error('Failed to publish service-type-deleted event:', publishError);
     }
 
     sendSuccess(res, null, 200, { message: 'Service type permanently deleted' });

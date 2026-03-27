@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { type Server } from 'node:http';
 import { DEFAULT_PORT, disconnectDB, startServer } from './app.js';
+import { masterDataEventsPublisher } from './services/index.js';
 
 const port = Number(process.env.PORT) || DEFAULT_PORT;
 let server: Server | null = null;
@@ -37,5 +38,6 @@ process.on('SIGINT', async function () {
   }
 
   await disconnectDB();
+  await masterDataEventsPublisher.disconnect();
   process.exit(0);
 });

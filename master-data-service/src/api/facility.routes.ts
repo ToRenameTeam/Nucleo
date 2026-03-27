@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import {
   facilityService,
+  masterDataEventsPublisher,
   FacilityValidationError,
   FacilityConflictError,
 } from '../services/index.js';
@@ -167,6 +168,15 @@ router.delete('/:id', async (req, res) => {
       return;
     }
 
+    try {
+      await masterDataEventsPublisher.publishFacilityDeleted({
+        id: facility.id,
+        deletedAt: new Date().toISOString(),
+      });
+    } catch (publishError) {
+      console.error('Failed to publish facility-deleted event:', publishError);
+    }
+
     sendSuccess(res, facility, 200, { message: 'Facility deactivated successfully' });
   } catch (error) {
     if (error instanceof ApiValidationError) {
@@ -191,6 +201,15 @@ router.delete('/:id/permanent', async (req, res) => {
     if (!facility) {
       sendError(res, 404, 'Facility not found');
       return;
+    }
+
+    try {
+      await masterDataEventsPublisher.publishFacilityDeleted({
+        id: facility.id,
+        deletedAt: new Date().toISOString(),
+      });
+    } catch (publishError) {
+      console.error('Failed to publish facility-deleted event:', publishError);
     }
 
     sendSuccess(res, null, 200, { message: 'Facility permanently deleted' });
