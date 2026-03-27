@@ -18,7 +18,8 @@ echo "Kafka is ready! Creating topics..."
 
 # Topic definitions in-place: <topic_name>:<partitions>:<replication_factor>
 TOPICS_TO_CREATE=(
-  "example:3:1"
+  # Publisher: User Service | Consumers: Appointment Service, Document Service
+  "users.user-deleted:3:1"
 )
 
 for topic_definition in "${TOPICS_TO_CREATE[@]}"; do

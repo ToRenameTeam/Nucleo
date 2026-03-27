@@ -75,6 +75,10 @@ PORT=3030
 MONGO_URI=mongodb://admin:password123@mongodb:27017/users_db?authSource=admin
 MONGODB_PORT=27017
 
+KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:29092
+KAFKA_CLIENT_ID=users-service
+KAFKA_TOPIC_USER_DELETED=users.user-deleted
+
 MONGO_INITDB_ROOT_USERNAME=admin
 MONGO_INITDB_ROOT_PASSWORD=password123
 "
@@ -95,6 +99,12 @@ DATABASE_URL=jdbc:postgresql://postgres:5432/appointments
 DATABASE_USER=appointments_user
 DATABASE_PASSWORD=appointments_pass
 
+# Kafka Configuration
+KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:29092
+KAFKA_CLIENT_ID=appointments-service
+KAFKA_CONSUMER_GROUP_ID=appointments-service
+KAFKA_TOPIC_USER_DELETED=users.user-deleted
+
 # Application Port
 APP_PORT=8080
 "
@@ -109,7 +119,13 @@ setup_env_file "frontend-service" "frontend-service" "
 VITE_API_GATEWAY_URL=http://localhost:8088
 "
 
-setup_env_file "documents-service" "documents-service" "GROQ_API_KEY="
+setup_env_file "documents-service" "documents-service" "GROQ_API_KEY=
+
+KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:29092
+KAFKA_CLIENT_ID=documents-service
+KAFKA_CONSUMER_GROUP_ID=documents-service
+KAFKA_TOPIC_USER_DELETED=users.user-deleted
+"
 
 setup_env_file "infrastructure/kafka" "kafka" "
 KAFKA_CONTAINER_NAME=kafka
