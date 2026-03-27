@@ -408,7 +408,11 @@ const handleCloseToast = () => {
 
         <div class="section-card section-card-spacing">
           <h3 class="section-title">{{ $t('home.recentDocuments') }}</h3>
-          <CardList>
+          <div v-if="recentDocuments.length === 0" class="empty-card-message">
+            {{ $t('home.noDocuments') }}
+          </div>
+
+          <CardList v-else>
             <DocumentCard
               v-for="doc in recentDocuments.slice(0, 2)"
               :key="doc.id"

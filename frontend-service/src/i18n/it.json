@@ -157,6 +157,7 @@
     "newAppointment": "Prenota visita",
     "upcomingAppointments": "Prossimi appuntamenti",
     "noAppointments": "Nessun appuntamento in programma",
+    "noDocuments": "Nessun documento presente",
     "recentDocuments": "Documenti recenti",
     "loadingAppointments": "Caricamento appuntamenti..."
   },

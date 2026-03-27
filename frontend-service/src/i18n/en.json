@@ -156,6 +156,7 @@
     "newAppointment": "Book Visit",
     "upcomingAppointments": "Upcoming Appointments",
     "noAppointments": "No scheduled appointments",
+    "noDocuments": "No documents available",
     "recentDocuments": "Recent Documents",
     "loadingAppointments": "Loading appointments..."
   },
