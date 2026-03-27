@@ -1,6 +1,7 @@
 import { UserService } from './user.service.js';
 import { AuthenticationService } from './authentication.service.js';
 import { DelegationService } from './delegation.service.js';
+import { UserEventsPublisher } from '../infrastructure/kafka/user-events.publisher.js';
 import {
   UserRepositoryImpl,
   PatientRepositoryImpl,
@@ -20,15 +21,22 @@ function createRepositoryDependencies() {
 function createServiceDependencies() {
   const { userRepository, patientRepository, doctorRepository, delegationRepository } =
     createRepositoryDependencies();
+  const userEventsPublisher = new UserEventsPublisher();
 
   return {
-    userService: new UserService(userRepository, patientRepository, doctorRepository),
+    userService: new UserService(
+      userRepository,
+      patientRepository,
+      doctorRepository,
+      userEventsPublisher
+    ),
     authenticationService: new AuthenticationService(
       userRepository,
       patientRepository,
       doctorRepository
     ),
     delegationService: new DelegationService(delegationRepository, patientRepository),
+    userEventsPublisher,
   };
 }
 
@@ -37,6 +45,7 @@ const services = createServiceDependencies();
 export const userService = services.userService;
 export const authenticationService = services.authenticationService;
 export const delegationService = services.delegationService;
+export const userEventsPublisher = services.userEventsPublisher;
 
 export { UserService } from './user.service.js';
 export { AuthenticationService } from './authentication.service.js';

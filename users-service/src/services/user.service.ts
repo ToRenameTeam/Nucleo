@@ -3,6 +3,7 @@ import { User, Patient, Doctor, FiscalCode, Credentials, ProfileInfo } from '../
 import type { UserRepository } from '../domain/repositories/index.js';
 import type { PatientRepository } from '../domain/repositories/index.js';
 import type { DoctorRepository } from '../domain/repositories/index.js';
+import type { UserEventsPublisher } from '../infrastructure/kafka/user-events.publisher.js';
 
 interface CreateUserData {
   fiscalCode: string;
@@ -20,7 +21,8 @@ export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly patientRepository: PatientRepository,
-    private readonly doctorRepository: DoctorRepository
+    private readonly doctorRepository: DoctorRepository,
+    private readonly userEventsPublisher: UserEventsPublisher
   ) {}
 
   async createUser(data: CreateUserData) {
@@ -91,6 +93,30 @@ export class UserService {
   async getUserByFiscalCode(fiscalCode: string) {
     const userData = await this.userRepository.findByFiscalCode(fiscalCode);
     return this.buildUserWithProfiles(userData);
+  }
+
+  async deleteUser(userId: string) {
+    const existingUser = await this.userRepository.findUserById(userId);
+    if (!existingUser) {
+      throw new Error('User not found');
+    }
+
+    await this.patientRepository.delete(userId);
+    await this.doctorRepository.delete(userId);
+    await this.userRepository.delete(userId);
+
+    try {
+      await this.userEventsPublisher.publishUserDeleted({
+        userId,
+        deletedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('Failed to publish user-deleted event', error);
+    }
+
+    return {
+      userId,
+    };
   }
 
   private async buildUserWithProfiles(

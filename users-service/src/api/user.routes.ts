@@ -93,4 +93,16 @@ router.get('/:userId', async (req: Request, res: Response) => {
   }
 });
 
+// Delete user by ID
+router.delete('/:userId', async (req: Request, res: Response) => {
+  try {
+    const { userId } = validateWithSchema(userIdParamsSchema, req.params, 'user params');
+
+    const result = await userService.deleteUser(userId);
+    return success(res, result);
+  } catch (err) {
+    return handleRouteError(res, err, 'Delete user error', USER_ERROR_RULES);
+  }
+});
+
 export default router;
