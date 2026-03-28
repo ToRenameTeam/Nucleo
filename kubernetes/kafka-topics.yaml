@@ -1,0 +1,39 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: users.user-deleted
+  labels:
+    strimzi.io/cluster: cluster
+spec:
+  partitions: 3
+  replicas: 1
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: master-data.medicine-deleted
+  labels:
+    strimzi.io/cluster: cluster
+spec:
+  partitions: 3
+  replicas: 1
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: master-data.facility-deleted
+  labels:
+    strimzi.io/cluster: cluster
+spec:
+  partitions: 3
+  replicas: 1
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: master-data.service-type-deleted
+  labels:
+    strimzi.io/cluster: cluster
+spec:
+  partitions: 3
+  replicas: 1
