@@ -75,6 +75,7 @@ echo -e "${GREEN}[OK] Application services removed${NC}"
 
 echo -e "\n${BLUE}==> Removing data stores${NC}"
 for release_name in \
+  minio \
   documents-db \
   appointments-db \
   master-data-db \
@@ -146,6 +147,7 @@ if [[ "$PURGE_PV" == true ]]; then
   echo -e "\n${BLUE}==> Purging persistent volumes${NC}"
 
   for pvc_name in \
+    data-minio-0 \
     data-users-db-mongo-chart-0 \
     data-master-data-db-mongo-chart-0 \
     data-appointments-db-postgres-chart-0 \
@@ -153,6 +155,9 @@ if [[ "$PURGE_PV" == true ]]; then
     kubectl -n "$NAMESPACE" delete pvc "$pvc_name" --ignore-not-found >/dev/null
     echo -e "${GRAY}  - PVC removed if present: $pvc_name${NC}"
   done
+
+  kubectl -n "$NAMESPACE" delete pvc -l app.kubernetes.io/instance=minio --ignore-not-found >/dev/null || true
+  echo -e "${GRAY}  - MinIO PVCs removed if present (label: app.kubernetes.io/instance=minio)${NC}"
 
   kubectl -n "$NAMESPACE" delete pvc -l strimzi.io/cluster=cluster --ignore-not-found >/dev/null || true
   echo -e "${GRAY}  - Kafka PVCs removed if present (label: strimzi.io/cluster=cluster)${NC}"

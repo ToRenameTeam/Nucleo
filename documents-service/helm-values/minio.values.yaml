@@ -1,0 +1,17 @@
+fullnameOverride: minio
+
+image:
+  repository: minio/minio
+  tag: RELEASE.2025-02-18T16-25-55Z
+
+service:
+  type: ClusterIP
+  port: 9000
+
+auth:
+  rootUser: minioadmin
+  rootPassword: minioadmin
+
+persistence:
+  size: 10Gi
+

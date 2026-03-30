@@ -1,0 +1,7 @@
+apiVersion: v2
+name: minio-chart
+description: Local Helm chart for MinIO used by Nucleo services.
+type: application
+version: 0.1.0
+appVersion: "RELEASE.2025-02-18T16-25-55Z"
+

@@ -8,6 +8,7 @@ HELM_TIMEOUT="${HELM_TIMEOUT:-10m}"
 STRIMZI_DEPLOYMENT_TIMEOUT="${STRIMZI_DEPLOYMENT_TIMEOUT:-300s}"
 KAFKA_READY_TIMEOUT="${KAFKA_READY_TIMEOUT:-600s}"
 TOPICS_READY_TIMEOUT="${TOPICS_READY_TIMEOUT:-300s}"
+MINIO_READY_TIMEOUT="${MINIO_READY_TIMEOUT:-300s}"
 BUILD_IMAGES="${BUILD_IMAGES:-true}"
 
 # Basic ANSI colors for readable output.
@@ -56,14 +57,6 @@ fi
 
 echo -e "${GREEN}[OK] Prerequisites satisfied${NC}"
 
-echo -e "\n${BLUE}==> Checking optional dependencies${NC}"
-if ! kubectl -n "$NAMESPACE" get service minio >/dev/null 2>&1; then
-  echo -e "${YELLOW}[WARN] Service 'minio' not found in namespace '$NAMESPACE'.${NC}"
-  echo -e "${YELLOW}[WARN] ai-service and documents-service may not work until MinIO is available.${NC}"
-else
-  echo -e "${GREEN}[OK] MinIO service detected${NC}"
-fi
-
 echo -e "\n${BLUE}==> Deploying Kafka (Strimzi operator, cluster, topics)${NC}"
 helm upgrade --install strimzi-cluster-operator \
   --set replicas=1 \
@@ -111,6 +104,19 @@ helm upgrade --install appointments-db "$ROOT_DIR/kubernetes/helm-chart/postgres
 helm upgrade --install documents-db "$ROOT_DIR/kubernetes/helm-chart/mongo-chart" \
   -f "$ROOT_DIR/documents-service/helm-values/mongo.values.yaml" \
   --namespace "$NAMESPACE" --create-namespace --wait --timeout "$HELM_TIMEOUT"
+
+helm upgrade --install minio "$ROOT_DIR/kubernetes/helm-chart/minio-chart" \
+  -f "$ROOT_DIR/documents-service/helm-values/minio.values.yaml" \
+  --namespace "$NAMESPACE" --create-namespace --wait --timeout "$HELM_TIMEOUT"
+
+if ! kubectl -n "$NAMESPACE" get service minio >/dev/null 2>&1; then
+  echo -e "${RED}[ERROR] MinIO service 'minio' was not found in namespace '$NAMESPACE'.${NC}" >&2
+  exit 1
+fi
+
+if ! kubectl -n "$NAMESPACE" rollout status statefulset/minio --timeout="$MINIO_READY_TIMEOUT"; then
+  echo -e "${YELLOW}[WARN] Timed out waiting for MinIO readiness; downstream services may fail until MinIO is ready.${NC}"
+fi
 
 echo -e "${GREEN}[OK] Data stores deployed${NC}"
 
