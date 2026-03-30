@@ -1,6 +1,9 @@
 package it.nucleo.documents.infrastructure.kafka
 
 import it.nucleo.documents.infrastructure.persistence.mongodb.MongoDocumentRepository
+import java.time.Duration
+import java.util.Properties
+import kotlin.concurrent.thread
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
@@ -10,9 +13,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.errors.WakeupException
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory
-import java.time.Duration
-import java.util.Properties
-import kotlin.concurrent.thread
 
 private const val DEFAULT_POLL_TIMEOUT_SECONDS = 1L
 
@@ -42,9 +42,7 @@ class DeleteEventsConsumer(
         }
 
         running = true
-        thread(name = "documents-delete-events-consumer", isDaemon = true) {
-            runConsumerLoop()
-        }
+        thread(name = "documents-delete-events-consumer", isDaemon = true) { runConsumerLoop() }
     }
 
     fun stop() {
