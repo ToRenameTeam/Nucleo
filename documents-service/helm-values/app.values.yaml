@@ -1,0 +1,39 @@
+image:
+  repository: documents-service
+  tag: latest
+
+containerPort: 8080
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: http
+
+env:
+  JAVA_OPTS: -Xms256m -Xmx512m
+  SERVER_PORT: "8080"
+  MONGO_DATABASE_NAME: nucleo_documents
+  MINIO_ENDPOINT: http://minio:9000
+  MINIO_BUCKET_NAME: documents
+  AI_SERVICE_HOST: ai-service-python-chart
+  AI_SERVICE_PORT: "8000"
+  KAFKA_BOOTSTRAP_SERVERS: cluster-kafka-bootstrap:9092
+  KAFKA_CLIENT_ID: documents-service
+  KAFKA_CONSUMER_GROUP_ID: documents-service
+  KAFKA_TOPIC_USER_DELETED: users.user-deleted
+  KAFKA_TOPIC_MEDICINE_DELETED: master-data.medicine-deleted
+  KAFKA_TOPIC_SERVICE_TYPE_DELETED: master-data.service-type-deleted
+
+secretEnv:
+  MONGO_CONNECTION_URI: mongodb://admin:password@documents-db-mongo-chart:27017
+  MINIO_ACCESS_KEY: minioadmin
+  MINIO_SECRET_KEY: minioadmin
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 600m
+    memory: 768Mi
+

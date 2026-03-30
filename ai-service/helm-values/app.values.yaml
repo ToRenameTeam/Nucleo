@@ -1,0 +1,36 @@
+image:
+  repository: ai-service
+  tag: latest
+
+containerPort: 8000
+
+service:
+  type: ClusterIP
+  port: 8000
+  targetPort: http
+
+env:
+  HTTP_PORT: "8000"
+  MINIO_ENDPOINT: minio:9000
+  MINIO_BUCKET_NAME: documents
+  MINIO_SECURE: "false"
+  GROQ_MODEL: openai/gpt-oss-120b
+  GROQ_MAX_TOKENS: "1024"
+  GROQ_TEMPERATURE: "0.1"
+  MAX_RETRIES: "3"
+  RETRY_DELAY_SECONDS: "1.0"
+  LOG_LEVEL: INFO
+
+secretEnv:
+  MINIO_ACCESS_KEY: minioadmin
+  MINIO_SECRET_KEY: minioadmin
+  GROQ_API_KEY: your_groq_api_key_here
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
+

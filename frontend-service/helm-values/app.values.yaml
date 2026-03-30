@@ -1,0 +1,22 @@
+image:
+  repository: frontend-service
+  tag: latest
+
+containerPort: 4173
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: http
+
+env:
+  VITE_API_GATEWAY_URL: http://api-gateway:8088
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 384Mi
+

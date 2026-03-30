@@ -1,0 +1,29 @@
+image:
+  repository: users-service
+  tag: latest
+
+containerPort: 3030
+
+service:
+  type: ClusterIP
+  port: 3030
+  targetPort: http
+
+env:
+  NODE_ENV: production
+  PORT: "3030"
+  KAFKA_BOOTSTRAP_SERVERS: cluster-kafka-bootstrap:9092
+  KAFKA_CLIENT_ID: users-service
+  KAFKA_TOPIC_USER_DELETED: users.user-deleted
+
+secretEnv:
+  MONGO_URI: mongodb://admin:password123@users-db-mongo-chart:27017/users_db?authSource=admin
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 384Mi
+

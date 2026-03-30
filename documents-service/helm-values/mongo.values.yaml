@@ -1,0 +1,25 @@
+image:
+  repository: mongo
+  tag: "7.0"
+
+service:
+  type: ClusterIP
+  port: 27017
+
+persistence:
+  enabled: true
+  size: 8Gi
+
+auth:
+  username: admin
+  password: password
+  database: documents
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 384Mi
+

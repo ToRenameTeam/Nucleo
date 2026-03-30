@@ -1,0 +1,25 @@
+image:
+  repository: postgres
+  tag: 16-alpine
+
+service:
+  type: ClusterIP
+  port: 5432
+
+persistence:
+  enabled: true
+  size: 8Gi
+
+auth:
+  username: appointments_user
+  password: appointments_pass
+  database: appointments
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 400m
+    memory: 512Mi
+

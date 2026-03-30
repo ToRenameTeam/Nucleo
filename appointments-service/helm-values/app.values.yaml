@@ -1,0 +1,37 @@
+image:
+  repository: appointments-service
+  tag: latest
+
+containerPort: 8080
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: http
+
+env:
+  DB_HOST: appointments-db-postgres-chart
+  DB_PORT: "5432"
+  DB_NAME: appointments
+  DB_USER: appointments_user
+  DATABASE_USER: appointments_user
+  KAFKA_BOOTSTRAP_SERVERS: cluster-kafka-bootstrap:9092
+  KAFKA_CLIENT_ID: appointments-service
+  KAFKA_CONSUMER_GROUP_ID: appointments-service
+  KAFKA_TOPIC_USER_DELETED: users.user-deleted
+  KAFKA_TOPIC_FACILITY_DELETED: master-data.facility-deleted
+  KAFKA_TOPIC_SERVICE_TYPE_DELETED: master-data.service-type-deleted
+
+secretEnv:
+  DB_PASSWORD: appointments_pass
+  DATABASE_PASSWORD: appointments_pass
+  DATABASE_URL: jdbc:postgresql://appointments-db-postgres-chart:5432/appointments
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 600m
+    memory: 768Mi
+

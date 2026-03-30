@@ -1,0 +1,6 @@
+apiVersion: v2
+name: kotlin-chart
+description: Reusable Helm chart for Kotlin/JVM microservices.
+type: application
+version: 0.2.0
+appVersion: "1.0.0"

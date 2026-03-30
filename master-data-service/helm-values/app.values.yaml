@@ -1,0 +1,31 @@
+image:
+  repository: master-data-service
+  tag: latest
+
+containerPort: 3040
+
+service:
+  type: ClusterIP
+  port: 3040
+  targetPort: http
+
+env:
+  NODE_ENV: production
+  PORT: "3040"
+  KAFKA_BOOTSTRAP_SERVERS: cluster-kafka-bootstrap:9092
+  KAFKA_CLIENT_ID: master-data-service
+  KAFKA_TOPIC_MEDICINE_DELETED: master-data.medicine-deleted
+  KAFKA_TOPIC_FACILITY_DELETED: master-data.facility-deleted
+  KAFKA_TOPIC_SERVICE_TYPE_DELETED: master-data.service-type-deleted
+
+secretEnv:
+  MONGO_URI: mongodb://admin:password@master-data-db-mongo-chart:27017/master_data_db?authSource=admin
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 384Mi
+
