@@ -2,12 +2,20 @@ package it.nucleo.appointments.infrastructure.persistence
 
 import it.nucleo.appointments.domain.*
 import kotlinx.datetime.toJavaLocalDateTime
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
+
+data class CleanupStats(
+    val deletedAppointments: Int,
+    val deletedAvailabilities: Int
+)
 
 class ExposedAppointmentRepository : AppointmentRepository {
 
@@ -67,5 +75,62 @@ class ExposedAppointmentRepository : AppointmentRepository {
             }
 
         if (updated > 0) appointment else null
+    }
+
+    suspend fun cleanupByDeletedUser(userId: String): CleanupStats {
+        val patientCleanup = cleanupByPatientId(userId)
+        val doctorCleanup = cleanupByDoctorId(userId)
+
+        return CleanupStats(
+            deletedAppointments =
+                patientCleanup.deletedAppointments + doctorCleanup.deletedAppointments,
+            deletedAvailabilities =
+                patientCleanup.deletedAvailabilities + doctorCleanup.deletedAvailabilities
+        )
+    }
+
+    suspend fun cleanupByDeletedFacility(facilityId: String): CleanupStats {
+        return cleanupByAvailabilityField(AvailabilitiesTable.facilityId, facilityId)
+    }
+
+    suspend fun cleanupByDeletedServiceType(serviceTypeId: String): CleanupStats {
+        return cleanupByAvailabilityField(AvailabilitiesTable.serviceTypeId, serviceTypeId)
+    }
+
+    private suspend fun cleanupByPatientId(patientId: String): CleanupStats = dbQuery {
+        val deletedAppointments =
+            AppointmentsTable.deleteWhere { AppointmentsTable.patientId eq patientId }
+
+        CleanupStats(
+            deletedAppointments = deletedAppointments,
+            deletedAvailabilities = 0
+        )
+    }
+
+    private suspend fun cleanupByDoctorId(doctorId: String): CleanupStats =
+        cleanupByAvailabilityField(AvailabilitiesTable.doctorId, doctorId)
+
+    private suspend fun cleanupByAvailabilityField(
+        field: org.jetbrains.exposed.sql.Column<String>,
+        value: String
+    ): CleanupStats = dbQuery {
+        val availabilityIds =
+            AvailabilitiesTable.select(AvailabilitiesTable.availabilityId)
+                .where { field eq value }
+                .map { it[AvailabilitiesTable.availabilityId] }
+
+        val deletedAppointments =
+            if (availabilityIds.isEmpty()) {
+                0
+            } else {
+                AppointmentsTable.deleteWhere { AppointmentsTable.availabilityId inList availabilityIds }
+            }
+
+        val deletedAvailabilities = AvailabilitiesTable.deleteWhere { field eq value }
+
+        CleanupStats(
+            deletedAppointments = deletedAppointments,
+            deletedAvailabilities = deletedAvailabilities
+        )
     }
 }
