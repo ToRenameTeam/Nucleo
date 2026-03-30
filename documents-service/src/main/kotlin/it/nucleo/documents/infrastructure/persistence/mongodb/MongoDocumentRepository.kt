@@ -242,6 +242,89 @@ class MongoDocumentRepository(database: MongoDatabase) : DocumentRepository {
         }
     }
 
+    suspend fun cleanupByDeletedUser(userId: String): Either<DomainError, Unit> {
+        logger.debug("Cleaning up documents for deleted user: $userId")
+
+        return try {
+            collection.deleteOne(Filters.eq(MedicalRecordDocument::patientId.name, userId))
+
+            collection.updateMany(
+                Filters.exists(MedicalRecordDocument::documents.name),
+                Updates.pull(MedicalRecordDocument::documents.name, Filters.eq("doctorId", userId))
+            )
+
+            logger.info("Cleanup completed for deleted user: $userId")
+            success(Unit)
+        } catch (e: MongoException) {
+            logger.error("Failed user cleanup for $userId", e)
+            failure(
+                RepositoryError.OperationFailed("Failed cleanup for deleted user '$userId'", e)
+            )
+        }
+    }
+
+    suspend fun cleanupByDeletedMedicine(medicineId: String): Either<DomainError, Unit> {
+        logger.debug("Cleaning up medicine references for deleted medicine: $medicineId")
+
+        return try {
+            collection.updateMany(
+                Filters.exists(MedicalRecordDocument::documents.name),
+                Updates.pull(
+                    MedicalRecordDocument::documents.name,
+                    Filters.and(
+                        Filters.eq("_t", "medicine_prescription"),
+                        Filters.eq("dosage.medicineId", medicineId)
+                    )
+                )
+            )
+
+            logger.info("Cleanup completed for deleted medicine: $medicineId")
+            success(Unit)
+        } catch (e: MongoException) {
+            logger.error("Failed medicine cleanup for $medicineId", e)
+            failure(
+                RepositoryError.OperationFailed(
+                    "Failed cleanup for deleted medicine '$medicineId'",
+                    e
+                )
+            )
+        }
+    }
+
+    suspend fun cleanupByDeletedServiceType(serviceTypeId: String): Either<DomainError, Unit> {
+        logger.debug("Cleaning up service type references for deleted service type: $serviceTypeId")
+
+        return try {
+            collection.updateMany(
+                Filters.exists(MedicalRecordDocument::documents.name),
+                Updates.pull(
+                    MedicalRecordDocument::documents.name,
+                    Filters.or(
+                        Filters.and(
+                            Filters.eq("_t", "service_prescription"),
+                            Filters.eq("serviceId", serviceTypeId)
+                        ),
+                        Filters.and(
+                            Filters.eq("_t", "report"),
+                            Filters.eq("servicePrescription.serviceId", serviceTypeId)
+                        )
+                    )
+                )
+            )
+
+            logger.info("Cleanup completed for deleted service type: $serviceTypeId")
+            success(Unit)
+        } catch (e: MongoException) {
+            logger.error("Failed service type cleanup for $serviceTypeId", e)
+            failure(
+                RepositoryError.OperationFailed(
+                    "Failed cleanup for deleted service type '$serviceTypeId'",
+                    e
+                )
+            )
+        }
+    }
+
     companion object {
         private const val COLLECTION_NAME = "medical_records"
     }

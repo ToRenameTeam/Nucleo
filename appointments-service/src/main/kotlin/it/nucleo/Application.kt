@@ -8,6 +8,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.application.ApplicationStopping
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -16,6 +17,7 @@ import it.nucleo.appointments.api.routes.availabilityRoutes
 import it.nucleo.appointments.application.AppointmentService
 import it.nucleo.appointments.application.AvailabilityService
 import it.nucleo.appointments.infrastructure.database.DatabaseFactory
+import it.nucleo.appointments.infrastructure.kafka.DeleteEventsConsumer
 import it.nucleo.appointments.infrastructure.persistence.ExposedAppointmentRepository
 import it.nucleo.appointments.infrastructure.persistence.ExposedAvailabilityRepository
 import it.nucleo.commons.api.ErrorResponse
@@ -40,6 +42,7 @@ fun Application.module() {
     configureCors()
     configureCallLogging()
     initializeDatabase()
+    configureKafkaConsumers()
     configureRouting()
     logger.info("Application initialized successfully")
 }
@@ -122,7 +125,43 @@ private fun Application.configureRouting() {
     }
 }
 
+private fun Application.configureKafkaConsumers() {
+    val consumer =
+        DeleteEventsConsumer(
+            cleanupRepository = ExposedAppointmentRepository(),
+            bootstrapServers = Environment.kafkaBootstrapServers,
+            clientId = Environment.kafkaClientId,
+            groupId = Environment.kafkaConsumerGroupId,
+            userDeletedTopic = Environment.kafkaTopicUserDeleted,
+            facilityDeletedTopic = Environment.kafkaTopicFacilityDeleted,
+            serviceTypeDeletedTopic = Environment.kafkaTopicServiceTypeDeleted
+        )
+
+    consumer.start()
+    environment.monitor.subscribe(ApplicationStopping) {
+        consumer.stop()
+    }
+}
+
 private object Environment {
     val serverPort: Int
         get() = System.getenv("SERVER_PORT")?.toIntOrNull() ?: DEFAULT_SERVER_PORT
+
+    val kafkaBootstrapServers: String
+        get() = System.getenv("KAFKA_BOOTSTRAP_SERVERS") ?: ""
+
+    val kafkaClientId: String
+        get() = System.getenv("KAFKA_CLIENT_ID") ?: "appointments-service"
+
+    val kafkaConsumerGroupId: String
+        get() = System.getenv("KAFKA_CONSUMER_GROUP_ID") ?: ""
+
+    val kafkaTopicUserDeleted: String
+        get() = System.getenv("KAFKA_TOPIC_USER_DELETED") ?: ""
+
+    val kafkaTopicFacilityDeleted: String
+        get() = System.getenv("KAFKA_TOPIC_FACILITY_DELETED") ?: ""
+
+    val kafkaTopicServiceTypeDeleted: String
+        get() = System.getenv("KAFKA_TOPIC_SERVICE_TYPE_DELETED") ?: ""
 }

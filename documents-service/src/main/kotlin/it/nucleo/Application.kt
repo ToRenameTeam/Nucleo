@@ -10,6 +10,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.application.ApplicationStopping
 import it.nucleo.commons.api.ErrorResponse
 import it.nucleo.commons.ktor.configureCors
 import it.nucleo.commons.logging.logger
@@ -21,6 +22,7 @@ import it.nucleo.documents.application.DocumentPdfGenerator
 import it.nucleo.documents.application.DocumentService
 import it.nucleo.documents.application.DocumentUploadService
 import it.nucleo.documents.infrastructure.ai.AiServiceClient
+import it.nucleo.documents.infrastructure.kafka.DeleteEventsConsumer
 import it.nucleo.documents.infrastructure.persistence.minio.MinioClientFactory
 import it.nucleo.documents.infrastructure.persistence.minio.MinioFileStorageRepository
 import it.nucleo.documents.infrastructure.persistence.mongodb.MongoDbFactory
@@ -153,7 +155,27 @@ private fun Application.configureRouting() {
         )
     val downloadService = DocumentDownloadService(fileStorageRepository)
 
+    configureKafkaConsumers(documentRepository)
+
     installRoutes(documentService, uploadService, downloadService)
+}
+
+private fun Application.configureKafkaConsumers(documentRepository: MongoDocumentRepository) {
+    val consumer =
+        DeleteEventsConsumer(
+            documentRepository = documentRepository,
+            bootstrapServers = Environment.kafkaBootstrapServers,
+            clientId = Environment.kafkaClientId,
+            groupId = Environment.kafkaConsumerGroupId,
+            userDeletedTopic = Environment.kafkaTopicUserDeleted,
+            medicineDeletedTopic = Environment.kafkaTopicMedicineDeleted,
+            serviceTypeDeletedTopic = Environment.kafkaTopicServiceTypeDeleted
+        )
+
+    consumer.start()
+    environment.monitor.subscribe(ApplicationStopping) {
+        consumer.stop()
+    }
 }
 
 private fun Application.installRoutes(
@@ -201,6 +223,24 @@ private object Environment {
         get() =
             System.getenv("AI_SERVICE_PORT")?.toIntOrNull()
                 ?: AiServiceClient.Companion.Defaults.PORT
+
+    val kafkaBootstrapServers: String
+        get() = System.getenv("KAFKA_BOOTSTRAP_SERVERS") ?: ""
+
+    val kafkaClientId: String
+        get() = System.getenv("KAFKA_CLIENT_ID") ?: "documents-service"
+
+    val kafkaConsumerGroupId: String
+        get() = System.getenv("KAFKA_CONSUMER_GROUP_ID") ?: ""
+
+    val kafkaTopicUserDeleted: String
+        get() = System.getenv("KAFKA_TOPIC_USER_DELETED") ?: ""
+
+    val kafkaTopicMedicineDeleted: String
+        get() = System.getenv("KAFKA_TOPIC_MEDICINE_DELETED") ?: ""
+
+    val kafkaTopicServiceTypeDeleted: String
+        get() = System.getenv("KAFKA_TOPIC_SERVICE_TYPE_DELETED") ?: ""
 }
 
 private fun createAiServiceClient(): AiServiceClient {
