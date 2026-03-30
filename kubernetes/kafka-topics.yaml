@@ -7,6 +7,8 @@ metadata:
 spec:
   partitions: 3
   replicas: 1
+  config:
+    min.insync.replicas: 1
 ---
 apiVersion: kafka.strimzi.io/v1
 kind: KafkaTopic
@@ -17,6 +19,8 @@ metadata:
 spec:
   partitions: 3
   replicas: 1
+  config:
+    min.insync.replicas: 1
 ---
 apiVersion: kafka.strimzi.io/v1
 kind: KafkaTopic
@@ -27,6 +31,8 @@ metadata:
 spec:
   partitions: 3
   replicas: 1
+  config:
+    min.insync.replicas: 1
 ---
 apiVersion: kafka.strimzi.io/v1
 kind: KafkaTopic
@@ -37,3 +43,5 @@ metadata:
 spec:
   partitions: 3
   replicas: 1
+  config:
+    min.insync.replicas: 1
