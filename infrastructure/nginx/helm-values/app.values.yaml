@@ -1,0 +1,35 @@
+image:
+  repository: nginx
+  tag: 1.27-alpine
+
+service:
+  type: ClusterIP
+  port: 8088
+  targetPort: http
+
+frontend:
+  host: frontend-service-node-chart
+  port: 80
+
+backends:
+  users:
+    host: users-service-node-chart
+    port: 3030
+  masterData:
+    host: master-data-service-node-chart
+    port: 3040
+  appointments:
+    host: appointments-service-kotlin-chart
+    port: 8080
+  documents:
+    host: documents-service-kotlin-chart
+    port: 8080
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+

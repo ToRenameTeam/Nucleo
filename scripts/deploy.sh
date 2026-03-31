@@ -90,22 +90,27 @@ echo -e "${GREEN}[OK] Kafka cluster ready and topics applied${NC}"
 
 echo -e "\n${BLUE}==> Deploying data stores${NC}"
 helm upgrade --install users-db "$ROOT_DIR/kubernetes/helm-chart/mongo-chart" \
+  --reset-values \
   -f "$ROOT_DIR/users-service/helm-values/mongo.values.yaml" \
   --namespace "$NAMESPACE" --create-namespace --wait --timeout "$HELM_TIMEOUT"
 
 helm upgrade --install master-data-db "$ROOT_DIR/kubernetes/helm-chart/mongo-chart" \
+  --reset-values \
   -f "$ROOT_DIR/master-data-service/helm-values/mongo.values.yaml" \
   --namespace "$NAMESPACE" --create-namespace --wait --timeout "$HELM_TIMEOUT"
 
 helm upgrade --install appointments-db "$ROOT_DIR/kubernetes/helm-chart/postgres-chart" \
+  --reset-values \
   -f "$ROOT_DIR/appointments-service/helm-values/postgres.values.yaml" \
   --namespace "$NAMESPACE" --create-namespace --wait --timeout "$HELM_TIMEOUT"
 
 helm upgrade --install documents-db "$ROOT_DIR/kubernetes/helm-chart/mongo-chart" \
+  --reset-values \
   -f "$ROOT_DIR/documents-service/helm-values/mongo.values.yaml" \
   --namespace "$NAMESPACE" --create-namespace --wait --timeout "$HELM_TIMEOUT"
 
 helm upgrade --install minio "$ROOT_DIR/kubernetes/helm-chart/minio-chart" \
+  --reset-values \
   -f "$ROOT_DIR/documents-service/helm-values/minio.values.yaml" \
   --namespace "$NAMESPACE" --create-namespace --wait --timeout "$HELM_TIMEOUT"
 
@@ -169,6 +174,10 @@ helm upgrade --install frontend-service "$ROOT_DIR/kubernetes/helm-chart/node-ch
   -f "$ROOT_DIR/frontend-service/helm-values/app.values.yaml" \
   --namespace "$NAMESPACE" --create-namespace --wait --timeout "$HELM_TIMEOUT"
 
+helm upgrade --install api-gateway "$ROOT_DIR/kubernetes/helm-chart/nginx-chart" \
+  -f "$ROOT_DIR/infrastructure/nginx/helm-values/app.values.yaml" \
+  --namespace "$NAMESPACE" --create-namespace --wait --timeout "$HELM_TIMEOUT"
+
 echo -e "${GREEN}[OK] Application services deployed${NC}"
 
 echo -e "\n${BLUE}==> Deployment summary${NC}"
@@ -176,3 +185,4 @@ kubectl -n "$NAMESPACE" get pods
 echo
 
 echo -e "${GREEN}[OK] Nucleo deployment completed in namespace '$NAMESPACE'${NC}"
+echo -e "${YELLOW}[INFO] Expose the gateway with: kubectl -n $NAMESPACE port-forward service/api-gateway-nginx-chart 8088:8088${NC}"

@@ -56,9 +56,11 @@ export async function startServer(options: StartServerOptions = {}): Promise<Ser
   const envPort = process.env.PORT ? Number(process.env.PORT) : undefined;
   const port = options.port ?? envPort ?? DEFAULT_PORT;
   const mongoUri = options.mongoUri ?? process.env.MONGO_URI ?? DEFAULT_MONGO_URI;
-  const shouldRunSeeds = options.runDatabaseSeeds ?? true;
+  const shouldRunSeeds =
+    options.runDatabaseSeeds ??
+    (process.env.RUN_DB_SEEDS ? process.env.RUN_DB_SEEDS === 'true' : true);
 
-  await connectDB(mongoUri);
+  await connectWithRetry(mongoUri);
 
   if (shouldRunSeeds) {
     await runSeeds();
@@ -73,4 +75,29 @@ export async function startServer(options: StartServerOptions = {}): Promise<Ser
       reject(error);
     });
   });
+}
+
+async function connectWithRetry(mongoUri: string): Promise<void> {
+  const maxAttempts = Number(process.env.DB_CONNECT_RETRIES ?? '10');
+  const delayMs = Number(process.env.DB_CONNECT_RETRY_DELAY_MS ?? '2000');
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      await connectDB(mongoUri);
+      return;
+    } catch (error) {
+      console.error(
+        `MongoDB connection attempt ${attempt}/${maxAttempts} failed. Retrying in ${delayMs}ms...`,
+        error
+      );
+
+      if (attempt === maxAttempts) {
+        throw error;
+      }
+
+      await new Promise(function (resolve) {
+        setTimeout(resolve, delayMs);
+      });
+    }
+  }
 }

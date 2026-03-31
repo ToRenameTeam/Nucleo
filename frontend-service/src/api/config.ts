@@ -1,5 +1,32 @@
-// All backend traffic goes through the API Gateway.
-export const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:8088';
+// Keep requests same-origin by default so the browser calls the NGINX gateway host serving the frontend.
+function getDefaultGatewayUrl(): string {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  const { protocol, hostname, port } = window.location;
+  const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
+  const isLocalFrontendPort = port === '3000' || port === '4173' || port === '5173';
+
+  if (isLocalHost && isLocalFrontendPort) {
+    return `${protocol}//${hostname}:8088`;
+  }
+
+  return '';
+}
+
+// Prefer explicit env configuration, then fall back to a smart local default.
+const rawGatewayUrl = import.meta.env.VITE_API_GATEWAY_URL?.trim() ?? getDefaultGatewayUrl();
+
+function normalizeGatewayUrl(url: string): string {
+  if (!url) {
+    return '';
+  }
+
+  return url.replace(/\/+$/, '');
+}
+
+export const API_GATEWAY_URL = normalizeGatewayUrl(rawGatewayUrl);
 
 // Kept for backward compatibility with existing API modules.
 // TODO: should refactor these modules to use API_GATEWAY_URL directly and remove these constants.

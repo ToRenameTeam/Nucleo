@@ -31,9 +31,8 @@ secretEnv:
 
 resources:
   requests:
-    cpu: 200m
-    memory: 256Mi
+    cpu: 100m
+    memory: 192Mi
   limits:
-    cpu: 600m
-    memory: 768Mi
-
+    cpu: 300m
+    memory: 512Mi

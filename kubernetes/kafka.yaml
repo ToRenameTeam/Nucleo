@@ -8,6 +8,13 @@ spec:
   replicas: 1
   roles:
     - controller
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 300m
+      memory: 512Mi
   storage:
     type: jbod
     volumes:
@@ -26,6 +33,13 @@ spec:
   replicas: 1
   roles:
     - broker
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
   storage:
     type: jbod
     volumes:

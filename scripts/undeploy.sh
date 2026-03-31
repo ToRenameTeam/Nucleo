@@ -57,6 +57,7 @@ fi
 
 echo -e "\n${BLUE}==> Removing application services${NC}"
 for release_name in \
+  api-gateway \
   frontend-service \
   documents-service \
   ai-service \
