@@ -10,6 +10,7 @@ KAFKA_READY_TIMEOUT="${KAFKA_READY_TIMEOUT:-600s}"
 TOPICS_READY_TIMEOUT="${TOPICS_READY_TIMEOUT:-300s}"
 MINIO_READY_TIMEOUT="${MINIO_READY_TIMEOUT:-300s}"
 BUILD_IMAGES="${BUILD_IMAGES:-true}"
+GATEWAY_API_CRDS_URL="${GATEWAY_API_CRDS_URL:-https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml}"
 
 # Basic ANSI colors for readable output.
 BLUE='\033[1;34m'
@@ -56,6 +57,54 @@ if [[ "$CURRENT_CONTEXT" != "minikube" ]]; then
 fi
 
 echo -e "${GREEN}[OK] Prerequisites satisfied${NC}"
+
+echo -e "\n${BLUE}==> Installing Gateway API and controller${NC}"
+REQUIRED_GATEWAY_API_CRDS=(
+  gatewayclasses.gateway.networking.k8s.io
+  gateways.gateway.networking.k8s.io
+  httproutes.gateway.networking.k8s.io
+  referencegrants.gateway.networking.k8s.io
+)
+
+missing_gateway_crds=()
+for crd_name in "${REQUIRED_GATEWAY_API_CRDS[@]}"; do
+  if ! kubectl get crd "$crd_name" >/dev/null 2>&1; then
+    missing_gateway_crds+=("$crd_name")
+  fi
+done
+
+if (( ${#missing_gateway_crds[@]} > 0 )); then
+  echo -e "${GRAY}  - Installing missing Gateway API CRDs${NC}"
+  if ! kubectl apply -f "$GATEWAY_API_CRDS_URL"; then
+    echo -e "${YELLOW}[WARN] Gateway API CRDs apply returned an error. Re-checking required CRDs...${NC}"
+  fi
+else
+  echo -e "${GRAY}  - Gateway API CRDs already present (skip apply)${NC}"
+fi
+
+for crd_name in "${REQUIRED_GATEWAY_API_CRDS[@]}"; do
+  if ! kubectl get crd "$crd_name" >/dev/null 2>&1; then
+    echo -e "${RED}[ERROR] Required Gateway API CRD not found: $crd_name${NC}" >&2
+    exit 1
+  fi
+done
+
+helm repo add traefik https://traefik.github.io/charts >/dev/null 2>&1 || true
+helm repo update >/dev/null
+
+helm upgrade --install gateway-api-controller traefik/traefik \
+  --namespace "$NAMESPACE" \
+  --create-namespace \
+  -f "$ROOT_DIR/kubernetes/gateway-api/controller-values.minikube.yaml" \
+  --wait \
+  --timeout "$HELM_TIMEOUT"
+
+echo -e "${GRAY}  - Waiting for Gateway API controller deployment${NC}"
+kubectl -n "$NAMESPACE" wait deployment/gateway-api-controller-traefik \
+  --for=condition=Available=True \
+  --timeout="$STRIMZI_DEPLOYMENT_TIMEOUT"
+
+echo -e "${GREEN}[OK] Gateway API controller ready${NC}"
 
 echo -e "\n${BLUE}==> Deploying Kafka (Strimzi operator, cluster, topics)${NC}"
 helm upgrade --install strimzi-cluster-operator \
@@ -174,15 +223,44 @@ helm upgrade --install frontend-service "$ROOT_DIR/kubernetes/helm-chart/node-ch
   -f "$ROOT_DIR/frontend-service/helm-values/app.values.yaml" \
   --namespace "$NAMESPACE" --create-namespace --wait --timeout "$HELM_TIMEOUT"
 
-helm upgrade --install api-gateway "$ROOT_DIR/kubernetes/helm-chart/nginx-chart" \
-  -f "$ROOT_DIR/infrastructure/nginx/helm-values/app.values.yaml" \
-  --namespace "$NAMESPACE" --create-namespace --wait --timeout "$HELM_TIMEOUT"
+kubectl -n "$NAMESPACE" apply -k "$ROOT_DIR/kubernetes/gateway-api"
+
+echo -e "${GRAY}  - Waiting for Gateway and HTTPRoutes acceptance${NC}"
+kubectl -n "$NAMESPACE" wait gateway/nucleo-gateway \
+  --for=condition=Accepted \
+  --timeout="$STRIMZI_DEPLOYMENT_TIMEOUT"
+
+for route_name in \
+  nucleo-users-route \
+  nucleo-master-data-route \
+  nucleo-appointments-route \
+  nucleo-documents-route \
+  nucleo-frontend-route; do
+  echo -e "${GRAY}    * Checking HTTPRoute: ${route_name}${NC}"
+  accepted=""
+  for _ in $(seq 1 60); do
+    accepted="$(kubectl -n "$NAMESPACE" get httproute "$route_name" -o jsonpath='{.status.parents[0].conditions[?(@.type=="Accepted")].status}' 2>/dev/null || true)"
+    if [[ "$accepted" == "True" ]]; then
+      break
+    fi
+    sleep 2
+  done
+
+  if [[ "$accepted" != "True" ]]; then
+    echo -e "${RED}[ERROR] HTTPRoute '$route_name' was not Accepted by the controller.${NC}" >&2
+    kubectl -n "$NAMESPACE" describe httproute "$route_name" >&2 || true
+    exit 1
+  fi
+done
 
 echo -e "${GREEN}[OK] Application services deployed${NC}"
 
 echo -e "\n${BLUE}==> Deployment summary${NC}"
 kubectl -n "$NAMESPACE" get pods
 echo
+kubectl -n "$NAMESPACE" get gateway,httproute
+echo
 
 echo -e "${GREEN}[OK] Nucleo deployment completed in namespace '$NAMESPACE'${NC}"
-echo -e "${YELLOW}[INFO] Expose the gateway with: kubectl -n $NAMESPACE port-forward service/api-gateway-nginx-chart 8088:8088${NC}"
+echo -e "${YELLOW}[INFO] Expose Gateway API with: kubectl -n $NAMESPACE port-forward service/gateway-api-controller-traefik 8088:80${NC}"
+echo -e "${YELLOW}[INFO] Then open: http://localhost:8088${NC}"

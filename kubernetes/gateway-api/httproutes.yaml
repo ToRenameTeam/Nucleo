@@ -1,0 +1,95 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: nucleo-users-route
+spec:
+  parentRefs:
+    - name: nucleo-gateway
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/auth
+        - path:
+            type: PathPrefix
+            value: /api/users
+        - path:
+            type: PathPrefix
+            value: /api/delegations
+      backendRefs:
+        - name: users-service-node-chart
+          port: 3030
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: nucleo-master-data-route
+spec:
+  parentRefs:
+    - name: nucleo-gateway
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/service-catalog
+        - path:
+            type: PathPrefix
+            value: /api/facilities
+        - path:
+            type: PathPrefix
+            value: /api/medicines
+      backendRefs:
+        - name: master-data-service-node-chart
+          port: 3040
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: nucleo-appointments-route
+spec:
+  parentRefs:
+    - name: nucleo-gateway
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/appointments
+        - path:
+            type: PathPrefix
+            value: /api/availabilities
+      backendRefs:
+        - name: appointments-service-kotlin-chart
+          port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: nucleo-documents-route
+spec:
+  parentRefs:
+    - name: nucleo-gateway
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/documents
+      backendRefs:
+        - name: documents-service-kotlin-chart
+          port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: nucleo-frontend-route
+spec:
+  parentRefs:
+    - name: nucleo-gateway
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: frontend-service-node-chart
+          port: 80
+

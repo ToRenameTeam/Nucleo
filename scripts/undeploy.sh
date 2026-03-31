@@ -55,9 +55,14 @@ else
   echo -e "${YELLOW}[MODE] Preserve data (PVCs kept, Kafka metadata kept)${NC}"
 fi
 
+echo -e "\n${BLUE}==> Removing Gateway API resources${NC}"
+kubectl -n "$NAMESPACE" delete -k "$ROOT_DIR/kubernetes/gateway-api" --ignore-not-found
+
+echo -e "${GREEN}[OK] Gateway API resources removed${NC}"
+
 echo -e "\n${BLUE}==> Removing application services${NC}"
 for release_name in \
-  api-gateway \
+  gateway-api-controller \
   frontend-service \
   documents-service \
   ai-service \
