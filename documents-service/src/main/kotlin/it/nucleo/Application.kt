@@ -3,6 +3,7 @@ package it.nucleo
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
+import io.ktor.server.application.ApplicationStopping
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.BadRequestException
@@ -10,7 +11,6 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.application.ApplicationStopping
 import it.nucleo.commons.api.ErrorResponse
 import it.nucleo.commons.ktor.configureCors
 import it.nucleo.commons.logging.logger
@@ -173,9 +173,7 @@ private fun Application.configureKafkaConsumers(documentRepository: MongoDocumen
         )
 
     consumer.start()
-    environment.monitor.subscribe(ApplicationStopping) {
-        consumer.stop()
-    }
+    environment.monitor.subscribe(ApplicationStopping) { consumer.stop() }
 }
 
 private fun Application.installRoutes(

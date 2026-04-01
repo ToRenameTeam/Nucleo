@@ -1,18 +1,21 @@
 package it.nucleo.appointments.infrastructure.kafka
 
 import it.nucleo.appointments.infrastructure.persistence.ExposedAppointmentRepository
+import java.time.Duration
+import java.util.Properties
+import kotlin.concurrent.thread
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.WakeupException
 import org.apache.kafka.common.serialization.StringDeserializer
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.slf4j.LoggerFactory
-import java.time.Duration
-import java.util.Properties
-import kotlin.concurrent.thread
 
 private const val DEFAULT_POLL_TIMEOUT_SECONDS = 1L
 
@@ -42,9 +45,7 @@ class DeleteEventsConsumer(
         }
 
         running = true
-        thread(name = "appointments-delete-events-consumer", isDaemon = true) {
-            runConsumerLoop()
-        }
+        thread(name = "appointments-delete-events-consumer", isDaemon = true) { runConsumerLoop() }
     }
 
     fun stop() {
@@ -81,7 +82,7 @@ class DeleteEventsConsumer(
             }
         } catch (_: WakeupException) {
             logger.info("Kafka consumer wakeup requested")
-        } catch (error: Exception) {
+        } catch (error: KafkaException) {
             logger.error("Kafka consumer loop failed", error)
         } finally {
             kafkaConsumer.close()
@@ -97,7 +98,13 @@ class DeleteEventsConsumer(
                 serviceTypeDeletedTopic -> handleServiceTypeDeleted(payload)
                 else -> logger.warn("Received message from unexpected topic: {}", topic)
             }
-        } catch (error: Exception) {
+        } catch (error: IllegalArgumentException) {
+            logger.error("Failed to handle message on topic {}", topic, error)
+        } catch (error: IllegalStateException) {
+            logger.error("Failed to handle message on topic {}", topic, error)
+        } catch (error: SerializationException) {
+            logger.error("Failed to handle message on topic {}", topic, error)
+        } catch (error: ExposedSQLException) {
             logger.error("Failed to handle message on topic {}", topic, error)
         }
     }

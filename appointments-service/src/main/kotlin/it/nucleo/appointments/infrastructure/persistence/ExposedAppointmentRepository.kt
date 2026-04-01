@@ -4,18 +4,15 @@ import it.nucleo.appointments.domain.*
 import kotlinx.datetime.toJavaLocalDateTime
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
-import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.andWhere
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
 
-data class CleanupStats(
-    val deletedAppointments: Int,
-    val deletedAvailabilities: Int
-)
+data class CleanupStats(val deletedAppointments: Int, val deletedAvailabilities: Int)
 
 class ExposedAppointmentRepository : AppointmentRepository {
 
@@ -101,10 +98,7 @@ class ExposedAppointmentRepository : AppointmentRepository {
         val deletedAppointments =
             AppointmentsTable.deleteWhere { AppointmentsTable.patientId eq patientId }
 
-        CleanupStats(
-            deletedAppointments = deletedAppointments,
-            deletedAvailabilities = 0
-        )
+        CleanupStats(deletedAppointments = deletedAppointments, deletedAvailabilities = 0)
     }
 
     private suspend fun cleanupByDoctorId(doctorId: String): CleanupStats =
@@ -123,7 +117,9 @@ class ExposedAppointmentRepository : AppointmentRepository {
             if (availabilityIds.isEmpty()) {
                 0
             } else {
-                AppointmentsTable.deleteWhere { AppointmentsTable.availabilityId inList availabilityIds }
+                AppointmentsTable.deleteWhere {
+                    AppointmentsTable.availabilityId inList availabilityIds
+                }
             }
 
         val deletedAvailabilities = AvailabilitiesTable.deleteWhere { field eq value }

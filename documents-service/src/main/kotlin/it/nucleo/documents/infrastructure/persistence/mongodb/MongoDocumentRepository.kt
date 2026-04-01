@@ -257,9 +257,7 @@ class MongoDocumentRepository(database: MongoDatabase) : DocumentRepository {
             success(Unit)
         } catch (e: MongoException) {
             logger.error("Failed user cleanup for $userId", e)
-            failure(
-                RepositoryError.OperationFailed("Failed cleanup for deleted user '$userId'", e)
-            )
+            failure(RepositoryError.OperationFailed("Failed cleanup for deleted user '$userId'", e))
         }
     }
 
