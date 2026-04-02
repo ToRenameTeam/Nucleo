@@ -14,6 +14,8 @@ import it.nucleo.documents.domain.Title
 import it.nucleo.documents.domain.uploaded.UploadedDocumentType
 import it.nucleo.documents.infrastructure.ai.AiAnalysisResult
 import it.nucleo.documents.infrastructure.ai.AiServiceClient
+import it.nucleo.documents.infrastructure.kafka.NotificationEventsPublisher
+import java.time.OffsetDateTime
 import java.util.UUID
 
 data class UploadDocumentCommand(
@@ -44,7 +46,8 @@ data class UploadDocumentCommand(
 class DocumentUploadService(
     private val fileStorageRepository: FileStorageRepository,
     private val documentRepository: DocumentRepository,
-    private val aiServiceClient: AiServiceClient? = null
+    private val aiServiceClient: AiServiceClient? = null,
+    private val notificationEventsPublisher: NotificationEventsPublisher? = null
 ) {
 
     private val logger = logger()
@@ -133,6 +136,12 @@ class DocumentUploadService(
             return failure(it)
         }
 
+        notificationEventsPublisher?.publish(
+            receiver = command.patientId.id,
+            title = "Nuovo documento disponibile",
+            content = "E stato caricato un nuovo referto: ${command.filename}"
+        )
+
         logger.info(
             "Document entity created and saved successfully: ${documentId.id}, type: ${document.documentType}"
         )
@@ -201,11 +210,13 @@ class DocumentUploadService(
         }
     }
 
+                val uploadedAt = OffsetDateTime.now()
+
     private fun validate(command: UploadDocumentCommand): ValidationError? {
         if (!command.filename.lowercase().endsWith(".pdf")) {
             return ValidationError("Only PDF files are accepted")
         }
-
+                        "Referto '${command.filename}' caricato il ${uploadedAt.toLocalDate()} alle ${uploadedAt.toLocalTime().toString().take(5)}"
         if (command.contentType != PDF_CONTENT_TYPE) {
             return ValidationError("Content type must be application/pdf")
         }

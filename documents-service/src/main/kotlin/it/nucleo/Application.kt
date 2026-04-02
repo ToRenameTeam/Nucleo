@@ -23,6 +23,7 @@ import it.nucleo.documents.application.DocumentService
 import it.nucleo.documents.application.DocumentUploadService
 import it.nucleo.documents.infrastructure.ai.AiServiceClient
 import it.nucleo.documents.infrastructure.kafka.DeleteEventsConsumer
+import it.nucleo.documents.infrastructure.kafka.NotificationEventsPublisher
 import it.nucleo.documents.infrastructure.persistence.minio.MinioClientFactory
 import it.nucleo.documents.infrastructure.persistence.minio.MinioFileStorageRepository
 import it.nucleo.documents.infrastructure.persistence.mongodb.MongoDbFactory
@@ -138,6 +139,12 @@ private fun Application.configureRouting() {
 
     logger.info("Initializing AI Service client")
     val aiServiceClient = createAiServiceClient()
+    val notificationPublisher =
+        NotificationEventsPublisher(
+            bootstrapServers = Environment.kafkaBootstrapServers,
+            clientId = Environment.kafkaClientId,
+            notificationsTopic = Environment.kafkaTopicNotifications
+        )
 
     val pdfGenerator = DocumentPdfGenerator()
     val documentService =
@@ -145,17 +152,20 @@ private fun Application.configureRouting() {
             repository = documentRepository,
             fileStorageRepository = fileStorageRepository,
             pdfGenerator = pdfGenerator,
-            aiServiceClient = aiServiceClient
+            aiServiceClient = aiServiceClient,
+            notificationEventsPublisher = notificationPublisher
         )
     val uploadService =
         DocumentUploadService(
             fileStorageRepository = fileStorageRepository,
             documentRepository = documentRepository,
-            aiServiceClient = aiServiceClient
+            aiServiceClient = aiServiceClient,
+            notificationEventsPublisher = notificationPublisher
         )
     val downloadService = DocumentDownloadService(fileStorageRepository)
 
     configureKafkaConsumers(documentRepository)
+    environment.monitor.subscribe(ApplicationStopping) { notificationPublisher.close() }
 
     installRoutes(documentService, uploadService, downloadService)
 }
@@ -239,6 +249,9 @@ private object Environment {
 
     val kafkaTopicServiceTypeDeleted: String
         get() = System.getenv("KAFKA_TOPIC_SERVICE_TYPE_DELETED") ?: ""
+
+    val kafkaTopicNotifications: String
+        get() = System.getenv("KAFKA_TOPIC_NOTIFICATIONS") ?: ""
 }
 
 private fun createAiServiceClient(): AiServiceClient {

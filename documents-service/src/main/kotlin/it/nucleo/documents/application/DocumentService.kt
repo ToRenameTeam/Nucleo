@@ -4,16 +4,19 @@ import it.nucleo.commons.errors.*
 import it.nucleo.commons.logging.logger
 import it.nucleo.documents.domain.*
 import it.nucleo.documents.domain.errors.*
+import it.nucleo.documents.domain.prescription.implementation.MedicinePrescription
 import it.nucleo.documents.domain.prescription.implementation.ServicePrescription
 import it.nucleo.documents.domain.report.Report
 import it.nucleo.documents.infrastructure.ai.AiAnalysisResult
 import it.nucleo.documents.infrastructure.ai.AiServiceClient
+import it.nucleo.documents.infrastructure.kafka.NotificationEventsPublisher
 
 class DocumentService(
     private val repository: DocumentRepository,
     private val fileStorageRepository: FileStorageRepository,
     private val pdfGenerator: DocumentPdfGenerator,
-    private val aiServiceClient: AiServiceClient? = null
+    private val aiServiceClient: AiServiceClient? = null,
+    private val notificationEventsPublisher: NotificationEventsPublisher? = null,
 ) {
     private val logger = logger()
 
@@ -71,6 +74,24 @@ class DocumentService(
 
         repository.addDocument(document.patientId, finalDocument).getOrElse {
             return failure(it)
+        }
+
+        when (finalDocument) {
+            is MedicinePrescription -> {
+                notificationEventsPublisher?.publish(
+                    receiver = finalDocument.patientId.id,
+                    title = "Nuova prescrizione farmaceutica",
+                    content = "E stata creata una nuova prescrizione farmaceutica"
+                )
+            }
+            is ServicePrescription -> {
+                notificationEventsPublisher?.publish(
+                    receiver = finalDocument.patientId.id,
+                    title = "Nuova prescrizione per esame",
+                    content = "E stata creata una nuova prescrizione per esame"
+                )
+            }
+            else -> {}
         }
 
         return success(finalDocument)
