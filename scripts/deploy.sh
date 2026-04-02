@@ -58,6 +58,33 @@ fi
 
 echo -e "${GREEN}[OK] Prerequisites satisfied${NC}"
 
+# Check for stale PVCs from previous deployments. If any database PVC already
+# exists, MongoDB will skip the init scripts and not create the root user,
+# causing authentication failures. Warn loudly so the operator can decide
+# whether to proceed or purge first with: ./scripts/undeploy.sh --purge-pv
+echo -e "\n${BLUE}==> Checking for stale PVCs${NC}"
+stale_pvcs=()
+for release in users-db master-data-db documents-db; do
+  pvc_name="data-${release}-mongo-chart-0"
+  if kubectl -n "$NAMESPACE" get pvc "$pvc_name" >/dev/null 2>&1; then
+    stale_pvcs+=("$pvc_name")
+  fi
+done
+
+if (( ${#stale_pvcs[@]} > 0 )); then
+  echo -e "${YELLOW}[WARN] The following MongoDB PVCs already exist in namespace '$NAMESPACE':${NC}"
+  for pvc in "${stale_pvcs[@]}"; do
+    echo -e "${YELLOW}         - $pvc${NC}"
+  done
+  echo -e "${YELLOW}[WARN] MongoDB will reuse existing data and SKIP user initialization.${NC}"
+  echo -e "${YELLOW}[WARN] If this is a fresh deploy, run first:${NC}"
+  echo -e "${YELLOW}[WARN]   ./scripts/undeploy.sh --purge-pv${NC}"
+  echo -e "${YELLOW}[WARN] Continuing in 10 seconds... (Ctrl+C to abort)${NC}"
+  sleep 10
+else
+  echo -e "${GREEN}[OK] No stale PVCs found — MongoDB will initialize fresh${NC}"
+fi
+
 echo -e "\n${BLUE}==> Installing Gateway API and controller${NC}"
 REQUIRED_GATEWAY_API_CRDS=(
   gatewayclasses.gateway.networking.k8s.io
@@ -262,5 +289,11 @@ kubectl -n "$NAMESPACE" get gateway,httproute
 echo
 
 echo -e "${GREEN}[OK] Nucleo deployment completed in namespace '$NAMESPACE'${NC}"
-echo -e "${YELLOW}[INFO] Expose Gateway API with: kubectl -n $NAMESPACE port-forward service/gateway-api-controller-traefik 8088:80${NC}"
-echo -e "${YELLOW}[INFO] Then open: http://localhost:8088${NC}"
+echo -e "${YELLOW}[INFO] Gateway exposed by Traefik Service: gateway-api-controller-traefik${NC}"
+echo -e "${YELLOW}[INFO] Primary access command:${NC}"
+echo -e "${YELLOW}[INFO]   minikube service gateway-api-controller-traefik -n $NAMESPACE --url${NC}"
+echo -e "${YELLOW}[INFO] NodePort fallback (may not be reachable on macOS + Docker driver):${NC}"
+echo -e "${YELLOW}[INFO]   http://$(minikube ip):30088${NC}"
+echo -e "${YELLOW}[INFO] If needed, use local forwarding:${NC}"
+echo -e "${YELLOW}[INFO]   kubectl -n $NAMESPACE port-forward service/gateway-api-controller-traefik 8088:80${NC}"
+echo -e "${YELLOW}[INFO]   then open http://localhost:8088${NC}"

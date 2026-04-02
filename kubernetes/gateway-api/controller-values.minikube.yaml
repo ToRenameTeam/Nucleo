@@ -11,7 +11,17 @@ gatewayClass:
   enabled: false
 
 service:
-  type: ClusterIP
+  type: NodePort
+
+ports:
+  web:
+    nodePort: 30088
+  websecure:
+    nodePort: 30443
+
+logs:
+  access:
+    enabled: true
 
 resources:
   requests:
@@ -20,4 +30,3 @@ resources:
   limits:
     cpu: 200m
     memory: 256Mi
-

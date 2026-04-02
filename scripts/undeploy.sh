@@ -25,6 +25,8 @@ Usage: ./scripts/undeploy.sh [--purge-pv]
 
 Options:
   --purge-pv   Delete all workloads and also remove PVCs (Kafka + service databases).
+               Required for a clean redeploy: without this flag MongoDB reuses
+               existing data and skips user initialization on next deploy.
   -h, --help   Show this help message.
 EOF
       exit 0
@@ -53,6 +55,8 @@ if [[ "$PURGE_PV" == true ]]; then
   echo -e "${YELLOW}[MODE] Full cleanup (PVCs will be deleted)${NC}"
 else
   echo -e "${YELLOW}[MODE] Preserve data (PVCs kept, Kafka metadata kept)${NC}"
+  echo -e "${YELLOW}[WARN] Next deploy will reuse existing MongoDB data and SKIP user init.${NC}"
+  echo -e "${YELLOW}[WARN] For a clean redeploy use: ./scripts/undeploy.sh --purge-pv${NC}"
 fi
 
 echo -e "\n${BLUE}==> Removing Gateway API resources${NC}"
@@ -152,21 +156,35 @@ echo -e "${GREEN}[OK] Strimzi operator removal completed${NC}"
 if [[ "$PURGE_PV" == true ]]; then
   echo -e "\n${BLUE}==> Purging persistent volumes${NC}"
 
-  for pvc_name in \
-    data-minio-0 \
-    data-users-db-mongo-chart-0 \
-    data-master-data-db-mongo-chart-0 \
-    data-appointments-db-postgres-chart-0 \
-    data-documents-db-mongo-chart-0; do
-    kubectl -n "$NAMESPACE" delete pvc "$pvc_name" --ignore-not-found >/dev/null
-    echo -e "${GRAY}  - PVC removed if present: $pvc_name${NC}"
+  # Use label selectors where possible so that PVC names remain correct
+  # even if Helm release names change in the future.
+
+  # MongoDB PVCs — identified by the StatefulSet label set by the mongo-chart.
+  for release_name in users-db master-data-db documents-db; do
+    echo -e "${GRAY}  - Removing PVCs for release: $release_name${NC}"
+    kubectl -n "$NAMESPACE" delete pvc \
+      -l "app.kubernetes.io/instance=${release_name}" \
+      --ignore-not-found >/dev/null || true
   done
 
-  kubectl -n "$NAMESPACE" delete pvc -l app.kubernetes.io/instance=minio --ignore-not-found >/dev/null || true
-  echo -e "${GRAY}  - MinIO PVCs removed if present (label: app.kubernetes.io/instance=minio)${NC}"
+  # Postgres PVC — same approach via release label.
+  echo -e "${GRAY}  - Removing PVCs for release: appointments-db${NC}"
+  kubectl -n "$NAMESPACE" delete pvc \
+    -l "app.kubernetes.io/instance=appointments-db" \
+    --ignore-not-found >/dev/null || true
 
-  kubectl -n "$NAMESPACE" delete pvc -l strimzi.io/cluster=cluster --ignore-not-found >/dev/null || true
-  echo -e "${GRAY}  - Kafka PVCs removed if present (label: strimzi.io/cluster=cluster)${NC}"
+  # MinIO PVC — via release label.
+  echo -e "${GRAY}  - Removing PVCs for release: minio${NC}"
+  kubectl -n "$NAMESPACE" delete pvc \
+    -l "app.kubernetes.io/instance=minio" \
+    --ignore-not-found >/dev/null || true
+
+  # Kafka PVCs — managed by Strimzi, identified by cluster label.
+  echo -e "${GRAY}  - Removing Kafka PVCs (label: strimzi.io/cluster=cluster)${NC}"
+  kubectl -n "$NAMESPACE" delete pvc \
+    -l "strimzi.io/cluster=cluster" \
+    --ignore-not-found >/dev/null || true
+
   echo -e "${GREEN}[OK] Persistent volumes purge completed${NC}"
 fi
 
@@ -179,5 +197,5 @@ if [[ "$PURGE_PV" == true ]]; then
 else
   echo -e "${GREEN}[OK] Nucleo undeployed from namespace '$NAMESPACE' (PVCs preserved)${NC}"
   echo -e "${YELLOW}[WARN] Kafka and DB data were kept. Next deploy will reuse existing persisted state.${NC}"
+  echo -e "${YELLOW}[WARN] For a clean redeploy: ./scripts/undeploy.sh --purge-pv${NC}"
 fi
-
