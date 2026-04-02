@@ -34,7 +34,7 @@ export interface ServicePrescriptionFormData {
   facilityName: string;
   validityType: 'until_date' | 'until_execution';
   validityDate: string;
-  priority: 'ROUTINE' | 'URGENT' | 'EMERGENCY';
+  priority: 'ROUTINE' | 'URGENT' | 'DEFERRED';
 }
 
 // Form data
@@ -74,7 +74,11 @@ const isLoadingFacilities = ref(false);
 const priorityOptions = [
   { value: 'ROUTINE', label: 'Routine', description: 'Non urgente' },
   { value: 'URGENT', label: 'Urgente', description: 'Da eseguire prima possibile' },
-  { value: 'EMERGENCY', label: 'Emergenza', description: 'Richiede attenzione immediata' },
+  {
+    value: 'DEFERRED',
+    label: 'Differita',
+    description: 'Può essere eseguita in un secondo momento',
+  },
 ];
 
 // Computed: filtered patients based on search

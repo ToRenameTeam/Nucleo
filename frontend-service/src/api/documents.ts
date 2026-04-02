@@ -52,7 +52,7 @@ export interface CreateServicePrescriptionRequest {
   };
   serviceId: string;
   facilityId: string;
-  priority: 'ROUTINE' | 'URGENT' | 'EMERGENCY';
+  priority: 'ROUTINE' | 'URGENT' | 'DEFERRED';
 }
 
 export interface CreateReportRequest {
@@ -173,7 +173,7 @@ const createServicePrescriptionRequestSchema = z.object({
   validity: validityRequestSchema,
   serviceId: idSchema,
   facilityId: idSchema,
-  priority: z.enum(['ROUTINE', 'URGENT', 'EMERGENCY']),
+  priority: z.enum(['ROUTINE', 'URGENT', 'DEFERRED']),
 });
 
 const createReportRequestSchema = z.object({
