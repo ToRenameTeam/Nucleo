@@ -3,12 +3,14 @@ import type { UUID } from 'crypto';
 import { Delegation, DelegationStatus } from '../domain/index.js';
 import type { DelegationRepository } from '../domain/repositories/index.js';
 import type { PatientRepository } from '../domain/repositories/index.js';
+import type { NotificationEventsPublisher } from '../infrastructure/kafka/notification-events.publisher.js';
 import { toUUID } from '../utils/uuid.js';
 
 export class DelegationService {
   constructor(
     private readonly delegationRepository: DelegationRepository,
-    private readonly patientRepository: PatientRepository
+    private readonly patientRepository: PatientRepository,
+    private readonly notificationEventsPublisher: NotificationEventsPublisher | null = null
   ) {}
 
   async createDelegation(data: { delegatingUserId: string; delegatorUserId: string }) {
@@ -39,6 +41,12 @@ export class DelegationService {
     );
 
     await this.delegationRepository.create(delegation);
+
+    await this.notificationEventsPublisher?.publish({
+      receiver: delegation.delegatingUserId,
+      title: 'Nuova delega ricevuta',
+      content: `La delega ${delegation.delegationId} e stata creata da ${delegation.delegatorUserId} per il tuo profilo ${delegation.delegatingUserId}`,
+    });
 
     return this.toDelegationResponse({
       delegationId: delegation.delegationId,
