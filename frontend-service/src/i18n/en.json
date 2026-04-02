@@ -77,7 +77,9 @@
     "selectDocument": "Select Document",
     "selection": {
       "selectMode": "Select documents",
-      "cancel": "Cancel selection"
+      "cancel": "Cancel selection",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all"
     },
     "batch": {
       "documentSelected": "document selected",

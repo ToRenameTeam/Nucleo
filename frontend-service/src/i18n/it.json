@@ -74,6 +74,7 @@
     "noResults": "Nessun documento trovato",
     "close": "Chiudi",
     "bookVisit": "Prenota visita",
+    "selectDocument": "Seleziona documento",
     "selection": {
       "selectMode": "Seleziona documenti",
       "cancel": "Annulla selezione",
@@ -642,7 +643,6 @@
       "successTitle": "Caricamento completato",
       "loadingMessage": "Il documento è in fase di caricamento e analisi. Potrebbe richiedere qualche istante.",
       "successMessage": "Il documento è stato caricato e analizzato con successo ed è ora disponibile."
-    },
-    "nonMedicalDocument": "Il documento non è stato accettato. Solo documenti medici (referti, prescrizioni, note cliniche) sono permessi."
+    }
   }
 }
