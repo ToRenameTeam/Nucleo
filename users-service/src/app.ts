@@ -2,7 +2,7 @@ import express, { type Express } from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import { type Server } from 'node:http';
-import { authRoutes, userRoutes, delegationRoutes } from './api/index.js';
+import { authRoutes, userRoutes, delegationRoutes, userNotificationRoutes } from './api/index.js';
 import { runSeeds } from './infrastructure/database/index.js';
 
 export const DEFAULT_PORT = 3030;
@@ -29,6 +29,7 @@ export function createApp(): Express {
   });
 
   app.use('/api/auth', authRoutes);
+  app.use('/api/users', userNotificationRoutes);
   app.use('/api/users', userRoutes);
   app.use('/api/delegations', delegationRoutes);
 
