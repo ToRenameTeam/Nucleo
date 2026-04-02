@@ -2,12 +2,14 @@ package it.nucleo.appointments.application
 
 import it.nucleo.appointments.domain.*
 import it.nucleo.appointments.domain.errors.*
+import it.nucleo.appointments.infrastructure.kafka.NotificationEventsPublisher
 import it.nucleo.commons.errors.*
 import org.slf4j.LoggerFactory
 
 class AppointmentService(
     private val appointmentRepository: AppointmentRepository,
-    private val availabilityRepository: AvailabilityRepository
+    private val availabilityRepository: AvailabilityRepository,
+    private val notificationEventsPublisher: NotificationEventsPublisher? = null
 ) {
 
     private val logger = LoggerFactory.getLogger(AppointmentService::class.java)
@@ -47,6 +49,15 @@ class AppointmentService(
                 return failure(it)
             }
         availabilityRepository.update(bookedAvailability)
+
+        val scheduledSlot = formatTimeSlot(availability.timeSlot)
+
+        notificationEventsPublisher?.publish(
+            receiver = availability.doctorId.value,
+            title = "Nuovo appuntamento prenotato",
+            content =
+                "Appuntamento prenotato dal paziente ${patientId.value} per il ${scheduledSlot.first} alle ${scheduledSlot.second}"
+        )
 
         logger.info("Appointment created successfully with ID: ${savedAppointment.id}")
         return success(savedAppointment)
@@ -134,6 +145,7 @@ class AppointmentService(
         id: String,
         status: String?,
         availabilityId: String?,
+        updatedBy: String? = null,
     ): Either<DomainError, Appointment> {
         logger.info("Updating appointment with ID: $id")
 
@@ -181,6 +193,7 @@ class AppointmentService(
                     // one
                     val oldAvailability =
                         availabilityRepository.findById(appointment.availabilityId)
+                    val previousSlot = oldAvailability?.timeSlot?.let(::formatTimeSlot)
                     if (oldAvailability?.status == AvailabilityStatus.BOOKED) {
                         val freed =
                             oldAvailability.makeAvailable().getOrElse { err ->
@@ -193,10 +206,34 @@ class AppointmentService(
                             return failure(it)
                         }
                     availabilityRepository.update(booked)
+                    val newSlot = formatTimeSlot(newAvailability.timeSlot)
 
-                    appointment.reschedule(newAvailabilityId).getOrElse {
-                        return failure(it)
+                    val rescheduledAppointment =
+                        appointment.reschedule(newAvailabilityId).getOrElse {
+                            return failure(it)
+                        }
+
+                    when (updatedBy?.uppercase()) {
+                        "PATIENT" -> {
+                            notificationEventsPublisher?.publish(
+                                receiver = newAvailability.doctorId.value,
+                                title = "Appuntamento ripianificato dal paziente",
+                                content =
+                                    "Appuntamento del ${previousSlot?.first ?: "-"} alle ${previousSlot?.second ?: "-"} ripianificato dal paziente ${appointment.patientId.value} per il ${newSlot.first} alle ${newSlot.second}"
+                            )
+                        }
+                        "DOCTOR" -> {
+                            notificationEventsPublisher?.publish(
+                                receiver = appointment.patientId.value,
+                                title = "Appuntamento ripianificato dal medico",
+                                content =
+                                    "Il tuo appuntamento del ${previousSlot?.first ?: "-"} alle ${previousSlot?.second ?: "-"} e stato ripianificato dal medico per il ${newSlot.first} alle ${newSlot.second}"
+                            )
+                        }
+                        else -> {}
                     }
+
+                    rescheduledAppointment
                 }
                 else ->
                     return failure(
@@ -245,9 +282,25 @@ class AppointmentService(
                     return failure(it)
                 }
             availabilityRepository.update(freed)
+
+            val deletedSlot = formatTimeSlot(availability.timeSlot)
+
+            notificationEventsPublisher?.publish(
+                receiver = availability.doctorId.value,
+                title = "Appuntamento cancellato",
+                content =
+                    "Appuntamento del ${deletedSlot.first} alle ${deletedSlot.second} cancellato dal paziente ${appointment.patientId.value}"
+            )
         }
 
         logger.info("Appointment deleted successfully with ID: $id")
         return success(Unit)
+    }
+
+    private fun formatTimeSlot(timeSlot: TimeSlot): Pair<String, String> {
+        val start = timeSlot.startDateTime.toString()
+        val date = start.substringBefore('T')
+        val time = start.substringAfter('T').take(5)
+        return Pair(date, time)
     }
 }

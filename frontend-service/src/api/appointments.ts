@@ -309,7 +309,8 @@ export const appointmentsApi = {
   async updateAppointment(
     id: string,
     status?: string,
-    availabilityId?: string
+    availabilityId?: string,
+    updatedBy?: 'PATIENT' | 'DOCTOR'
   ): Promise<Appointment> {
     const sanitizedId = parseWithSchema(idSchema, id, 'update appointment id');
     const sanitizedStatus = status
@@ -318,13 +319,20 @@ export const appointmentsApi = {
     const sanitizedAvailabilityId = availabilityId
       ? parseWithSchema(idSchema, availabilityId, 'update appointment availabilityId')
       : undefined;
+    const sanitizedUpdatedBy = updatedBy
+      ? parseWithSchema(z.enum(['PATIENT', 'DOCTOR']), updatedBy, 'update appointment updatedBy')
+      : undefined;
 
     const response = await fetch(`${BASE_URL}/${sanitizedId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ status: sanitizedStatus, availabilityId: sanitizedAvailabilityId }),
+      body: JSON.stringify({
+        status: sanitizedStatus,
+        availabilityId: sanitizedAvailabilityId,
+        updatedBy: sanitizedUpdatedBy,
+      }),
     });
 
     const appointmentRaw = await handleResponse<unknown>(response);

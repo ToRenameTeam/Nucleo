@@ -18,6 +18,7 @@ import it.nucleo.appointments.application.AppointmentService
 import it.nucleo.appointments.application.AvailabilityService
 import it.nucleo.appointments.infrastructure.database.DatabaseFactory
 import it.nucleo.appointments.infrastructure.kafka.DeleteEventsConsumer
+import it.nucleo.appointments.infrastructure.kafka.NotificationEventsPublisher
 import it.nucleo.appointments.infrastructure.persistence.ExposedAppointmentRepository
 import it.nucleo.appointments.infrastructure.persistence.ExposedAvailabilityRepository
 import it.nucleo.commons.api.ErrorResponse
@@ -113,7 +114,16 @@ private fun Application.configureRouting() {
     val availabilityRepository = ExposedAvailabilityRepository()
     val appointmentRepository = ExposedAppointmentRepository()
     val availabilityService = AvailabilityService(availabilityRepository)
-    val appointmentService = AppointmentService(appointmentRepository, availabilityRepository)
+    val notificationPublisher =
+        NotificationEventsPublisher(
+            bootstrapServers = Environment.kafkaBootstrapServers,
+            clientId = Environment.kafkaClientId,
+            notificationsTopic = Environment.kafkaTopicNotifications
+        )
+    val appointmentService =
+        AppointmentService(appointmentRepository, availabilityRepository, notificationPublisher)
+
+    environment.monitor.subscribe(ApplicationStopping) { notificationPublisher.close() }
 
     routing {
         get("/health") { call.respond(HttpStatusCode.OK, mapOf("status" to "UP")) }
@@ -162,4 +172,7 @@ private object Environment {
 
     val kafkaTopicServiceTypeDeleted: String
         get() = System.getenv("KAFKA_TOPIC_SERVICE_TYPE_DELETED") ?: ""
+
+    val kafkaTopicNotifications: String
+        get() = System.getenv("KAFKA_TOPIC_NOTIFICATIONS") ?: ""
 }

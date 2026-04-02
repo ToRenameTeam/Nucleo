@@ -121,6 +121,7 @@ fun Route.appointmentRoutes(service: AppointmentService) {
                         id = id,
                         status = request.status,
                         availabilityId = request.availabilityId,
+                        updatedBy = request.updatedBy,
                     )
                     .map { it.toResponse() }
             call.respondEither(result)
