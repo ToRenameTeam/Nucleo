@@ -22,5 +22,9 @@ CHANGELOG.md
 pnpm-lock.yaml
 ai-service/uv.lock
 
+# Kubernetes & Helm files
+**/kubernetes/
+**/helm-values/*
+
 # Logs
 **/*.log

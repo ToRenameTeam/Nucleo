@@ -12,6 +12,7 @@ Conventional Commits with a service scope are optional but recommended:
 - `frontend`
 - `master-data`
 - `users`
+- `infrastructure`
 - `commons` (shared code, no Docker publish)
 
 Examples:
