@@ -42,6 +42,9 @@
     "selectEnglishAria": "Select English language",
     "userMenuAria": "User menu for {user}",
     "userProfileAria": "Profile of {user}",
+    "noNotifications": "No notifications available",
+    "close": "Close",
+    "markAsRead": "Mark as read",
     "unread": "unread",
     "notification": "notification"
   },

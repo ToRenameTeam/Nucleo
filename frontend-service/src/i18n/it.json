@@ -42,6 +42,9 @@
     "selectEnglishAria": "Seleziona lingua inglese",
     "userMenuAria": "Menu utente per {user}",
     "userProfileAria": "Profilo di {user}",
+    "noNotifications": "Nessuna notifica disponibile",
+    "close": "Chiudi",
+    "markAsRead": "Segna come letta",
     "unread": "non letto",
     "notification": "notifica"
   },
