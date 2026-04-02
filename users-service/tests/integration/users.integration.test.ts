@@ -3,6 +3,7 @@ import { type Server } from 'node:http';
 import mongoose from 'mongoose';
 import { type StartedTestContainer } from 'testcontainers';
 import { startServer, disconnectDB } from '../../src/app.js';
+import { NotificationModel } from '../../src/infrastructure/database/index.js';
 import { startMongoTestContainer, stopMongoTestContainer } from './test-container.js';
 
 interface ApiResponse<T> {
@@ -17,6 +18,15 @@ interface CreateUserPayload {
   name: string;
   lastName: string;
   dateOfBirth: string;
+}
+
+interface NotificationResponse {
+  id: string;
+  receiver: string;
+  title: string;
+  content: string | null;
+  status: 'UNREAD' | 'READ';
+  created_at: string;
 }
 
 let container: StartedTestContainer;
@@ -179,6 +189,72 @@ describe('Users Service Integration', function () {
       ])
     );
   });
+
+  it('lists notifications with combinable filters', async function () {
+    const user = await createUser({
+      fiscalCode: 'TSTMNO94E05H501U',
+      password: 'Notifications123!',
+      name: 'Elena',
+      lastName: 'Notifiche',
+      dateOfBirth: '1994-05-05',
+    });
+
+    await NotificationModel.create([
+      {
+        id: '0f5f7f88-4b21-4be8-938b-145df24d1b22',
+        receiver: user.userId,
+        title: 'Titolo 1',
+        content: 'Contenuto 1',
+        status: 'UNREAD',
+        created_at: new Date('2026-03-20T10:00:00.000Z'),
+      },
+      {
+        id: '20d4d302-f5d6-45bc-b514-cd2f4176f88f',
+        receiver: user.userId,
+        title: 'Titolo 2',
+        content: 'Contenuto 2',
+        status: 'READ',
+        created_at: new Date('2026-03-01T10:00:00.000Z'),
+      },
+    ]);
+
+    const response = await getJson<ApiResponse<{ notifications: NotificationResponse[] }>>(
+      `${baseUrl}/api/users/${user.userId}/notifications?since=2026-03-15&status=UNREAD&limit=1`
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data.notifications).toHaveLength(1);
+    expect(response.body.data.notifications[0]?.status).toBe('UNREAD');
+  });
+
+  it('marks a notification as read', async function () {
+    const user = await createUser({
+      fiscalCode: 'TSTPQR95F06H501T',
+      password: 'ReadStatus123!',
+      name: 'Marco',
+      lastName: 'Letto',
+      dateOfBirth: '1995-06-06',
+    });
+
+    await NotificationModel.create({
+      id: '6ed9ebf5-2ca0-44b7-bf30-c2ac6416ec52',
+      receiver: user.userId,
+      title: 'Titolo da leggere',
+      content: null,
+      status: 'UNREAD',
+      created_at: new Date('2026-03-30T10:00:00.000Z'),
+    });
+
+    const response = await patchJson<ApiResponse<NotificationResponse>>(
+      `${baseUrl}/api/users/${user.userId}/notifications/6ed9ebf5-2ca0-44b7-bf30-c2ac6416ec52/read`,
+      {}
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data.status).toBe('READ');
+  });
 });
 
 async function createUser(payload: CreateUserPayload): Promise<{
@@ -232,6 +308,26 @@ async function putJson<T = unknown>(
 ): Promise<{ status: number; body: T }> {
   const response = await fetch(url, {
     method: 'PUT',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const body = (await response.json()) as T;
+
+  return {
+    status: response.status,
+    body,
+  };
+}
+
+async function patchJson<T = unknown>(
+  url: string,
+  payload: unknown
+): Promise<{ status: number; body: T }> {
+  const response = await fetch(url, {
+    method: 'PATCH',
     headers: {
       'content-type': 'application/json',
     },
