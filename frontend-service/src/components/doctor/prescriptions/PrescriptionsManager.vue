@@ -30,6 +30,10 @@ const isLoadingUsers = ref(false);
 
 const allUsers = ref<UserInfo[]>([]);
 
+function refreshPageAfterDocumentCreation(): void {
+  window.location.reload();
+}
+
 const openPrescriptionsMenu = () => {
   isPrescriptionsMenuOpen.value = true;
 };
@@ -119,6 +123,7 @@ const handleSaveMedicinePrescription = async (prescription: MedicinePrescription
 
     // Emit event to update the list of prescriptions
     window.dispatchEvent(new CustomEvent('prescriptions-updated'));
+    refreshPageAfterDocumentCreation();
   } catch (error) {
     prescriptionSaveError.value = t('doctor.documents.prescriptions.errors.saveFailed');
     console.error('Error saving medicine prescription:', error);
@@ -165,6 +170,7 @@ const handleSaveServicePrescription = async (prescription: ServicePrescriptionFo
     showSuccessToast.value = true;
 
     window.dispatchEvent(new CustomEvent('prescriptions-updated'));
+    refreshPageAfterDocumentCreation();
   } catch (error) {
     prescriptionSaveError.value = t('doctor.documents.prescriptions.errors.saveFailed');
     console.error('Error saving service prescription:', error);
