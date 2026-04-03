@@ -38,7 +38,7 @@ const delegationResponseSchema = z
     delegatingUserId: idSchema,
     delegatorUserId: idSchema,
     status: delegationStatusSchema,
-    createdAt: nonEmptyTrimmedStringSchema,
+    createdAt: nonEmptyTrimmedStringSchema.optional(),
   })
   .passthrough();
 
