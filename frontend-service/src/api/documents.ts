@@ -1,6 +1,7 @@
 import { DOCUMENTS_API_URL } from './config';
 import { z } from 'zod';
 import { idSchema, nonEmptyTrimmedStringSchema, parseWithSchema } from './validation';
+import { userApi } from './users';
 import type {
   AnyDocument,
   Document,
@@ -250,8 +251,58 @@ const uploadResponseSchema = z
   })
   .passthrough();
 
+const userFullNameCache = new Map<string, Promise<string>>();
+
 function buildDocumentTitle(type: CreateDocumentRequest['type'], summary: string): string {
   return summary.trim() || getDocumentTypeLabel(type);
+}
+
+function resolveUserFullName(userId: string): Promise<string> {
+  const cachedValue = userFullNameCache.get(userId);
+
+  if (cachedValue) {
+    return cachedValue;
+  }
+
+  const request = userApi.getUserFullName(userId).catch((error) => {
+    console.warn('[Documents API] Failed to resolve user full name:', userId, error);
+    return userId;
+  });
+
+  userFullNameCache.set(userId, request);
+  return request;
+}
+
+async function enrichDocumentWithUserName(
+  document: AnyDocument,
+  userRole: 'doctor' | 'patient'
+): Promise<AnyDocument> {
+  const userId = userRole === 'doctor' ? document.doctorId : document.patientId;
+
+  if (!userId) {
+    return document;
+  }
+
+  const userFullName = await resolveUserFullName(userId);
+
+  if (userRole === 'doctor') {
+    return {
+      ...document,
+      doctor: `Dott. ${userFullName}`,
+    };
+  }
+
+  return {
+    ...document,
+    patient: userFullName,
+  };
+}
+
+async function enrichDocumentsWithUserName(
+  documents: AnyDocument[],
+  userRole: 'doctor' | 'patient'
+): Promise<AnyDocument[]> {
+  return Promise.all(documents.map((document) => enrichDocumentWithUserName(document, userRole)));
 }
 
 // Helper functions
@@ -438,7 +489,8 @@ export const documentsApiService = {
         documentsRaw,
         'documents by patient response'
       );
-      return documents.map((doc) => mapDocumentResponse(doc));
+      const mappedDocuments = documents.map((doc) => mapDocumentResponse(doc));
+      return enrichDocumentsWithUserName(mappedDocuments, 'doctor');
     } catch (error) {
       console.error('[Documents API] Error fetching documents by patient:', error);
       throw error;
@@ -569,7 +621,8 @@ export const documentsApiService = {
         documentsRaw,
         'documents by doctor response'
       );
-      return documents.map((doc) => mapDocumentResponse(doc));
+      const mappedDocuments = documents.map((doc) => mapDocumentResponse(doc));
+      return enrichDocumentsWithUserName(mappedDocuments, 'patient');
     } catch (error) {
       console.error('[Documents API] Error fetching documents by doctor:', error);
       throw error;

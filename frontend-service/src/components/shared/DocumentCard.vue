@@ -61,7 +61,9 @@ const getBadgeIcon = (tag: string): string => {
 const metadata = computed<CardMetadata[]>(() => {
   const meta: CardMetadata[] = [{ icon: CalendarIcon, label: props.document.date }];
 
-  if (props.document.doctor) {
+  if (props.document.patient) {
+    meta.push({ icon: UserIcon, label: props.document.patient });
+  } else if (props.document.doctor) {
     meta.push({ icon: UserIcon, label: props.document.doctor });
   }
 
