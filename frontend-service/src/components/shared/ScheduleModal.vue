@@ -16,6 +16,8 @@ import type { Facility, ServiceType } from '../../api/masterData';
 import { masterDataApi } from '../../api/masterData';
 import { availabilitiesApi } from '../../api/availabilities';
 import { formatDateToISO, formatTimeForInput } from '../../utils/dateUtils';
+import { useAuth } from '../../composables/useAuth';
+import { hasMatchingSpecialization } from '../../utils/specialization';
 
 const props = withDefaults(defineProps<ScheduleModalProps>(), {
   mode: 'create',
@@ -40,6 +42,7 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const { currentUser } = useAuth();
 
 // Form state (for create/edit modes)
 const selectedDate = ref('');
@@ -90,8 +93,20 @@ async function loadMasterData() {
       masterDataApi.getFacilities(),
       masterDataApi.getServiceTypes(),
     ]);
+
+    const doctorSpecializations = currentUser.value?.doctor?.specializations ?? [];
+    const filteredServiceTypes =
+      currentUser.value?.activeProfile === 'DOCTOR'
+        ? serviceTypesData.filter((service) => {
+            if (!service.category || service.category.length === 0) {
+              return false;
+            }
+            return hasMatchingSpecialization(doctorSpecializations, service.category);
+          })
+        : serviceTypesData;
+
     facilities.value = facilitiesData;
-    serviceTypes.value = serviceTypesData;
+    serviceTypes.value = filteredServiceTypes;
   } catch (error) {
     console.error('Error loading master data:', error);
   } finally {

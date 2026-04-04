@@ -4,9 +4,14 @@ import { useI18n } from 'vue-i18n';
 import FormModal from '../../shared/FormModal.vue';
 import type { UserInfo } from '../../../api/users';
 import { masterDataApi, type ServiceType, type Facility } from '../../../api/masterData';
-import { formatSpecializationsList } from '../../../utils/specialization';
+import { useAuth } from '../../../composables/useAuth';
+import {
+  formatSpecializationsList,
+  hasMatchingSpecialization,
+} from '../../../utils/specialization';
 
 const { t } = useI18n();
+const { currentUser } = useAuth();
 
 // Props
 const props = defineProps<{
@@ -257,7 +262,19 @@ const loadMasterData = async () => {
   // Load services
   isLoadingServices.value = true;
   try {
-    allServices.value = await masterDataApi.getServiceTypes();
+    const serviceTypes = await masterDataApi.getServiceTypes();
+    const doctorSpecializations = currentUser.value?.doctor?.specializations ?? [];
+
+    allServices.value =
+      currentUser.value?.activeProfile === 'DOCTOR'
+        ? serviceTypes.filter((service) => {
+            if (!service.category || service.category.length === 0) {
+              return false;
+            }
+            return hasMatchingSpecialization(doctorSpecializations, service.category);
+          })
+        : serviceTypes;
+
     console.log('[ServicePrescriptionForm] Loaded service types:', allServices.value.length);
   } catch (error) {
     console.error('[ServicePrescriptionForm] Error loading service types:', error);
