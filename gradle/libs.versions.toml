@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.2.20"
-kotest = "6.1.10"
+kotest = "6.1.11"
 testcontainers = "2.0.2"
 ktfmt = "0.18.0"
 kover = "0.9.7"
