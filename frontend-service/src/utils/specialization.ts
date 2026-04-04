@@ -19,9 +19,27 @@ export function normalizeToCategory(text: string): string {
  */
 export function normalizeToSpecialization(text: string): string {
   return text
-    .split('_')
+    .trim()
+    .replace(/_/g, ' ')
+    .split(/\s+/)
+    .filter((word) => word.length > 0)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
+}
+
+/**
+ * Normalize one or more specializations and format them as comma-separated text
+ */
+export function formatSpecializationsList(
+  specializations: string | string[] | null | undefined
+): string {
+  const rawValues = Array.isArray(specializations) ? specializations : [specializations ?? ''];
+  const values = rawValues.flatMap((item) => (typeof item === 'string' ? item.split(',') : []));
+
+  return values
+    .filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+    .map((item) => normalizeToSpecialization(item))
+    .join(', ');
 }
 
 /**

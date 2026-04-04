@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import FormModal from '../../shared/FormModal.vue';
 import type { UserInfo } from '../../../api/users';
 import { masterDataApi, type ServiceType, type Facility } from '../../../api/masterData';
+import { formatSpecializationsList } from '../../../utils/specialization';
 
 const { t } = useI18n();
 
@@ -472,9 +473,11 @@ onUnmounted(() => {
               >
                 <div class="suggestion-main">
                   <span class="suggestion-name">{{ service.name }}</span>
-                  <span v-if="service.category" class="suggestion-strength">{{
-                    service.category
-                  }}</span>
+                  <span
+                    v-if="formatSpecializationsList(service.category)"
+                    class="suggestion-strength"
+                    >{{ formatSpecializationsList(service.category) }}</span
+                  >
                 </div>
                 <span v-if="service.description" class="suggestion-detail">{{
                   service.description
@@ -502,7 +505,9 @@ onUnmounted(() => {
           <span class="badge-label">Servizio selezionato:</span>
           <span class="badge-value"
             >{{ selectedService.name
-            }}<span v-if="selectedService.category"> ({{ selectedService.category }})</span></span
+            }}<span v-if="formatSpecializationsList(selectedService.category)">
+              ({{ formatSpecializationsList(selectedService.category) }})</span
+            ></span
           >
         </div>
       </div>
