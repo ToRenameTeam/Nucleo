@@ -7,6 +7,7 @@ import type {
 } from '../types/delegation';
 import { z } from 'zod';
 import { DELEGATIONS_API_URL, API_ENDPOINTS } from './config';
+import { requestApi } from './httpClient';
 import {
   idSchema,
   nonEmptyTrimmedStringSchema,
@@ -38,7 +39,7 @@ const delegationResponseSchema = z
     delegatingUserId: idSchema,
     delegatorUserId: idSchema,
     status: delegationStatusSchema,
-    createdAt: nonEmptyTrimmedStringSchema,
+    createdAt: nonEmptyTrimmedStringSchema.optional(),
   })
   .passthrough();
 
@@ -64,7 +65,7 @@ export const delegationApi = {
       'create delegation request'
     );
 
-    const response = await fetch(BASE_URL, {
+    const response = await requestApi(BASE_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -90,7 +91,7 @@ export const delegationApi = {
     const url = `${BASE_URL}/received?${params}`;
     console.log('[Delegations API] Fetching from:', url);
 
-    const response = await fetch(url, {
+    const response = await requestApi(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -119,7 +120,7 @@ export const delegationApi = {
     const url = `${BASE_URL}/sent?${params}`;
     console.log('[Delegations API] Fetching from:', url);
 
-    const response = await fetch(url, {
+    const response = await requestApi(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -139,7 +140,7 @@ export const delegationApi = {
     const url = `${BASE_URL}/${sanitizedDelegationId}`;
     console.log('[Delegations API] Fetching from:', url);
 
-    const response = await fetch(url, {
+    const response = await requestApi(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -154,7 +155,7 @@ export const delegationApi = {
     const sanitizedUserId = parseWithSchema(idSchema, userId, 'accept delegation userId');
 
     console.log('[Delegations API] acceptDelegation called for:', sanitizedDelegationId);
-    const response = await fetch(`${BASE_URL}/${sanitizedDelegationId}/accept`, {
+    const response = await requestApi(`${BASE_URL}/${sanitizedDelegationId}/accept`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -170,7 +171,7 @@ export const delegationApi = {
     const sanitizedUserId = parseWithSchema(idSchema, userId, 'decline delegation userId');
 
     console.log('[Delegations API] declineDelegation called for:', sanitizedDelegationId);
-    const response = await fetch(`${BASE_URL}/${sanitizedDelegationId}/decline`, {
+    const response = await requestApi(`${BASE_URL}/${sanitizedDelegationId}/decline`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -188,7 +189,7 @@ export const delegationApi = {
     console.log('[Delegations API] deleteDelegation called for:', sanitizedDelegationId);
     const params = new URLSearchParams({ userId: sanitizedUserId });
 
-    const response = await fetch(`${BASE_URL}/${sanitizedDelegationId}?${params}`, {
+    const response = await requestApi(`${BASE_URL}/${sanitizedDelegationId}?${params}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

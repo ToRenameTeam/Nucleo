@@ -6,6 +6,7 @@ export interface Document {
   date: string;
   patientId?: string;
   doctorId?: string;
+  patient?: string;
   doctor?: string;
   hospital?: string;
 }

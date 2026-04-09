@@ -6,6 +6,7 @@ import type {
 } from '../types/auth';
 import { z } from 'zod';
 import { USERS_API_URL, DELEGATIONS_API_URL, API_ENDPOINTS, ApiError } from './config';
+import { requestApi } from './httpClient';
 import {
   idSchema,
   nonEmptyTrimmedStringSchema,
@@ -74,10 +75,13 @@ const selectPatientProfileRequestSchema = z.object({
 
 const loginResponseSchema = userInfoSchema
   .extend({
+    accessToken: nonEmptyTrimmedStringSchema,
     activeProfile: z.enum(['PATIENT', 'DOCTOR']).optional(),
     requiresProfileSelection: z.boolean().optional(),
   })
   .passthrough();
+
+const userLookupResponseSchema = userInfoSchema.passthrough();
 
 const searchUserByFiscalCodeResponseSchema = z
   .object({
@@ -104,8 +108,9 @@ export const authApi = {
       'auth login request'
     );
 
-    const response = await fetch(`${AUTH_BASE_URL}/login`, {
+    const response = await requestApi(`${AUTH_BASE_URL}/login`, {
       method: 'POST',
+      authRequired: false,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -123,7 +128,7 @@ export const authApi = {
       'select patient profile request'
     );
 
-    const response = await fetch(`${AUTH_BASE_URL}/select-profile`, {
+    const response = await requestApi(`${AUTH_BASE_URL}/select-profile`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -137,7 +142,7 @@ export const authApi = {
   async getActiveDelegations(userId: string) {
     const sanitizedUserId = parseWithSchema(idSchema, userId, 'active delegations userId');
     console.log('[Auth API] getActiveDelegations called for userId:', sanitizedUserId);
-    const response = await fetch(
+    const response = await requestApi(
       `${DELEGATIONS_BASE_URL}/active-for-user?userId=${encodeURIComponent(sanitizedUserId)}`,
       {
         method: 'GET',
@@ -150,17 +155,17 @@ export const authApi = {
     return parseApiResponse(response, z.unknown(), 'active delegations response');
   },
 
-  async getUserById(userId: string): Promise<LoginResponse> {
+  async getUserById(userId: string): Promise<UserInfo> {
     const sanitizedUserId = parseWithSchema(idSchema, userId, 'auth get user by id');
     console.log('[Auth API] getUserById called for userId:', sanitizedUserId);
-    const response = await fetch(`${USERS_BASE_URL}/${sanitizedUserId}`, {
+    const response = await requestApi(`${USERS_BASE_URL}/${sanitizedUserId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
-    return parseApiResponse(response, loginResponseSchema, 'auth get user by id response');
+    return parseApiResponse(response, userLookupResponseSchema, 'auth get user by id response');
   },
 };
 
@@ -178,7 +183,7 @@ export const userApi = {
     console.log('[User API] searchUserByFiscalCode called for:', sanitizedFiscalCode);
     const params = new URLSearchParams({ fiscalCode: sanitizedFiscalCode });
 
-    const response = await fetch(`${USERS_BASE_URL}/search?${params}`, {
+    const response = await requestApi(`${USERS_BASE_URL}/search?${params}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -202,7 +207,7 @@ export const userApi = {
     console.log('[User API] Fetching from:', url);
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -244,7 +249,7 @@ export const userApi = {
     console.log('[User API] Fetching from:', url);
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

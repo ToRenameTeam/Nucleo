@@ -6,3 +6,4 @@ export * from './fiscal-code.js';
 export * from './credentials.js';
 export * from './profile-info.js';
 export * from './delegation-status.js';
+export * from './notification.js';

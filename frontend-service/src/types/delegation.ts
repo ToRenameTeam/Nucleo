@@ -55,7 +55,7 @@ export interface DelegationResponse {
   delegatingUserId: string;
   delegatorUserId: string;
   status: DelegationStatus;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface DelegationsListResponse {

@@ -21,6 +21,9 @@ TOPICS_TO_CREATE=(
   # Publisher: User Service | Consumers: Appointment Service, Document Service
   "users.user-deleted:3:1"
 
+  # Publisher: domain services | Consumer: Users Service
+  "users.notifications:3:1"
+
   # Publisher: Master Data Service | Consumers: Document Service
   "master-data.medicine-deleted:3:1"
 

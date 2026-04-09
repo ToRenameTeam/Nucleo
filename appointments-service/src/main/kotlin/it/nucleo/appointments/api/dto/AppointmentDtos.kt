@@ -7,7 +7,11 @@ import kotlinx.serialization.Serializable
 data class CreateAppointmentRequest(val patientId: String, val availabilityId: String)
 
 @Serializable
-data class UpdateAppointmentRequest(val availabilityId: String? = null, val status: String? = null)
+data class UpdateAppointmentRequest(
+    val availabilityId: String? = null,
+    val status: String? = null,
+    val updatedBy: String? = null
+)
 
 @Serializable
 data class AppointmentResponse(

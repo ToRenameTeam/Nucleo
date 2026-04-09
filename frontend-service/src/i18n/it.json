@@ -42,6 +42,9 @@
     "selectEnglishAria": "Seleziona lingua inglese",
     "userMenuAria": "Menu utente per {user}",
     "userProfileAria": "Profilo di {user}",
+    "noNotifications": "Nessuna notifica disponibile",
+    "close": "Chiudi",
+    "markAsRead": "Segna come letta",
     "unread": "non letto",
     "notification": "notifica"
   },
@@ -71,6 +74,7 @@
     "noResults": "Nessun documento trovato",
     "close": "Chiudi",
     "bookVisit": "Prenota visita",
+    "selectDocument": "Seleziona documento",
     "selection": {
       "selectMode": "Seleziona documenti",
       "cancel": "Annulla selezione",
@@ -311,7 +315,7 @@
       "subtitle": "Inserisci il codice fiscale",
       "back": "Indietro",
       "fiscalCodeLabel": "Codice Fiscale",
-      "fiscalCodePlaceholder": "RSSMRA88A41H501Z",
+      "fiscalCodePlaceholder": "Inserisci il tuo codice fiscale",
       "search": "Cerca",
       "characters": "caratteri",
       "userFound": "UTENTE TROVATO",
@@ -639,7 +643,6 @@
       "successTitle": "Caricamento completato",
       "loadingMessage": "Il documento è in fase di caricamento e analisi. Potrebbe richiedere qualche istante.",
       "successMessage": "Il documento è stato caricato e analizzato con successo ed è ora disponibile."
-    },
-    "nonMedicalDocument": "Il documento non è stato accettato. Solo documenti medici (referti, prescrizioni, note cliniche) sono permessi."
+    }
   }
 }

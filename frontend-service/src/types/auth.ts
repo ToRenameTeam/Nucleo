@@ -26,6 +26,7 @@ export interface UserData {
 
 export interface AuthenticatedUser extends UserData {
   activeProfile: 'PATIENT' | 'DOCTOR';
+  accessToken: string;
 }
 
 export interface LoginRequest {
@@ -34,6 +35,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse extends UserData {
+  accessToken: string;
   activeProfile?: 'PATIENT' | 'DOCTOR';
   requiresProfileSelection?: boolean;
 }

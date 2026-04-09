@@ -10,7 +10,7 @@ import type { UserInfo } from '../../api/users';
 import { masterDataApi } from '../../api/masterData';
 import { userApi } from '../../api/users';
 import { availabilitiesApi } from '../../api/availabilities';
-import { hasMatchingSpecialization } from '../../utils/specialization';
+import { hasMatchingSpecialization, formatSpecializationsList } from '../../utils/specialization';
 
 interface Props {
   isOpen: boolean;
@@ -200,7 +200,8 @@ function resetModal() {
 // Format doctor name with specializations
 function formatDoctorName(doctor: UserInfo): string {
   const specs = doctor.doctor?.specializations || [];
-  const specsText = specs.length > 0 ? ` (${specs.join(', ')})` : '';
+  const formattedSpecializations = formatSpecializationsList(specs);
+  const specsText = formattedSpecializations.length > 0 ? ` (${formattedSpecializations})` : '';
   return `Dott. ${doctor.lastName} ${doctor.name}${specsText}`;
 }
 

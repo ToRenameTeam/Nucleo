@@ -22,6 +22,10 @@ tasks.test {
     useJUnitPlatform()
 }
 
+tasks.withType<Test>().configureEach {
+    environment("JWT_SECRET", "integration-test-jwt-secret")
+}
+
 val testSourceSet = extensions.getByType<JavaPluginExtension>().sourceSets.getByName("test")
 
 val integrationTest by

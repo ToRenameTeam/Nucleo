@@ -1,7 +1,11 @@
 import 'dotenv/config';
 import { type Server } from 'node:http';
 import { DEFAULT_PORT, disconnectDB, startServer } from './app.js';
-import { userEventsPublisher } from './services/index.js';
+import {
+  userEventsPublisher,
+  notificationEventsConsumer,
+  notificationEventsPublisher,
+} from './services/index.js';
 
 const port = Number(process.env.PORT) || DEFAULT_PORT;
 let server: Server | null = null;
@@ -13,6 +17,7 @@ bootstrap().catch(function (error) {
 
 async function bootstrap() {
   server = await startServer({ port });
+  await notificationEventsConsumer.start();
 
   console.log(`Server running on port ${port}`);
   console.log(`Health check: http://localhost:${port}/health`);
@@ -38,6 +43,8 @@ process.on('SIGINT', async function () {
   }
 
   await disconnectDB();
+  await notificationEventsConsumer.stop();
+  await notificationEventsPublisher.disconnect();
   await userEventsPublisher.disconnect();
   process.exit(0);
 });

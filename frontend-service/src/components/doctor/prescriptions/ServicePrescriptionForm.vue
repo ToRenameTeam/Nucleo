@@ -4,8 +4,14 @@ import { useI18n } from 'vue-i18n';
 import FormModal from '../../shared/FormModal.vue';
 import type { UserInfo } from '../../../api/users';
 import { masterDataApi, type ServiceType, type Facility } from '../../../api/masterData';
+import { useAuth } from '../../../composables/useAuth';
+import {
+  formatSpecializationsList,
+  hasMatchingSpecialization,
+} from '../../../utils/specialization';
 
 const { t } = useI18n();
+const { currentUser } = useAuth();
 
 // Props
 const props = defineProps<{
@@ -34,7 +40,7 @@ export interface ServicePrescriptionFormData {
   facilityName: string;
   validityType: 'until_date' | 'until_execution';
   validityDate: string;
-  priority: 'ROUTINE' | 'URGENT' | 'EMERGENCY';
+  priority: 'ROUTINE' | 'URGENT' | 'DEFERRED';
 }
 
 // Form data
@@ -74,7 +80,11 @@ const isLoadingFacilities = ref(false);
 const priorityOptions = [
   { value: 'ROUTINE', label: 'Routine', description: 'Non urgente' },
   { value: 'URGENT', label: 'Urgente', description: 'Da eseguire prima possibile' },
-  { value: 'EMERGENCY', label: 'Emergenza', description: 'Richiede attenzione immediata' },
+  {
+    value: 'DEFERRED',
+    label: 'Differita',
+    description: 'Può essere eseguita in un secondo momento',
+  },
 ];
 
 // Computed: filtered patients based on search
@@ -252,7 +262,19 @@ const loadMasterData = async () => {
   // Load services
   isLoadingServices.value = true;
   try {
-    allServices.value = await masterDataApi.getServiceTypes();
+    const serviceTypes = await masterDataApi.getServiceTypes();
+    const doctorSpecializations = currentUser.value?.doctor?.specializations ?? [];
+
+    allServices.value =
+      currentUser.value?.activeProfile === 'DOCTOR'
+        ? serviceTypes.filter((service) => {
+            if (!service.category || service.category.length === 0) {
+              return false;
+            }
+            return hasMatchingSpecialization(doctorSpecializations, service.category);
+          })
+        : serviceTypes;
+
     console.log('[ServicePrescriptionForm] Loaded service types:', allServices.value.length);
   } catch (error) {
     console.error('[ServicePrescriptionForm] Error loading service types:', error);
@@ -468,9 +490,11 @@ onUnmounted(() => {
               >
                 <div class="suggestion-main">
                   <span class="suggestion-name">{{ service.name }}</span>
-                  <span v-if="service.category" class="suggestion-strength">{{
-                    service.category
-                  }}</span>
+                  <span
+                    v-if="formatSpecializationsList(service.category)"
+                    class="suggestion-strength"
+                    >{{ formatSpecializationsList(service.category) }}</span
+                  >
                 </div>
                 <span v-if="service.description" class="suggestion-detail">{{
                   service.description
@@ -498,7 +522,9 @@ onUnmounted(() => {
           <span class="badge-label">Servizio selezionato:</span>
           <span class="badge-value"
             >{{ selectedService.name
-            }}<span v-if="selectedService.category"> ({{ selectedService.category }})</span></span
+            }}<span v-if="formatSpecializationsList(selectedService.category)">
+              ({{ formatSpecializationsList(selectedService.category) }})</span
+            ></span
           >
         </div>
       </div>

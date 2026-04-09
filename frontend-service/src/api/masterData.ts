@@ -1,4 +1,5 @@
 import { MASTER_DATA_API_URL, API_ENDPOINTS, handleApiResponse } from './config';
+import { requestApi } from './httpClient';
 import { z } from 'zod';
 import { idSchema, nonEmptyTrimmedStringSchema, parseWithSchema } from './validation';
 
@@ -103,7 +104,7 @@ export const masterDataApi = {
   async getServiceTypes(): Promise<ServiceType[]> {
     const url = `${MASTER_DATA_API_URL}${API_ENDPOINTS.SERVICE_CATALOG}`;
 
-    const response = await fetch(url, {
+    const response = await requestApi(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -122,7 +123,7 @@ export const masterDataApi = {
     const url = `${MASTER_DATA_API_URL}${API_ENDPOINTS.SERVICE_CATALOG}/${sanitizedId}`;
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -146,7 +147,7 @@ export const masterDataApi = {
   async getFacilities(): Promise<Facility[]> {
     const url = `${MASTER_DATA_API_URL}${API_ENDPOINTS.FACILITIES}`;
 
-    const response = await fetch(url, {
+    const response = await requestApi(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -165,7 +166,7 @@ export const masterDataApi = {
     const url = `${MASTER_DATA_API_URL}${API_ENDPOINTS.FACILITIES}/${sanitizedId}`;
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -208,7 +209,7 @@ export const masterDataApi = {
     const url = `${MASTER_DATA_API_URL}/api/medicines${queryString ? `?${queryString}` : ''}`;
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -231,7 +232,7 @@ export const masterDataApi = {
     const url = `${MASTER_DATA_API_URL}/api/medicines/${sanitizedId}`;
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -257,7 +258,7 @@ export const masterDataApi = {
     const url = `${MASTER_DATA_API_URL}/api/medicines/categories`;
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

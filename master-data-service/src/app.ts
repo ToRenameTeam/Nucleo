@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import { type Server } from 'node:http';
 import { serviceCatalogRoutes, facilityRoutes, medicineRoutes } from './api/index.js';
 import { runSeeds } from './infrastructure/database/index.js';
+import { requireAuth } from './middleware/auth.middleware.js';
 
 export const DEFAULT_PORT = 3040;
 export const DEFAULT_MONGO_URI = 'mongodb://localhost:27017/master_data_db';
@@ -28,6 +29,7 @@ export function createApp(): Express {
     });
   });
 
+  app.use('/api', requireAuth);
   app.use('/api/service-catalog', serviceCatalogRoutes);
   app.use('/api/facilities', facilityRoutes);
   app.use('/api/medicines', medicineRoutes);

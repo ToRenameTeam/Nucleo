@@ -22,7 +22,7 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly patientRepository: PatientRepository,
     private readonly doctorRepository: DoctorRepository,
-    private readonly userEventsPublisher: UserEventsPublisher
+    private readonly userEventsPublisher: UserEventsPublisher | null = null
   ) {}
 
   async createUser(data: CreateUserData) {
@@ -106,7 +106,7 @@ export class UserService {
     await this.userRepository.delete(userId);
 
     try {
-      await this.userEventsPublisher.publishUserDeleted({
+      await this.userEventsPublisher?.publishUserDeleted({
         userId,
         deletedAt: new Date().toISOString(),
       });

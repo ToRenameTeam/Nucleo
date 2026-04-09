@@ -1,6 +1,8 @@
 import { DOCUMENTS_API_URL } from './config';
 import { z } from 'zod';
 import { idSchema, nonEmptyTrimmedStringSchema, parseWithSchema } from './validation';
+import { userApi } from './users';
+import { requestApi } from './httpClient';
 import type {
   AnyDocument,
   Document,
@@ -52,7 +54,7 @@ export interface CreateServicePrescriptionRequest {
   };
   serviceId: string;
   facilityId: string;
-  priority: 'ROUTINE' | 'URGENT' | 'EMERGENCY';
+  priority: 'ROUTINE' | 'URGENT' | 'DEFERRED';
 }
 
 export interface CreateReportRequest {
@@ -173,7 +175,7 @@ const createServicePrescriptionRequestSchema = z.object({
   validity: validityRequestSchema,
   serviceId: idSchema,
   facilityId: idSchema,
-  priority: z.enum(['ROUTINE', 'URGENT', 'EMERGENCY']),
+  priority: z.enum(['ROUTINE', 'URGENT', 'DEFERRED']),
 });
 
 const createReportRequestSchema = z.object({
@@ -250,8 +252,58 @@ const uploadResponseSchema = z
   })
   .passthrough();
 
+const userFullNameCache = new Map<string, Promise<string>>();
+
 function buildDocumentTitle(type: CreateDocumentRequest['type'], summary: string): string {
   return summary.trim() || getDocumentTypeLabel(type);
+}
+
+function resolveUserFullName(userId: string): Promise<string> {
+  const cachedValue = userFullNameCache.get(userId);
+
+  if (cachedValue) {
+    return cachedValue;
+  }
+
+  const request = userApi.getUserFullName(userId).catch((error) => {
+    console.warn('[Documents API] Failed to resolve user full name:', userId, error);
+    return userId;
+  });
+
+  userFullNameCache.set(userId, request);
+  return request;
+}
+
+async function enrichDocumentWithUserName(
+  document: AnyDocument,
+  userRole: 'doctor' | 'patient'
+): Promise<AnyDocument> {
+  const userId = userRole === 'doctor' ? document.doctorId : document.patientId;
+
+  if (!userId) {
+    return document;
+  }
+
+  const userFullName = await resolveUserFullName(userId);
+
+  if (userRole === 'doctor') {
+    return {
+      ...document,
+      doctor: `Dott. ${userFullName}`,
+    };
+  }
+
+  return {
+    ...document,
+    patient: userFullName,
+  };
+}
+
+async function enrichDocumentsWithUserName(
+  documents: AnyDocument[],
+  userRole: 'doctor' | 'patient'
+): Promise<AnyDocument[]> {
+  return Promise.all(documents.map((document) => enrichDocumentWithUserName(document, userRole)));
 }
 
 // Helper functions
@@ -367,7 +419,7 @@ export const documentsApiService = {
       title: buildDocumentTitle(sanitizedRequest.type, sanitizedRequest.metadata.summary),
     };
 
-    const response = await fetch(`${BASE_URL}/api/documents/patients/${sanitizedPatientId}`, {
+    const response = await requestApi(`${BASE_URL}/api/documents/patients/${sanitizedPatientId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -391,7 +443,7 @@ export const documentsApiService = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(
+    const response = await requestApi(
       `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/upload`,
       {
         method: 'POST',
@@ -425,12 +477,15 @@ export const documentsApiService = {
     try {
       const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'get documents by patientId');
 
-      const response = await fetch(`${BASE_URL}/api/documents/patients/${sanitizedPatientId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await requestApi(
+        `${BASE_URL}/api/documents/patients/${sanitizedPatientId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       const documentsRaw = await handleResponse<unknown>(response);
       const documents = parseWithSchema(
@@ -438,7 +493,8 @@ export const documentsApiService = {
         documentsRaw,
         'documents by patient response'
       );
-      return documents.map((doc) => mapDocumentResponse(doc));
+      const mappedDocuments = documents.map((doc) => mapDocumentResponse(doc));
+      return enrichDocumentsWithUserName(mappedDocuments, 'doctor');
     } catch (error) {
       console.error('[Documents API] Error fetching documents by patient:', error);
       throw error;
@@ -457,7 +513,7 @@ export const documentsApiService = {
       );
       const sanitizedDocumentId = parseWithSchema(idSchema, documentId, 'download documentId');
 
-      const response = await fetch(
+      const response = await requestApi(
         `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/${sanitizedDocumentId}/pdf`,
         {
           method: 'GET',
@@ -523,7 +579,7 @@ export const documentsApiService = {
       const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'get document patientId');
       const sanitizedDocumentId = parseWithSchema(idSchema, documentId, 'get document documentId');
 
-      const response = await fetch(
+      const response = await requestApi(
         `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/${sanitizedDocumentId}`,
         {
           method: 'GET',
@@ -556,7 +612,7 @@ export const documentsApiService = {
     const url = `${BASE_URL}/api/documents?${queryParams.toString()}`;
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -569,7 +625,8 @@ export const documentsApiService = {
         documentsRaw,
         'documents by doctor response'
       );
-      return documents.map((doc) => mapDocumentResponse(doc));
+      const mappedDocuments = documents.map((doc) => mapDocumentResponse(doc));
+      return enrichDocumentsWithUserName(mappedDocuments, 'patient');
     } catch (error) {
       console.error('[Documents API] Error fetching documents by doctor:', error);
       throw error;
@@ -585,7 +642,7 @@ export const documentsApiService = {
     const url = `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/${sanitizedDocumentId}`;
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -624,7 +681,7 @@ export const documentsApiService = {
     };
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -675,7 +732,7 @@ export const documentsApiService = {
     };
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

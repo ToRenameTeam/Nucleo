@@ -189,7 +189,8 @@ async function handleSelectAvailability(availabilityId: string) {
     await appointmentsApi.updateAppointment(
       appointmentToReschedule.value.id,
       undefined,
-      availabilityId
+      availabilityId,
+      'PATIENT'
     );
 
     isRescheduleModalOpen.value = false;

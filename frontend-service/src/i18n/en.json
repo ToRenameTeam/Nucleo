@@ -42,6 +42,9 @@
     "selectEnglishAria": "Select English language",
     "userMenuAria": "User menu for {user}",
     "userProfileAria": "Profile of {user}",
+    "noNotifications": "No notifications available",
+    "close": "Close",
+    "markAsRead": "Mark as read",
     "unread": "unread",
     "notification": "notification"
   },
@@ -74,7 +77,9 @@
     "selectDocument": "Select Document",
     "selection": {
       "selectMode": "Select documents",
-      "cancel": "Cancel selection"
+      "cancel": "Cancel selection",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all"
     },
     "batch": {
       "documentSelected": "document selected",
@@ -310,7 +315,7 @@
       "subtitle": "Enter the fiscal code",
       "back": "Back",
       "fiscalCodeLabel": "Fiscal Code",
-      "fiscalCodePlaceholder": "RSSMRA88A41H501Z",
+      "fiscalCodePlaceholder": "Enter your fiscal code",
       "search": "Search",
       "characters": "characters",
       "userFound": "USER FOUND",

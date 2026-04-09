@@ -50,6 +50,16 @@ setup_env_file() {
     if [ -f "$env_example_path" ]; then
         if [ -f "$env_path" ]; then
             echo -e "  ${GREEN}✓ .env file already exists${NC}"
+            # Merge missing keys from template into existing .env without overwriting user values.
+            while IFS= read -r line; do
+                if [[ "$line" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
+                    key="${line%%=*}"
+                    if ! grep -q "^${key}=" "$env_path"; then
+                        echo "$line" >> "$env_path"
+                        echo -e "  ${YELLOW}＋ Added missing key: ${key}${NC}"
+                    fi
+                fi
+            done <<< "$env_content"
         else
             echo -e "  ${YELLOW}📝 .env file not found. Creating it...${NC}"
             echo "$env_content" > "$env_path"
@@ -77,10 +87,15 @@ MONGODB_PORT=27017
 
 KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:29092
 KAFKA_CLIENT_ID=users-service
+KAFKA_CONSUMER_GROUP_ID=users-service-notifications
 KAFKA_TOPIC_USER_DELETED=users.user-deleted
+KAFKA_TOPIC_NOTIFICATIONS=users.notifications
 
 MONGO_INITDB_ROOT_USERNAME=admin
 MONGO_INITDB_ROOT_PASSWORD=password123
+
+JWT_SECRET=4esY-20ZQh8XXiL2Xu5KaiiHLTZFxmuDCLoGCGn2i06mQnWUdzoIlAYChkmyA9PzaBXK5BdNf2DIZx5jeyBheA
+JWT_EXPIRY=1h
 "
 setup_env_file "appointments-service" "appointments-service" "
 # Database Configuration
@@ -106,9 +121,12 @@ KAFKA_CONSUMER_GROUP_ID=appointments-service
 KAFKA_TOPIC_USER_DELETED=users.user-deleted
 KAFKA_TOPIC_FACILITY_DELETED=master-data.facility-deleted
 KAFKA_TOPIC_SERVICE_TYPE_DELETED=master-data.service-type-deleted
+KAFKA_TOPIC_NOTIFICATIONS=users.notifications
 
 # Application Port
 APP_PORT=8080
+
+JWT_SECRET=4esY-20ZQh8XXiL2Xu5KaiiHLTZFxmuDCLoGCGn2i06mQnWUdzoIlAYChkmyA9PzaBXK5BdNf2DIZx5jeyBheA
 "
 setup_env_file "master-data-service" "master-data-service" "
 PORT=3040
@@ -123,12 +141,21 @@ KAFKA_TOPIC_SERVICE_TYPE_DELETED=master-data.service-type-deleted
 
 MONGO_INITDB_ROOT_USERNAME=admin
 MONGO_INITDB_ROOT_PASSWORD=password
+
+JWT_SECRET=4esY-20ZQh8XXiL2Xu5KaiiHLTZFxmuDCLoGCGn2i06mQnWUdzoIlAYChkmyA9PzaBXK5BdNf2DIZx5jeyBheA
 "
 setup_env_file "frontend-service" "frontend-service" "
-VITE_API_GATEWAY_URL=http://localhost:8088
+KAFKA_CONTAINER_NAME=kafka
+KAFKA_VERSION=latest
+KAFKA_NODE_ID=1
+KAFKA_KRAFT_CLUSTER_ID=CiTQ5Q8mS9-Ef6M2Wf4h2A
+KAFKA_PORT=9092
+KAFKA_EXTERNAL_PORT=29092
+KAFKA_UI_PORT=8089
 "
 
-setup_env_file "documents-service" "documents-service" "GROQ_API_KEY=
+setup_env_file "documents-service" "documents-service" "
+GROQ_API_KEY=
 
 KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:29092
 KAFKA_CLIENT_ID=documents-service
@@ -136,6 +163,8 @@ KAFKA_CONSUMER_GROUP_ID=documents-service
 KAFKA_TOPIC_USER_DELETED=users.user-deleted
 KAFKA_TOPIC_MEDICINE_DELETED=master-data.medicine-deleted
 KAFKA_TOPIC_SERVICE_TYPE_DELETED=master-data.service-type-deleted
+KAFKA_TOPIC_NOTIFICATIONS=users.notifications
+JWT_SECRET=4esY-20ZQh8XXiL2Xu5KaiiHLTZFxmuDCLoGCGn2i06mQnWUdzoIlAYChkmyA9PzaBXK5BdNf2DIZx5jeyBheA
 "
 
 setup_env_file "infrastructure/kafka" "kafka" "

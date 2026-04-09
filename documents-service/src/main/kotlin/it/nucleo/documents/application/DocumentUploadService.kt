@@ -14,6 +14,7 @@ import it.nucleo.documents.domain.Title
 import it.nucleo.documents.domain.uploaded.UploadedDocumentType
 import it.nucleo.documents.infrastructure.ai.AiAnalysisResult
 import it.nucleo.documents.infrastructure.ai.AiServiceClient
+import it.nucleo.documents.infrastructure.kafka.NotificationEventsPublisher
 import java.util.UUID
 
 data class UploadDocumentCommand(
@@ -44,7 +45,8 @@ data class UploadDocumentCommand(
 class DocumentUploadService(
     private val fileStorageRepository: FileStorageRepository,
     private val documentRepository: DocumentRepository,
-    private val aiServiceClient: AiServiceClient? = null
+    private val aiServiceClient: AiServiceClient? = null,
+    private val notificationEventsPublisher: NotificationEventsPublisher? = null
 ) {
 
     private val logger = logger()
@@ -132,6 +134,12 @@ class DocumentUploadService(
         documentRepository.addDocument(command.patientId, document).getOrElse {
             return failure(it)
         }
+
+        notificationEventsPublisher?.publish(
+            receiver = command.patientId.id,
+            title = "Nuovo documento disponibile",
+            content = "E stato caricato un nuovo referto: ${command.filename}"
+        )
 
         logger.info(
             "Document entity created and saved successfully: ${documentId.id}, type: ${document.documentType}"

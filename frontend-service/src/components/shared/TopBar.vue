@@ -1,13 +1,22 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuth } from '../../composables/useAuth';
+import { useNotifications } from '../../composables/useNotifications';
+import NotificationMenu from './NotificationMenu.vue';
 import { ArrowRightStartOnRectangleIcon, ArrowsRightLeftIcon } from '@heroicons/vue/24/outline';
 
 const { t, locale } = useI18n();
 const router = useRouter();
 const { currentUser, currentPatientProfile, logout: authLogout } = useAuth();
+const {
+  notifications,
+  unreadCount,
+  initializeNotifications,
+  refreshNotifications,
+  markAllNotificationsAsRead,
+} = useNotifications();
 const showUserMenu = ref(false);
 const showLanguageMenu = ref(false);
 
@@ -48,6 +57,27 @@ const changeUser = () => {
   showUserMenu.value = false;
   router.push('/patient-choice');
 };
+
+const handleNotificationsOpened = async () => {
+  await refreshNotifications();
+  await markAllNotificationsAsRead();
+};
+
+watch(
+  () => currentPatientProfile.value?.userId,
+  async (userId) => {
+    if (!userId) {
+      return;
+    }
+
+    try {
+      await initializeNotifications(userId);
+    } catch (error) {
+      console.error('[TopBar] Failed to initialize notifications', error);
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
@@ -56,6 +86,12 @@ const changeUser = () => {
       <h1 class="topbar-title" @click="router.push('/patient/home')">{{ t('app.title') }}</h1>
     </div>
     <div class="topbar-actions">
+      <NotificationMenu
+        :notifications="notifications"
+        :unread-count="unreadCount"
+        @opened="handleNotificationsOpened"
+      />
+
       <!-- Language Selector -->
       <div class="language-selector">
         <button
@@ -263,7 +299,7 @@ const changeUser = () => {
   justify-content: center;
   padding: 0.5rem 1rem;
   background: transparent;
-  color: var(--accent-primary);
+  color: var(--glass-menu-text-primary);
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -277,7 +313,7 @@ const changeUser = () => {
   background: var(--glass-menu-hover-bg);
 }
 .language-menu-text {
-  color: var(--accent-primary);
+  color: var(--glass-menu-text-primary);
 }
 
 .user-menu-container {
