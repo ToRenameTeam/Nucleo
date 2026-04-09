@@ -699,11 +699,14 @@ const handleCloseModal = () => {
 .book-visit-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  width: 100%;
+  min-height: 44px;
   padding: 0.75rem 1.25rem;
   background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--white);
+  border: 1px solid var(--white-20);
   border-radius: 0.875rem;
   font-size: 0.875rem;
   font-weight: 600;
@@ -711,7 +714,9 @@ const handleCloseModal = () => {
   transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
   box-shadow: 0 4px 12px var(--accent-primary-40);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   white-space: nowrap;
+  line-height: 1;
 }
 
 .book-visit-btn:hover {
