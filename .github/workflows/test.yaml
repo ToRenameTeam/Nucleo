@@ -186,3 +186,49 @@ jobs:
 
       - name: Run integration tests
         run: ./gradlew :documents-service:integrationTest
+
+  coverage-report:
+    name: Coverage Report (Codecov)
+    runs-on: ubuntu-latest
+    needs:
+      - test-users-service
+      - test-master-data-service
+      - test-appointments-service
+      - test-documents-service
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 22
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Node.js coverage reports
+        run: |
+          pnpm --filter @nucleo/master-data-service test:coverage
+          pnpm --filter @nucleo/users-service test:coverage
+
+      - name: Generate Kotlin coverage reports
+        run: ./gradlew :appointments-service:koverXmlReport :documents-service:koverXmlReport
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          verbose: true
