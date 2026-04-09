@@ -4,6 +4,12 @@ import { authenticationService } from '../services/index.js';
 import { success } from './utils/response.js';
 import { handleRouteError } from './utils/http-helpers.js';
 import { nonEmptyTrimmedStringSchema, validateWithSchema } from './validation.js';
+import {
+  createAccessToken,
+  requireAuth,
+  type AuthenticatedRequest,
+} from '../modules/authorization/index.js';
+import { error } from './utils/response.js';
 
 const router = Router();
 
@@ -29,6 +35,11 @@ router.post('/login', async (req: Request, res: Response) => {
     const { fiscalCode, password } = validateWithSchema(loginBodySchema, req.body, 'login body');
 
     const authenticatedUser = await authenticationService.login(fiscalCode, password);
+    const accessToken = createAccessToken({
+      userId: authenticatedUser.user.userId,
+      fiscalCode: authenticatedUser.user.fiscalCode.value,
+      activeProfile: authenticatedUser.activeProfile,
+    });
 
     const baseData = {
       userId: authenticatedUser.user.userId,
@@ -43,6 +54,7 @@ router.post('/login', async (req: Request, res: Response) => {
       return success(res, {
         ...baseData,
         activeProfile: 'PATIENT',
+        accessToken,
         patient: {
           userId: authenticatedUser.user.userId,
         },
@@ -53,13 +65,14 @@ router.post('/login', async (req: Request, res: Response) => {
     return success(res, {
       ...baseData,
       requiresProfileSelection: true,
+      accessToken,
     });
   } catch (err) {
     return handleRouteError(res, err, 'Login error', AUTH_ERROR_RULES);
   }
 });
 
-router.post('/select-profile', async (req: Request, res: Response) => {
+router.post('/select-profile', requireAuth, async (req: Request, res: Response) => {
   try {
     const { userId, selectedProfile } = validateWithSchema(
       selectProfileBodySchema,
@@ -67,8 +80,22 @@ router.post('/select-profile', async (req: Request, res: Response) => {
       'select profile body'
     );
 
+    const authenticatedRequest = req as AuthenticatedRequest;
+    if (authenticatedRequest.auth?.userId !== userId) {
+      return error(res, 'Unauthorized', 401);
+    }
+
     const profileData = await authenticationService.getProfileData(userId, selectedProfile);
-    return success(res, profileData);
+    const accessToken = createAccessToken({
+      userId: profileData.userId,
+      fiscalCode: profileData.fiscalCode,
+      activeProfile: selectedProfile,
+    });
+
+    return success(res, {
+      ...profileData,
+      accessToken,
+    });
   } catch (err) {
     return handleRouteError(res, err, 'Profile selection error', AUTH_ERROR_RULES);
   }

@@ -1,5 +1,6 @@
 import { type AddressInfo } from 'node:net';
 import { type Server } from 'node:http';
+import crypto from 'node:crypto';
 import mongoose from 'mongoose';
 import { type StartedTestContainer } from 'testcontainers';
 import { startServer, disconnectDB } from '../../src/app.js';
@@ -33,9 +34,13 @@ let container: StartedTestContainer;
 let server: Server | null = null;
 let baseUrl = '';
 
+const TEST_JWT_SECRET = 'integration-test-jwt-secret';
+
 jest.setTimeout(120000);
 
 beforeAll(async function () {
+  process.env.JWT_SECRET = TEST_JWT_SECRET;
+
   const context = await startMongoTestContainer();
   container = context.container;
 
@@ -273,7 +278,13 @@ async function createUser(payload: CreateUserPayload): Promise<{
 }
 
 async function getJson<T>(url: string): Promise<{ status: number; body: T }> {
-  const response = await fetch(url);
+  const token = createTestAccessToken();
+
+  const response = await fetch(url, {
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+  });
   const body = (await response.json()) as T;
 
   return {
@@ -282,14 +293,48 @@ async function getJson<T>(url: string): Promise<{ status: number; body: T }> {
   };
 }
 
+function base64UrlEncode(value: string): string {
+  return Buffer.from(value)
+    .toString('base64')
+    .replaceAll('+', '-')
+    .replaceAll('/', '_')
+    .replaceAll('=', '');
+}
+
+function createTestAccessToken(): string {
+  const issuedAt = Math.floor(Date.now() / 1000);
+  const expiresAt = issuedAt + 3600;
+  const header = base64UrlEncode(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+  const payload = base64UrlEncode(
+    JSON.stringify({
+      userId: 'integration-user',
+      fiscalCode: 'TSTINT90A01H501Z',
+      activeProfile: 'PATIENT',
+      iat: issuedAt,
+      exp: expiresAt,
+      iss: 'nucleo-users-service',
+    })
+  );
+
+  const signature = crypto
+    .createHmac('sha256', TEST_JWT_SECRET)
+    .update(`${header}.${payload}`)
+    .digest('base64url');
+
+  return `${header}.${payload}.${signature}`;
+}
+
 async function postJson<T = unknown>(
   url: string,
   payload: unknown
 ): Promise<{ status: number; body: T }> {
+  const token = createTestAccessToken();
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
+      authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(payload),
   });
@@ -306,10 +351,13 @@ async function putJson<T = unknown>(
   url: string,
   payload: unknown
 ): Promise<{ status: number; body: T }> {
+  const token = createTestAccessToken();
+
   const response = await fetch(url, {
     method: 'PUT',
     headers: {
       'content-type': 'application/json',
+      authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(payload),
   });
@@ -326,10 +374,13 @@ async function patchJson<T = unknown>(
   url: string,
   payload: unknown
 ): Promise<{ status: number; body: T }> {
+  const token = createTestAccessToken();
+
   const response = await fetch(url, {
     method: 'PATCH',
     headers: {
       'content-type': 'application/json',
+      authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(payload),
   });
