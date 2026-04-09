@@ -12,6 +12,10 @@ class AppointmentService(
     private val notificationEventsPublisher: NotificationEventsPublisher? = null
 ) {
 
+    private companion object {
+        const val HH_MM_LENGTH = 5
+    }
+
     private val logger = LoggerFactory.getLogger(AppointmentService::class.java)
 
     data class AppointmentDetails(val appointment: Appointment, val availability: Availability)
@@ -141,6 +145,7 @@ class AppointmentService(
         return success(appointments)
     }
 
+    @Suppress("CyclomaticComplexMethod")
     suspend fun updateAppointment(
         id: String,
         status: String?,
@@ -300,7 +305,7 @@ class AppointmentService(
     private fun formatTimeSlot(timeSlot: TimeSlot): Pair<String, String> {
         val start = timeSlot.startDateTime.toString()
         val date = start.substringBefore('T')
-        val time = start.substringAfter('T').take(5)
+        val time = start.substringAfter('T').take(HH_MM_LENGTH)
         return Pair(date, time)
     }
 }

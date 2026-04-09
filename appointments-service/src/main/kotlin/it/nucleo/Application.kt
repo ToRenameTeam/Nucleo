@@ -23,6 +23,7 @@ import it.nucleo.appointments.infrastructure.persistence.ExposedAppointmentRepos
 import it.nucleo.appointments.infrastructure.persistence.ExposedAvailabilityRepository
 import it.nucleo.commons.api.ErrorResponse
 import it.nucleo.commons.ktor.configureCors
+import it.nucleo.security.installJwtAuthGuard
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
@@ -42,6 +43,7 @@ fun Application.module() {
     configureStatusPages()
     configureCors()
     configureCallLogging()
+    installJwtAuthGuard()
     initializeDatabase()
     configureKafkaConsumers()
     configureRouting()

@@ -3,11 +3,13 @@ package it.nucleo.appointments.infrastructure.kafka
 import java.time.Instant
 import java.util.Properties
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.serialization.StringSerializer
 import org.slf4j.LoggerFactory
 
@@ -49,10 +51,10 @@ class NotificationEventsPublisher(
                 )
             val payload = json.encodeToString(event)
 
-            getOrCreateProducer().send(
-                ProducerRecord(notificationsTopic, receiver, payload)
-            )
-        } catch (error: Exception) {
+            getOrCreateProducer().send(ProducerRecord(notificationsTopic, receiver, payload))
+        } catch (error: SerializationException) {
+            logger.error("Failed to serialize notification event", error)
+        } catch (error: KafkaException) {
             logger.error("Failed to publish notification event", error)
         }
     }
