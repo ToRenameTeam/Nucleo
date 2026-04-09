@@ -28,6 +28,7 @@ import it.nucleo.documents.infrastructure.persistence.minio.MinioClientFactory
 import it.nucleo.documents.infrastructure.persistence.minio.MinioFileStorageRepository
 import it.nucleo.documents.infrastructure.persistence.mongodb.MongoDbFactory
 import it.nucleo.documents.infrastructure.persistence.mongodb.MongoDocumentRepository
+import it.nucleo.security.installJwtAuthGuard
 import kotlinx.serialization.json.Json
 
 private const val DEFAULT_SERVER_PORT = 8080
@@ -44,6 +45,7 @@ fun Application.module() {
     configureSerialization()
     configureStatusPages()
     configureCors()
+    installJwtAuthGuard()
     configureRouting()
     logger.info("Application initialized successfully")
 }

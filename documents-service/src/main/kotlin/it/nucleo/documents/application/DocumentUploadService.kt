@@ -15,7 +15,6 @@ import it.nucleo.documents.domain.uploaded.UploadedDocumentType
 import it.nucleo.documents.infrastructure.ai.AiAnalysisResult
 import it.nucleo.documents.infrastructure.ai.AiServiceClient
 import it.nucleo.documents.infrastructure.kafka.NotificationEventsPublisher
-import java.time.OffsetDateTime
 import java.util.UUID
 
 data class UploadDocumentCommand(
@@ -210,13 +209,11 @@ class DocumentUploadService(
         }
     }
 
-                val uploadedAt = OffsetDateTime.now()
-
     private fun validate(command: UploadDocumentCommand): ValidationError? {
         if (!command.filename.lowercase().endsWith(".pdf")) {
             return ValidationError("Only PDF files are accepted")
         }
-                        "Referto '${command.filename}' caricato il ${uploadedAt.toLocalDate()} alle ${uploadedAt.toLocalTime().toString().take(5)}"
+
         if (command.contentType != PDF_CONTENT_TYPE) {
             return ValidationError("Content type must be application/pdf")
         }
