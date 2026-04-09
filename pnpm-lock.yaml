@@ -36,9 +36,6 @@ catalogs:
     '@types/node':
       specifier: ^25.0.10
       version: 25.0.10
-    '@vitejs/plugin-vue':
-      specifier: ^6.0.1
-      version: 6.0.4
     '@vue/tsconfig':
       specifier: ^0.8.1
       version: 0.8.1
@@ -179,7 +176,7 @@ importers:
         version: 25.0.10
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
-        version: 6.0.4(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))(vue@3.5.27(typescript@5.9.3))
+        version: 6.0.5(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))(vue@3.5.27(typescript@5.9.3))
       '@vue/tsconfig':
         specifier: 'catalog:'
         version: 0.8.1(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3))
@@ -1743,13 +1740,6 @@ packages:
     resolution: {integrity: sha512-lrW200hZdbfRtztbygyaq/6jP6AKE8qQN2KvPcJ+x7wiD038YtnYtZ82IMNJ69GJibV7bwL3y9FgK+5w/pYt6g==}
     cpu: [x64]
     os: [win32]
-
-  '@vitejs/plugin-vue@6.0.4':
-    resolution: {integrity: sha512-uM5iXipgYIn13UUQCZNdWkYk+sysBeA97d5mHsAoAt1u/wpN3+zxOmsVJWosuzX+IMGRzeYUNytztrYznboIkQ==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    peerDependencies:
-      vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
-      vue: ^3.2.25
 
   '@vitejs/plugin-vue@6.0.5':
     resolution: {integrity: sha512-bL3AxKuQySfk1iGcBsQnoRVexTPJq0Z/ixFVM8OhVJAP6ZXXXLtM7NFKWhLl30Kg7uTBqIaPXbh+nuQCuBDedg==}
@@ -6417,7 +6407,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@vitejs/plugin-vue@6.0.4(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))(vue@3.5.27(typescript@5.9.3))':
+  '@vitejs/plugin-vue@6.0.5(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))(vue@3.5.27(typescript@5.9.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-rc.2
       vite: 7.3.1(@types/node@25.0.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3)
