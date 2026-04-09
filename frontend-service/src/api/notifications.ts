@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { API_ENDPOINTS, USERS_API_URL } from './config';
+import { requestApi } from './httpClient';
 import {
   idSchema,
   nonEmptyTrimmedStringSchema,
@@ -57,7 +58,7 @@ export const notificationsApi = {
     const baseUrl = `${USERS_API_URL}${API_ENDPOINTS.USERS}/${sanitizedUserId}/notifications`;
     const requestUrl = query ? `${baseUrl}?${query}` : baseUrl;
 
-    const response = await fetch(requestUrl, {
+    const response = await requestApi(requestUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -75,7 +76,7 @@ export const notificationsApi = {
       'notifications markAsRead notificationId'
     );
 
-    const response = await fetch(
+    const response = await requestApi(
       `${USERS_API_URL}${API_ENDPOINTS.USERS}/${sanitizedUserId}/notifications/${sanitizedNotificationId}/read`,
       {
         method: 'PATCH',

@@ -1,6 +1,10 @@
 import { ref, computed } from 'vue';
 import type { Profile, AuthenticatedUser } from '../types/auth';
 
+const CURRENT_USER_STORAGE_KEY = 'currentUser';
+const CURRENT_PATIENT_PROFILE_STORAGE_KEY = 'currentPatientProfile';
+const ACCESS_TOKEN_STORAGE_KEY = 'accessToken';
+
 function getStoredValue<T>(key: string): T | null {
   try {
     const item = localStorage.getItem(key);
@@ -11,68 +15,54 @@ function getStoredValue<T>(key: string): T | null {
   }
 }
 
-// Dev user for development - automatically logged in
-const DEV_USER: AuthenticatedUser = {
-  userId: 'dev-user-001',
-  fiscalCode: 'DVLUSR00A01H501X',
-  name: 'Dev',
-  lastName: 'User',
-  dateOfBirth: '2000-01-01',
-  activeProfile: 'PATIENT',
-  patient: {
-    userId: 'dev-user-001',
-  },
-  doctor: {
-    userId: 'dev-user-001',
-    medicalLicenseNumber: 'DEV123456',
-    specializations: ['Medicina Generale', 'Pediatria', 'Cardiologia'],
-  },
-};
+function readStoredAuthenticatedUser(): AuthenticatedUser | null {
+  const storedUser = getStoredValue<AuthenticatedUser>(CURRENT_USER_STORAGE_KEY);
+  const storedToken = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
 
-const DEV_PROFILE: Profile = {
-  userId: 'dev-profile-001',
-  name: 'Dev',
-  lastName: 'User',
-  fiscalCode: 'DVLUSR00A01H501X',
-  dateOfBirth: '2000-01-01',
-};
+  if (!storedUser || !storedToken) {
+    return null;
+  }
 
-// In development mode, automatically use dev user
-const isDev = import.meta.env.DEV;
-const currentUser = ref<AuthenticatedUser | null>(isDev ? DEV_USER : getStoredValue('currentUser'));
+  return {
+    ...storedUser,
+    accessToken: storedUser.accessToken || storedToken,
+  };
+}
+
+const currentUser = ref<AuthenticatedUser | null>(readStoredAuthenticatedUser());
 const currentPatientProfile = ref<Profile | null>(
-  isDev ? DEV_PROFILE : getStoredValue('currentPatientProfile')
+  getStoredValue<Profile>(CURRENT_PATIENT_PROFILE_STORAGE_KEY)
 );
+
+function persistAuthenticatedUser(user: AuthenticatedUser): void {
+  localStorage.setItem(CURRENT_USER_STORAGE_KEY, JSON.stringify(user));
+  localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, user.accessToken);
+}
+
+function clearAuthStorage(): void {
+  localStorage.removeItem(CURRENT_USER_STORAGE_KEY);
+  localStorage.removeItem(CURRENT_PATIENT_PROFILE_STORAGE_KEY);
+  localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+}
 
 export function useAuth() {
   const isAuthenticated = computed(() => currentUser.value !== null);
 
-  const setAuthenticatedUser = (user: AuthenticatedUser) => {
+  function setAuthenticatedUser(user: AuthenticatedUser) {
     currentUser.value = user;
-    if (!isDev) {
-      localStorage.setItem('currentUser', JSON.stringify(user));
-    }
-  };
+    persistAuthenticatedUser(user);
+  }
 
-  const selectPatientProfile = (profile: Profile) => {
+  function selectPatientProfile(profile: Profile) {
     currentPatientProfile.value = profile;
-    if (!isDev) {
-      localStorage.setItem('currentPatientProfile', JSON.stringify(profile));
-    }
-  };
+    localStorage.setItem(CURRENT_PATIENT_PROFILE_STORAGE_KEY, JSON.stringify(profile));
+  }
 
-  const logout = () => {
-    // In dev mode, reset to dev user instead of full logout
-    if (isDev) {
-      currentUser.value = DEV_USER;
-      currentPatientProfile.value = DEV_PROFILE;
-    } else {
-      currentUser.value = null;
-      currentPatientProfile.value = null;
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('currentPatientProfile');
-    }
-  };
+  function logout() {
+    currentUser.value = null;
+    currentPatientProfile.value = null;
+    clearAuthStorage();
+  }
 
   return {
     currentUser,

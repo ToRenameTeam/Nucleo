@@ -3,31 +3,37 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { UserIcon, BuildingOfficeIcon } from '@heroicons/vue/24/outline';
 import { useAuth } from '../composables/useAuth';
+import { authApi } from '../api/users';
 
 const { t } = useI18n();
 const router = useRouter();
 const { setAuthenticatedUser, selectPatientProfile: setProfile, currentUser } = useAuth();
 
-const selectDoctor = () => {
+async function selectDoctor() {
   if (currentUser.value) {
+    const response = await authApi.selectPatientProfile({
+      userId: currentUser.value.userId,
+      selectedProfile: 'DOCTOR',
+    });
+
     setAuthenticatedUser({
-      ...currentUser.value,
+      ...response,
       activeProfile: 'DOCTOR',
     });
 
     setProfile({
-      userId: currentUser.value.userId,
-      name: currentUser.value.name,
-      lastName: currentUser.value.lastName,
-      fiscalCode: currentUser.value.fiscalCode,
-      dateOfBirth: currentUser.value.dateOfBirth,
+      userId: response.userId,
+      name: response.name,
+      lastName: response.lastName,
+      fiscalCode: response.fiscalCode,
+      dateOfBirth: response.dateOfBirth,
     });
 
     router.push('/doctor/appointments');
   }
-};
+}
 
-const selectPatient = () => {
+function selectPatient() {
   if (currentUser.value) {
     setAuthenticatedUser({
       ...currentUser.value,
@@ -35,7 +41,7 @@ const selectPatient = () => {
     });
     router.push('/patient-choice');
   }
-};
+}
 </script>
 
 <template>

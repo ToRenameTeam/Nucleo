@@ -1,5 +1,6 @@
 import { APPOINTMENTS_API_URL, API_ENDPOINTS, handleApiResponse } from './config';
 import { masterDataApi } from './masterData';
+import { requestApi } from './httpClient';
 import { z } from 'zod';
 import { idSchema, nonEmptyTrimmedStringSchema, parseWithSchema } from './validation';
 import type {
@@ -54,7 +55,7 @@ export async function getAvailabilityByIdRaw(id: string): Promise<Availability |
   const url = `${BASE_URL}/${sanitizedId}`;
 
   try {
-    const response = await fetch(url, {
+    const response = await requestApi(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -143,7 +144,7 @@ export const availabilitiesApi = {
     console.log('[Availabilities API] Fetching from:', url);
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -176,7 +177,7 @@ export const availabilitiesApi = {
     const url = `${BASE_URL}/${sanitizedId}`;
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -220,7 +221,7 @@ export const availabilitiesApi = {
     };
 
     try {
-      const response = await fetch(BASE_URL, {
+      const response = await requestApi(BASE_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -273,7 +274,7 @@ export const availabilitiesApi = {
     }
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -303,7 +304,7 @@ export const availabilitiesApi = {
     const url = `${BASE_URL}/${sanitizedId}`;
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

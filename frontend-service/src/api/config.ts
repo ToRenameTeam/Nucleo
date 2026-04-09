@@ -40,13 +40,7 @@ export async function handleApiResponse<T>(response: Response): Promise<T> {
     const errorData: ApiErrorPayload = await response
       .json()
       .catch(() => ({ message: 'Unknown error' }));
-    const error = new Error(errorData.message || 'Request failed') as Error & {
-      code?: string;
-      details?: ApiErrorPayload;
-    };
-    error.code = errorData.code;
-    error.details = errorData;
-    throw error;
+    throw new ApiError(response.status, errorData.message || 'Request failed');
   }
 
   const data = await response.json();

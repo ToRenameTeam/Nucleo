@@ -1,6 +1,7 @@
 import type { Appointment } from '../types/appointment';
 import type { Availability, AvailabilityStatus } from '../types/availability';
 import { APPOINTMENTS_API_URL, API_ENDPOINTS } from './config';
+import { requestApi } from './httpClient';
 import { z } from 'zod';
 import { masterDataApi } from './masterData';
 import { getAvailabilityByIdRaw } from './availabilities';
@@ -208,7 +209,7 @@ export const appointmentsApi = {
     const url = `${BASE_URL}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     console.log('[Appointments API] Fetch call to:', url);
 
-    const response = await fetch(url, {
+    const response = await requestApi(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -258,7 +259,7 @@ export const appointmentsApi = {
 
   async getAppointmentById(id: string): Promise<Appointment | null> {
     const sanitizedId = parseWithSchema(idSchema, id, 'appointment id');
-    const response = await fetch(`${BASE_URL}/${sanitizedId}/details`, {
+    const response = await requestApi(`${BASE_URL}/${sanitizedId}/details`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -286,7 +287,7 @@ export const appointmentsApi = {
       'create appointment availabilityId'
     );
 
-    const response = await fetch(`${BASE_URL}`, {
+    const response = await requestApi(`${BASE_URL}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -323,7 +324,7 @@ export const appointmentsApi = {
       ? parseWithSchema(z.enum(['PATIENT', 'DOCTOR']), updatedBy, 'update appointment updatedBy')
       : undefined;
 
-    const response = await fetch(`${BASE_URL}/${sanitizedId}`, {
+    const response = await requestApi(`${BASE_URL}/${sanitizedId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -346,7 +347,7 @@ export const appointmentsApi = {
 
   async deleteAppointment(id: string): Promise<boolean> {
     const sanitizedId = parseWithSchema(idSchema, id, 'delete appointment id');
-    const response = await fetch(`${BASE_URL}/${sanitizedId}`, {
+    const response = await requestApi(`${BASE_URL}/${sanitizedId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

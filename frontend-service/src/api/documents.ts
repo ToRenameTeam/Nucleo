@@ -2,6 +2,7 @@ import { DOCUMENTS_API_URL } from './config';
 import { z } from 'zod';
 import { idSchema, nonEmptyTrimmedStringSchema, parseWithSchema } from './validation';
 import { userApi } from './users';
+import { requestApi } from './httpClient';
 import type {
   AnyDocument,
   Document,
@@ -418,7 +419,7 @@ export const documentsApiService = {
       title: buildDocumentTitle(sanitizedRequest.type, sanitizedRequest.metadata.summary),
     };
 
-    const response = await fetch(`${BASE_URL}/api/documents/patients/${sanitizedPatientId}`, {
+    const response = await requestApi(`${BASE_URL}/api/documents/patients/${sanitizedPatientId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -442,7 +443,7 @@ export const documentsApiService = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(
+    const response = await requestApi(
       `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/upload`,
       {
         method: 'POST',
@@ -476,12 +477,15 @@ export const documentsApiService = {
     try {
       const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'get documents by patientId');
 
-      const response = await fetch(`${BASE_URL}/api/documents/patients/${sanitizedPatientId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await requestApi(
+        `${BASE_URL}/api/documents/patients/${sanitizedPatientId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       const documentsRaw = await handleResponse<unknown>(response);
       const documents = parseWithSchema(
@@ -509,7 +513,7 @@ export const documentsApiService = {
       );
       const sanitizedDocumentId = parseWithSchema(idSchema, documentId, 'download documentId');
 
-      const response = await fetch(
+      const response = await requestApi(
         `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/${sanitizedDocumentId}/pdf`,
         {
           method: 'GET',
@@ -575,7 +579,7 @@ export const documentsApiService = {
       const sanitizedPatientId = parseWithSchema(idSchema, patientId, 'get document patientId');
       const sanitizedDocumentId = parseWithSchema(idSchema, documentId, 'get document documentId');
 
-      const response = await fetch(
+      const response = await requestApi(
         `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/${sanitizedDocumentId}`,
         {
           method: 'GET',
@@ -608,7 +612,7 @@ export const documentsApiService = {
     const url = `${BASE_URL}/api/documents?${queryParams.toString()}`;
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -638,7 +642,7 @@ export const documentsApiService = {
     const url = `${BASE_URL}/api/documents/patients/${sanitizedPatientId}/${sanitizedDocumentId}`;
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -677,7 +681,7 @@ export const documentsApiService = {
     };
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -728,7 +732,7 @@ export const documentsApiService = {
     };
 
     try {
-      const response = await fetch(url, {
+      const response = await requestApi(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
