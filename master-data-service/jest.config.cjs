@@ -19,6 +19,12 @@ module.exports = {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   extensionsToTreatAsEsm: ['.ts'],
-  collectCoverageFrom: ['<rootDir>/src/**/*.ts', '!<rootDir>/src/**/*.d.ts'],
+  collectCoverageFrom: [
+    '<rootDir>/src/**/*.ts',
+    '!<rootDir>/src/**/*.d.ts',
+    '!<rootDir>/src/app.ts',
+    '!<rootDir>/src/index.ts',
+    '!<rootDir>/src/infrastructure/**',
+  ],
   coveragePathIgnorePatterns: ['<rootDir>/tests/'],
 };
