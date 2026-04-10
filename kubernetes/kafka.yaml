@@ -10,18 +10,18 @@ spec:
     - controller
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 256Mi
     limits:
-      cpu: 300m
-      memory: 512Mi
+      cpu: 200m
+      memory: 384Mi
   storage:
     type: jbod
     volumes:
       - id: 0
         type: persistent-claim
-        size: 20Gi
-        deleteClaim: false
+        size: 5Gi
+        deleteClaim: true
 ---
 apiVersion: kafka.strimzi.io/v1
 kind: KafkaNodePool
@@ -35,18 +35,18 @@ spec:
     - broker
   resources:
     requests:
-      cpu: 200m
-      memory: 512Mi
+      cpu: 100m
+      memory: 384Mi
     limits:
-      cpu: 500m
-      memory: 1Gi
+      cpu: 300m
+      memory: 512Mi
   storage:
     type: jbod
     volumes:
       - id: 0
         type: persistent-claim
-        size: 100Gi
-        deleteClaim: false
+        size: 10Gi
+        deleteClaim: true
 ---
 apiVersion: kafka.strimzi.io/v1
 kind: Kafka
@@ -58,17 +58,22 @@ metadata:
 spec:
   kafka:
     version: 4.2.0
+
+    jvmOptions:
+      -Xms: 256m
+      -Xmx: 256m
+
     listeners:
       - name: plain
         port: 9092
         type: internal
         tls: false
+
     config:
       offsets.topic.replication.factor: 1
       transaction.state.log.replication.factor: 1
       transaction.state.log.min.isr: 1
       default.replication.factor: 1
       min.insync.replicas: 1
-  entityOperator:
-    topicOperator: {}
-    userOperator: {}
+
+  entityOperator: null
