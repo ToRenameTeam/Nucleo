@@ -46,8 +46,7 @@ export default defineConfig({
             text: 'Implementation',
             items: [
               { text: 'Microservices', link: '/implementation/microservices' },
-              { text: 'Testing', link: '/implementation/testing' },
-              { text: 'Monitoring', link: '/implementation/monitoring' },
+              { text: 'Testing', link: '/implementation/testing' }
             ],
           },
           {
@@ -55,8 +54,7 @@ export default defineConfig({
             items: [
               { text: 'Project Structure', link: '/devops/project-structure' },
               { text: 'Version Control & Release', link: '/devops/vc-and-release' },
-              { text: 'Quality Assurance', link: '/devops/quality-assurance' },
-              { text: 'Monitoring', link: '/devops/monitoring' },
+              { text: 'Quality Assurance', link: '/devops/quality-assurance' }
             ],
           },
           { text: 'Deployment', link: '/deployment' },
