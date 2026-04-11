@@ -20,8 +20,8 @@ To avoid duplicating build configuration across JVM microservices, shared logic 
 
 Two convention plugins are defined:
 
-- **`kotlin-base.gradle.kts`**: establishes the Kotlin baseline for all JVM projects. It configures the JVM toolchain, applies code formatting ([ktfmt](https://github.com/facebook/ktfmt)), static analysis ([Detekt](https://detekt.dev/)), and coverage ([Kover](https://github.com/Kotlin/kotlinx-kover)). It also registers a dedicated `integrationTest` task, separating integration tests (matched by package or class name convention) from unit tests.
-- **`nucleo-services.gradle.kts`**: extends `kotlin-base` and adds the dependencies common to every microservice: the `commons` module, [Ktor](https://ktor.io/), Kafka client, and Logback. Each microservice only needs to declare its own specific dependencies on top of this shared baseline.
+- **`kotlin-base.gradle.kts`**: establishes the Kotlin baseline for all JVM projects.
+- **`nucleo-services.gradle.kts`**: extends `kotlin-base` and adds the dependencies common to every microservice. Each microservice only needs to declare its own specific dependencies on top of this shared baseline.
 
 A microservice's build file is therefore minimal. For example, `documents-service` only declares its own dependencies (MongoDB driver, MinIO, PDFBox, etc.) while all cross-cutting concerns are inherited:
 
