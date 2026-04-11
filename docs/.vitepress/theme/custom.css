@@ -1,0 +1,33 @@
+.VPDoc .mermaid .edgeLabel,
+.VPDoc .mermaid .edgeLabel p,
+.VPDoc .mermaid .edgeLabel span,
+.VPDoc .mermaid .edgeLabel div {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.1 !important;
+}
+
+.VPDoc .mermaid .startLabel,
+.VPDoc .mermaid .endLabel,
+.VPDoc .mermaid .startLabel tspan,
+.VPDoc .mermaid .endLabel tspan {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  fill: var(--vp-c-text-1) !important;
+  paint-order: stroke !important;
+  stroke: var(--vp-c-bg) !important;
+  stroke-width: 1px !important;
+  stroke-linejoin: round !important;
+}
+
+.VPDoc .mermaid svg {
+  overflow: visible !important;
+}
+
+.VPDoc .mermaid .edgeLabel rect {
+  fill-opacity: 0.9 !important;
+}
+
+.VPDoc .mermaid .relationshipLabelBox {
+  opacity: 1 !important;
+}
