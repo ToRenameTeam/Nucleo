@@ -1,10 +1,16 @@
 import { defineConfig } from 'vitepress';
+import { withMermaid } from 'vitepress-plugin-mermaid';
 
 // https://vitepress.dev/reference/site-config
-export default defineConfig({
+export default withMermaid(defineConfig({
   base: '/Nucleo/',
   title: 'Nucleo',
   description: "Nucleo's documentation",
+  vite: {
+    optimizeDeps: {
+      include: ['mermaid'],
+    },
+  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [{ text: 'Home', link: '/' }],
@@ -65,4 +71,4 @@ export default defineConfig({
 
     socialLinks: [{ icon: 'github', link: 'https://github.com/ToRenameTeam/Nucleo' }],
   },
-});
+}));
