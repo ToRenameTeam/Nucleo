@@ -54,7 +54,7 @@ export default defineConfig({
             text: 'DevOps',
             items: [
               { text: 'Project Structure', link: '/devops/project-structure' },
-              { text: 'VCS & Repo', link: '/devops/vcs-and-repo' },
+              { text: 'Version Control & Release', link: '/devops/vc-and-release' },
               { text: 'Quality Assurance', link: '/devops/quality-assurance' },
               { text: 'Monitoring', link: '/devops/monitoring' },
             ],
