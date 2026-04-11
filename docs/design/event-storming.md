@@ -58,7 +58,7 @@ In this step, we grouped related commands and events into **Aggregates**. These 
 
 Finally, we established the **Bounded Contexts** by grouping aggregates that share a common model and language.
 
-![Bounded Contexts](../figures/event_storming/3b_bounded-contexts.svg)
+![Bounded Contexts](../figures/event_storming/3b_bounded-contexts.jpg)
 
 The identified bounded contexts are:
 
