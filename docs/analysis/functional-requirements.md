@@ -1,5 +1,7 @@
 # Functional Requirements
 
+This page describes the functional requirements of Nucleo, defining what the system must do from the perspective of its users and stakeholders.
+
 ## Users
 
 | ID  | Requirement                  | Description                                                                                         |

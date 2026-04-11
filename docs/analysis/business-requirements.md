@@ -1,5 +1,7 @@
 # Business Requirements
 
+This page outlines the business requirements that capture the high-level goals and motivations behind the development of Nucleo.
+
 | ID  | Requirement                               | Description                                                                                                            |
 | --- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | BR1 | Reduction of Administrative Fragmentation | The project must reduce healthcare administrative fragmentation by centralizing data management and booking processes. |
