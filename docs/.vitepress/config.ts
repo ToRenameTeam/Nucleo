@@ -59,8 +59,9 @@ export default withMermaid(defineConfig({
             text: 'DevOps',
             items: [
               { text: 'Project Structure', link: '/devops/project-structure' },
-              { text: 'Version Control & Release', link: '/devops/vc-and-release' },
-              { text: 'Quality Assurance', link: '/devops/quality-assurance' }
+              { text: 'Version Control and Release', link: '/devops/vc-and-release' },
+              { text: 'Quality Assurance', link: '/devops/quality-assurance' },
+              { text: 'Continuous Integration and Delivery', link: '/devops/ci-cd' },
             ],
           },
           { text: 'Deployment', link: '/deployment' },
