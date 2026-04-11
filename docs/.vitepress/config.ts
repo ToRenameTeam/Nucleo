@@ -21,13 +21,6 @@ export default withMermaid(defineConfig({
         items: [
           { text: 'Introduction', link: '/introduction' },
           {
-            text: 'Deliverables',
-            items: [
-              { text: 'Glossary', link: '/deliverables/glossary' },
-              { text: 'Domain Model', link: '/deliverables/domain-model' },
-            ],
-          },
-          {
             text: 'Analysis',
             items: [
               { text: 'Business Requirements', link: '/analysis/business-requirements' },
@@ -38,6 +31,7 @@ export default withMermaid(defineConfig({
               },
             ],
           },
+          { text: 'Glossary', link: '/glossary' },
           {
             text: 'Design',
             items: [
