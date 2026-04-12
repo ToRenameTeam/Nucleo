@@ -29,55 +29,55 @@ TRUNCATE TABLE availabilities CASCADE;
 -- Past availabilities for COMPLETED appointments (-28, -24, -22 days ago)
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status)
 VALUES
-    ('a1b2c3d4-1111-4aa1-8bb1-111111111111', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp - INTERVAL '28 days' + INTERVAL '9 hours', 30, 'BOOKED'),
-    ('a1b2c3d4-2222-4aa2-8bb2-222222222222', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp - INTERVAL '24 days' + INTERVAL '10 hours 30 minutes', 30, 'BOOKED'),
-    ('a1b2c3d4-3333-4aa3-8bb3-333333333333', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp - INTERVAL '22 days' + INTERVAL '14 hours', 30, 'BOOKED');
+    ('a1b2c3d4-1111-4aa1-8bb1-111111111111', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp - INTERVAL '28 days' + INTERVAL '9 hours', 30, 'BOOKED'),
+    ('a1b2c3d4-2222-4aa2-8bb2-222222222222', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp - INTERVAL '24 days' + INTERVAL '10 hours 30 minutes', 30, 'BOOKED'),
+    ('a1b2c3d4-3333-4aa3-8bb3-333333333333', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp - INTERVAL '22 days' + INTERVAL '14 hours', 30, 'BOOKED');
 
 -- Past availability for NO_SHOW appointment (-20 days ago)
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status)
 VALUES
-    ('a1b2c3d4-4444-4aa4-8bb4-444444444444', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp - INTERVAL '20 days' + INTERVAL '11 hours', 30, 'BOOKED');
+    ('a1b2c3d4-4444-4aa4-8bb4-444444444444', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp - INTERVAL '20 days' + INTERVAL '11 hours', 30, 'BOOKED');
 
 -- Past availability for CANCELLED appointment (returns to AVAILABLE status, -19 days ago)
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status)
 VALUES
-    ('a1b2c3d4-5555-4aa5-8bb5-555555555555', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp - INTERVAL '19 days' + INTERVAL '15 hours 30 minutes', 30, 'AVAILABLE');
+    ('a1b2c3d4-5555-4aa5-8bb5-555555555555', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp - INTERVAL '19 days' + INTERVAL '15 hours 30 minutes', 30, 'AVAILABLE');
 
 -- Today's availabilities (some BOOKED for SCHEDULED appointments, some AVAILABLE)
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status)
 VALUES
-    ('a1b2c3d4-6001-4aa6-8bb6-600100000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '8 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6002-4aa6-8bb6-600200000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '8 hours 30 minutes', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6003-4aa6-8bb6-600300000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '9 hours', 30, 'BOOKED'),
-    ('a1b2c3d4-6004-4aa6-8bb6-600400000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '9 hours 30 minutes', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6005-4aa6-8bb6-600500000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '10 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6006-4aa6-8bb6-600600000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '10 hours 30 minutes', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6007-4aa6-8bb6-600700000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '11 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6008-4aa6-8bb6-600800000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '11 hours 30 minutes', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6009-4aa6-8bb6-600900000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '14 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6010-4aa6-8bb6-601000000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '14 hours 30 minutes', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6011-4aa6-8bb6-601100000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '15 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6012-4aa6-8bb6-601200000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '15 hours 30 minutes', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6013-4aa6-8bb6-601300000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '16 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6014-4aa6-8bb6-601400000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '16 hours 30 minutes', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6015-4aa6-8bb6-601500000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '17 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-6016-4aa6-8bb6-601600000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '17 hours 30 minutes', 30, 'AVAILABLE');
+    ('a1b2c3d4-6001-4aa6-8bb6-600100000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '8 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6002-4aa6-8bb6-600200000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '8 hours 30 minutes', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6003-4aa6-8bb6-600300000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '9 hours', 30, 'BOOKED'),
+    ('a1b2c3d4-6004-4aa6-8bb6-600400000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '9 hours 30 minutes', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6005-4aa6-8bb6-600500000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '10 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6006-4aa6-8bb6-600600000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '10 hours 30 minutes', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6007-4aa6-8bb6-600700000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '11 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6008-4aa6-8bb6-600800000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '11 hours 30 minutes', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6009-4aa6-8bb6-600900000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '14 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6010-4aa6-8bb6-601000000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '14 hours 30 minutes', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6011-4aa6-8bb6-601100000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '15 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6012-4aa6-8bb6-601200000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '15 hours 30 minutes', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6013-4aa6-8bb6-601300000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '16 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6014-4aa6-8bb6-601400000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '16 hours 30 minutes', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6015-4aa6-8bb6-601500000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '17 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-6016-4aa6-8bb6-601600000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '17 hours 30 minutes', 30, 'AVAILABLE');
 
 -- Future availabilities (+7 days)
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status)
 VALUES
-    ('a1b2c3d4-7001-4aa7-8bb7-700100000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '8 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-7002-4aa7-8bb7-700200000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '8 hours 30 minutes', 30, 'BOOKED'),
-    ('a1b2c3d4-7003-4aa7-8bb7-700300000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '9 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-7004-4aa7-8bb7-700400000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '9 hours 30 minutes', 30, 'AVAILABLE'),
-    ('a1b2c3d4-7005-4aa7-8bb7-700500000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '10 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-7006-4aa7-8bb7-700600000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '10 hours 30 minutes', 30, 'AVAILABLE'),
-    ('a1b2c3d4-7007-4aa7-8bb7-700700000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '11 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-7008-4aa7-8bb7-700800000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '11 hours 30 minutes', 30, 'AVAILABLE'),
-    ('a1b2c3d4-7009-4aa7-8bb7-700900000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '14 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-7010-4aa7-8bb7-701000000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '14 hours 30 minutes', 30, 'AVAILABLE'),
-    ('a1b2c3d4-7011-4aa7-8bb7-701100000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '15 hours', 30, 'AVAILABLE'),
-    ('a1b2c3d4-7012-4aa7-8bb7-701200000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-001', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '15 hours 30 minutes', 30, 'AVAILABLE');
+    ('a1b2c3d4-7001-4aa7-8bb7-700100000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '8 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-7002-4aa7-8bb7-700200000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '8 hours 30 minutes', 30, 'BOOKED'),
+    ('a1b2c3d4-7003-4aa7-8bb7-700300000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '9 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-7004-4aa7-8bb7-700400000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '9 hours 30 minutes', 30, 'AVAILABLE'),
+    ('a1b2c3d4-7005-4aa7-8bb7-700500000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '10 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-7006-4aa7-8bb7-700600000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '10 hours 30 minutes', 30, 'AVAILABLE'),
+    ('a1b2c3d4-7007-4aa7-8bb7-700700000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '11 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-7008-4aa7-8bb7-700800000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '11 hours 30 minutes', 30, 'AVAILABLE'),
+    ('a1b2c3d4-7009-4aa7-8bb7-700900000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '14 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-7010-4aa7-8bb7-701000000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '14 hours 30 minutes', 30, 'AVAILABLE'),
+    ('a1b2c3d4-7011-4aa7-8bb7-701100000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '15 hours', 30, 'AVAILABLE'),
+    ('a1b2c3d4-7012-4aa7-8bb7-701200000000', 'f0aa4140-8d57-425d-b880-e8cf2008f265', 'facility-001', 'service-002', CURRENT_DATE::timestamp + INTERVAL '7 days' + INTERVAL '15 hours 30 minutes', 30, 'AVAILABLE');
 
 -- ============================================
 -- PAOLO GRECO (Ortopedico) - AVAILABILITIES
@@ -157,37 +157,37 @@ VALUES
 -- Past availability for COMPLETED appointment (-19 days ago)
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status)
 VALUES
-    ('d4e5f6a7-1111-4dd1-9ee1-111111111111', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp - INTERVAL '19 days' + INTERVAL '14 hours', 30, 'BOOKED');
+    ('d4e5f6a7-1111-4dd1-9ee1-111111111111', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp - INTERVAL '19 days' + INTERVAL '14 hours', 30, 'BOOKED');
 
 -- In 3 days (+3 days, all AVAILABLE)
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status)
 VALUES
-    ('d4e5f6a7-2001-4dd2-9ee2-200100000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '8 hours', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2002-4dd2-9ee2-200200000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '8 hours 30 minutes', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2003-4dd2-9ee2-200300000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '9 hours', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2004-4dd2-9ee2-200400000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '9 hours 30 minutes', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2005-4dd2-9ee2-200500000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '10 hours', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2006-4dd2-9ee2-200600000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '10 hours 30 minutes', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2007-4dd2-9ee2-200700000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '11 hours', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2008-4dd2-9ee2-200800000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '11 hours 30 minutes', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2009-4dd2-9ee2-200900000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '14 hours', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2010-4dd2-9ee2-201000000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '14 hours 30 minutes', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2011-4dd2-9ee2-201100000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '15 hours', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2012-4dd2-9ee2-201200000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '15 hours 30 minutes', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2013-4dd2-9ee2-201300000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '16 hours', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2014-4dd2-9ee2-201400000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '16 hours 30 minutes', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2015-4dd2-9ee2-201500000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '17 hours', 30, 'AVAILABLE'),
-    ('d4e5f6a7-2016-4dd2-9ee2-201600000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '17 hours 30 minutes', 30, 'AVAILABLE');
+    ('d4e5f6a7-2001-4dd2-9ee2-200100000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '8 hours', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2002-4dd2-9ee2-200200000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '8 hours 30 minutes', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2003-4dd2-9ee2-200300000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '9 hours', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2004-4dd2-9ee2-200400000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '9 hours 30 minutes', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2005-4dd2-9ee2-200500000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '10 hours', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2006-4dd2-9ee2-200600000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '10 hours 30 minutes', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2007-4dd2-9ee2-200700000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '11 hours', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2008-4dd2-9ee2-200800000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '11 hours 30 minutes', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2009-4dd2-9ee2-200900000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '14 hours', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2010-4dd2-9ee2-201000000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '14 hours 30 minutes', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2011-4dd2-9ee2-201100000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '15 hours', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2012-4dd2-9ee2-201200000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '15 hours 30 minutes', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2013-4dd2-9ee2-201300000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '16 hours', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2014-4dd2-9ee2-201400000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '16 hours 30 minutes', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2015-4dd2-9ee2-201500000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '17 hours', 30, 'AVAILABLE'),
+    ('d4e5f6a7-2016-4dd2-9ee2-201600000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '3 days' + INTERVAL '17 hours 30 minutes', 30, 'AVAILABLE');
 
 -- Future availabilities (+10 days, all AVAILABLE)
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status)
 VALUES
-    ('d4e5f6a7-3001-4dd3-9ee3-300100000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '10 days' + INTERVAL '8 hours', 30, 'AVAILABLE'),
-    ('d4e5f6a7-3002-4dd3-9ee3-300200000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '10 days' + INTERVAL '8 hours 30 minutes', 30, 'AVAILABLE'),
-    ('d4e5f6a7-3003-4dd3-9ee3-300300000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '10 days' + INTERVAL '9 hours', 30, 'AVAILABLE'),
-    ('d4e5f6a7-3004-4dd3-9ee3-300400000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '10 days' + INTERVAL '9 hours 30 minutes', 30, 'AVAILABLE'),
-    ('d4e5f6a7-3005-4dd3-9ee3-300500000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '10 days' + INTERVAL '10 hours', 30, 'AVAILABLE'),
-    ('d4e5f6a7-3006-4dd3-9ee3-300600000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-002', CURRENT_DATE::timestamp + INTERVAL '10 days' + INTERVAL '10 hours 30 minutes', 30, 'AVAILABLE');
+    ('d4e5f6a7-3001-4dd3-9ee3-300100000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '10 days' + INTERVAL '8 hours', 30, 'AVAILABLE'),
+    ('d4e5f6a7-3002-4dd3-9ee3-300200000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '10 days' + INTERVAL '8 hours 30 minutes', 30, 'AVAILABLE'),
+    ('d4e5f6a7-3003-4dd3-9ee3-300300000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '10 days' + INTERVAL '9 hours', 30, 'AVAILABLE'),
+    ('d4e5f6a7-3004-4dd3-9ee3-300400000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '10 days' + INTERVAL '9 hours 30 minutes', 30, 'AVAILABLE'),
+    ('d4e5f6a7-3005-4dd3-9ee3-300500000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '10 days' + INTERVAL '10 hours', 30, 'AVAILABLE'),
+    ('d4e5f6a7-3006-4dd3-9ee3-300600000000', '1cac71a0-c761-4ea8-b378-8eab4731c524', 'facility-002', 'service-001', CURRENT_DATE::timestamp + INTERVAL '10 days' + INTERVAL '10 hours 30 minutes', 30, 'AVAILABLE');
 
 -- ============================================
 -- SARA COLOMBO (Pediatra) - AVAILABILITIES
@@ -196,32 +196,32 @@ VALUES
 -- Past availability for COMPLETED appointment (-21 days ago)
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status)
 VALUES
-    ('e5f6a7b8-1111-4ee1-9ff1-111111111111', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp - INTERVAL '21 days' + INTERVAL '10 hours', 45, 'BOOKED');
+    ('e5f6a7b8-1111-4ee1-9ff1-111111111111', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp - INTERVAL '21 days' + INTERVAL '10 hours', 45, 'BOOKED');
 
 -- In 4 days (+4 days, all AVAILABLE)
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status)
 VALUES
-    ('e5f6a7b8-2001-4ee2-9ff2-200100000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '8 hours', 45, 'AVAILABLE'),
-    ('e5f6a7b8-2002-4ee2-9ff2-200200000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '8 hours 45 minutes', 45, 'AVAILABLE'),
-    ('e5f6a7b8-2003-4ee2-9ff2-200300000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '9 hours 30 minutes', 45, 'AVAILABLE'),
-    ('e5f6a7b8-2004-4ee2-9ff2-200400000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '10 hours 15 minutes', 45, 'AVAILABLE'),
-    ('e5f6a7b8-2005-4ee2-9ff2-200500000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '11 hours', 45, 'AVAILABLE'),
-    ('e5f6a7b8-2006-4ee2-9ff2-200600000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '11 hours 45 minutes', 45, 'AVAILABLE'),
-    ('e5f6a7b8-2007-4ee2-9ff2-200700000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '14 hours', 45, 'AVAILABLE'),
-    ('e5f6a7b8-2008-4ee2-9ff2-200800000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '14 hours 45 minutes', 45, 'AVAILABLE'),
-    ('e5f6a7b8-2009-4ee2-9ff2-200900000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '15 hours 30 minutes', 45, 'AVAILABLE'),
-    ('e5f6a7b8-2010-4ee2-9ff2-201000000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '16 hours 15 minutes', 45, 'AVAILABLE'),
-    ('e5f6a7b8-2011-4ee2-9ff2-201100000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '17 hours', 45, 'AVAILABLE');
+    ('e5f6a7b8-2001-4ee2-9ff2-200100000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '8 hours', 45, 'AVAILABLE'),
+    ('e5f6a7b8-2002-4ee2-9ff2-200200000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '8 hours 45 minutes', 45, 'AVAILABLE'),
+    ('e5f6a7b8-2003-4ee2-9ff2-200300000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '9 hours 30 minutes', 45, 'AVAILABLE'),
+    ('e5f6a7b8-2004-4ee2-9ff2-200400000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '10 hours 15 minutes', 45, 'AVAILABLE'),
+    ('e5f6a7b8-2005-4ee2-9ff2-200500000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '11 hours', 45, 'AVAILABLE'),
+    ('e5f6a7b8-2006-4ee2-9ff2-200600000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '11 hours 45 minutes', 45, 'AVAILABLE'),
+    ('e5f6a7b8-2007-4ee2-9ff2-200700000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '14 hours', 45, 'AVAILABLE'),
+    ('e5f6a7b8-2008-4ee2-9ff2-200800000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '14 hours 45 minutes', 45, 'AVAILABLE'),
+    ('e5f6a7b8-2009-4ee2-9ff2-200900000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '15 hours 30 minutes', 45, 'AVAILABLE'),
+    ('e5f6a7b8-2010-4ee2-9ff2-201000000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '16 hours 15 minutes', 45, 'AVAILABLE'),
+    ('e5f6a7b8-2011-4ee2-9ff2-201100000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '4 days' + INTERVAL '17 hours', 45, 'AVAILABLE');
 
 -- Future availabilities (+11 days, all AVAILABLE)
 INSERT INTO availabilities (availability_id, doctor_id, facility_id, service_type_id, start_date_time, duration_minutes, status)
 VALUES
-    ('e5f6a7b8-3001-4ee3-9ff3-300100000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '11 days' + INTERVAL '8 hours', 45, 'AVAILABLE'),
-    ('e5f6a7b8-3002-4ee3-9ff3-300200000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '11 days' + INTERVAL '8 hours 45 minutes', 45, 'AVAILABLE'),
-    ('e5f6a7b8-3003-4ee3-9ff3-300300000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '11 days' + INTERVAL '9 hours 30 minutes', 45, 'AVAILABLE'),
-    ('e5f6a7b8-3004-4ee3-9ff3-300400000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '11 days' + INTERVAL '10 hours 15 minutes', 45, 'AVAILABLE'),
-    ('e5f6a7b8-3005-4ee3-9ff3-300500000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '11 days' + INTERVAL '11 hours', 45, 'AVAILABLE'),
-    ('e5f6a7b8-3006-4ee3-9ff3-300600000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-005', CURRENT_DATE::timestamp + INTERVAL '11 days' + INTERVAL '11 hours 45 minutes', 45, 'AVAILABLE');
+    ('e5f6a7b8-3001-4ee3-9ff3-300100000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '11 days' + INTERVAL '8 hours', 45, 'AVAILABLE'),
+    ('e5f6a7b8-3002-4ee3-9ff3-300200000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '11 days' + INTERVAL '8 hours 45 minutes', 45, 'AVAILABLE'),
+    ('e5f6a7b8-3003-4ee3-9ff3-300300000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '11 days' + INTERVAL '9 hours 30 minutes', 45, 'AVAILABLE'),
+    ('e5f6a7b8-3004-4ee3-9ff3-300400000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '11 days' + INTERVAL '10 hours 15 minutes', 45, 'AVAILABLE'),
+    ('e5f6a7b8-3005-4ee3-9ff3-300500000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '11 days' + INTERVAL '11 hours', 45, 'AVAILABLE'),
+    ('e5f6a7b8-3006-4ee3-9ff3-300600000000', '5eab37f0-1d7b-4ded-a7bd-6676b195231a', 'facility-003', 'service-008', CURRENT_DATE::timestamp + INTERVAL '11 days' + INTERVAL '11 hours 45 minutes', 45, 'AVAILABLE');
 
 -- ============================================
 -- APPOINTMENTS SEED DATA
