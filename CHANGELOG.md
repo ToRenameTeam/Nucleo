@@ -1,6 +1,33 @@
 ### Features
 
 
+- add access token to backend api calls (26d2dea)
+- filter service type for doctors specialization (baed27d)
+- refresh document page on document creation (d41332b)
+- add patient/doctor name into document card (e244161)
+- notifications UI (5f592d5)
+- message for empty document list (9c01b08)
+
+### Fixes
+
+
+- book visit button layout (bc6240f)
+- specializations format (d1611c1)
+- sent and received delegations visualization (5bfc4f7)
+- fiscal code placeholder (25ef402)
+- service prescription (9258649)
+- add missing labels (42edd69)
+
+### Other
+
+
+- chore: merge branch 'feat/notifications' into dev (1dc7d9f)
+- chore: add k8s and helm files to .prettierignore and remove helm-values readme (ce8e236)
+- chore: helm charts for microservices and databases (61e32d0)
+
+### Features
+
+
 - add authorization layer (ce45e1a)
 - publish delete data event (9fedb1c)
 - service in master data deleted topics (e62ea1c)
