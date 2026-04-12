@@ -1,6 +1,29 @@
 ### Features
 
 
+- add authorization layer (6b72eb2)
+- publish notification event on user topic (c6cf863)
+- delete user, meidicine and service type event consumer (18c1812)
+- service in master data deleted topics (e62ea1c)
+- set up consumer groups and user deleted topic (d8c17e7)
+
+### Fixes
+
+
+- exception handling (157d582)
+- format (1c66c5f)
+- deploy minio on k8s (5ddf43f)
+
+### Other
+
+
+- chore: add k8s and helm files to .prettierignore and remove helm-values readme (ce8e236)
+- chore: helm charts for microservices and databases (61e32d0)
+- chore: rename ktor custom plugin to nucleo-services and add kafka client dependency (6e6b820)
+
+### Features
+
+
 - add authorization layer (f4cd921)
 - publish notification event on user topic (5b1baf1)
 - delete user, facility and service type event consumer (7773a56)
