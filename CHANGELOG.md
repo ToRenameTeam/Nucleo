@@ -1,3 +1,25 @@
+### Features
+
+
+- add authorization module (ca8066f)
+- add nginx configuration for notifications api (78dda5e)
+- notification routes and configurations (1726edb)
+- notification events handling (0b8a8ef)
+- add topic for notifications (6bb367d)
+- delete user and publish delete event (770f4bb)
+- set up consumer groups and user deleted topic (d8c17e7)
+
+### Other
+
+
+- chore: merge branch 'main' into dev (37d8c4b)
+- test: add exclusions to coverage for node services (9f37d0c)
+- chore: merge branch 'feat/notifications' into dev (1dc7d9f)
+- test: notifications (629363c)
+- chore: add k8s and helm files to .prettierignore and remove helm-values readme (ce8e236)
+- chore: helm charts for microservices and databases (61e32d0)
+- chore: add kafka dependency to node services (1829e28)
+
 ### Breaking Changes
 
 
