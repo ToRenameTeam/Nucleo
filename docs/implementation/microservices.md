@@ -1,15 +1,10 @@
 # Microservices Implementation
 
-This page documents implementation patterns used in Nucleo microservices.
-The focus is on runtime composition, layering, persistence, and service integration.
-
 ## Clean Architecture Perspective
 
-In Nucleo, implementation choices are driven by a Clean Architecture objective: keep business decisions stable while allowing infrastructure and framework details to evolve. In practical terms, this means protecting domain and application logic from direct coupling to HTTP frameworks, database drivers, and broker clients.
+Implementation choices are driven by a Clean Architecture objective: keep business decisions stable while allowing infrastructure and framework details to evolve. In practical terms, this means protecting domain and application logic from direct coupling to HTTP frameworks, database drivers, and broker clients.
 
 The working rule across services is the dependency rule: dependencies point inward, while implementations of technical concerns stay outward. Repositories, event publishers, and external clients are modeled as ports in the inner layers and implemented as adapters in infrastructure.
-
-This perspective is applied consistently across Kotlin and Node.js services, with each runtime using its own tools only at the edges of the system.
 
 ## Layering Strategy
 
@@ -17,7 +12,7 @@ The implementation follows a practical layering model across runtimes:
 
 - API layer (interface adapters): HTTP routes/controllers and request validation.
 - Application layer (use cases): orchestration of workflows and domain rules.
-- Domain layer (enterprise rules): entities/value objects and service/repository contracts.
+- Domain layer (enterprise rules): entities/value objects and repository contracts.
 - Infrastructure layer (frameworks and drivers): DB adapters, Kafka adapters, external service clients.
 
 The diagram below summarizes dependency direction and the role of each layer.
@@ -62,9 +57,6 @@ fun Application.module() {
 }
 ```
 
-This keeps startup deterministic and makes dependencies visible at the edge.
-It also reflects the framework-on-the-edge principle: Ktor setup happens in bootstrap, while use cases and domain contracts remain framework-agnostic.
-
 The same explicit module wiring approach is also used in `documents-service`, where bootstrap assembles MongoDB, MinIO, AI client, Kafka consumers, and HTTP routes in a single startup flow.
 
 ### Node.js services (Express)
@@ -94,7 +86,6 @@ export function createApp(): Express {
 ```
 
 The same app-factory and startup orchestration pattern is reused in `master-data-service` for consistency.
-As in Kotlin services, Express is treated as an outer-layer concern: routing and middleware stay at the boundary, while domain operations are delegated inward.
 
 ## API, Application, Domain Flow
 
@@ -229,8 +220,6 @@ export class UserService {
 	}
 }
 ```
-
-This mirrors the same port-and-adapter shape in TypeScript: services consume domain contracts, while Mongoose repositories and Kafka publishers provide the infrastructure implementation.
 
 ## Event-Driven Integration (Kafka)
 
@@ -418,9 +407,6 @@ async softDelete(id: string): Promise<ServiceType | null> {
 }
 ```
 
-This aligns with the database-per-service principle while using data models tailored to each domain.
-At the same time, it preserves the Clean Architecture boundary between inner contracts and outer persistence technology.
-
 ## Documents and AI Service Integration
 
 In `documents-service`, an infrastructure HTTP client invokes the Python AI service:
@@ -461,59 +447,3 @@ async def analyze_document(request: AnalyzeRequest):
 				tags=metadata.tags,
 		)
 ```
-
-## Configuration and Local Orchestration
-
-Service configuration is environment-driven.
-
-A minimal configuration template is defined in `appointments-service/.env.example`:
-
-Source: `appointments-service/.env.example`.
-
-```env
-DATABASE_URL=
-DATABASE_USER=
-DATABASE_PASSWORD=
-KAFKA_BOOTSTRAP_SERVERS=
-KAFKA_TOPIC_USER_DELETED=
-KAFKA_TOPIC_FACILITY_DELETED=
-KAFKA_TOPIC_SERVICE_TYPE_DELETED=
-JWT_SECRET=
-APP_PORT=
-```
-
-In `documents-service/docker-compose.yml`, local composition includes MongoDB, MinIO, and AI service dependencies:
-
-Source: `documents-service/docker-compose.yml`.
-
-```yaml
-services:
-	documents-service:
-		environment:
-			- MONGO_CONNECTION_URI=mongodb://admin:password@mongodb:27017
-			- MINIO_ENDPOINT=http://minio:9000
-			- AI_SERVICE_HOST=ai-service
-			- AI_SERVICE_PORT=8000
-			- KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
-		depends_on:
-			mongodb:
-				condition: service_healthy
-			minio:
-				condition: service_healthy
-			ai-service:
-				condition: service_healthy
-```
-
-## Summary
-
-Nucleo implements microservices with a consistent layering approach across different runtimes:
-
-- Explicit bootstrap and dependency composition at startup.
-- Clear API -> application -> domain flow.
-- Framework on the edge: Ktor/Express/FastAPI concerns remain in outer layers.
-- Port-and-adapter boundaries for repositories, event producers, and external clients.
-- Dependency rule enforced through inward-facing contracts.
-- Infrastructure adapters for persistence and messaging.
-- Event-driven consistency through Kafka.
-- Isolated data ownership with technology-specific repositories.
-- Dedicated integration boundary for AI capabilities.

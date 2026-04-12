@@ -320,19 +320,6 @@ classDiagram
 
 ## Context Map
 
-The system uses asynchronous integration with Published Language event contracts. For deletion propagation, `Appointments` and `Documents` follow a **Conformist** relationship toward upstream `Users` and `Master Data` contracts.
-For notification flows, `Users` acts as the downstream consumer of Notification Events produced by `Users`, `Appointments`, and `Documents`. This keeps notification persistence and delivery centralized in one place, while each upstream service remains responsible for emitting events tied to its own domain actions.
-
-The currently implemented notification event types are:
-- Delegation created (upstream producer: `Users` service)
-- Medicine prescription created (upstream producer: `Documents` service)
-- Exam prescription created (upstream producer: `Documents` service)
-- Appointment scheduled (both from prescription and from scratch) (upstream producer: `Appointments` service)
-- Appointment rescheduled by patient (upstream producer: `Appointments` service)
-- Appointment rescheduled by doctor (upstream producer: `Appointments` service)
-- Appointment deleted (upstream producer: `Appointments` service)
-- Document uploaded (upstream producer: `Documents` service)
-
 ```mermaid
 %%{init: {'themeVariables': {'fontSize': '22px'}, 'flowchart': {'nodeSpacing': 60, 'rankSpacing': 90, 'curve': 'basis'}}}%%
 flowchart LR
@@ -363,6 +350,9 @@ flowchart LR
 
     style UBC stroke-dasharray: 6 4,stroke-width: 2px,fill: transparent;
 ```
+
+The system uses asynchronous integration with Published Language event contracts. For deletion propagation, `Appointments` and `Documents` follow a **Conformist** relationship toward upstream `Users` and `Master Data` contracts.
+For notification flows, `Users` acts as the downstream consumer of Notification Events produced by `Users`, `Appointments`, and `Documents`.
 
 ## Event Contracts
 

@@ -2,12 +2,6 @@
 
 This page describes the key architectural patterns adopted in Nucleo and why they were selected.
 
-The structure follows four viewpoints:
-
-- Communication patterns.
-- Deployment and observability patterns.
-- Security patterns.
-
 ## Communication Patterns
 
 ### API Gateway
@@ -64,21 +58,9 @@ flowchart TB
 
 All services are containerized and can run consistently across local and cluster environments.
 
-Main benefits in this project:
-
-- Reproducible runtime behavior.
-- Isolated service dependencies.
-- Better portability and independent scaling.
-
 ### Database per Service
 
 Each microservice owns its persistence boundary and does not allow direct data access from other services.
-
-Main benefits in this project:
-
-- Strong ownership of data and schema evolution.
-- Reduced accidental cross-service coupling.
-- Independent optimization of storage per domain.
 
 ```mermaid
 %%{init: {'themeVariables': {'fontSize': '16px'}}}%%
@@ -90,36 +72,9 @@ flowchart LR
 	AIS[ai-service] --> AIX[(AI Data / Vector Store)]
 ```
 
-### Externalized Configuration
-
-Services use environment-based and deployment-time configuration (for example with Docker, Compose, and Helm values) rather than hardcoded environment data.
-
-Main benefits in this project:
-
-- Clear separation between code and runtime configuration.
-- Easier promotion across environments.
-- More secure handling of operational parameters.
-
-### Health-check API
-
-Nucleo services expose health endpoints (for example `/health`) to support runtime checks in local and deployment environments.
-
-Main benefits in this project:
-
-- Faster detection of unhealthy instances.
-- Better operational reliability during deployments and service startup.
-
 ## Security Pattern
 
-### Access Token
-
 Nucleo secures API access using token-based authentication and authorization.
-
-Main benefits in this project:
-
-- Controlled access to protected resources.
-- Stateless verification suitable for distributed services.
-- Permission scoping and token lifecycle management.
 
 ```mermaid
 %%{init: {'themeVariables': {'fontSize': '16px'}}}%%
