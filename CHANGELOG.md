@@ -1,6 +1,23 @@
 ### Features
 
 
+- add authorization layer (ce45e1a)
+- publish delete data event (9fedb1c)
+- service in master data deleted topics (e62ea1c)
+
+### Other
+
+
+- chore: merge branch 'main' into dev (37d8c4b)
+- test: add exclusions to coverage for node services (9f37d0c)
+- chore: merge branch 'feat/notifications' into dev (1dc7d9f)
+- chore: add k8s and helm files to .prettierignore and remove helm-values readme (ce8e236)
+- chore: helm charts for microservices and databases (61e32d0)
+- chore: add kafka dependency to node services (1829e28)
+
+### Features
+
+
 - add authorization module (ca8066f)
 - add nginx configuration for notifications api (78dda5e)
 - notification routes and configurations (1726edb)
