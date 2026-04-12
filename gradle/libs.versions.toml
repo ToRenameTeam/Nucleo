@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.3.20"
 kotest = "6.1.11"
-testcontainers = "2.0.2"
+testcontainers = "2.0.4"
 ktfmt = "0.18.0"
 kover = "0.9.8"
 detekt = "2.0.0-alpha.2"
