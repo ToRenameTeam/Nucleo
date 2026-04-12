@@ -23,7 +23,7 @@
   },
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.28.1",
+  "packageManager": "pnpm@10.33.0",
   "lint-staged": {
     "*.{js,ts,json,css,vue}": [
       "prettier --write"
@@ -44,7 +44,7 @@
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "mermaid": "^11.14.0",
+    "mermaid": "^11.12.1",
     "prettier": "^3.8.1",
     "semantic-release": "^24.2.9",
     "tsx": "^4.21.0",
