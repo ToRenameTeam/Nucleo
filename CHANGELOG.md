@@ -1,6 +1,29 @@
 ### Features
 
 
+- add authorization layer (f4cd921)
+- publish notification event on user topic (5b1baf1)
+- delete user, facility and service type event consumer (7773a56)
+- service in master data deleted topics (e62ea1c)
+- set up consumer groups and user deleted topic (d8c17e7)
+
+### Fixes
+
+
+- align doctor availabilities with correct service types and specializations (2d36028)
+- exception handling (157d582)
+- format (85bf21c)
+
+### Other
+
+
+- chore: add k8s and helm files to .prettierignore and remove helm-values readme (ce8e236)
+- chore: helm charts for microservices and databases (61e32d0)
+- chore: rename ktor custom plugin to nucleo-services and add kafka client dependency (6e6b820)
+
+### Features
+
+
 - add access token to backend api calls (26d2dea)
 - filter service type for doctors specialization (baed27d)
 - refresh document page on document creation (d41332b)
