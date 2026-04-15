@@ -1,6 +1,6 @@
 services:
   api-gateway:
-    image: nginx:1.27-alpine
+    image: nginx:1.30-alpine
     container_name: nucleo-api-gateway
     ports:
       - '8088:80'

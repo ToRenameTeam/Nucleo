@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: nginx
-  tag: 1.27-alpine
+  tag: 1.30-alpine
   pullPolicy: IfNotPresent
 
 containerPort: 80
