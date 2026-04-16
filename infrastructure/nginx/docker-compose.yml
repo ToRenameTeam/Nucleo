@@ -10,7 +10,7 @@ services:
       - 'host.docker.internal:host-gateway'
     restart: unless-stopped
     healthcheck:
-      test: ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://localhost/health']
+      test: ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://localhost/plutopaperino']
       interval: 30s
       timeout: 5s
       retries: 3
