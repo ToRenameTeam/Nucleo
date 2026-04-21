@@ -2,7 +2,7 @@
 kotlin = "2.3.20"
 kotest = "6.1.11"
 testcontainers = "2.0.4"
-ktfmt = "0.18.0"
+ktfmt = "0.26.0"
 kover = "0.9.8"
 detekt = "2.0.0-alpha.2"
 ktor = "3.4.2"
